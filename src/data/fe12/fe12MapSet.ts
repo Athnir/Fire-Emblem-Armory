@@ -43,6 +43,14 @@ const SPLITS: [string, string, string][] = [
   ['fe12-p6', 'fe12-p6b', 'Prologue VI'],
   ['fe12-p7', 'fe12-p7b', 'Prologue VII'],
 ]
+/** Each split's question, in the game's words (the translation patch's English of the message its Ending's DialogYesNo follows:
+ * MS203_ED2, MS205_ED3 and MS206_ED2, the Avatar's name Kris); Yes sets Ｂに行く and plays the next chapter's second version. The
+ * Roster asks the same (its build-fe12-units.py). */
+const QUESTIONS = [
+  "At the end of Prologue III, Jagen asks: \"Don't tell me you're still in the dark about Prince Marth's method of fighting during the War of Shadows?\"",
+  'At the end of Prologue V, Katarina asks: "What\'s the matter, Kris? Is there something bothering you?"',
+  'At the end of Prologue VI, Katarina asks: "Um, what about you, Kris? Do you, perhaps, feel the same as I...?"',
+]
 const SPLIT_IDS = new Set(SPLITS.flatMap(([a, b]) => [a, b]))
 const firstOf = (id: string) => STORY_MAPS.findIndex((m) => m.id === id)
 const AFTER = [pick(['fe12-p5']), [], STORY_MAPS.slice(firstOf('fe12-p8')).filter((m) => !SPLIT_IDS.has(m.id))]
@@ -69,7 +77,7 @@ function fork(before: ChapterMap[], k: number): StoryFork {
       ...(last ? {} : { fork: fork(maps, k + 1) }),
     }
   }
-  return { before: upToSplit(before), choices: [choice(yes, 'Yes'), choice(no, 'No')] }
+  return { before: upToSplit(before), question: QUESTIONS[k], choices: [choice(yes, 'Yes'), choice(no, 'No')] }
 }
 
 /** New Mystery of the Emblem as the spoiler block walks it: the prologue's three answers, each picking a version of a chapter. */

@@ -27,6 +27,9 @@ export interface StoryOrder {
 export interface StoryFork {
   before: StoryOrder
   choices: ForkChoice[]
+  /** What the bar asks at the split where the game asks it in its own words (New Mystery's prologue questions); without it, the
+   * story's split ("The story splits here: pick the route you're playing to carry on."). */
+  question?: string
 }
 
 /** One way a story splits: the route's own story, and any split further down it. */

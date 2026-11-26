@@ -16,10 +16,12 @@ match but the first 8 MB window, because the patch was made from a dump whose se
 2DA8A814). The text is read through the patched file table: its `m/` files (Awakening's label -> string container, as the game's own),
 by the game's labels: MPID_ people (a named person's is MPID_ + its PID's tail, or its face's: PID_WOLEN's face FID_WOLLEN, Warren),
 MJID_ classes, MIID_ items, MS_TER_ terrain, MCT chapter titles. The patch packs long names by putting a narrow-spacing code (0x88, a
-Shift-JIS lead byte with no character under 0x889F) between their letters; it's dropped. Nothing patched is written.
+Shift-JIS lead byte with no character under 0x889F) between their letters; it's dropped, and so is its other spacing code, 0x89 before
+a byte under 0x40 (no character there either), which three unused strings and "Cecille's Sword" (MIID_CECILSWORD: 89 20 before the
+space) use. Nothing patched is written.
 
-The patch mostly uses Shadow Dragon's official names (208 of the shared names are the same). The Avatar is "Avatar" on the maps, as
-Awakening's are (the patch's default name is Chris). The modes are the patch's: Normal, Hard, Maniac, Lunatic, Reverse Lunatic.
+The patch mostly uses Shadow Dragon's official names (208 of the shared names are the same). The Avatar is Kris on the maps, the
+game's default name (クリス; the patch's is Chris). The modes are the patch's: Normal, Hard, Maniac, Lunatic, Reverse Lunatic.
 
 ## Containers and tables (`scripts/fe12_data.py`)
 
@@ -55,8 +57,9 @@ forge slots). Shadow Dragon's layouts where the tables match (`data-raw/fe11/REA
 
 ## Maps (`scripts/build-fe12-maps.py`)
 
-- **The story**: Prologue I-VIII (bmap201-208; the answer at the end of III, V and VI, a Yes or No to Katarina, picks the next
-  chapter's version: Yes sets Ｂに行く and ChapterNext loads bmap204B, 206B or 207B, which share their chapter's grid and placements,
+- **The story**: Prologue I-VIII (bmap201-208; the answer at the end of III, V and VI, a Yes or No to Jagen's question and then
+  Katarina's (the message each Ending's DialogYesNo follows, MS203_ED2, MS205_ED3, MS206_ED2: the bar asks it in their words,
+  `fe12MapSet.ts`), picks the next chapter's version: Yes sets Ｂに行く and ChapterNext loads bmap204B, 206B or 207B, which share their chapter's grid and placements,
   MapTableData +4, with scripts of their own), Chapters 1-23 (bmap001-023) with the gaiden chapters 3x, 6x, 10x, 13x, 16x and 20x
   (bmap103-120), and the Endgame (bmap024). Chapter 20's ChapterNext goes on (to 20x, or to 21) only once the Binding Shield is
   completed (封印の盾完成: the Fire Emblem with all five orbs, MS020_ED1_A_04), else it calls BadEnd and the game ends. Outside it: the
@@ -71,12 +74,32 @@ forge slots). Shadow Dragon's layouts where the tables match (`data-raw/fe11/REA
   +0x40-+0x4c their parameters. A record's mode gate (+0x2c, overlay 00 0x2205b5c): 0x400 Hard and up, 0x800 Maniac and up, 0x1000
   Lunatic, 0x2000 below Hard, 0x4000 below Maniac, 0x8000 below Lunatic; an item slot's flags (0x204c544): 0x01 drops, 0x04-0x80 the
   same gates, 0x100 never changed by the modes.
+- **Joins** (`creates()`, `join()`): a record of yours with flag 0x80 brings its unit into your army where it's placed (overlay 00
+  0x2205b5c: with none of 0x20e it takes the person from the army if they're in it, else back from those who left, force 6, else
+  makes them; arm9 0x204ccf4 gives one who comes back the record's items, new copies). A deployment slot (0x04) of a unit joining
+  there has 0x80 too (Ryan's in Prologue II, Arran's in Chapter 1); one of a unit you have doesn't. Where the opening places it (or
+  turn 1's player phase, before you move: Prologue VI's Cecille) it's on the map, yours, its gear yours from that chapter (`kit`);
+  where a later turn does (Prologue V's Merric, Chapter 6's Frey and Norne) it's a joiner, and where the Ending does (Chapter 10's
+  Dice and Maris, Chapter 17's Frost, under the checks before it: Chapter 21's Michalis) its gear counts from the next chapter; a
+  scene's actors (e/ev/ed/op groups) and the units the same handler takes off again (Chapter 20's Nyna, Elice, Maria and Lena) don't
+  join. The army is followed down each way through the prologue's answers: each version of a chapter counts its own joins, Prologue
+  VIII's ChapterNext sends away everyone but the eight its function names (UnitCheckPID: Marth, Kris, Cecille, Luke, Rody, Ryan,
+  Gordin and Draug; UnitTransferDefection, their items to the convoy, arm9 0x2058608), so who comes back later (Merric in Chapter
+  10, Ogma in 4, Cain in 8, Athena in 13x, Est in 15) brings new copies, and Chapter 1's deployment brings in Gordin or Draug where
+  the answers left him out (said with the answer). A talk's recruit among the starting foes says so on the unit before the stand-ins
+  copy it (Jeorge, Astram, Sedgar, Wolf). The Archanean Chronicles' and the downloadable chapters' casts are their own and nothing
+  comes back from them (no ChapterNext, the convoy off): their units' gear is no source, as Path of Radiance's trial maps keep nothing.
 - **Scripts**: Shadow Dragon's bytecode (`scripts/fe11_cmb.py`), with opcodes it never used (a switch's 0x44 dup and 0x3b jump if true,
   0x1f, 0x43 increment, 0x21 / 0x24 / 0x26 arithmetic, 0x33 >). Handler types: 0x03 and 0x17 a turn, 0x04 an area, 0x06 a tutorial
   step, 0x08 a talk, 0x09 a battle talk, 0x0b a death (startup.cmb's for Marth and the Avatar set gf_gameover), 0x18 a hidden treasure
   (an area where the unit that finds it gets its item: Chapter 11's desert holds ten). Terrain scripts' tile kinds: 5 a door, 6 a chest,
   7 and 8 a drawbridge, 9 a village, 10 a house, 11 an armory, 12 a vendor, 13 a secret shop (a VIP Card; every item a limited stock,
-  GoodsLimit, as many as the chapter's RegistLocalFlags sets), 15 the tile to seize. The battle preparations' armory (overlay 10
+  GoodsLimit, as many as the chapter's RegistLocalFlags sets), 15 the tile to seize. Only Marth visits a village, as in Shadow Dragon:
+  the Visit command (overlay 00 0x21ec9e0) offers a village only to a unit with attribute 0x02 (the test, arm9 0x204f84c: the person's,
+  the unit's and the class's attributes), which only Marth's person record has, read through the unit a link stands for (+0x98 while
+  +0x94 has 0x48000, arm9 0x204a608; not traced further), and a house to anyone; but where MapBegin calls SetGameMode(2) (the Archanean
+  Chronicles and the downloadable chapters) it sets the global flag 0x4000000 (arm9 0x205986c), and any unit visits (0x21eca20). The
+  village handlers don't check the visitor. The battle preparations' armory (overlay 10
   0x22304f0) sells the Iron Sword, Lance, Axe and Bow, Fire and Heal wherever MapTableData +0x18 has 0x04 (Chapter 1 on), and the stat
   boosters after a Lunatic clear.
 - **The scenes** (`play()`): Shadow Dragon's, played once per mode: a check of the difficulty (GetHard(): the save's 0 Normal, 3 Hard, 4

@@ -11945,7 +11945,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-dlc19",
       "kind": "dlc-gift-later",
-      "text": "Given at the end of the chapter"
+      "text": "Given at the end of the chapter, if you take the secret battles, offered when the first battle is won by turn 2, and win them all without quitting"
     },
     {
       "mapId": "fe13-prologue",

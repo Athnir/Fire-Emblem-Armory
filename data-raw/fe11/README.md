@@ -110,7 +110,9 @@ loaded at 0x02000000) and its overlays (`overlay/<id>_<load address>.bin`). Only
   one arrival; an arrival made of others' groups (the Endgame's turns 15 and 20) adds its turns to theirs.
 - **Tiles** (`script/<chapter>_ter.cmb`): handlers (x, y, kind): 5 a door, 6 a chest (TreasureGet), 7 a drawbridge, 8 a village
   (ItemGet, MoneyGet, or a recruit walking out), 9 a house, 10 an armory and 11 a vendor (Goods; GoodsLimit a limited stock), 12 the
-  secret shop (a VIP Card), 14 the tile to seize, 19 Prologue IV's decoy fort. A limited stock (GoodsLimit(item, value)) sells as many
+  secret shop (a VIP Card), 14 the tile to seize, 19 Prologue IV's decoy fort. Only Marth visits a village: the Visit command (overlay
+  00 0x21c112c) offers a village only to a unit with attribute 0x02 (the test, arm9 0x203c810), which only Marth's placements carry
+  (+0x0c), and a house to anyone; the village handlers don't check the visitor. A limited stock (GoodsLimit(item, value)) sells as many
   as the chapter's script sets that value to (ValueRegistSet: one Rapier or Wing Spear, three of each of the secret shops' and
   Chapter 24's Wyrmslayers, Dragonpikes and Master Seals): the line says how many and the weapon page marks it "limited".
 - **Map changes** (`changes_of`): the scripts' tile natives (arm9 0x2046e50) set a tile's state: TTEnable 0, TTDone 1, TTDestroy 2;

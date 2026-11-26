@@ -102,7 +102,9 @@ export function SpoilerBar({
           {!next && !choosing && game.afterStory && ` ${game.afterStory} are open now.`}
         </p>
       )}
-      {choosing && <p className="text-neutral-400">The story splits here: pick the route you're playing to carry on.</p>}
+      {choosing && (
+        <p className="text-neutral-400">{walked!.pending!.question ?? "The story splits here: pick the route you're playing to carry on."}</p>
+      )}
     </section>
   )
 }

@@ -348,15 +348,30 @@ describe("Awakening's maps", () => {
       'Recruit: joins on reaching Holland and talking (Holland then leaves the map); Talk with Chrom or Cordelia (a conversation)',
     )
     expect(unit('fe13-par10', 'Severa').note).toContain('Turns against you if Holland falls before Severa reaches Holland.')
+    // Her one-off mind routine (AI_MI_X010Serena) is AI_MI_Talk's command on Holland, run until she turns hostile.
+    expect(unit('fe13-par10', 'Severa').note).toContain('Goes to Holland to talk.')
     expect(unit('fe13-par18', 'Gangrel').talk).toBe('Recruit: talk with Chrom three times, one talk a turn')
     expect(unit('fe13-par15', 'Noire').note).toContain('Joins your army at the start of turn 2 (player phase), with a Steel Bow.')
     expect(unit('fe13-par17', 'Tiki').note).toContain('Joins your army after the battle if alive.')
     expect(map('fe13-par14').objects.find((o) => o.tile[0] === 5 && o.tile[1] === 3)).toMatchObject({
       note: 'Visited by Chrom or Miriel, Laurent joins your army. It turns to desert once visited.',
     })
-    // A DLC map's reward join (ev::CompleteJoin), by the DLC's own name for it.
+    // A DLC map's reward join (ev::CompleteJoin), by the DLC's own name for it, and the flags its end checks first: Roster Rescue's
+    // ゾンビ離脱 (its exit areas), Five-Anna Firefight's 商人死亡 (the Annas' deaths), Death's Embrace's ボス撤退 (turn 10 takes Algol off the
+    // map), Apotheosis' 途中棄権 and 裏面 (quitting, and the secret battles, which give the Supreme Emblem instead).
     expect(map('fe13-dlc1').notes).toContain('Clearing it adds Pr. Marth to your army.')
-    expect(map('fe13-dlc16').notes).toContain('Clearing it adds Palla to your army.')
+    expect(map('fe13-dlc16').notes).toContain('Clearing it adds Palla to your army if none of the seven Revenants escapes.')
+    expect(map('fe13-dlc17').notes).toContain('Clearing it adds Catria to your army if none of the five Annas falls.')
+    expect(map('fe13-dlc18').notes).toContain(
+      'Clearing it adds Est to your army if Algol is defeated before the enemy phase of turn 10, when he leaves the map.',
+    )
+    expect(map('fe13-dlc19').notes).toContain(
+      'Clearing it adds Katarina to your army if you win all five normal battles without quitting (the secret battles, offered when the first battle is won by turn 2, give the Supreme Emblem instead).',
+    )
+    expect(unit('fe13-dlc18', 'Algol').note).toContain('Leaves the map at the start of turn 10 (enemy phase) if still alive.')
+    expect(FE13_ITEM_SOURCES['Supreme Emblem'].find((s) => s.mapId === 'fe13-dlc19')!.text).toBe(
+      'Given at the end of the chapter, if you take the secret battles, offered when the first battle is won by turn 2, and win them all without quitting',
+    )
   })
 
   it("says what a choice of offers does to the armies, what it brings, and the gold the end gives by it", () => {

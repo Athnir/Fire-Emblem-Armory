@@ -437,7 +437,9 @@ def ai_behaviour(src, u, h):
                True, None, target or 'any', None)
     elif u['team'] == 2 and mv == 'AI_MV_Position' and tile(0):
         out = (f'heads for {at_(tile(0))}', False, [tile(0)], None, None)
-    elif u['team'] == 2 and mi == 'AI_MI_Talk' and mi_p:
+    elif u['team'] == 2 and mi in ('AI_MI_Talk', 'AI_MI_X010Serena') and mi_p:
+        # Paralogue 10's Severa: her one-off mind routine is AI_MI_Talk's command (0x3c) on Holland, run while her AI state is 0, until
+        # she turns hostile (data/AIData.bin; the runner, 0x272990).
         out = (f'goes to {unit_name(src, mi_p)} to talk', False, None, None, None)
     elif mv == 'AI_MV_Person' and mv_p:
         out = (f'goes for {who(mv_p)}', False, None, None, 'person' if at == 'AI_AT_Person' else None)
@@ -1154,6 +1156,12 @@ def build_map(key, facts=None):
                 notes_on[pid].append(f'Joins your army at the start of {when_text(hd)}' + (f", with {', '.join(gives)}." if gives else '.'))
             elif army == 1 and hd['k'] == E.AREA and len(hd['args']) > 5 and TURN_CONDITIONS.get(ch.string(hd['args'][5])):
                 notes_on[pid].append(f'Turns against you {TURN_CONDITIONS[ch.string(hd["args"][5])]}.')
+    # A unit a later turn takes off the map while it's alive (UnitIsAlive, then UnitExpulsionByIndex: Death's Embrace's Algol warps out
+    # on turn 10's enemy phase, setting the flag its end checks before Est joins).
+    for hd in ch.of_kind(E.TURN, E.TURN2):
+        if hd['args'][0] > 1 and ch.calls(hd, 'ev::UnitIsAlive'):
+            for pid in E.removed_pids(ch, hd):
+                notes_on[pid].append(f'Leaves the map at the start of {when_text(hd)} if still alive.')
     for e in units + joiners + [u for g in reinforcements for u in g['units']]:
         pid = e.get('_pid')
         if pid in talks:
@@ -1303,16 +1311,22 @@ def build_map(key, facts=None):
         gold = gold_rewards(ch, hd, src, h)
         if gold:
             m['notes'].append(f"Clearing it gives {'; '.join(gold)}.")
-    # A DLC map's reward: who clearing it adds to your army (ev::CompleteJoin, in its end scene).
+    # A DLC map's reward: who clearing it adds to your army (ev::CompleteJoin, in its end scene), under the checks its end makes first
+    # (end_guards: Roster Rescue's Palla only if no Revenant escapes...).
     for hd in ch.hs:
-        for args in ch.calls(hd, 'ev::CompleteJoin'):
-            if args and args[0]:
+        for pc, n, a in hd['ins']:
+            if not (n == 'call' and a.split('/')[0] == 'ev::CompleteJoin'):
+                continue
+            k = next(j for j, x in enumerate(hd['ins']) if x[0] == pc)
+            arg = hd['ins'][k - 1][2].strip("'") if hd['ins'][k - 1][1] == 'str' else None
+            if arg:
                 # The DLC's own name for its reward (MID_DLC_名前_<name>), else its hero's (its person file, then its text's MPID_配信 /
                 # 予約 / plain labels), else the game's.
-                pid = f'PID_{key}_{args[0]}'
-                name = src.text.get(f'MID_DLC_名前_{args[0]}') or (unit_name(src, pid) if pid in src.persons else None) or next(
-                    (n for n in (src.name(f'MPID_{p}{args[0]}') for p in ('配信', '予約', '')) if n), None) or unit_name(src, 'PID_' + args[0])
-                m['notes'].append(f'Clearing it adds {name} to your army.')
+                pid = f'PID_{key}_{arg}'
+                name = src.text.get(f'MID_DLC_名前_{arg}') or (unit_name(src, pid) if pid in src.persons else None) or next(
+                    (n_ for n_ in (src.name(f'MPID_{p}{arg}') for p in ('配信', '予約', '')) if n_), None) or unit_name(src, 'PID_' + arg)
+                cond = dlc_end_words(ch, end_guards(ch, hd, pc))
+                m['notes'].append(f'Clearing it adds {name} to your army' + (f' if {cond}.' if cond else '.'))
     if any('schedule' in json.dumps(g['when']) for g in m.get('reinforcements', [])):
         m.setdefault('unconfirmed', []).append("Which turns each sigil's foes come on: the script's schedule isn't decoded.")
     if key == 'X016':
@@ -1581,6 +1595,80 @@ def ins_str(x):
 POST = 0x0b  # the post-battle handler (ChapterSetNextIncrement): with 0x0a, the chapter's end
 
 
+def flag_guards(hd, pc):
+    """[(flag, must be set)]: the flags a handler checks before the instruction at pc, from each FlagGet(f), a not (?32) or none,
+    then jz T: the code from the jz to T runs on the flag's one value, and an else, from T to where the if's last jmp goes, on the
+    other."""
+    ins = hd['ins']
+    at = {p: j for j, (p, _, _) in enumerate(ins)}
+    out = []
+    for k, (p, n, a) in enumerate(ins):
+        if not (n == 'call' and a.startswith('ev::FlagGet/') and k and ins[k - 1][1] == 'str'):
+            continue
+        j = k + 1
+        on = True
+        if j < len(ins) and ins[j][1] == '?32':
+            on, j = False, j + 1
+        if j >= len(ins) or ins[j][1] != 'jz':
+            continue
+        start, target = ins[j][0], ins[j][2]
+        if start < pc < target:
+            out.append((ins[k - 1][2].strip("'"), on))
+            continue
+        t = at.get(target)
+        if t and ins[t - 1][1] == 'jmp' and ins[t - 1][2] > target and target <= pc < ins[t - 1][2]:
+            out.append((ins[k - 1][2].strip("'"), not on))
+    return out
+
+
+def end_guards(ch, hd, pc):
+    """The flags a map's end checks before the instruction at pc: in an end handler (0x0a, 0x0b), those around it; in a scene function
+    an end handler calls (gvar n: Roster Rescue's E016_ED_CARD, its recruit's), those around the call, then its own."""
+    if hd['k'] in (E.END, POST):
+        return flag_guards(hd, pc)
+    out = []
+    for h2 in ch.hs:
+        if h2['k'] in (E.END, POST):
+            for p2, n, a in h2['ins']:
+                if n == 'gvar' and int(a, 16) == hd['index']:
+                    out += flag_guards(h2, p2)
+    return out + flag_guards(hd, pc)
+
+
+# The flags the Path of a Grandmaster maps' ends check before their reward, in words, from what sets each in its script: Roster Rescue's
+# exit areas set ゾンビ離脱 when one of its seven Revenants escapes (MindIsEscape); Five-Anna Firefight's Annas' deaths set 商人死亡; Death's
+# Embrace's turn 10, enemy phase, takes Algol off the map while he lives and sets ボス撤退; Apotheosis' 途中棄権 is a yes to "Would you like
+# to quit now?" after a win, and 裏面 a yes to the secret battles, offered when its first battle is won by turn 2 (its last waves' turn
+# limits, run out, set 途中棄権 too). Checked against each script in dlc_end_words().
+END_FLAGS = {
+    ('ゾンビ離脱', False): 'none of the seven Revenants escapes',
+    ('商人死亡', False): 'none of the five Annas falls',
+    ('ボス撤退', False): 'Algol is defeated before the enemy phase of turn 10, when he leaves the map',
+}
+SECRET = {False: 'you win all five normal battles without quitting (the secret battles, offered when the first battle is won by turn '
+                 '2, give the Supreme Emblem instead)',
+          True: 'you take the secret battles, offered when the first battle is won by turn 2, and win them all without quitting'}
+END_FLAG_NAMES = {f for f, _ in END_FLAGS} | {'途中棄権', '裏面'}
+
+
+def dlc_end_words(ch, guards):
+    """The end's checks before a DLC map's reward in words ('none of the five Annas falls'), each flag checked against what sets it in
+    the map's script; None where there are none."""
+    if not guards:
+        return None
+    g = dict(guards)
+    sets = {f: [hd for hd in ch.hs if f in E.flags_set(hd)] for f in g}
+    if '裏面' in g:
+        assert g == {'途中棄権': False, '裏面': g['裏面']}, guards
+        return SECRET[g['裏面']]
+    for f in g:
+        kinds = [hd['k'] for hd in sets[f]]
+        assert {'ゾンビ離脱': E.AREA, '商人死亡': E.DEATH, 'ボス撤退': E.TURN}[f] in kinds, (f, kinds)
+    assert len([hd for hd in sets.get('商人死亡', []) if hd['k'] == E.DEATH]) in (0, 5)
+    assert all(hd['args'][:3] == (10, 10, 1) for hd in sets.get('ボス撤退', []) if hd['k'] == E.TURN)
+    return ' and '.join(END_FLAGS[(f, on)] for f, on in guards)
+
+
 def gift_conditions(ch, hd, src):
     """{iid: words} for the gifts a handler gives only on a condition: each gift is under the checks whose jump (jz) it sits inside, a
     count at or above a number (the green units left, VariableGet('緑軍生存数'); a PID's units left, ForceUnitGetCountPID; a unit's
@@ -1630,6 +1718,10 @@ def gift_conditions(ch, hd, src):
                     clauses.append(f'{n_} or more {who.lower()}s survive')
             clauses = [f'{x} is alive' for x in dict.fromkeys(alive)] + clauses
             words = [f"if {' and '.join(clauses)}"] if clauses else []
+            # A Path of a Grandmaster map's end flags (Apotheosis' Supreme Emblem: the secret battles won without quitting).
+            flags = [x for x in end_guards(ch, hd, pc) if x[0] in END_FLAG_NAMES]
+            if flags:
+                words.insert(0, f'if {dlc_end_words(ch, flags)}')
             if ins[k - 2][1] == 'var' and ins[k - 2][2] in var_pid:
                 words.append(f'to {unit_name(src, var_pid[ins[k - 2][2]])}')
             out[ins[k - 1][2].strip("'")] = ', '.join(words)

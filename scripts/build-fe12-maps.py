@@ -212,8 +212,8 @@ def play(ch, handlers, mode=None):
     placed = []
 
     def find(ref):
-        if not ref:
-            return None
+        if not isinstance(ref, tuple) or len(ref) != 2:
+            return None   # a unit the scene got some other way (an Ending's loops over an army)
         kind, v = ref
         for i in range(len(placed) - 1, -1, -1):
             g, u, at, _ = placed[i]
@@ -323,6 +323,42 @@ def play(ch, handlers, mode=None):
 
 def groups_placed(s, h):
     return [a[0] for fn, a in s.calls(h) if fn.startswith('Dispos') and fn not in ('DisposWait',) and a and isinstance(a[0], str)]
+
+
+# A placement of yours that brings a unit into your army (overlay 00 0x2205b5c): a record with flag 0x80 and none of 0x20e takes the
+# person from your army if they're in it, else back from those who left it (force 6), else makes them; arm9 0x204ccf4 gives a unit
+# that comes back the record's five items (new copies). A deployment slot (0x04, one of 0x20e) of a unit joining there has 0x80 too
+# (Ryan's in Prologue II, Arran's in Chapter 1), one of a unit you have already doesn't.
+CREATE, PLACE_ONLY = 0x80, 0x20e
+# Groups that are a scene's actors, placed for a moment and taken off again: e01, ev01, ed01, op01.
+SCENE_GROUP = re.compile(r'(e|ev|ed|op)\d')
+
+
+def creates(u):
+    return u['team'] == 0 and bool(u['flags'] & CREATE) and not u['flags'] & PLACE_ONLY
+
+
+def stay_after_prologue():
+    """The units Prologue VIII's end keeps: its ChapterNext sends every other unit of your army away (UnitTransferDefection, its items to
+    the convoy, arm9 0x2058608), but those the function it asks names (UnitCheckPID: Marth, Kris, Cecille, Luke, Rody, Ryan, Gordin and
+    Draug)."""
+    s = script('bmap208')
+    h = named(s, 'ChapterNext')
+    assert any(fn == 'UnitTransferDefection' for fn, _ in s.calls(h))
+    asked = [s.handlers()[v] for _, op, v in s.disasm(h) if op == 'gosub']
+    keep = {a[1] for f in asked for fn, a in s.calls(f) if fn == 'UnitCheckPID' and len(a) > 1 and isinstance(a[1], str)}
+    assert len(keep) == 8 and 'PID_MARS' in keep, keep
+    return keep
+
+
+def visitor(ch):
+    """Who can visit a village: the Visit command (overlay 00 0x21ec9e0) offers one (tile kind 9) only to a unit with attribute 0x02
+    (the test, arm9 0x204f84c), which only Marth has, and a house (kind 10) to anyone; but on a map whose MapBegin calls SetGameMode(2)
+    (the Archanean Chronicles and the downloadable chapters: it sets the global flag 0x4000000, arm9 0x205986c, which the check reads at
+    0x21eca20) any unit visits a village."""
+    begin = named(ch.s, 'MapBegin')
+    free = begin and any(fn == 'SetGameMode' and a == [2] for fn, a in ch.s.calls(begin))
+    return 'a unit' if free else 'Marth'
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -1347,6 +1383,42 @@ def ending_of(ch):
     return joins, gifts
 
 
+def end_guard_words(ch, conds):
+    """The checks an Ending makes before it places a join, in words, from what sets each flag (Chapter 21: Michalis only if Minerva
+    reached the village by turn 15 while it was unvisited, and it was then visited): a village's visit (the terrain script's tile), or
+    an area whose condition function asks for a person (UnitCheckPID), its village still unvisited (TTIsEnable) and a turn (GetTurn()
+    over it ends it). '' where there are none."""
+    visits, stops = [], []
+    for c in conds:
+        assert c[0] == 'flag' and c[2], (ch.key, c)
+        flag = c[1]
+        for h in ch.ter.handlers() if ch.ter else []:
+            if len(h['args']) > 2 and h['args'][2] == VILLAGE and ('FlagSet', [flag]) in ch.ter.calls(h):
+                visits.append(tuple(ch.app(h['args'][:2])))
+        for h in ch.s.handlers():
+            if trigger(ch.s, h) == AREA and ('FlagSet', [flag]) in ch.s.calls(h):
+                f = named(ch.s, ch.s.string(h['args'][5]))
+                calls = dict(ch.s.calls(f))
+                ops = ch.s.disasm(f)
+                turn = next(ops[k + 1][2] for k, (_, op, v) in enumerate(ops) if op == 'call' and v[0] == 'GetTurn')
+                assert ops[[k for k, (_, op, v) in enumerate(ops) if op == 'call' and v[0] == 'GetTurn'][0] + 2][1] == 'op33', ch.key
+                assert calls['TTIsEnable'][2] == VILLAGE and tuple(h['args'][:2]) == tuple(calls['TTIsEnable'][:2]), ch.key
+                stops.append((person_name(calls['UnitCheckPID'][1]), tuple(ch.app(h['args'][:2])), turn))
+    said = len(visits) + len(stops)
+    assert said == len(conds), (ch.key, conds)
+    if not conds:
+        return ''
+    words = []
+    for who, (x, y), turn in stops:
+        then = (x, y) in visits
+        words.append(f'{who} stops on the village at ({x}, {y}) by turn {turn}, before it is visited' +
+                     (f', and {visitor(ch)} then visits it' if then else ''))
+        if then:
+            visits.remove((x, y))
+    words += [f'{visitor(ch)} visits the village at ({x}, {y})' for x, y in visits]
+    return ' (if ' + ' and '.join(words) + ')'
+
+
 def tid(label):
     """The terrain id with a name label (its first: the lord's own variants come after)."""
     return next(i for i, row in enumerate(TERRAIN) if row[0] == label)
@@ -1603,6 +1675,11 @@ def main():
     def source(iid, mid, kind, text, ds=None, limited=None):
         if iid.endswith('_FALSE'):
             return  # a double's false copy is never yours
+        if mid.startswith(('fe12-ac', 'fe12-dl')) and kind in ('kit', 'kit-later'):
+            # The Archanean Chronicles and the downloadable chapters have casts of their own (the Chronicles' PID_TR_ people; the
+            # downloadable chapters' made afresh, SetGameMode(2), the convoy off) and hand nothing back to the story (no ChapterNext):
+            # what their units carry is never yours, as nothing on Path of Radiance's trial maps is.
+            return
         name = item_name(iid)
         # The downloadable chapters' sources sit behind the weapon page's DLC switch.
         if mid.startswith('fe12-dl'):
@@ -1612,21 +1689,47 @@ def main():
             sources[name].append(e)
         held.setdefault((name, mid, kind, text), set()).update(ds or MODES)
 
-    # Who has joined: every mode plays the prologue.
-    joined = set()
+    # Who is in your army as each chapter is played (every mode plays the prologue), on each way through the prologue's three
+    # questions (each answer plays the next chapter's own version, SECOND): a unit joins, its record's items new copies, where a
+    # placement brings it in while it isn't in the army that way (creates()). Prologue VIII's end sends away all but the units it keeps
+    # (stay_after_prologue()); the ways meet again once Chapter 1's deployment has brought in the units the prologue left out.
+    stay = stay_after_prologue()
+    firsts = {b: a for a, b in SECOND.items()}
+    worlds = [{'picks': {}, 'army': set()}]
+    here = worlds
+
+    def asked(split):
+        """'Prologue III' for the question whose answer picks the version of `split` (bmap204: the end of Prologue III)."""
+        return f'Prologue {["I", "II", "III", "IV", "V", "VI", "VII"][PROLOGUE.index(split) - 1]}'
 
     def join(who, key):
-        """The modes on which a unit joining in this chapter joins for the first time ([]: it has joined before)."""
-        if who in joined:
-            return []
-        joined.add(who)
-        return list(MODES)
+        """(the modes, ' (if ...)'): the modes on which a unit placed in this chapter joins your army ([] where it's in the army already
+        on every way here), and the answer it needs where it joins on some ways only (Chapter 1's Gordin: where Athena came instead)."""
+        absent = [w for w in here if who not in w['army']]
+        for w in absent:
+            w['army'].add(who)
+        if not absent:
+            return [], ''
+        if len(absent) == len(here):
+            return list(MODES), ''
+        others = [w for w in here if w not in absent]
+        words = []
+        for split in SECOND:
+            mine, theirs = {w['picks'].get(split) for w in absent}, {w['picks'].get(split) for w in others}
+            if len(mine) == 1 and None not in mine and not mine & theirs:
+                words.append(f'the answer at the end of {asked(split)} was {mine.pop()}')
+        assert words, (who, key)
+        return list(MODES), ' (if ' + ' and '.join(words) + ')'
 
     for key in story:
         ch = Chapter(key)
         title = titles[key]
         route = 'Story'
-        firsts = {b: a for a, b in SECOND.items()}
+        if key in SECOND:
+            # The question at the end of the chapter before: No plays this version, Yes its second (Ｂに行く, data-raw/fe12/README.md).
+            worlds = [{'picks': {**w['picks'], key: answer}, 'army': set(w['army'])} for w in worlds for answer in ('No', 'Yes')]
+        here = ([w for w in worlds if w['picks'].get(key) == 'No'] if key in SECOND else
+                [w for w in worlds if w['picks'].get(firsts[key]) == 'Yes'] if key in firsts else worlds)
         if key in PROLOGUE or key in firsts:
             n = PROLOGUE.index(firsts.get(key, key)) + 1
             mid, chapter, heading = f'fe12-p{n}' + ('b' if key in firsts else ''), n, 'Prologue'
@@ -1694,10 +1797,10 @@ def main():
                 if pid in end_joins and pid not in join_later:
                     e['note'] += '. ' + end_joins[pid]
                     e['note'] = e['note'].replace('..', '.')
-            ds = join(pid, key)
+            ds, cond = join(pid, key)
             for iid, *_ in u['items'] if ds else []:
                 if iid not in talk_takes.get(pid, ()):
-                    source(iid, mid, 'kit-later', f"Carried by {unit_name(u)} on joining", ds)
+                    source(iid, mid, 'kit-later', f"Carried by {unit_name(u)} on joining{cond}", ds)
             return True
         boss_pids = set(boss_dead)
         real, doubles = {}, set()
@@ -1725,10 +1828,15 @@ def main():
             u = {**u, 'at': at}
             when = '; '.join(('if ' if on else 'unless ') + FLAG_WORDS.get(flag, flag) for flag, on in conds)
             if not g.startswith('mikata') and u['team'] == 0 and u['person']['pid'] in ('PID_MARS', AVATAR) and ch.inside(u['at']):
-                # Marth or Kris left standing by the opening's scene (Prologue I's Kris is its scene's e02): yours to move.
+                # Marth or Kris left standing by the opening's scene (Prologue I's Kris is its scene's e02): yours to move, and where
+                # the record makes them (0x80), with its items.
                 m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(u['at'])})
                 if u['person']['pid'] == AVATAR and 'corrinStart' not in m:
                     m['corrinStart'] = ch.app(u['at'])
+                if u['flags'] & CREATE:
+                    ds, cond = join(u['person']['pid'], key)
+                    for iid, *_ in u['items'] if ds else []:
+                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining{cond}", ds)
                 continue
             if g.startswith('mikata'):
                 if not ch.inside(u['at']):
@@ -1745,12 +1853,23 @@ def main():
                     alternatives.setdefault(tuple(u['at']), []).append((conds[0][1], unit_name(u), conds[0][0]))
                 else:
                     m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(u['at'])})
-                # A unit's items are a source where it first joins: a deployment slot's in the prologue (Normal) and Chapter 1 (the
-                # Hard modes, whose army joins there), any other placement of yours where it's placed.
-                if not deploy or key in PROLOGUE or key == 'bmap001':
-                    ds = join(u['person']['pid'], key)
+                # A unit's items are a source where it first joins: a deployment slot's in the prologue (either version of a chapter)
+                # and Chapter 1, whose deployment brings in the units the prologue didn't (Arran; Gordin or Draug, by the answers),
+                # any other placement of yours where it's placed; a slot of a unit joining there has flag 0x80 (Ryan's in Prologue II,
+                # Arran's in Chapter 1), one of a unit you have already doesn't (Gordin's in Prologue V).
+                if (not deploy or key in PROLOGUE or key in firsts or key == 'bmap001') and u['flags'] & CREATE:
+                    ds, cond = join(u['person']['pid'], key)
                     for iid, *_ in u['items'] if ds else []:
-                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining" + (f' ({when})' if when else ''), ds)
+                        source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining{cond}" + (f' ({when})' if when else ''), ds)
+                continue
+            if creates(u) and not SCENE_GROUP.match(g) and ch.inside(u['at']):
+                # A unit the opening brings into your army (Chapter 2's Catria, Chapter 10's Merric back): yours from the start, on
+                # its tile, with the record's items.
+                m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(u['at'])})
+                ds, cond = join(u['person']['pid'], key)
+                ds = [x for x in ds if x in umodes]
+                for iid, *_ in u['items'] if ds else []:
+                    source(iid, mid, 'kit', f"Carried by {unit_name(u)} on joining{cond}", ds)
                 continue
             if re.match(r'e\d|ev', g) or not ch.inside(u['at']) or u['team'] == 0:
                 continue
@@ -1789,6 +1908,13 @@ def main():
                 e['note'] += f'. Placed {said}.'
             m['units'].extend(e for e, _, _ in ents)
             starting_foes.append((u, ents))
+        # Talks that recruit (talks_of), and units the chapter's end hands over (ending_of), among the foes on the map at the start:
+        # said on their entries before the stand-ins below copy them (Jeorge, Astram, Sedgar and Wolf stand on tiles a generic takes
+        # once they're killed); their gear is yours from the next chapter.
+        recruited = set()
+        for u, ents in starting_foes:
+            if recruit(u, [e for e, _, _ in ents]):
+                recruited.add(id(u))
         # Stand-ins (the MapBegin's `if (!FlagGet(gf_<person>殺害)) Dispos(person) else Dispos(generic)`: Astram, Jeorge, Sedgar,
         # Wolf), said when they stand in (the chapters whose death handlers set the flag). The person's entries on that tile are split
         # where the stand-in's own split (each mode shows one), each carrying the stand-in its modes place.
@@ -2108,10 +2234,14 @@ def main():
         for k in keys:
             gs, conds = k[0], conds_of[k]
             modes_on = [mode for mode in MODES if times[k].get(mode)]
-            units = []
+            units, joining = [], []
             for g in gs:
                 for u, at in arrived.get(g, {}).values():
                     ms = [mode for mode in modes_on if mode in record_modes(u) and g in gs_on[k][mode]]
+                    if ms and ch.inside(at) and creates(u) and not SCENE_GROUP.match(g):
+                        # One of yours this handler brings in (Prologue V's Merric on turn 2, Chapter 6's Frey and Norne on turn 3).
+                        joining.append((g, u, at, ms))
+                        continue
                     if not ms or not ch.inside(at) or u['team'] == 0:
                         continue
                     u = {**u, 'at': at}
@@ -2127,7 +2257,7 @@ def main():
                         for iid, drop in items:
                             source(iid, mid, 'drop-later' if drop else 'foe-later', ('Dropped by ' if drop else 'Carried by ') + (
                                 e['name'] if u['person']['named'] else f"a foe {e['name']}"), ms2)
-            if not units:
+            if not units and not joining:
                 continue
             gates = [c[1] for c in conds if c[0] == 'flag' and c[2] and c[1] in flag_areas]
             unless = [c[1] for c in conds if c[0] == 'flag' and not c[2] and c[1] in flag_areas]
@@ -2223,6 +2353,26 @@ def main():
                 if boss and boss_name:
                     w += f', until {boss_name} is defeated'
                 per[mode] = w
+            for g, u, at, ms in joining:
+                if not conds and all(times[k][mode] == [(1, 1, 0, None, None)] for mode in ms):
+                    # Placed as the first player phase starts, before you move (Prologue VI's Cecille): yours from the start.
+                    m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(at)})
+                    ds, jcond = join(u['person']['pid'], key)
+                    kind_ = 'kit'
+                else:
+                    jw = {mode: per[mode] for mode in ms}
+                    j = {'name': unit_name(u), 'tile': ch.app(at), 'from': ch.app(u['from']) if ch.inside(u['from']) else ch.app(at),
+                         'group': g, 'when': jw[ms[0]] if len(set(jw.values())) == 1 else jw}
+                    if areas:
+                        j['areas'] = [a for i, a in enumerate(areas) if a not in areas[:i]]
+                    m.setdefault('joiners', []).append(j)
+                    ds, jcond = join(u['person']['pid'], key)
+                    kind_ = 'kit-later'
+                ds = [x for x in ds if x in ms]
+                for iid, *_ in u['items'] if ds else []:
+                    source(iid, mid, kind_, f"Carried by {unit_name(u)} on joining{jcond}", ds)
+            if not units:
+                continue
             r = {'id': f"{mid}-{'-'.join(gs)}", 'label': gs, 'units': units,
                  'when': per[modes_on[0]] if len(set(per.values())) == 1 else per, '_conds': conds}
             areas = [a for i, a in enumerate(areas) if a not in areas[:i]]
@@ -2362,11 +2512,20 @@ def main():
         if reinf:
             m['reinforcements'] = reinf
 
-        # Talks that recruit (talks_of), and units the chapter's end hands over (ending_of): their gear is yours from the next chapter.
-        recruited = set()
-        for u, ents in starting_foes:
-            if recruit(u, [e for e, _, _ in ents]):
-                recruited.add(id(u))
+        # Who the chapter's end places on your side (its Ending's groups, under the checks before them: Chapter 4's Caeda, Chapter
+        # 10's Dice and Maris, Chapter 21's Michalis), the scenes' actors it takes off again left out (Chapter 20's Nyna, Elice,
+        # Maria and Lena, whom Gharnef takes): they join after the battle, their gear yours from the next chapter.
+        end = named(ch.s, 'Ending')
+        if end:
+            guards = {a[0]: conds for _, fn, a, conds in guarded_calls(ch.s, end)
+                      if fn.startswith('Dispos') and fn != 'DisposWait' and a and isinstance(a[0], str)}
+            for g, u, _, _ in play(ch, [end]):
+                if not creates(u) or SCENE_GROUP.match(g):
+                    continue
+                ds, cond = join(u['person']['pid'], key)
+                extra = end_guard_words(ch, guards.get(g, []))
+                for iid, *_ in u['items'] if ds else []:
+                    source(iid, mid, 'kit-later', f"Carried by {unit_name(u)} on joining{cond}{extra}", ds)
         # What a talk or the chapter's end gives: from the next chapter (talk-later, event-later).
         for iid, who, pid in talk_gifts:
             source(iid, mid, 'talk-later', f'Given to {who} when {pid} joins')
@@ -2400,15 +2559,16 @@ def main():
                 elif kind == VILLAGE:
                     reward = []
                     for g in groups_placed(ch.ter, h):
-                        # A recruit walks out of the village (Wrys in Chapter 1).
+                        # A recruit walks out of the village (Malicia in Chapter 1). Only Marth visits a village (visitor(): the Visit
+                        # command's check), but on a map that lets any unit.
                         for u in ch.groups.get(g, []):
                             who = unit_name(u)
                             reward.append(f'{who} joins')
                             m.setdefault('joiners', []).append({'name': who, 'tile': ch.app(u['at']), 'from': tile, 'group': g,
-                                                                'when': f'Joins when a unit visits the village at ({tile[0]}, {tile[1]})'})
-                            ds = join(u['person']['pid'], key)
+                                                                'when': f'Joins when {visitor(ch)} visits the village at ({tile[0]}, {tile[1]})'})
+                            ds, jcond = join(u['person']['pid'], key)
                             for iid, *_ in u['items'] if ds else []:
-                                source(iid, mid, 'kit-later', f'Carried by {who} on joining', ds)
+                                source(iid, mid, 'kit-later', f'Carried by {who} on joining{jcond}', ds)
                     # A reward only for a visit with items in hand (Chapter 22's Starlight: Marth carrying the Lightsphere and the
                     # Starsphere, both taken), read from the checks before it.
                     needs = [a[1] for fn, a in calls if fn == 'UnitCheckItem' and len(a) > 1 and isinstance(a[1], str)]
@@ -2580,6 +2740,13 @@ def main():
         m['wideBridges'] = True
         maps.append(m)
         print(mid, m['title'], f'{ch.w}x{ch.h}', len(m['units']), 'units', len(m.get('reinforcements', [])), 'groups')
+        if key == PROLOGUE[-1]:
+            for w in worlds:
+                w['army'] &= stay
+        if key not in SECOND and len(worlds) > 1 and all(w['army'] == worlds[0]['army'] for w in worlds):
+            # Every way has the same army again (once Chapter 1's deployment has them all): one way on.
+            worlds = [{'picks': {}, 'army': set(worlds[0]['army'])}]
+        assert key != 'bmap001' or len(worlds) == 1, 'the ways through the prologue should meet in Chapter 1'
 
     # One entry per code, named by its most common name; a map whose tiles of a code have other names says them ('Floor / Plain', and
     # each tile's own name), as the tile panel and the legend show.

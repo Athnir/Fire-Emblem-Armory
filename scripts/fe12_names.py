@@ -8,7 +8,9 @@ The dump's secure area is stored decrypted, so the patch's first 8 MB window (th
 did; every other window matches its Adler-32, and the text is read through the patched file table.
 
 The patch packs long names by putting a narrow-spacing code (0x88, a Shift-JIS lead byte with no character under 0x889F) between
-their letters ("B r a v e  L a n c e"); it's dropped. A few generic names are drawn as pictures (MPID_REP16): read as None.
+their letters ("B r a v e  L a n c e"); it's dropped, and so is its other spacing code, 0x89 before a byte under 0x40 (no character
+there either: 0x8940 is the first), which spaces a few names' gaps ("Cecille's Sword": 89 20 before the space). A few generic names are
+drawn as pictures (MPID_REP16): read as None.
 """
 import os
 import sys
@@ -31,7 +33,7 @@ def decode(raw):
     out, i = bytearray(), 0
     while i < len(raw):
         b = raw[i]
-        if b == 0x88 and i + 1 < len(raw) and raw[i + 1] < 0x9F:
+        if (b == 0x88 and i + 1 < len(raw) and raw[i + 1] < 0x9F) or (b == 0x89 and i + 1 < len(raw) and raw[i + 1] < 0x40):
             i += 1
             continue
         if 0x81 <= b <= 0x9F or 0xE0 <= b <= 0xFC:

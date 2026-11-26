@@ -113,13 +113,16 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (sword, lance and axe; Hit 5 to 10 and Atk 1 at A by the advantaged side's rank, the loser losing as much and its own rank bonus) and
   weapon rank bonuses, all read in the battle overlay's code; it rolls hit with two numbers averaged (2RN), and its forge (each stat
   either way: Mt, Hit, Crit and Wt) prices each stat by triangular steps of the weapon's price (`src/logic/fe11Forge.ts`). Who may use
-  an item is its equip check's (lock bits against the person's, class's and placement's attributes), never the help text.
+  an item is its equip check's (lock bits against the person's, class's and placement's attributes), never the help text. Only Marth
+  visits a village in Shadow Dragon and New Mystery (the Visit command offers it to attribute 0x02, his placements' alone), a house
+  anyone; New Mystery's maps that call `SetGameMode(2)` (the Archanean Chronicles, the DLC chapters) let any unit.
 - **Anything not confirmed goes under `unconfirmed`, not stated as fact.**
 
 ## Weapons & forging
 
 - **List only what the player can get:** sold, forged, given, in a chest, village or hidden spot, dropped,
-  carried by a recruit, or stealable.
+  carried by a recruit, or stealable. A side story with a cast of its own gives no unit gear, as Path of Radiance's trial maps keep
+  nothing (New Mystery's Archanean Chronicles and DLC chapters: the look-over, 2026-11-26).
 - **Your units' gear counts once, from the chapter each unit first joins** (`kitAt` on a weapon in Path of Radiance and Radiant
   Dawn, `kit` in Fates): the weapon page says nothing about it, the weapon simply turns up in the list at the right chapter. In Path
   of Radiance (`build-fe9-items.py`'s `kit()`) a group a script places on your side (Ranulf's in Ch.23's opening), the first
@@ -1036,6 +1039,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   yours) is said on that character, worded from its AI (Clarine walks to Roy herself). A unit of yours a script takes off the map stays
   yours, its gear counted from the next chapter (Matthew and Serra in Eliwood's Chapter 12); a unit in the not-yet-joined state or a
   cutscene's load is no join (Nils before Cog of Destiny's end, Chapter 19's Rausten Knight).
+- **New Mystery's joins are where its records place them** (the look-over, 2026-11-26): a record of yours with flag 0x80 brings its
+  unit in (overlay 00 0x2205b5c): the opening's stands on the map as a forced unit, its gear from that chapter; a later turn's is a
+  joiner, its gear from the next chapter; the Ending's gives its gear from the next chapter, under the Ending's checks. A unit that
+  left and comes back brings new copies (Merric's Excalibur in Chapter 10); each version of a prologue chapter counts its own joins,
+  and a shared chapter's join on only some ways says the answer it needs.
 - **A talk says when it opens**, from the game's talk table where it has one (Genealogy's chapter data +6: "Recruit: talk with
   Sigurd, once you seize Genoa"; Altena's talk with Leif "only if Leif and Finn are both in your army as the chapter starts"), and
   talks the game closes together say only one can be held ("Only one of Iuchar and Iucharba joins: talking to either closes the
@@ -1202,6 +1210,9 @@ A global switch (header, any game) that lets someone play along without being to
 - **A game whose story splits (Fates) asks which route you're on** when the shared chapters run out (the user's pattern, 2026-11-26: the
   route's first chapter, then the route, "Proceed to Chapter 6: Birthright", in both apps); the route can be changed in the bar. Only that route's chapters, paralogues and
   weapons are ever shown, and the route select on the weapon page goes away.
+- **A split the game asks as a question is asked in its own words** (New Mystery's prologue, the patch's MS203_ED2 and the rest), its
+  buttons the chapter and then the answer ("Proceed to Prologue IV: answered Yes"), never naming who joins; the same in both apps (the
+  look-over, 2026-11-26).
 - **A story can split more than once** (The Binding Blade: 10A or 10B after Chapter 9, Ilia or Sacae after 16x; The Blazing Blade:
   Lyn's story, then Eliwood's or Hector's, each split at Lloyd or Linus and at Kenneth or Jerme). Each split is
   asked when it's reached ("Proceed to Chapter 10A"), the bar keeps one route select per split passed, and changing an earlier

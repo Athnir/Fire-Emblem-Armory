@@ -9,7 +9,7 @@ import type { ItemSource } from '../../components/ChapterWeapons'
 export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Iron Lance": [
     {
-      "mapId": "fe12-p2",
+      "mapId": "fe12-p1",
       "kind": "kit",
       "text": "Carried by Kris on joining"
     },
@@ -20,6 +20,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-p4",
+      "kind": "kit",
+      "text": "Carried by Caeda on joining"
+    },
+    {
+      "mapId": "fe12-p4b",
       "kind": "kit",
       "text": "Carried by Caeda on joining"
     },
@@ -45,8 +50,18 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-2",
+      "kind": "kit",
+      "text": "Carried by Catria on joining"
+    },
+    {
+      "mapId": "fe12-2",
       "kind": "shop",
       "text": "Sold at the preparations' armory"
+    },
+    {
+      "mapId": "fe12-3",
+      "kind": "kit",
+      "text": "Carried by Palla on joining"
     },
     {
       "mapId": "fe12-3",
@@ -216,6 +231,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe12-2",
+      "kind": "kit",
+      "text": "Carried by Catria on joining"
+    },
+    {
       "mapId": "fe12-3",
       "kind": "kit-later",
       "text": "Carried by Matthis on joining"
@@ -226,14 +246,34 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe12-4",
+      "kind": "kit-later",
+      "text": "Carried by Caeda on joining"
+    },
+    {
       "mapId": "fe12-5",
       "kind": "shop",
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe12-6",
+      "kind": "kit-later",
+      "text": "Carried by Frey on joining"
+    },
+    {
       "mapId": "fe12-7",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-8",
+      "kind": "kit",
+      "text": "Carried by Cain on joining"
+    },
+    {
+      "mapId": "fe12-15",
+      "kind": "kit",
+      "text": "Carried by Dolph on joining"
     },
     {
       "mapId": "fe12-15",
@@ -252,6 +292,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-21",
+      "kind": "kit-later",
+      "text": "Carried by Michalis on joining (if Minerva stops on the village at (27, 29) by turn 15, before it is visited, and Marth then visits it)"
+    },
+    {
+      "mapId": "fe12-21",
       "kind": "shop",
       "text": "Sold at the armory"
     }
@@ -263,8 +308,8 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Ryan on joining"
     },
     {
-      "mapId": "fe12-p5",
-      "kind": "kit",
+      "mapId": "fe12-p4",
+      "kind": "kit-later",
       "text": "Carried by Gordin on joining"
     },
     {
@@ -455,6 +500,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Luke on joining"
     },
     {
+      "mapId": "fe12-p4b",
+      "kind": "kit-later",
+      "text": "Carried by Athena on joining"
+    },
+    {
       "mapId": "fe12-p7",
       "kind": "drop",
       "text": "Dropped by a foe Mercenary"
@@ -533,6 +583,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-6x",
       "kind": "shop",
       "text": "Sold at the preparations' armory"
+    },
+    {
+      "mapId": "fe12-7",
+      "kind": "kit",
+      "text": "Carried by Feena on joining"
     },
     {
       "mapId": "fe12-7",
@@ -864,6 +919,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Wrys on joining"
     },
     {
+      "mapId": "fe12-p4b",
+      "kind": "kit",
+      "text": "Carried by Wrys on joining"
+    },
+    {
       "mapId": "fe12-p7",
       "kind": "drop",
       "text": "Dropped by Est"
@@ -895,8 +955,18 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-3x",
+      "kind": "kit",
+      "text": "Carried by Wrys on joining"
+    },
+    {
+      "mapId": "fe12-3x",
       "kind": "shop",
       "text": "Sold at the preparations' armory"
+    },
+    {
+      "mapId": "fe12-4",
+      "kind": "kit",
+      "text": "Carried by Yumina on joining"
     },
     {
       "mapId": "fe12-4",
@@ -912,6 +982,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-5",
       "kind": "shop",
       "text": "Sold at the preparations' armory"
+    },
+    {
+      "mapId": "fe12-6",
+      "kind": "kit-later",
+      "text": "Carried by Wendell on joining"
     },
     {
       "mapId": "fe12-6",
@@ -1081,6 +1156,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Wrys on joining"
     },
     {
+      "mapId": "fe12-p4b",
+      "kind": "kit",
+      "text": "Carried by Wrys on joining"
+    },
+    {
       "mapId": "fe12-p5",
       "kind": "drop",
       "text": "Dropped by a foe Barbarian"
@@ -1150,8 +1230,23 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-3",
+      "kind": "kit",
+      "text": "Carried by Palla on joining"
+    },
+    {
+      "mapId": "fe12-3",
       "kind": "kit-later",
       "text": "Carried by Matthis on joining"
+    },
+    {
+      "mapId": "fe12-3x",
+      "kind": "kit",
+      "text": "Carried by Wrys on joining"
+    },
+    {
+      "mapId": "fe12-4",
+      "kind": "kit",
+      "text": "Carried by Ogma on joining"
     },
     {
       "mapId": "fe12-4",
@@ -1172,6 +1267,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-5",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-6",
+      "kind": "kit-later",
+      "text": "Carried by Norne on joining"
     },
     {
       "mapId": "fe12-6",
@@ -1196,6 +1296,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-6x",
       "kind": "drop",
       "text": "Dropped by a foe Knight"
+    },
+    {
+      "mapId": "fe12-7",
+      "kind": "kit",
+      "text": "Carried by Feena on joining"
     },
     {
       "mapId": "fe12-8",
@@ -1233,6 +1338,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Bishop"
     },
     {
+      "mapId": "fe12-10x",
+      "kind": "kit",
+      "text": "Carried by Horace on joining"
+    },
+    {
       "mapId": "fe12-11",
       "kind": "drop",
       "text": "Dropped by a foe Wyvern"
@@ -1264,9 +1374,24 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Dark Mage"
     },
     {
+      "mapId": "fe12-13x",
+      "kind": "kit",
+      "text": "Carried by Athena on joining"
+    },
+    {
+      "mapId": "fe12-14",
+      "kind": "kit",
+      "text": "Carried by Xane on joining"
+    },
+    {
       "mapId": "fe12-14",
       "kind": "drop",
       "text": "Dropped by a foe I. Dragon"
+    },
+    {
+      "mapId": "fe12-15",
+      "kind": "kit",
+      "text": "Carried by Dolph on joining"
     },
     {
       "mapId": "fe12-15",
@@ -1292,6 +1417,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-15",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-16",
+      "kind": "kit",
+      "text": "Carried by Macellan on joining"
     },
     {
       "mapId": "fe12-16",
@@ -1360,6 +1490,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-21",
+      "kind": "kit",
+      "text": "Carried by Ymir on joining"
+    },
+    {
+      "mapId": "fe12-21",
       "kind": "drop",
       "text": "Dropped by a foe Berserker"
     },
@@ -1402,14 +1537,14 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-dl1",
       "kind": "dlc-drop",
       "text": "Dropped by a foe Myrmidon"
-    },
-    {
-      "mapId": "fe12-dl3",
-      "kind": "dlc-kit-later",
-      "text": "Carried by Navarre on joining"
     }
   ],
   "Steel Bow": [
+    {
+      "mapId": "fe12-1",
+      "kind": "kit",
+      "text": "Carried by Gordin on joining (if the answer at the end of Prologue III was Yes)"
+    },
     {
       "mapId": "fe12-2",
       "kind": "kit-later",
@@ -1431,6 +1566,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe12-6",
+      "kind": "kit-later",
+      "text": "Carried by Norne on joining"
+    },
+    {
       "mapId": "fe12-7",
       "kind": "shop",
       "text": "Sold at the armory"
@@ -1444,6 +1584,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-11",
       "kind": "drop",
       "text": "Dropped by a foe Hunter"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "kit-later",
+      "text": "Carried by Robert on joining"
     },
     {
       "mapId": "fe12-15",
@@ -1478,14 +1623,29 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Steel Sword": [
     {
+      "mapId": "fe12-p6",
+      "kind": "kit",
+      "text": "Carried by Cecille on joining"
+    },
+    {
+      "mapId": "fe12-p6",
+      "kind": "kit-later",
+      "text": "Carried by Ogma on joining"
+    },
+    {
+      "mapId": "fe12-p6b",
+      "kind": "kit",
+      "text": "Carried by Cecille on joining"
+    },
+    {
+      "mapId": "fe12-p7b",
+      "kind": "kit-later",
+      "text": "Carried by Cain on joining"
+    },
+    {
       "mapId": "fe12-p8",
       "kind": "kit",
       "text": "Carried by Marth on joining"
-    },
-    {
-      "mapId": "fe12-1",
-      "kind": "kit",
-      "text": "Carried by Cecille on joining"
     },
     {
       "mapId": "fe12-3",
@@ -1496,6 +1656,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-3",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-4",
+      "kind": "kit",
+      "text": "Carried by Ogma on joining"
     },
     {
       "mapId": "fe12-5",
@@ -1518,6 +1683,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe12-8",
+      "kind": "kit",
+      "text": "Carried by Cain on joining"
+    },
+    {
       "mapId": "fe12-9",
       "kind": "drop",
       "text": "Dropped by a foe Thief"
@@ -1526,6 +1696,26 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-9",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "kit-later",
+      "text": "Carried by Robert on joining"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "kit-later",
+      "text": "Carried by Belf on joining"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "kit-later",
+      "text": "Carried by Leiden on joining"
+    },
+    {
+      "mapId": "fe12-14",
+      "kind": "kit",
+      "text": "Carried by Xane on joining"
     },
     {
       "mapId": "fe12-15",
@@ -1561,16 +1751,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-dl2",
       "kind": "dlc-foe",
       "text": "Carried by a foe Thief"
-    },
-    {
-      "mapId": "fe12-dl3",
-      "kind": "dlc-kit-later",
-      "text": "Carried by Navarre on joining"
-    },
-    {
-      "mapId": "fe12-dl3",
-      "kind": "dlc-kit-later",
-      "text": "Carried by Maris on joining"
     }
   ],
   "Steel Axe": [
@@ -1657,9 +1837,19 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Steel Lance": [
     {
+      "mapId": "fe12-p6b",
+      "kind": "kit-later",
+      "text": "Carried by Draug on joining"
+    },
+    {
+      "mapId": "fe12-p7",
+      "kind": "kit-later",
+      "text": "Carried by Est on joining"
+    },
+    {
       "mapId": "fe12-1",
       "kind": "kit",
-      "text": "Carried by Draug on joining"
+      "text": "Carried by Draug on joining (if the answer at the end of Prologue V was No)"
     },
     {
       "mapId": "fe12-3",
@@ -1697,6 +1887,21 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe12-10x",
+      "kind": "kit",
+      "text": "Carried by Horace on joining"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "kit-later",
+      "text": "Carried by Belf on joining"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "kit-later",
+      "text": "Carried by Leiden on joining"
+    },
+    {
       "mapId": "fe12-15",
       "kind": "drop",
       "text": "Dropped by a foe Knight"
@@ -1717,87 +1922,10 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Knight"
     }
   ],
-  "Hand Axe": [
-    {
-      "mapId": "fe12-1",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe12-3",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe12-5",
-      "kind": "kit-later",
-      "text": "Carried by Barst on joining"
-    },
-    {
-      "mapId": "fe12-5",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe12-7",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe12-12",
-      "kind": "kit-later",
-      "text": "Carried by Darros on joining"
-    },
-    {
-      "mapId": "fe12-15",
-      "kind": "drop",
-      "text": "Dropped by a foe Fighter"
-    },
-    {
-      "mapId": "fe12-15",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe12-17",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe12-21",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe12-ac3",
-      "kind": "kit-later",
-      "text": "Carried by Dice on joining"
-    },
-    {
-      "mapId": "fe12-dl1",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Barbarian"
-    },
-    {
-      "mapId": "fe12-dl1",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Barbarian"
-    },
-    {
-      "mapId": "fe12-dl3",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Barbarian"
-    },
-    {
-      "mapId": "fe12-dl3",
-      "kind": "dlc-kit-later",
-      "text": "Carried by Dice on joining"
-    }
-  ],
   "Fire": [
     {
-      "mapId": "fe12-p8",
-      "kind": "kit",
+      "mapId": "fe12-p5",
+      "kind": "kit-later",
       "text": "Carried by Merric on joining"
     },
     {
@@ -1819,6 +1947,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-3x",
       "kind": "shop",
       "text": "Sold at the preparations' armory"
+    },
+    {
+      "mapId": "fe12-4",
+      "kind": "kit",
+      "text": "Carried by Yubello on joining"
     },
     {
       "mapId": "fe12-4",
@@ -2001,6 +2134,78 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Dark Mage"
     }
   ],
+  "Hand Axe": [
+    {
+      "mapId": "fe12-1",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-3",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-5",
+      "kind": "kit-later",
+      "text": "Carried by Barst on joining"
+    },
+    {
+      "mapId": "fe12-5",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-7",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-10",
+      "kind": "kit-later",
+      "text": "Carried by Dice on joining"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "kit-later",
+      "text": "Carried by Darros on joining"
+    },
+    {
+      "mapId": "fe12-15",
+      "kind": "drop",
+      "text": "Dropped by a foe Fighter"
+    },
+    {
+      "mapId": "fe12-15",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-17",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-21",
+      "kind": "shop",
+      "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-dl1",
+      "kind": "dlc-foe-later",
+      "text": "Carried by a foe Barbarian"
+    },
+    {
+      "mapId": "fe12-dl1",
+      "kind": "dlc-foe",
+      "text": "Carried by a foe Barbarian"
+    },
+    {
+      "mapId": "fe12-dl3",
+      "kind": "dlc-foe-later",
+      "text": "Carried by a foe Barbarian"
+    }
+  ],
   "Rapier": [
     {
       "mapId": "fe12-p8",
@@ -2136,6 +2341,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-21",
+      "kind": "kit",
+      "text": "Carried by Ymir on joining"
+    },
+    {
+      "mapId": "fe12-21",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -2162,14 +2372,14 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Dahl"
     },
     {
+      "mapId": "fe12-10",
+      "kind": "kit-later",
+      "text": "Carried by Maris on joining"
+    },
+    {
       "mapId": "fe12-13",
       "kind": "kit-later",
       "text": "Carried by Beck on joining"
-    },
-    {
-      "mapId": "fe12-ac3",
-      "kind": "kit-later",
-      "text": "Carried by Maris on joining"
     },
     {
       "mapId": "fe12-dl1",
@@ -2187,6 +2397,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-12",
       "kind": "drop",
       "text": "Dropped by a foe Swordmaster"
+    },
+    {
+      "mapId": "fe12-13x",
+      "kind": "kit",
+      "text": "Carried by Athena on joining"
     },
     {
       "mapId": "fe12-15",
@@ -2237,6 +2452,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-3",
+      "kind": "kit",
+      "text": "Carried by Palla on joining"
+    },
+    {
+      "mapId": "fe12-3",
       "kind": "drop",
       "text": "Dropped by a foe Dracoknight"
     },
@@ -2244,6 +2464,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-8",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-15",
+      "kind": "kit",
+      "text": "Carried by Dolph on joining"
     },
     {
       "mapId": "fe12-15",
@@ -2259,6 +2484,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-15",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe12-16",
+      "kind": "kit",
+      "text": "Carried by Macellan on joining"
     },
     {
       "mapId": "fe12-17",
@@ -2294,6 +2524,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-19",
       "kind": "kit-later",
       "text": "Carried by Roshea on joining"
+    },
+    {
+      "mapId": "fe12-21",
+      "kind": "kit-later",
+      "text": "Carried by Michalis on joining (if Minerva stops on the village at (27, 29) by turn 15, before it is visited, and Marth then visits it)"
     },
     {
       "mapId": "fe12-21",
@@ -2380,6 +2615,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
+      "mapId": "fe12-16",
+      "kind": "kit",
+      "text": "Carried by Macellan on joining"
+    },
+    {
       "mapId": "fe12-17",
       "kind": "shop",
       "text": "Sold at the armory"
@@ -2391,11 +2631,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Horseman (if Sedgar was killed in Chapter 18)"
-    },
-    {
-      "mapId": "fe12-19",
       "kind": "kit-later",
       "text": "Carried by Sedgar on joining"
     },
@@ -2403,6 +2638,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-19",
       "kind": "kit-later",
       "text": "Carried by Wolf on joining"
+    },
+    {
+      "mapId": "fe12-19",
+      "kind": "drop",
+      "text": "Dropped by a foe Horseman (if Sedgar was killed in Chapter 18)"
     },
     {
       "mapId": "fe12-19",
@@ -2432,6 +2672,92 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Thief"
     }
   ],
+  "Aura": [
+    {
+      "mapId": "fe12-2",
+      "kind": "kit-later",
+      "text": "Carried by Linde on joining"
+    },
+    {
+      "mapId": "fe12-20x",
+      "kind": "chest",
+      "text": "In a chest"
+    }
+  ],
+  "Thunder": [
+    {
+      "mapId": "fe12-2",
+      "kind": "kit-later",
+      "text": "Carried by Linde on joining"
+    },
+    {
+      "mapId": "fe12-9",
+      "kind": "drop",
+      "text": "Dropped by a foe Mage"
+    },
+    {
+      "mapId": "fe12-9",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-15",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-17",
+      "kind": "kit-later",
+      "text": "Carried by Frost on joining"
+    },
+    {
+      "mapId": "fe12-17",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-19",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-21",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-ac1",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe12-dl2",
+      "kind": "dlc-foe-later",
+      "text": "Carried by a foe Mage"
+    },
+    {
+      "mapId": "fe12-dl2",
+      "kind": "dlc-foe",
+      "text": "Carried by a foe Mage"
+    }
+  ],
+  "Nosferatu": [
+    {
+      "mapId": "fe12-2",
+      "kind": "kit-later",
+      "text": "Carried by Linde on joining"
+    },
+    {
+      "mapId": "fe12-16x",
+      "kind": "kit-later",
+      "text": "Carried by Katarina on joining"
+    },
+    {
+      "mapId": "fe12-17",
+      "kind": "drop",
+      "text": "Dropped by a foe Thief"
+    }
+  ],
   "Fire Emblem": [
     {
       "mapId": "fe12-2",
@@ -2446,14 +2772,14 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Thief"
     },
     {
+      "mapId": "fe12-10",
+      "kind": "kit-later",
+      "text": "Carried by Maris on joining"
+    },
+    {
       "mapId": "fe12-11",
       "kind": "hidden",
       "text": "Hidden on the map"
-    },
-    {
-      "mapId": "fe12-ac3",
-      "kind": "kit-later",
-      "text": "Carried by Maris on joining"
     },
     {
       "mapId": "fe12-dl1",
@@ -2616,6 +2942,43 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Given at a village"
     }
   ],
+  "Rescue": [
+    {
+      "mapId": "fe12-4",
+      "kind": "kit",
+      "text": "Carried by Yumina on joining"
+    },
+    {
+      "mapId": "fe12-16",
+      "kind": "chest",
+      "text": "In a chest"
+    }
+  ],
+  "Wing Spear": [
+    {
+      "mapId": "fe12-4",
+      "kind": "kit-later",
+      "text": "Carried by Caeda on joining"
+    },
+    {
+      "mapId": "fe12-11",
+      "kind": "shop",
+      "text": "Sold at the secret shop, with a VIP Card (1 in stock)",
+      "limited": 1
+    },
+    {
+      "mapId": "fe12-15",
+      "kind": "shop",
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
+    },
+    {
+      "mapId": "fe12-19",
+      "kind": "shop",
+      "text": "Sold at the armory (1 in stock)",
+      "limited": 1
+    }
+  ],
   "Devil Sword": [
     {
       "mapId": "fe12-4",
@@ -2690,6 +3053,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-21",
+      "kind": "kit",
+      "text": "Carried by Ymir on joining"
+    },
+    {
+      "mapId": "fe12-21",
       "kind": "shop",
       "text": "Sold at the armory"
     }
@@ -2753,6 +3121,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-9",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe12-10",
+      "kind": "kit",
+      "text": "Carried by Merric on joining"
     },
     {
       "mapId": "fe12-10",
@@ -2841,6 +3214,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Bishop"
     },
     {
+      "mapId": "fe12-17",
+      "kind": "kit-later",
+      "text": "Carried by Frost on joining"
+    },
+    {
       "mapId": "fe12-19",
       "kind": "event-later",
       "text": "Given at the end of the chapter to Marth"
@@ -2854,11 +3232,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-final",
       "kind": "kit-later",
       "text": "Carried by Lena on joining"
-    },
-    {
-      "mapId": "fe12-ac2",
-      "kind": "kit-later",
-      "text": "Carried by Frost on joining"
     },
     {
       "mapId": "fe12-ac3",
@@ -2940,36 +3313,16 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     }
   ],
-  "Killer Lance": [
-    {
-      "mapId": "fe12-13",
-      "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
-      "limited": 3
-    },
-    {
-      "mapId": "fe12-15",
-      "kind": "drop",
-      "text": "Dropped by a foe General"
-    },
-    {
-      "mapId": "fe12-21",
-      "kind": "shop",
-      "text": "Sold at the armory"
-    }
-  ],
-  "Longbow": [
-    {
-      "mapId": "fe12-20x",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper"
-    }
-  ],
   "Killing Edge": [
     {
       "mapId": "fe12-6",
       "kind": "kit-later",
       "text": "Carried by Samto on joining"
+    },
+    {
+      "mapId": "fe12-7",
+      "kind": "kit",
+      "text": "Carried by Navarre on joining"
     },
     {
       "mapId": "fe12-10",
@@ -3009,66 +3362,42 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Samto on joining"
     }
   ],
-  "Cancer": [
+  "Killer Lance": [
     {
       "mapId": "fe12-6",
-      "kind": "drop",
-      "text": "Dropped by Lang"
-    }
-  ],
-  "Thunder": [
-    {
-      "mapId": "fe12-9",
-      "kind": "drop",
-      "text": "Dropped by a foe Mage"
+      "kind": "kit-later",
+      "text": "Carried by Frey on joining"
     },
     {
-      "mapId": "fe12-9",
+      "mapId": "fe12-13",
       "kind": "shop",
-      "text": "Sold at the vendor"
+      "text": "Sold at the secret shop, with a VIP Card (3 in stock)",
+      "limited": 3
     },
     {
       "mapId": "fe12-15",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe12-17",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe12-19",
-      "kind": "shop",
-      "text": "Sold at the vendor"
+      "kind": "drop",
+      "text": "Dropped by a foe General"
     },
     {
       "mapId": "fe12-21",
       "kind": "shop",
-      "text": "Sold at the vendor"
-    },
+      "text": "Sold at the armory"
+    }
+  ],
+  "Longbow": [
     {
-      "mapId": "fe12-ac1",
-      "kind": "chest",
-      "text": "In a chest"
-    },
-    {
-      "mapId": "fe12-ac2",
-      "kind": "kit-later",
-      "text": "Carried by Frost on joining"
-    },
-    {
-      "mapId": "fe12-dl2",
-      "kind": "dlc-foe-later",
-      "text": "Carried by a foe Mage"
-    },
-    {
-      "mapId": "fe12-dl2",
-      "kind": "dlc-foe",
-      "text": "Carried by a foe Mage"
+      "mapId": "fe12-20x",
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper"
     }
   ],
   "Blizzard": [
+    {
+      "mapId": "fe12-6",
+      "kind": "kit-later",
+      "text": "Carried by Wendell on joining"
+    },
     {
       "mapId": "fe12-9",
       "kind": "kit-later",
@@ -3108,6 +3437,13 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-dl3",
       "kind": "dlc-foe-later",
       "text": "Carried by a foe Dark Mage"
+    }
+  ],
+  "Cancer": [
+    {
+      "mapId": "fe12-6",
+      "kind": "drop",
+      "text": "Dropped by Lang"
     }
   ],
   "Swarm": [
@@ -3385,13 +3721,13 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Sagittarius": [
     {
       "mapId": "fe12-8",
-      "kind": "drop",
-      "text": "Dropped by a foe Sniper (if Jeorge was killed in Chapter 5)"
+      "kind": "kit-later",
+      "text": "Carried by Jeorge on joining"
     },
     {
       "mapId": "fe12-8",
-      "kind": "kit-later",
-      "text": "Carried by Jeorge on joining"
+      "kind": "drop",
+      "text": "Dropped by a foe Sniper (if Jeorge was killed in Chapter 5)"
     }
   ],
   "Gradivus": [
@@ -3554,11 +3890,40 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     }
   ],
+  "Excalibur": [
+    {
+      "mapId": "fe12-10",
+      "kind": "kit",
+      "text": "Carried by Merric on joining"
+    },
+    {
+      "mapId": "fe12-20x",
+      "kind": "chest",
+      "text": "In a chest"
+    }
+  ],
   "Aries": [
     {
       "mapId": "fe12-10",
       "kind": "kit-later",
       "text": "Carried by Elrean on joining"
+    }
+  ],
+  "Devil Axe": [
+    {
+      "mapId": "fe12-10",
+      "kind": "kit-later",
+      "text": "Carried by Dice on joining"
+    },
+    {
+      "mapId": "fe12-12",
+      "kind": "drop",
+      "text": "Dropped by a foe Barbarian"
+    },
+    {
+      "mapId": "fe12-21",
+      "kind": "drop",
+      "text": "Dropped by a foe Berserker"
     }
   ],
   "Silver Card": [
@@ -3580,28 +3945,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-10",
       "kind": "chest",
       "text": "In a chest"
-    }
-  ],
-  "Devil Axe": [
-    {
-      "mapId": "fe12-12",
-      "kind": "drop",
-      "text": "Dropped by a foe Barbarian"
-    },
-    {
-      "mapId": "fe12-21",
-      "kind": "drop",
-      "text": "Dropped by a foe Berserker"
-    },
-    {
-      "mapId": "fe12-ac3",
-      "kind": "kit-later",
-      "text": "Carried by Dice on joining"
-    },
-    {
-      "mapId": "fe12-dl3",
-      "kind": "dlc-kit-later",
-      "text": "Carried by Dice on joining"
     }
   ],
   "Poleax": [
@@ -3776,26 +4119,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Thief"
     }
   ],
-  "Wing Spear": [
-    {
-      "mapId": "fe12-11",
-      "kind": "shop",
-      "text": "Sold at the secret shop, with a VIP Card (1 in stock)",
-      "limited": 1
-    },
-    {
-      "mapId": "fe12-15",
-      "kind": "shop",
-      "text": "Sold at the armory (1 in stock)",
-      "limited": 1
-    },
-    {
-      "mapId": "fe12-19",
-      "kind": "shop",
-      "text": "Sold at the armory (1 in stock)",
-      "limited": 1
-    }
-  ],
   "Elysian Whip": [
     {
       "mapId": "fe12-11",
@@ -3850,13 +4173,13 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe12-19",
-      "kind": "drop",
-      "text": "Dropped by a foe Horseman (if Wolf was killed in Chapter 18)"
+      "kind": "kit-later",
+      "text": "Carried by Wolf on joining"
     },
     {
       "mapId": "fe12-19",
-      "kind": "kit-later",
-      "text": "Carried by Wolf on joining"
+      "kind": "drop",
+      "text": "Dropped by a foe Horseman (if Wolf was killed in Chapter 18)"
     },
     {
       "mapId": "fe12-21",
@@ -3956,6 +4279,11 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe12-14",
       "kind": "kit-later",
       "text": "Carried by Tiki on joining"
+    },
+    {
+      "mapId": "fe12-22",
+      "kind": "kit",
+      "text": "Carried by Nagi on joining"
     }
   ],
   "Warp": [
@@ -4199,25 +4527,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by a foe Thief"
     }
   ],
-  "Rescue": [
-    {
-      "mapId": "fe12-16",
-      "kind": "chest",
-      "text": "In a chest"
-    }
-  ],
-  "Nosferatu": [
-    {
-      "mapId": "fe12-16x",
-      "kind": "kit-later",
-      "text": "Carried by Katarina on joining"
-    },
-    {
-      "mapId": "fe12-17",
-      "kind": "drop",
-      "text": "Dropped by a foe Thief"
-    }
-  ],
   "Hoistflamme": [
     {
       "mapId": "fe12-18",
@@ -4334,20 +4643,6 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Brave Bow": [
     {
       "mapId": "fe12-20",
-      "kind": "chest",
-      "text": "In a chest"
-    }
-  ],
-  "Excalibur": [
-    {
-      "mapId": "fe12-20x",
-      "kind": "chest",
-      "text": "In a chest"
-    }
-  ],
-  "Aura": [
-    {
-      "mapId": "fe12-20x",
       "kind": "chest",
       "text": "In a chest"
     }

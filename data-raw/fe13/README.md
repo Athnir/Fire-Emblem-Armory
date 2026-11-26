@@ -114,8 +114,11 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   `AI_MV_NearestEnemyExcludePerson` (0x54) leave them out (Chapter 9's Libra, Chapter 15's Say'ri, Holland never attacking Severa).
   `AI_MV_X017Enemy` switches the unit to `AI_AT_Attack` on a condition about its target (0x58, not read), and Paralogue 9's boss
   heads for the tile its `AI_MV_X009Boss` names (its `AI_MI_X009Boss` with 50, not read). A random foe takes its template's AI: The
-  Golden Gaffe's and EXPonential Growth's all escape with no exit given (the Fire Emblem Wiki says to the south). Not read: the other
-  one-off routines (`AI_MI_X010Serena`, `AI_AT_X002Anna`, `AI_MI_Irregular`: Paralogue 22's shadows).
+  Golden Gaffe's and EXPonential Growth's all escape with no exit given (the Fire Emblem Wiki says to the south). Paralogue 10's
+  `AI_MI_X010Serena` is `AI_MI_Talk`'s command (0x3c) on Holland and `AI_MV_X010Serena` `AI_MV_Person`'s (0x57), both marked to run
+  only while the unit's AI state is 0 (0xFE in their third byte; the runner, `0x272990`), so until she turns hostile Severa goes to
+  Holland to talk, as `AI_MI_Talk` does. Not read: the other one-off routines (`AI_AT_X002Anna`, `AI_MI_Irregular`: Paralogue 22's
+  shadows).
 - **A unit's items** (the loader, `0x27cd00`): an item whose level on the difficulty is 0 isn't carried there. On a unit outside your
   army (person +0x46 not 1), a weapon that isn't a staff or an item, and is the first the unit carries or one it doesn't drop, steps up
   its series (item +0x19) to that level where the level is past the item's tier (+0x1a): the program's table at `0x4d0a24` gives each
@@ -151,11 +154,18 @@ Mechanics checked in the program (`scripts/fe13_code.py` finds a class's virtual
   condition (The Future Past 3's Lucina). A talk says what it does (`fe13_events.transfers`: to your army or the enemy's, a gift with
   the PID it checks, a unit taken off, or only a conversation), and joins without one are read from the end handler (after the battle
   if alive), a turn handler (Noire on turn 2), a village's group of yours (Laurent, by Chrom or Miriel) and a DLC map's
-  `ev::CompleteJoin` (named by its text's `MID_DLC_名前_<name>`).
+  `ev::CompleteJoin` (named by its text's `MID_DLC_名前_<name>`), under the flags its end checks first (`end_guards`: each FlagGet,
+  a not or none, then jz, around the join or around the call, `gvar n`, of the scene that makes it), each worded from what sets it
+  (`dlc_end_words`): Roster Rescue's Palla only if no Revenant escapes (ゾンビ離脱, set by its exit areas), Five-Anna Firefight's Catria
+  only if no Anna falls (商人死亡, their deaths), Death's Embrace's Est only if Algol is beaten before turn 10's enemy phase, which
+  takes him off the map while he lives (ボス撤退), and Apotheosis' Katarina only if all five normal battles are won without quitting
+  (途中棄権, a yes to "Would you like to quit now?"), the secret battles (裏面, offered when the first battle is won by turn 2) giving
+  the Supreme Emblem instead. A later turn that takes a unit off the map while it lives says so on it (Algol).
 - **Gifts** (`gift_conditions`): the load's or turn 1's opening gifts are yours from the chapter; one at the end (0x0a), after the
   battle (0x0b) or in a scene nothing calls, in a talk or on a turn, from the next. Each gift is under the checks whose jump (`jz`) it
   sits inside: a count at or above a number (`VariableGet('緑軍生存数')` the green units left, `ForceUnitGetCountPID` a PID's units
-  left, `UnitGetRecordKill` a unit's kills; each threshold is its own check, so the rewards stack) and a unit alive (`UnitIsAlive`); a
+  left, `UnitGetRecordKill` a unit's kills; each threshold is its own check, so the rewards stack), a unit alive (`UnitIsAlive`) and
+  a Path of a Grandmaster map's end flags (Apotheosis' Supreme Emblem: the secret battles won without quitting); a
   check that only guards a scene or a join before the gifts (Paralogue 22's, Paralogue 12's) doesn't count. A gift handed to a unit the
   script names (ItemGain's or ItemGainSilent's first argument) says so; a talk's gift says who talks (`UnitIsPID`; the branch after it
   is everyone else's). A recruit who joins during the battle (a talk, a turn, a handover at the end) brings their gear from the next

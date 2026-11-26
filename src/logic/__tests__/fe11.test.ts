@@ -149,6 +149,12 @@ describe("Shadow Dragon's openings and arrivals, as the scripts play them", () =
     })
   })
 
+  it('has only Marth visit a village, as the Visit command allows (overlay 00 0x21c112c: attribute 0x02, only his)', () => {
+    const joiners = FE11_MAPS.flatMap((m) => m.joiners ?? []).filter((j) => typeof j.when === 'string' && j.when.includes('village'))
+    expect(joiners).toHaveLength(9)
+    for (const j of joiners) expect(j.when).toMatch(/^Joins when Marth visits the village at \(\d+, \d+\)$/)
+  })
+
   it('places one of two units by a story flag, saying which', () => {
     expect(map('fe11-final').forced).toEqual([{ name: 'Gotoh (Nagi if Chapter 24x was played)', tile: [15, 5] }])
   })

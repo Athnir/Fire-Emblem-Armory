@@ -1394,12 +1394,14 @@ def main():
                 elif kind == VILLAGE:
                     reward = []
                     for g in groups_placed(ch.ter, h):
-                        # A recruit walks out of the village (Wrys in Chapter 1).
+                        # A recruit walks out of the village (Wrys in Chapter 1). Only Marth visits a village: the Visit command
+                        # offers one (tile kind 8) only to a unit with attribute 0x02 (overlay 00 0x21c112c, arm9 0x203c810), which
+                        # only Marth's placements carry; a house (kind 9) is anyone's.
                         for u in ch.groups.get(g, []):
                             who = unit_name(u)
                             reward.append(f'{who} joins')
                             m.setdefault('joiners', []).append({'name': who, 'tile': ch.app(u['at']), 'from': tile, 'group': g,
-                                                                'when': f'Joins when a unit visits the village at ({tile[0]}, {tile[1]})'})
+                                                                'when': f'Joins when Marth visits the village at ({tile[0]}, {tile[1]})'})
                             ds = join(u['person']['pid'], key)
                             for iid, _ in u['items'] if ds else []:
                                 source(iid, mid, 'kit-later', f'Carried by {who} on joining', ds)

@@ -37,6 +37,11 @@ describe("New Mystery of the Emblem's chapters", () => {
   it("splits three times in the prologue: the answer at the end of III, V and VI picks the next chapter's version", () => {
     const ids = (route: string) => walkFork(FE12_FORK, route).story.maps.map((m) => m.id)
     expect(FE12_FORK.choices.map((c) => c.label)).toEqual(['Prologue IV (Yes)', 'Prologue IV (No)'])
+    // Each split asks the game's own question (the message its Ending's DialogYesNo follows), its buttons the chapter, then the answer.
+    expect(FE12_FORK.question).toMatch(/^At the end of Prologue III, Jagen asks: "Don't tell me you're still in the dark/)
+    expect(FE12_FORK.choices.map((c) => c.proceed)).toEqual(['Proceed to Prologue IV: answered Yes', 'Proceed to Prologue IV: answered No'])
+    expect(FE12_FORK.choices[0].fork!.question).toBe(`At the end of Prologue V, Katarina asks: "What's the matter, Kris? Is there something bothering you?"`)
+    expect(FE12_FORK.choices[0].fork!.choices[1].fork!.question).toMatch(/^At the end of Prologue VI, Katarina asks: /)
     const yes = ids('yes/yes/yes')
     expect(yes.slice(0, 11)).toEqual(['fe12-p1', 'fe12-p2', 'fe12-p3', 'fe12-p4b', 'fe12-p5', 'fe12-p6b', 'fe12-p7b', 'fe12-p8', 'fe12-1', 'fe12-2', 'fe12-3'])
     const mixed = ids('no/yes/no')
@@ -265,6 +270,73 @@ describe("New Mystery of the Emblem's weapons", () => {
   it('marks the weapons only foes carry, and lists only what something gives', () => {
     expect(FE12_LISTED.find((w) => w.name === 'Dark Breath')?.foeOnly).toBe(true)
     expect(FE12_LISTED.find((w) => w.name === 'Iron Sword')?.foeOnly).toBeUndefined()
+  })
+
+  it("names Cecille's Sword without the patch's spacing code (0x89 before a space)", () => {
+    expect(weapon("Cecille's Sword")).toBeDefined()
+    expect(FE12_WEAPONS.some((w) => w.name.includes('\ufffd'))).toBe(false)
+  })
+})
+
+describe("New Mystery of the Emblem's joins, as the placements make them", () => {
+  const rows = (name: string, mapId: string) => (FE12_ITEM_SOURCES[name] ?? []).filter((s) => s.mapId === mapId).map((s) => [s.kind, s.text])
+  const anyone = (id: string, name: string) =>
+    [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)].filter((u) => u.name === name)
+
+  it('has only Marth visit a village, but any unit on the maps that let it (SetGameMode(2): the Chronicles, the DLC)', () => {
+    const joiners = FE12_MAPS.filter((m) => m.route === 'Story').flatMap((m) => m.joiners ?? [])
+      .filter((j) => typeof j.when === 'string' && j.when.includes('village'))
+    expect(joiners).toHaveLength(9)
+    for (const j of joiners) expect(j.when).toMatch(/^Joins when Marth visits the village at \(\d+, \d+\)$/)
+  })
+
+  it("counts a unit's gear where a record of yours with 0x80 brings it in: the opening, a turn, the end", () => {
+    // The opening (Chapter 2's Catria, on the map from the start), a returning unit's new copies (Merric in Chapter 10, after
+    // Prologue VIII's end sent him away), a turn (Prologue V's Merric, Chapter 6's Frey and Norne: joiners), the end (kit-later).
+    expect(map('fe12-2').forced).toContainEqual({ name: 'Catria', tile: [17, 5] })
+    expect(rows('Excalibur', 'fe12-10')).toEqual([['kit', 'Carried by Merric on joining']])
+    expect(map('fe12-p5').joiners).toEqual([{ name: 'Merric', tile: [2, 3], from: [2, 3], group: 'm01', when: 'Turn 2, player phase' }])
+    expect(rows('Fire', 'fe12-p5')).toContainEqual(['kit-later', 'Carried by Merric on joining'])
+    expect(map('fe12-6').joiners!.map((j) => [j.name, j.when])).toEqual([['Frey', 'Turn 3, player phase'], ['Norne', 'Turn 3, player phase']])
+    expect(rows('Devil Axe', 'fe12-10')).toEqual([['kit-later', 'Carried by Dice on joining']])
+    expect(rows('Thunder', 'fe12-17')).toContainEqual(['kit-later', 'Carried by Frost on joining'])
+    // Placed as the first player phase starts, before you move: Cecille, in both versions of Prologue VI.
+    for (const id of ['fe12-p6', 'fe12-p6b']) {
+      expect(map(id).forced).toEqual([{ name: 'Cecille', tile: [9, 4] }])
+      expect(rows('Steel Sword', id)).toContainEqual(['kit', 'Carried by Cecille on joining'])
+    }
+    expect(rows('Steel Sword', 'fe12-1').some(([, t]) => t.includes('Cecille'))).toBe(false)
+    // Chapter 20's end places Nyna, Elice, Maria and Lena for its scene and takes them off again: none joins there.
+    expect(rows('Thoron', 'fe12-20')).toEqual([])
+    // Chapter 21's Michalis, under the checks its end makes.
+    expect(rows('Silver Lance', 'fe12-21')).toContainEqual([
+      'kit-later', 'Carried by Michalis on joining (if Minerva stops on the village at (27, 29) by turn 15, before it is visited, and Marth then visits it)',
+    ])
+  })
+
+  it("follows each way through the prologue's answers, the units it brings counted once on each", () => {
+    expect(rows('Iron Bow', 'fe12-p4')).toEqual([['kit-later', 'Carried by Gordin on joining']])
+    expect(rows('Iron Sword', 'fe12-p4b')).toEqual([['kit-later', 'Carried by Athena on joining']])
+    expect(rows('Iron Lance', 'fe12-p4b')).toContainEqual(['kit', 'Carried by Caeda on joining'])
+    // Chapter 1's deployment brings in whoever the prologue's answers left out.
+    expect(rows('Steel Bow', 'fe12-1')).toEqual([['kit', 'Carried by Gordin on joining (if the answer at the end of Prologue III was Yes)']])
+    expect(rows('Steel Lance', 'fe12-1')).toEqual([['kit', 'Carried by Draug on joining (if the answer at the end of Prologue V was No)']])
+  })
+
+  it("takes nothing from the side stories: their casts are their own, their units' gear never yours", () => {
+    const side = Object.values(FE12_ITEM_SOURCES).flat().filter((s) => /^fe12-(ac|dl)/.test(s.mapId))
+    expect(side.some((s) => s.kind.replace(/^dlc-/, '').startsWith('kit'))).toBe(false)
+    expect(map('fe12-dl1').joiners!.map((j) => j.name)).toEqual(['Michalis', 'Feena'])
+  })
+
+  it('says each recruiting talk on the starting foes, a stand-in or not', () => {
+    // Jeorge, Astram, Sedgar and Wolf stand on tiles a generic takes once they're killed: their entries carry the talk, and no drop.
+    const talk = (id: string, name: string) => [...new Set(anyone(id, name).map((u) => u.talk))]
+    expect(talk('fe12-8', 'Jeorge')).toEqual(['Recruit: talk with Gordin or Marth'])
+    expect(talk('fe12-16', 'Astram')).toEqual(['Recruit: talk with Jeorge'])
+    expect(talk('fe12-19', 'Sedgar')).toEqual(['Recruit: talk with Vyland'])
+    expect(talk('fe12-19', 'Wolf')).toEqual(['Recruit: talk with Sedgar'])
+    expect(anyone('fe12-19', 'Wolf').every((u) => !u.drops && u.standIn?.drops)).toBe(true)
   })
 })
 

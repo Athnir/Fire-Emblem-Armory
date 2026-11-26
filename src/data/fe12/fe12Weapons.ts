@@ -102,7 +102,7 @@ export const FE12_WEAPONS: ChapterWeapon[] = [
   {"id": "pure-sword", "name": "Pure Sword", "romId": 137, "category": "Sword", "rank": "D", "range": "1", "uses": 10, "worth": 700, "mt": 8, "hit": 100, "crit": 0, "effective": [], "rules": ["Can be used to raise Res +7"]},
   {"id": "quick-sword", "name": "Quick Sword", "romId": 138, "category": "Sword", "rank": "D", "range": "1", "uses": 12, "worth": 960, "mt": 2, "hit": 80, "crit": 0, "effective": [], "rules": ["Strikes twice in a row"]},
   {"id": "lukes-sword", "name": "Luke's Sword", "romId": 139, "category": "Sword", "rank": "E", "range": "1", "uses": 30, "worth": 750, "mt": 7, "hit": 80, "crit": 10, "effective": [], "rules": []},
-  {"id": "cecilles-sword", "name": "Cecille's� Sword", "romId": 140, "category": "Sword", "rank": "E", "range": "1", "uses": 25, "worth": 625, "mt": 6, "hit": 100, "crit": 10, "effective": [], "rules": []},
+  {"id": "cecilles-sword", "name": "Cecille's Sword", "romId": 140, "category": "Sword", "rank": "E", "range": "1", "uses": 25, "worth": 625, "mt": 6, "hit": 100, "crit": 10, "effective": [], "rules": []},
   {"id": "ogmas-blade", "name": "Ogma's Blade", "romId": 141, "category": "Sword", "rank": "C", "range": "1", "uses": 20, "worth": 1600, "mt": 12, "hit": 90, "crit": 20, "effective": [], "rules": []},
   {"id": "laundry-pole", "name": "Laundry Pole", "romId": 142, "category": "Lance", "rank": "E", "range": "1", "uses": 20, "worth": 100, "mt": 1, "hit": 90, "crit": 0, "effective": [], "rules": []},
   {"id": "flycatcher", "name": "Flycatcher", "romId": 143, "category": "Lance", "rank": "E", "range": "1", "uses": 10, "worth": 800, "mt": 6, "hit": 70, "crit": 0, "effective": ["flying"], "rules": []},
