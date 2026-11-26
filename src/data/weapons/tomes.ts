@@ -29,7 +29,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'fire',
   },
   {
@@ -44,7 +44,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'thunder',
   },
   {
@@ -59,7 +59,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'fimbulvetr',
   },
   {
@@ -74,7 +74,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'ragnarok',
   },
   {
@@ -89,7 +89,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'ginnungagap',
   },
   {
@@ -104,7 +104,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 3400, sell: 1150 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'lightning',
   },
   {
@@ -119,7 +119,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 3000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'mjolnir',
   },
   {
@@ -135,7 +135,7 @@ export const TOMES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'nosferatu',
   },
   {
@@ -264,7 +264,7 @@ export const TOMES: Weapon[] = [
     faction: 'Nohr',
     rank: 'B',
     stats: { mt: 7, hit: 85, crit: 0, avoid: 0, dodge: 0, range: '1~2' },
-    effects: 'After combat, Magic and Skill -2 (stacks; recovers 1 a turn). On-hit debuff: Defence/Resistance -4',
+    effects: 'After combat, Magic and Skill -2 (stacks; recovers 1 a turn). On-hit debuff: Defense/Resistance -4',
     canCrit: true,
     isMagic: true,
     forgeable: true,
@@ -324,7 +324,7 @@ export const TOMES: Weapon[] = [
     purchase: { buy: 3000 },
     availability: {
       routes: ['all'],
-      source: 'Dawn or Dusk Armoury (whichever your route builds) — sold at any level, when Robin is your Visiting Shopkeeper (requires Robin amiibo)',
+      source: 'Dawn or Dusk Armory (whichever your route builds) — sold at any level, when Robin is your Visiting Shopkeeper (requires Robin amiibo)',
     },
     iconId: 'robins-primer',
   },

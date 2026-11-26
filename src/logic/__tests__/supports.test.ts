@@ -47,7 +47,7 @@ describe('Radiant Dawn supports', () => {
 
   it('is in the game list with its own hit system, supports, weapons and maps', async () => {
     const fe10 = GAMES.find((g) => g.id === 'fe10')!
-    expect(fe10).toMatchObject({ title: 'Fire Emblem: Radiant Dawn', hitSystem: '2rn' })
+    expect(fe10).toMatchObject({ title: 'Radiant Dawn', hitSystem: '2rn' })
     const parts = await fe10.load()
     expect(parts.supports).toBeDefined()
     expect(parts.weapons).toBeDefined()

@@ -8,6 +8,7 @@ import { ForgeTable } from './ForgeTable'
 import { PixelIcon } from '../icons/PixelSprite'
 import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, NOT_FOR_PLAYER, REVERSED_TRIANGLE } from '../icons/sprites'
 import { effectivenessIcons } from '../icons/weaponIcons'
+import { rangeText } from '../logic/rangeText'
 
 const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }
 
@@ -135,7 +136,7 @@ export function WeaponDetailPanel({
             ['Crit', crit],
             ['Avoid', weapon.stats.avoid],
             ['Dodge', weapon.stats.dodge],
-            ['Rng', weapon.stats.range],
+            ['Rng', rangeText(weapon.stats.range)],
             ...(weapon.stats.uses !== undefined ? ([['Uses', weapon.stats.uses]] as const) : []),
           ] as const
         ).map(([label, value]) => (

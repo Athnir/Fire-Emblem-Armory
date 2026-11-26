@@ -143,7 +143,7 @@ def flag_list(value):
 _ID_TAGS = [('改_ノーマル', 'upgraded, Normal'), ('改', 'upgraded'), ('＋＋', '++'), ('＋', '+'), ('_最弱', 'weakest'),
             ('_微弱', 'a little weaker'), ('_弱', 'weaker'), ('_微強', 'a little stronger'), ('_最強', 'strongest'),
             ('_強', 'stronger'), ('_低命中', 'lower Hit'), ('闇', 'dark'), ('黒', 'dark'), ('_竜族', 'dragons'),
-            ('_重装', 'armoured'), ('_気功', 'Arts'), ('_風魔法', 'wind'), ('_炎魔法', 'fire'), ('_雷魔法', 'thunder')]
+            ('_重装', 'armored'), ('_気功', 'Arts'), ('_風魔法', 'wind'), ('_炎魔法', 'fire'), ('_雷魔法', 'thunder')]
 
 
 @functools.lru_cache(maxsize=None)

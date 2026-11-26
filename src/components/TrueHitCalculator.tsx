@@ -64,10 +64,10 @@ export function TrueHitCalculator({ system, gameName, note }: { system: HitSyste
         {result ? (
           <div>
             <p className="text-sm text-neutral-400">True chance to hit</p>
-            <p className="text-5xl font-bold text-emerald-400">{formatBasisPoints(result.trueHitBasisPoints)}%</p>
+            <p className="text-5xl font-bold text-violet-400">{formatBasisPoints(result.trueHitBasisPoints)}%</p>
             <p className="mt-1 text-sm text-neutral-400">
               Displayed {result.displayed} → true {formatBasisPoints(result.trueHitBasisPoints)}%
-              {gain > 0 && <span className="text-emerald-500"> (+{gain.toFixed(2)})</span>}
+              {gain > 0 && <span className="text-violet-400"> (+{gain.toFixed(2)})</span>}
             </p>
             {result.adjusted && <p className="mt-1 text-sm text-amber-400">{ADJUSTED_NOTE[result.adjusted]}</p>}
           </div>
@@ -100,9 +100,9 @@ export function TrueHitCalculator({ system, gameName, note }: { system: HitSyste
           </text>
           {/* Dashed diagonal = "what you see is what you get", for reference against the real curve. */}
           <line x1={x(0)} y1={y(0)} x2={x(100)} y2={y(100)} strokeDasharray="3 3" className="stroke-neutral-600" />
-          <polyline points={curve(system)} fill="none" strokeWidth={2} className="stroke-emerald-400" />
+          <polyline points={curve(system)} fill="none" strokeWidth={2} className="stroke-violet-400" />
           {result && truePct !== null && (
-            <circle cx={x(result.displayed)} cy={y(truePct)} r={4} className="fill-emerald-300 stroke-neutral-950" strokeWidth={1.5} />
+            <circle cx={x(result.displayed)} cy={y(truePct)} r={4} className="fill-violet-300 stroke-neutral-950" strokeWidth={1.5} />
           )}
         </svg>
         <p className="mt-1 text-xs text-neutral-500">Dashed line: displayed = true. Green: what {gameName} actually rolls.</p>

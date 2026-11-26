@@ -215,7 +215,7 @@ function App() {
                 onClick={() => setTool(t.id)}
                 className={`-mb-px border-b-2 px-3 py-1.5 text-sm ${
                   tool === t.id
-                    ? 'border-emerald-400 text-neutral-100'
+                    ? 'border-violet-400 text-neutral-100'
                     : 'border-transparent text-neutral-400 hover:text-neutral-200'
                 }`}
               >

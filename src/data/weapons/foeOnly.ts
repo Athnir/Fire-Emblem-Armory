@@ -3,7 +3,7 @@ import { HOSHIDO_CATEGORIES, NOHR_CATEGORIES } from '../types'
 import { GAME_ITEMS } from './gameItems'
 
 const TARGET: Record<string, string> = {
-  flying: 'Flying units', dragon: 'Dragon units', armour: 'Armoured units', beast: 'Horse/Beast units', monster: 'Monster units',
+  flying: 'Flying units', dragon: 'Dragon units', armour: 'Armored units', beast: 'Horse/Beast units', monster: 'Monster units',
   sword: 'Sword-wielding units', lance: 'Lance-wielding units', axe: 'Axe-wielding units', tome: 'Tome-wielding units',
 }
 

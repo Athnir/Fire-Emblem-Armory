@@ -14,7 +14,7 @@ import type { Weapon } from '../types'
  * character-locked personal weapon follows THAT character's own route availability (e.g. Ganglari
  * is Corrin's default weapon on Conquest specifically), and the rare named "cross" weapon that shows
  * up on the opposite faction's route through a specific one-off chapter reward (e.g. Dual Club,
- * normally a Dawn Armoury/Hoshido-only item, also dropping in Conquest ch. 10). Don't chase
+ * normally a Dawn Armory/Hoshido-only item, also dropping in Conquest ch. 10). Don't chase
  * per-chapter sourcing on ordinary shop-tier weapons — the category-faction default is enough.
  *
  * IMPORTANT CAVEAT on that "everything else defaults to 'all'" rule: it does NOT apply to My Castle
@@ -36,7 +36,7 @@ export const SWORDS: Weapon[] = [
     canCrit: false,
     forgeable: true,
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'bronze-sword',
   },
   {
@@ -50,7 +50,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'iron-sword',
   },
   {
@@ -64,7 +64,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'steel-sword',
   },
   {
@@ -78,7 +78,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'silver-sword',
   },
   {
@@ -92,7 +92,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'brave-sword',
   },
   {
@@ -105,9 +105,9 @@ export const SWORDS: Weapon[] = [
     effects: '',
     canCrit: true,
     forgeable: true,
-    effectiveness: { vs: 'Armoured units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
+    effectiveness: { vs: 'Armored units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
     purchase: { buy: 2500, sell: 850 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'armorslayer',
   },
   {
@@ -122,7 +122,7 @@ export const SWORDS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Dragon units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
     purchase: { buy: 2500, sell: 850 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'wyrmslayer',
   },
   {
@@ -136,7 +136,7 @@ export const SWORDS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 3000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'killing-edge',
   },
   {
@@ -151,7 +151,7 @@ export const SWORDS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 3300, sell: 1100 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'levin-sword',
   },
   {
@@ -161,7 +161,7 @@ export const SWORDS: Weapon[] = [
     faction: 'Nohr',
     rank: 'E',
     stats: { mt: 11, hit: 80, crit: 5, avoid: 0, dodge: 10, range: '1~2' },
-    effects: 'Xander only; Defence +4 while in possession (even unequipped)',
+    effects: 'Xander only; Defense +4 while in possession (even unequipped)',
     canCrit: true,
     forgeable: false,
     isPersonal: true,
@@ -362,7 +362,7 @@ export const SWORDS: Weapon[] = [
     purchase: { buy: 3000 },
     availability: {
       routes: ['all'],
-      source: 'Dawn or Dusk Armoury (whichever your route builds) — sold at any level, when Marth is your Visiting Shopkeeper (requires Marth amiibo)',
+      source: 'Dawn or Dusk Armory (whichever your route builds) — sold at any level, when Marth is your Visiting Shopkeeper (requires Marth amiibo)',
     },
     iconId: 'marths-spatha',
   },
@@ -380,7 +380,7 @@ export const SWORDS: Weapon[] = [
     purchase: { buy: 3000 },
     availability: {
       routes: ['all'],
-      source: 'Dawn or Dusk Armoury (whichever your route builds) — sold at any level, when Ike is your Visiting Shopkeeper (requires Ike amiibo)',
+      source: 'Dawn or Dusk Armory (whichever your route builds) — sold at any level, when Ike is your Visiting Shopkeeper (requires Ike amiibo)',
     },
     iconId: 'ikes-backup',
   },
@@ -398,7 +398,7 @@ export const SWORDS: Weapon[] = [
     purchase: { buy: 3000 },
     availability: {
       routes: ['all'],
-      source: 'Dawn or Dusk Armoury (whichever your route builds) — sold at any level, when Lucina is your Visiting Shopkeeper (requires Lucina amiibo)',
+      source: 'Dawn or Dusk Armory (whichever your route builds) — sold at any level, when Lucina is your Visiting Shopkeeper (requires Lucina amiibo)',
     },
     iconId: 'lucinas-estoc',
   },

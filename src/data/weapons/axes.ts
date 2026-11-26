@@ -29,7 +29,7 @@ export const AXES: Weapon[] = [
     canCrit: false,
     forgeable: true,
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'bronze-axe',
   },
   {
@@ -43,7 +43,7 @@ export const AXES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'iron-axe',
   },
   {
@@ -57,7 +57,7 @@ export const AXES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'steel-axe',
   },
   {
@@ -71,7 +71,7 @@ export const AXES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'silver-axe',
   },
   {
@@ -85,7 +85,7 @@ export const AXES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'brave-axe',
   },
   {
@@ -100,7 +100,7 @@ export const AXES: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     purchase: { buy: 1800, sell: 650 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'hand-axe',
   },
   {
@@ -115,7 +115,7 @@ export const AXES: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     purchase: { buy: 4500, sell: 1500 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'tomahawk',
   },
   {
@@ -128,9 +128,9 @@ export const AXES: Weapon[] = [
     effects: '',
     canCrit: true,
     forgeable: true,
-    effectiveness: { vs: 'Armoured units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
+    effectiveness: { vs: 'Armored units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
     purchase: { buy: 2500, sell: 850 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'hammer',
   },
   {
@@ -145,7 +145,7 @@ export const AXES: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 3300, sell: 1100 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'bolt-axe',
   },
   {
@@ -159,7 +159,7 @@ export const AXES: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 3000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'killer-axe',
   },
   {

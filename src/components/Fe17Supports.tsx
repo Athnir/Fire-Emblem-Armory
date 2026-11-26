@@ -2,7 +2,7 @@ import { FE17_SUPPORTS } from '../data/fe17/fe17Supports'
 
 /**
  * Engage's supports: what an adjacent supporter gives by its own support type and the pair's level, read from the game's support table
- * and program (scripts/build-fe17-supports.py). Who has which type, and who supports whom, belong to the units: the Unit Planner's.
+ * and program (scripts/build-fe17-supports.py). Who has which type, and who supports whom, belong to the units: the Roster's.
  */
 export function Fe17Supports() {
   const cell = 'py-1 pr-4 text-right text-neutral-100'
@@ -46,7 +46,7 @@ export function Fe17Supports() {
         <li>An ally without a support with the unit (no rank yet) adds nothing.</li>
         <li>
           The types are the game's own, each named here by what it raises most: most playable characters have one of the last five, a few
-          and every other unit the Default one. Who has which belongs to the units, so it's in the Unit Planner.
+          and every other unit the Default one. Who has which belongs to the units, so it's in the Roster's Supports tab.
         </li>
       </ul>
     </section>

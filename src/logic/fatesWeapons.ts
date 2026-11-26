@@ -17,12 +17,12 @@ export interface FatesChapter {
 
 /** The shops each route builds: the Hoshidan pair, the Nohrian pair, or (Revelation) both. */
 const SHOPS: Record<Exclude<Route, 'all'>, string[]> = {
-  Birthright: ['Dawn Armoury', 'Rod Store'],
-  Conquest: ['Dusk Armoury', 'Staff Store'],
-  Revelation: ['Dawn Armoury', 'Rod Store', 'Dusk Armoury', 'Staff Store'],
+  Birthright: ['Dawn Armory', 'Rod Store'],
+  Conquest: ['Dusk Armory', 'Staff Store'],
+  Revelation: ['Dawn Armory', 'Rod Store', 'Dusk Armory', 'Staff Store'],
 }
 /** The chapter whose completion opens My Castle's first shop level: from then on its allies' items are yours to collect. */
-const CASTLE_OPENS_AFTER = FATES_BUILDING_CHAPTERS['Dawn Armoury'][0]
+const CASTLE_OPENS_AFTER = FATES_BUILDING_CHAPTERS['Dawn Armory'][0]
 /** The chapter whose completion opens the Dragon's Gate, which holds the DLC maps (Serenes Forest). */
 const DLC_OPENS_AFTER = 6
 

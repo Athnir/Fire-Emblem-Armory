@@ -2649,7 +2649,7 @@ export function MapViewer({ set }: { set: MapSet }) {
             onClick={() => chooseRoute(r)}
             aria-pressed={route === r}
             className={`rounded border px-3 py-1 text-sm ${
-              route === r ? 'border-emerald-500 bg-emerald-950/60 text-emerald-100' : 'border-neutral-700 text-neutral-300 hover:bg-neutral-800'
+              route === r ? 'border-violet-500 bg-violet-950/60 text-violet-100' : 'border-neutral-700 text-neutral-300 hover:bg-neutral-800'
             }`}
           >
             {r}
@@ -2742,7 +2742,7 @@ export function MapViewer({ set }: { set: MapSet }) {
           onClick={toggleInfoBelow}
           aria-pressed={infoBelow}
           title="Puts the tile and chapter panels under the map, so the map can use the full width."
-          className={`rounded border px-2 py-1 ${infoBelow ? 'border-emerald-500 bg-emerald-950 text-emerald-200' : 'border-neutral-700 bg-neutral-900'}`}
+          className={`rounded border px-2 py-1 ${infoBelow ? 'border-violet-500 bg-violet-950 text-violet-200' : 'border-neutral-700 bg-neutral-900'}`}
         >
           {infoBelow ? 'Info below the map' : 'Info beside the map'}
         </button>
@@ -2750,10 +2750,10 @@ export function MapViewer({ set }: { set: MapSet }) {
           type="button"
           onClick={toggleColourBlind}
           aria-pressed={colourBlind}
-          title="Tells the armies apart by their markers' shapes and edges, the starting tiles by their corners and every outline by its dashes, in colours that stay apart for red-green and blue-yellow colour blindness."
+          title="Tells the armies apart by their markers' shapes and edges, the starting tiles by their corners and every outline by its dashes, in colors that stay apart for red-green and blue-yellow color blindness."
           className={`rounded border px-2 py-1 ${colourBlind ? 'border-sky-500 bg-sky-950 text-sky-200' : 'border-neutral-700 bg-neutral-900'}`}
         >
-          {colourBlind ? 'Colour-blind friendly: on' : 'Colour-blind friendly'}
+          {colourBlind ? 'Colorblind-friendly: on' : 'Colorblind-friendly'}
         </button>
         {steps.length > 0 && !reach.on && (
           <div className="flex items-center gap-1" role="group" aria-label="The map by turn">

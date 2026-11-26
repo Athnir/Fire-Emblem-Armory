@@ -322,17 +322,17 @@ describe("Awakening's maps", () => {
   it("plays each opening: turn 1's placements stand from the start, a scripted battle's victim is gone, the gender's Morgan", () => {
     // The Prologue's party comes in the turn-1 opening: placed by the game, with Chrom's tile the lord's start.
     expect(map('fe13-prologue').corrinStart).toEqual([3, 2])
-    expect(map('fe13-prologue').forced!.map((f) => f.name)).toEqual(['Chrom', 'Lissa', 'Frederick', 'Avatar'])
+    expect(map('fe13-prologue').forced!.map((f) => f.name)).toEqual(['Chrom', 'Lissa', 'Frederick', 'Robin'])
     expect(map('fe13-premonition').corrinStart).toBeDefined()
     expect(map('fe13-3').forced).toContainEqual({ name: 'Sumia', tile: [12, 1] })
     // Chapter 7's Hierarch falls in the opening's scripted battle (ev::Battle): not a unit on the map.
     expect(map('fe13-7').units.some((u) => u.type === 'ally')).toBe(false)
-    // Paralogue 12 places one Morgan by the Avatar's gender: the other is its stand-in.
+    // Paralogue 12 places one Morgan by Robin's gender: the other is its stand-in.
     const morgans = map('fe13-par12').units.filter((u) => u.name === 'Morgan')
     expect(morgans).toHaveLength(1)
-    expect(morgans[0].standIn).toMatchObject({ name: 'Morgan', when: 'the Avatar is female' })
+    expect(morgans[0].standIn).toMatchObject({ name: 'Morgan', when: 'Robin is female' })
     // The Future Past 3's turn 1 gives the green Lucina the defeat condition (UnitSetSkill(SID_敗北条件)).
-    expect(map('fe13-dlc27').defeat).toBe('Chrom, the Avatar or Lucina is defeated')
+    expect(map('fe13-dlc27').defeat).toBe('Chrom, Robin or Lucina is defeated')
   })
 
   it('says what every talk does, and who joins without one', () => {
@@ -444,9 +444,9 @@ describe("Awakening's maps", () => {
     expect(map('fe13-1').victory).toBe('Rout the enemy')
     // Chapter 23 sets no win rule: the game's default, rout.
     expect(map('fe13-23').victory).toBe('Rout the enemy')
-    expect(map('fe13-6').defeat).toBe('Chrom, the Avatar or Emmeryn is defeated')
+    expect(map('fe13-6').defeat).toBe('Chrom, Robin or Emmeryn is defeated')
     expect(map('fe13-3').defeat).toContain('door keys')
-    expect(map('fe13-5').defeat).toBe('Chrom or the Avatar is defeated')
+    expect(map('fe13-5').defeat).toBe('Chrom or Robin is defeated')
   })
 
   it("times reinforcements from the chapter's script, by difficulty", () => {

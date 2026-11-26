@@ -11,7 +11,7 @@ export const FE12_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe12-p2",
       "kind": "kit",
-      "text": "Carried by Avatar on joining"
+      "text": "Carried by Kris on joining"
     },
     {
       "mapId": "fe12-p3",

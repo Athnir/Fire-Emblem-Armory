@@ -52,11 +52,16 @@ export function SpoilerBar({
           ‹ Back
         </button>
         {choosing ? (
-          walked!.pending!.choices.map((c) => (
-            <button key={c.id} onClick={() => onRoute([...path, c.id].join('/'), true)} className={proceed}>
-              {c.proceed ?? `Proceed as ${c.label}`} ›
-            </button>
-          ))
+          walked!.pending!.choices.map((c) => {
+            // The route's first chapter, then the route: "Proceed to Chapter 6: Birthright" (every route starts with the chapters
+            // walked so far).
+            const first = c.story.maps[at + 1]
+            return (
+              <button key={c.id} onClick={() => onRoute([...path, c.id].join('/'), true)} className={proceed}>
+                {c.proceed ?? (first ? `Proceed to ${c.story.name(first)}: ${c.label}` : `Proceed: ${c.label}`)} ›
+              </button>
+            )
+          })
         ) : (
           <button onClick={() => onChange(at + 1)} disabled={!next} className={proceed}>
             {next ? `Proceed to ${story.name(next)} ›` : 'End of the story'}

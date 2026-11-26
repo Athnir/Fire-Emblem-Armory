@@ -9,12 +9,13 @@ import { useDifficulty } from './Difficulty'
 import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import { ARMOR_HELM, BRAVE, BREACH, DRAGON_HEAD, HORSE_HEAD, LION_HEAD, MAGIC, NO_CRIT, NOT_FOR_PLAYER, PAW, WING } from '../icons/sprites'
+import { rangeText } from '../logic/rangeText'
 
 /** Damage from Mag, against Res: the tomes, and Radiant Dawn's cards (their type counts as magic). */
 const MAGIC_CATEGORIES = new Set(['Fire', 'Thunder', 'Wind', 'Light', 'Dark', 'Card'])
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   flying: { sprite: WING, label: 'fliers' },
-  armour: { sprite: ARMOR_HELM, label: 'armoured units' },
+  armour: { sprite: ARMOR_HELM, label: 'armored units' },
   horseback: { sprite: HORSE_HEAD, label: 'horseback units' },
   beast: { sprite: LION_HEAD, label: 'beast laguz' },
   dragon: { sprite: DRAGON_HEAD, label: 'dragon laguz' },
@@ -152,7 +153,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search weapon name..."
+          placeholder="Search weapon name…"
           className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         />
         {weapons.some((w) => w.foeOnly) && (
@@ -202,7 +203,7 @@ export function TelliusWeapons({ config }: { config: TelliusWeaponsConfig }) {
                   <td className={NUM}>{w.hit}</td>
                   <td className={NUM}>{w.crit}</td>
                   <td className={NUM}>{w.wt}</td>
-                  <td className={`${NUM} whitespace-nowrap`}>{w.range}</td>
+                  <td className={`${NUM} whitespace-nowrap`}>{rangeText(w.range)}</td>
                 </tr>
               ))}
             </tbody>
@@ -325,7 +326,7 @@ function Detail({ weapon: w, config }: { weapon: TelliusWeapon; config: TelliusW
         {stat('Hit', w.hit)}
         {stat('Crit', w.crit)}
         {stat('Wt', w.wt)}
-        {stat('Rng', w.range)}
+        {stat('Rng', rangeText(w.range))}
         {stat('Uses', w.uses ?? '∞')}
         {stat('Price', w.worth ? w.worth.toLocaleString() : '—')}
         {stat('WEx', w.wex)}

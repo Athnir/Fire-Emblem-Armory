@@ -4,6 +4,7 @@ import { PixelIcon } from '../icons/PixelSprite'
 import type { Sprite } from '../icons/sprites'
 import { BRAVE, MAGIC, MIGHT_UP, NO_CRIT, NO_FOLLOW_UP, NOT_FOR_PLAYER, REVERSED_TRIANGLE } from '../icons/sprites'
 import { effectivenessIcons } from '../icons/weaponIcons'
+import { rangeText } from '../logic/rangeText'
 
 /** Compact pixel-art markers shown next to a weapon's name in the list. Each mirrors a badge in
  * WeaponDetailPanel; the effectiveness ones show what the weapon is effective against. */
@@ -79,7 +80,7 @@ export function WeaponList({
             <td className={NUM}>{w.stats.mt}</td>
             <td className={NUM}>{w.stats.hit}</td>
             <td className={NUM}>{w.stats.crit}</td>
-            <td className={`${NUM} whitespace-nowrap`}>{w.stats.range}</td>
+            <td className={`${NUM} whitespace-nowrap`}>{rangeText(w.stats.range)}</td>
           </tr>
         ))}
         {weapons.length === 0 && (

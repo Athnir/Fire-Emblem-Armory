@@ -124,7 +124,7 @@ DUMMY = 'PID_ダミー'
 
 def unit_name(src, pid):
     if pid in AVATAR:
-        return 'Avatar'
+        return 'Robin'
     if pid == DUMMY:
         return 'Random foe'
     p = person(src, pid)
@@ -975,7 +975,7 @@ def build_map(key, facts=None):
                     if not cond and group not in at_start:
                         at_start.append(group)
     m['victory'] = 'Defeat the commander' if rule == 0x40000 else 'Rout the enemy'
-    m['defeat'] = 'Chrom or the Avatar is defeated'
+    m['defeat'] = 'Chrom or Robin is defeated'
     # Anyone else whose fall loses the chapter: a unit on your side whose person record has the defeat-condition flag (SID_敗北条件,
     # 0x20), and Chapter 3's keys (its CantDoorOpen condition ends the game).
     losers = []
@@ -984,16 +984,16 @@ def build_map(key, facts=None):
             p = person(src, u['pid'])
             if p and u['team'] != 1 and p['flags'] & 0x20 and u['pid'] not in AVATAR + ('PID_クロム',):
                 name = unit_name(src, u['pid'])
-                if name not in losers and name not in ('Chrom', 'Avatar', 'Player'):
+                if name not in losers and name not in ('Chrom', 'Robin', 'Player'):
                     losers.append(name)
     # And anyone a script gives the defeat condition (The Future Past 3's green Lucina, turn 1: UnitSetSkill(SID_敗北条件)).
     for hd in ch.of_kind(E.LOAD, E.TURN):
         for pid in E.skilled(ch, hd, 'SID_敗北条件'):
             name = unit_name(src, pid)
-            if name not in losers and name not in ('Chrom', 'Avatar'):
+            if name not in losers and name not in ('Chrom', 'Robin'):
                 losers.append(name)
     if losers:
-        m['defeat'] = 'Chrom, the Avatar' + ''.join(f', {n}' for n in losers[:-1]) + f' or {losers[-1]} is defeated'
+        m['defeat'] = 'Chrom, Robin' + ''.join(f', {n}' for n in losers[:-1]) + f' or {losers[-1]} is defeated'
     for hd in ch.of_kind(E.AREA):
         if ch.string(hd['args'][5]) == 'CantDoorOpen':
             m['defeat'] += ', or the door keys are lost before a door is opened'
@@ -1043,7 +1043,7 @@ def build_map(key, facts=None):
             m['victory'] = f'Defeat {bosses[0]}'
     m['objectives'] = []
     units = merge_same(units)
-    # A load that places one group or another by the Avatar's gender (Paralogue 12's Morgans): the other is a stand-in.
+    # A load that places one group or another by Robin's gender (Paralogue 12's Morgans): the other is a stand-in.
     for hd in ch.of_kind(E.LOAD):
         pair = E.gender_branch(hd)
         if pair:
@@ -1054,7 +1054,7 @@ def build_map(key, facts=None):
                 if stand and base:
                     units.remove(stand)
                     base['standIn'] = {'type': stand['type'], 'name': stand['name'], 'note': stand.get('note', ''),
-                                       'when': 'the Avatar is female'}
+                                       'when': 'Robin is female'}
                     if stand.get('generic'):
                         base['standIn']['generic'] = True
     m['units'] = units
@@ -1248,7 +1248,7 @@ def build_map(key, facts=None):
         if key.startswith('E'):
             m['notes'].append(f'Opens at the Outrealm Gate once {after} is cleared.')
         elif opener.get('parent'):
-            parent = 'the Avatar' if opener['parent'].startswith('プレイヤー') else src.name('MPID_' + opener['parent'])
+            parent = 'Robin' if opener['parent'].startswith('プレイヤー') else src.name('MPID_' + opener['parent'])
             m['notes'].append(f'Opens once {after} is cleared and {parent} is married.')
         elif opener.get('type') == 2:
             m['notes'].append(f'Opens once {after} is cleared and its SpotPass data has been received.')
@@ -1739,10 +1739,10 @@ def main():
                 if idx == D.RARE:
                     continue
                 add(D.item_name(by_index[idx]), mid, 'merchant-later',
-                    f"Sometimes sold by a travelling merchant in {c['location']}")
+                    f"Sometimes sold by a traveling merchant in {c['location']}")
             if D.RARE in c['merchant'] and key == 'P002':
                 for iid in D.rare_items():
-                    add(item_name(iid), mid, 'merchant-later', 'Sometimes sold by a travelling merchant anywhere (a rare item)')
+                    add(item_name(iid), mid, 'merchant-later', 'Sometimes sold by a traveling merchant anywhere (a rare item)')
         for name in facts['chests']:
             add(name, mid, pre + 'chest', 'In a chest')
         for name in facts['hidden']:
@@ -1778,7 +1778,6 @@ def main():
             if pid in joined or dlc or here.setdefault(pid, later) != later:
                 continue
             who = unit_name(Source(key), pid)
-            who = 'the Avatar' if who == 'Avatar' else who
             for iid in iids:
                 add(item_name(iid), mid, 'kit-later' if later else 'kit', f'Carried by {who} when they join', ds)
         joined |= set(here)
@@ -1837,18 +1836,18 @@ def skirmish_map(key, base):
     units = [{'type': 'enemy', 'name': 'Random foe', 'tile': t, 'note': f"One of {g['label']}'s Risen can stand here (the game picks them)."}
              for g in foe_groups for t in g['tiles']]
     units += [{'type': 'ally', 'name': 'Merchant', 'tile': t, 'generic': True,
-               'note': "The travelling merchant's tiles, used in place of a group when the world map puts a merchant here."}
+               'note': "The traveling merchant's tiles, used in place of a group when the world map puts a merchant here."}
               for t in trader]
     location = CHAPTERS.get(key, {}).get('location') or base['title']
     out = {
         'id': f"{base['id']}-skirmish", 'route': 'Skirmish', 'chapter': base['chapter'], 'title': location,
         'skirmishOf': base['id'], 'width': w - 2, 'height': h - 2, 'grid': grid_rows(w, h, tiles),
-        'victory': 'Rout the enemy', 'defeat': 'Chrom or the Avatar is defeated', 'objectives': [], 'units': units,
+        'victory': 'Rout the enemy', 'defeat': 'Chrom or Robin is defeated', 'objectives': [], 'units': units,
         'foeGroups': foe_groups, 'starts': starts, 'objects': [], 'changes': [],
         'notes': [
             'A skirmish the world map brings here: the game picks its Risen each time (their classes, levels, items and how many), '
             'and they come as one group or two, on the outlined tiles.',
-            "When the world map puts a travelling merchant here instead of one of the groups, the merchant takes the merchant's tiles; "
+            "When the world map puts a traveling merchant here instead of one of the groups, the merchant takes the merchant's tiles; "
             'if the merchant survives, you get a token of thanks.',
             'Routing two groups of Risen gets a reward from the villagers.',
             "The map is the chapter's own grid, as its terrain file lays it out: none of the chapter's own changes are made.",

@@ -8,7 +8,7 @@ import {
 } from '../data/supports/fatesSupports'
 import type { CombatBonus, StatBonus } from '../data/supports/types'
 
-const AVATAR = 'Corrin (Avatar)'
+const AVATAR = 'Corrin'
 const BOONS = ['Robust', 'Strong', 'Clever', 'Deft', 'Quick', 'Lucky', 'Sturdy', 'Calm']
 const BANES = ['Sickly', 'Weak', 'Dull', 'Clumsy', 'Slow', 'Unlucky', 'Fragile', 'Excitable']
 /** A boon and a bane can't hit the same stat. */

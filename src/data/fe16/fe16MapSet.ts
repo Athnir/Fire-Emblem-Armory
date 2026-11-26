@@ -94,7 +94,7 @@ export const FE16_FORK: StoryFork = {
       return {
         id: h.id,
         label: `${h.label} (${routes[0].route})`,
-        proceed: `Proceed to Chapter 1 with the ${h.label}`,
+        proceed: `Proceed to Chapter 1: ${h.label}`,
         story: stretch(routeMaps(routes[0].route), [routes[0].route]),
       }
     }
@@ -102,14 +102,14 @@ export const FE16_FORK: StoryFork = {
     return {
       id: h.id,
       label: h.label,
-      proceed: `Proceed to Chapter 1 with the ${h.label}`,
+      proceed: `Proceed to Chapter 1: ${h.label}`,
       story: before,
       fork: {
         before,
         choices: routes.map((r) => ({
           id: r.key,
           label: r.route,
-          proceed: `Proceed to Chapter 12 (${r.route})`,
+          proceed: `Proceed to Chapter 12: ${r.route}`,
           story: stretch(routeMaps(r.route), [r.route]),
         })),
       },

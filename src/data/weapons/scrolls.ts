@@ -30,7 +30,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'rat-spirit',
   },
   {
@@ -45,7 +45,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'ox-spirit',
   },
   {
@@ -60,7 +60,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'tiger-spirit',
   },
   {
@@ -75,7 +75,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'rabbit-spirit',
   },
   {
@@ -91,7 +91,7 @@ export const SCROLLS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Dragon units', multiplier: 3 },
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'dragon-spirit',
   },
   {
@@ -107,7 +107,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'calamity-gate',
   },
   {
@@ -122,7 +122,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'snake-spirit',
   },
   {
@@ -137,7 +137,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 2100, sell: 780 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'horse-spirit',
   },
   {
@@ -152,7 +152,7 @@ export const SCROLLS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 1800, sell: 700 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'sheep-spirit',
   },
   {

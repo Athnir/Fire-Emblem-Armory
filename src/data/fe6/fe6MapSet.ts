@@ -44,8 +44,8 @@ function secondSplit(first: ChapterMap[]): StoryFork {
   return {
     before: upToSplit(first),
     choices: [
-      { id: 'ilia', label: 'Ilia (17A–20A)', proceed: 'Proceed to Chapter 17A (Ilia)', story: toTheEnd([...first, ...ILIA, ...END]) },
-      { id: 'sacae', label: 'Sacae (17B–20B)', proceed: 'Proceed to Chapter 17B (Sacae)', story: toTheEnd([...first, ...SACAE, ...END]) },
+      { id: 'ilia', label: 'Ilia (17A–20A)', proceed: 'Proceed to Chapter 17A: Ilia', story: toTheEnd([...first, ...ILIA, ...END]) },
+      { id: 'sacae', label: 'Sacae (17B–20B)', proceed: 'Proceed to Chapter 17B: Sacae', story: toTheEnd([...first, ...SACAE, ...END]) },
     ],
   }
 }

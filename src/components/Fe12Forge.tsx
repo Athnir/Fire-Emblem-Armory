@@ -84,7 +84,7 @@ export function Fe12Forge({ weapon: w, opensAt }: { weapon: ChapterWeapon; opens
       </ul>
       <div className="rounded border border-amber-900 bg-amber-950/30 p-2">
         <p className="text-amber-300">Not yet confirmed in-game</p>
-        <p className="text-amber-200/80">One weapon per chapter: the option greys out after a forge, but where it's turned back on isn't traced.</p>
+        <p className="text-amber-200/80">One weapon per chapter: the option grays out after a forge, but where it's turned back on isn't traced.</p>
       </div>
     </div>
   )

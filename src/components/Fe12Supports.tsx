@@ -48,7 +48,7 @@ export function Fe12Supports() {
         <li>None of it applies in the arena, and the foe's army gets none of it.</li>
         <li>Displayed hit and crit are held between 0 and 100 after everything is added.</li>
       </ul>
-      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Unit Planner.</p>
+      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Roster's Supports tab.</p>
     </section>
   )
 }

@@ -1135,8 +1135,8 @@ describe("Three Houses' spoiler walk", () => {
     const be = walkFork(FE16_FORK, 'be')
     expect(be.story.maps.map((m) => m.id)).toEqual(WHITE_CLOUDS('be'))
     expect(be.pending?.choices.map((c) => [c.id, c.proceed])).toEqual([
-      ['cf', 'Proceed to Chapter 12 (Crimson Flower)'],
-      ['ss', 'Proceed to Chapter 12 (Silver Snow)'],
+      ['cf', 'Proceed to Chapter 12: Crimson Flower'],
+      ['ss', 'Proceed to Chapter 12: Silver Snow'],
     ])
     expect(walkFork(FE16_FORK, 'be/cf').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('be'), ...PART_TWO['Crimson Flower']])
     expect(walkFork(FE16_FORK, 'be/ss').story.maps.map((m) => m.id)).toEqual([...WHITE_CLOUDS('be'), ...PART_TWO['Silver Snow']])
@@ -1279,7 +1279,7 @@ describe("Three Houses' maps as its stages draw them", () => {
     // the same numbers the merged kinds had: only fliers cross them
     for (const code of ['wx', 'w7', 'wb'] as const) {
       expect(FE16_TERRAIN[code]!.move.Fliers, code).toBe(1)
-      expect(FE16_TERRAIN[code]!.move['Infantry & armour'], code).toBeNull()
+      expect(FE16_TERRAIN[code]!.move['Infantry & armor'], code).toBeNull()
     }
   })
 
@@ -1447,7 +1447,7 @@ describe("Three Houses' maps as its stages draw them", () => {
     // the user's fourth look: (18, 20) its dark slate, (15, 20) its grey stone, (16, 29) its tan, each with the Floor's numbers
     expect([at('fe16-20-ss', 18, 20), at('fe16-20-ss', 15, 20), at('fe16-20-ss', 16, 29)]).toEqual(['ge', 'gf', 't1'])
     for (const c of ['ge', 'gf', 't1']) expect(codes('fe16-20-ss').filter((k) => k === c).length, c).toBeGreaterThan(100)
-    expect(map('fe16-20-ss').terrainOverrides?.gf?.name).toBe('Floor (grey stone)')
+    expect(map('fe16-20-ss').terrainOverrides?.gf?.name).toBe('Floor (gray stone)')
   })
 
   it("gives Crimson Flower 36's water one colour, its ground a clear step over it", () => {

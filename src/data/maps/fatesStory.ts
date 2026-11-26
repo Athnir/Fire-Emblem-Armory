@@ -23,7 +23,7 @@ const MOZU_OPENS_AFTER = 8
  * the parents match who each child's chapter says to talk to.
  */
 const FIXED_PARENT: Record<number, string> = {
-  2: 'Avatar', 3: 'Azura', 4: 'Jakob', 5: 'Silas', 6: 'Kaze', 7: 'Ryoma', 8: 'Takumi', 9: 'Saizo', 10: 'Kaden', 11: 'Hinata',
+  2: 'Corrin', 3: 'Azura', 4: 'Jakob', 5: 'Silas', 6: 'Kaze', 7: 'Ryoma', 8: 'Takumi', 9: 'Saizo', 10: 'Kaden', 11: 'Hinata',
   12: 'Azama', 13: 'Subaki', 14: 'Hayato', 15: 'Xander', 16: 'Leo', 17: 'Benny', 18: 'Keaton', 19: 'Arthur', 20: 'Odin',
   21: 'Laslow', 22: 'Niles',
 }

@@ -77,7 +77,7 @@ TERRAIN = {
 # Tower is a peak's (fliers only, and fliers get no Avoid from terrain); Ruins (19) are what a razed village's houses become.
 # The movement types that have identical costs everywhere share one column on the page. (type numbers, the page's name)
 MOVE_GROUPS = [
-    ((0,), 'Knights'), ((1,), 'Promoted knights'), ((2,), 'Fliers'), ((3,), 'Swordfighters & archers'), ((4,), 'Armours'),
+    ((0,), 'Knights'), ((1,), 'Promoted knights'), ((2,), 'Fliers'), ((3,), 'Swordfighters & archers'), ((4,), 'Armors'),
     ((5, 9), 'Soldiers & lords'), ((6,), 'Axe fighters'), ((7,), 'Barbarians & hunters'), ((8,), 'Pirates'),
     ((10, 14), 'Mages & priests'), ((11, 12), 'Thieves & civilians'),
 ]

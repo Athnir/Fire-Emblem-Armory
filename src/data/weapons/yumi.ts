@@ -35,7 +35,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'brass-yumi',
   },
   {
@@ -50,7 +50,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'iron-yumi',
   },
   {
@@ -65,7 +65,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'steel-yumi',
   },
   {
@@ -80,7 +80,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'silver-yumi',
   },
   {
@@ -96,7 +96,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'spys-yumi',
   },
   {
@@ -112,7 +112,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 4000, sell: 1250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'dual-yumi',
   },
   {
@@ -127,7 +127,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 2700, sell: 900 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'illusory-yumi',
   },
   {
@@ -142,7 +142,7 @@ export const YUMI: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 4300, sell: 1400 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'surefire-yumi',
   },
   {
@@ -312,7 +312,7 @@ export const YUMI: Weapon[] = [
     faction: 'Hoshido',
     rank: 'D',
     stats: { mt: 7, hit: 55, crit: 0, avoid: 0, dodge: 0, range: '2' },
-    effects: "On-hit debuff: Skill/Defence/Resistance -4",
+    effects: "On-hit debuff: Skill/Defense/Resistance -4",
     canCrit: true,
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },

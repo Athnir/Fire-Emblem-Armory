@@ -74,7 +74,7 @@ OPENS = {
 # Hector's chapter numbers run one or two ahead of Eliwood's from Chapter 15; the notes name chapters the way the mode does.
 NUMBERS = {'Eliwood': {16: '16', 18: '18', 22: '22', 26: '26'}, 'Hector': {16: '17', 18: '19', 22: '23', 26: '28'}}
 
-MOVE_NAMES = {1: 'Lords, heroes & thieves', 10: 'Infantry', 20: 'Armours', 18: 'Fighters', 57: 'Brigands', 58: 'Pirates',
+MOVE_NAMES = {1: 'Lords, heroes & thieves', 10: 'Infantry', 20: 'Armors', 18: 'Fighters', 57: 'Brigands', 58: 'Pirates',
               59: 'Berserkers', 28: 'Mages & priests', 40: 'Cavaliers', 42: 'Paladins', 46: 'Nomads', 48: 'Nomad troopers',
               50: 'Fliers', 70: 'Dragons'}
 PHASE = {0x00: 'your phase', 0x40: "the other army's phase", 0x80: 'enemy phase'}
@@ -926,7 +926,7 @@ def story():
             text = r.text(r.u16(rec + (0x72 if mode == 'Hector' else 0x70)))
             head, title = heading_title(text)
             if entry in VERSION:
-                title = f'{title} (vs {VERSION[entry]})'
+                title = f'{title} (vs. {VERSION[entry]})'
             if entry == 47:
                 title = f'{title} (part 2)'
             number = int(re.match(r'Ch\.([0-9]+)', head).group(1)) if head.startswith('Ch.') else (0 if head == 'Prologue' else 33)

@@ -9,11 +9,8 @@ import type { GameParts } from '.'
 import { newWeaponsIn } from './newWeapons'
 
 // A weapon that deals magic damage counts as its magic type in the triangle too (main.dol 0x801a609c): the Flame Lance as fire.
-const magicIn = (type: string) => FE9_WEAPONS.filter((w) => w.magic === type).map((w) => w.name)
-const MAGIC_WEAPONS = `The weapons that deal magic damage take their magic's place instead: ${[
-  ...(['fire', 'thunder', 'wind'] as const).flatMap((t) => magicIn(t).map((n) => `the ${n} counts as ${t}`)),
-  ...magicIn('light').map((n) => `the ${n} (light) is outside it`),
-].join(', ')}.`
+// The tab names no weapon (the user's call, 2026-11-26): each one's datasheet says which magic it deals.
+const MAGIC_WEAPONS = "A weapon that deals magic damage takes its magic's place instead (fire, thunder or wind; light magic is outside it): its datasheet says which magic it deals."
 
 /** Path of Radiance's screens and data: loaded on their own the first time the game is picked. */
 const parts: GameParts = {

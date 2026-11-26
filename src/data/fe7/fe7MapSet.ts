@@ -13,14 +13,14 @@ const pick = (...ids: string[]) =>
   })
 
 const STORIES = ['Lyn', 'Eliwood', 'Hector'] as const
-/** The version a chapter's title names ('Four-Fanged Offense (vs Lloyd)'), where the story has two. */
-const version = (m: ChapterMap) => m.title.match(/\((vs [^)]+)\)$/)?.[1]
+/** The foe a chapter's version is named for ('Four-Fanged Offense (vs. Lloyd)': Lloyd), where the story has two. */
+const version = (m: ChapterMap) => m.title.match(/\(vs\.? ([^)]+)\)$/)?.[1]
 
 function chapterName(m: ChapterMap) {
   const h = m.heading ?? `Ch.${m.chapter}`
   const base = h === 'Final' ? 'Final Chapter' : h === 'Prologue' ? 'Prologue' : `Chapter ${h.slice(3)}`
   const v = version(m)
-  return v ? `${base} (${v})` : base
+  return v ? `${base} (vs. ${v})` : base
 }
 
 const words = { name: chapterName, short: (m: ChapterMap) => m.heading ?? `Ch.${m.chapter}` }
@@ -63,7 +63,7 @@ const HECTOR = {
 /** The story up to a split: nothing outside it opens. */
 const upToSplit = (maps: ChapterMap[]): StoryOrder => ({ ...storyOrder(maps, words), opensAt: () => Infinity })
 const toTheEnd = (maps: ChapterMap[]): StoryOrder => ({ ...storyOrder(maps, words), opensAt: () => Infinity })
-const versus = (id: string) => version(byId.get(id)!)!.slice(3)
+const versus = (id: string) => version(byId.get(id)!)!
 
 function lordStory(id: string, label: string, s: typeof ELIWOOD) {
   const start = [...LYN, ...s.before]
@@ -72,7 +72,7 @@ function lordStory(id: string, label: string, s: typeof ELIWOOD) {
     choices: s.second.map((v) => ({
       id: versus(v).toLowerCase(),
       label: `${s.numbers[1]}: ${versus(v)}`,
-      proceed: `Proceed to Chapter ${s.numbers[1]} (vs ${versus(v)})`,
+      proceed: `Proceed to Chapter ${s.numbers[1]}: vs. ${versus(v)}`,
       story: toTheEnd([...first, ...pick(v), ...s.after]),
     })),
   })
@@ -83,13 +83,13 @@ function lordStory(id: string, label: string, s: typeof ELIWOOD) {
       return {
         id: versus(v).toLowerCase(),
         label: `${s.numbers[0]}: ${versus(v)}`,
-        proceed: `Proceed to Chapter ${s.numbers[0]} (vs ${versus(v)})`,
+        proceed: `Proceed to Chapter ${s.numbers[0]}: vs. ${versus(v)}`,
         story: upToSplit(first),
         fork: secondSplit(first),
       }
     }),
   }
-  return { id, label, proceed: `Proceed to ${label} (Chapter 11)`, story: upToSplit(start), fork: firstSplit }
+  return { id, label, proceed: `Proceed to Chapter 11: ${label}`, story: upToSplit(start), fork: firstSplit }
 }
 
 /**
@@ -104,7 +104,7 @@ export const FE7_FORK: StoryFork = {
 /** Every chapter in the order the map page lists them (each story in turn): the weapon page's chapter names without the block. */
 export const FE7_STORY = storyOrder(FE7_MAPS, wordsWithStory)
 
-const label = (m: ChapterMap) => `${chapterName(m).replace(/ \(vs [^)]+\)$/, '')}: ${m.title}`
+const label = (m: ChapterMap) => `${chapterName(m).replace(/ \(vs\. [^)]+\)$/, '')}: ${m.title}`
 
 /** The Blazing Blade on the map page: a button per story, Normal and Hard (Lyn's story is Normal only). */
 export const FE7_MAP_SET: MapSet = {

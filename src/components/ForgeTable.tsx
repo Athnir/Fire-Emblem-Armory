@@ -54,7 +54,7 @@ export function ForgeTable({ weapon, highlightRank, maxRank = 7 }: { weapon: Wea
             return (
               <tr
                 key={rank}
-                className={`border-b border-neutral-800 ${rank === highlightRank ? 'bg-emerald-950' : ''}`}
+                className={`border-b border-neutral-800 ${rank === highlightRank ? 'bg-violet-950' : ''}`}
               >
                 <td className={`${CELL} text-neutral-200`}>{rank === 0 ? 'Base' : `+${rank}`}</td>
                 <td className={CELL}>{weapon.stats.mt + bonus.mt}</td>

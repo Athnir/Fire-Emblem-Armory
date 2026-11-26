@@ -65,7 +65,7 @@ export const FE8_FORK: StoryFork = {
   choices: ROUTES.map((route) => ({
     id: route.toLowerCase(),
     label: `${route}'s route`,
-    proceed: `Proceed to Chapter 9 (${route}'s route)`,
+    proceed: `Proceed to Chapter 9: ${route}'s route`,
     story: toTheEnd([...SHARED, ...ofRoute(route)], route),
   })),
 }

@@ -10,6 +10,7 @@ import type { Reach } from '../logic/spoiler'
 import { turnsUpAt } from '../logic/spoiler'
 import { useReach } from './Reach'
 import { onDifficulty, useDifficulty } from './Difficulty'
+import { rangeText } from '../logic/rangeText'
 
 /** A weapon of a game whose items turn up chapter by chapter (FE4, FE6): read from the game's own item table. */
 export interface ChapterWeapon {
@@ -131,7 +132,7 @@ export function withModifier(w: ChapterWeapon, m?: WeaponModifier): ChapterWeapo
 const TARGET: Record<string, { sprite: Sprite; label: string }> = {
   horseback: { sprite: HORSE_HEAD, label: 'horseback units' },
   flying: { sprite: WING, label: 'fliers' },
-  armour: { sprite: ARMOR_HELM, label: 'armoured units' },
+  armour: { sprite: ARMOR_HELM, label: 'armored units' },
   dragon: { sprite: DRAGON_HEAD, label: 'dragons' },
   wyvern: { sprite: DRAGON_HEAD, label: 'dragons and wyverns' },
   monster: { sprite: MONSTER, label: 'monsters' },
@@ -313,7 +314,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search weapon name..."
+          placeholder="Search weapon name…"
           className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         />
       </div>
@@ -357,7 +358,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
                   <td className={NUM}>{w.hit ?? '—'}</td>
                   {hasCrit && <td className={NUM}>{w.crit ?? '—'}</td>}
                   {hasWt && <td className={NUM}>{w.wt ?? '—'}</td>}
-                  <td className={`${NUM} whitespace-nowrap`}>{w.range}</td>
+                  <td className={`${NUM} whitespace-nowrap`}>{rangeText(w.range)}</td>
                 </tr>
               ))}
               {filtered.length === 0 && (
@@ -475,7 +476,7 @@ function Detail({
         {!staff && stat('Hit', w.hit ?? '—', delta('hit'))}
         {!staff && w.crit !== undefined && stat('Crit', w.crit, delta('crit'))}
         {!staff && hasWt && stat('Wt', w.wt ?? '—', delta('wt'), true)}
-        {w.range && stat('Rng', w.range)}
+        {w.range && stat('Rng', rangeText(w.range))}
         {hasUses && stat('Uses', w.uses ?? '∞')}
         {hasPrices && price}
         {w.exp !== undefined && stat('EXP', w.exp)}

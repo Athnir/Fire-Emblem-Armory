@@ -6,7 +6,7 @@ import type { Weapon } from '../types'
  * (https://serenesforest.net/fire-emblem-fates/inventory/katanas/), cross-checked per-weapon against
  * Fire Emblem Wiki for dodge/effectiveness/obtain-source the same way swords.ts was.
  *
- * Category-wide passive (not restated per-weapon): all Katanas grant +1 Speed, -1 Defence/Resistance
+ * Category-wide passive (not restated per-weapon): all Katanas grant +1 Speed, -1 Defense/Resistance
  * when equipped, unless a weapon's own effects explicitly override it (a few below do).
  *
  * Route default: Birthright+Revelation (Hoshido category). My Castle Treasure/Rank-reward items
@@ -32,7 +32,7 @@ export const KATANAS: Weapon[] = [
     canCrit: false,
     forgeable: true,
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'brass-katana',
   },
   {
@@ -46,7 +46,7 @@ export const KATANAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'iron-katana',
   },
   {
@@ -60,7 +60,7 @@ export const KATANAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'steel-katana',
   },
   {
@@ -74,7 +74,7 @@ export const KATANAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'silver-katana',
   },
   {
@@ -88,7 +88,7 @@ export const KATANAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'venge-katana',
   },
   {
@@ -103,7 +103,7 @@ export const KATANAS: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     purchase: { buy: 1800, sell: 650 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'kodachi',
   },
   {
@@ -118,7 +118,7 @@ export const KATANAS: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     purchase: { buy: 4500, sell: 1500 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'wakizashi',
   },
   {
@@ -133,7 +133,7 @@ export const KATANAS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Axe-wielding units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
     purchase: { buy: 3400, sell: 1150 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'axe-splitter',
   },
   {
@@ -148,7 +148,7 @@ export const KATANAS: Weapon[] = [
     reversesTriangle: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'dual-katana',
   },
   {
@@ -162,7 +162,7 @@ export const KATANAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 2700, sell: 900 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'practice-katana',
   },
   {
@@ -177,7 +177,7 @@ export const KATANAS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Monster units', multiplier: 3 },
     purchase: { buy: 2200, sell: 800 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'spirit-katana',
   },
   {
@@ -248,7 +248,7 @@ export const KATANAS: Weapon[] = [
     faction: 'Hoshido',
     rank: 'E',
     stats: { mt: 11, hit: 85, crit: 5, avoid: 10, dodge: 0, range: '1' },
-    effects: 'Avatar only; Defence and Resistance +2 while in possession (even unequipped)',
+    effects: 'Avatar only; Defense and Resistance +2 while in possession (even unequipped)',
     canCrit: true,
     forgeable: false,
     isPersonal: true,
@@ -263,7 +263,7 @@ export const KATANAS: Weapon[] = [
     faction: 'Hoshido',
     rank: 'E',
     stats: { mt: 16, hit: 85, crit: 10, avoid: 10, dodge: 10, range: '1' },
-    effects: 'Avatar only; Dragonskin cuts its damage by a quarter instead of half; Defence and Resistance +4 while in possession (even unequipped)',
+    effects: 'Avatar only; Dragonskin cuts its damage by a quarter instead of half; Defense and Resistance +4 while in possession (even unequipped)',
     canCrit: true,
     forgeable: false,
     isPersonal: true,
@@ -278,7 +278,7 @@ export const KATANAS: Weapon[] = [
     faction: 'Hoshido',
     rank: 'E',
     stats: { mt: 11, hit: 85, crit: 5, avoid: 10, dodge: 0, range: '1' },
-    effects: 'Avatar only; Strength, Speed, Defence and Resistance +2 while in possession (even unequipped)',
+    effects: 'Avatar only; Strength, Speed, Defense and Resistance +2 while in possession (even unequipped)',
     canCrit: true,
     forgeable: false,
     isPersonal: true,
@@ -293,7 +293,7 @@ export const KATANAS: Weapon[] = [
     faction: 'Hoshido',
     rank: 'E',
     stats: { mt: 16, hit: 85, crit: 10, avoid: 10, dodge: 10, range: '1' },
-    effects: 'Avatar only; Dragonskin cuts its damage by a quarter instead of half; Strength, Speed, Defence and Resistance +4 while in possession (even unequipped)',
+    effects: 'Avatar only; Dragonskin cuts its damage by a quarter instead of half; Strength, Speed, Defense and Resistance +4 while in possession (even unequipped)',
     canCrit: true,
     forgeable: false,
     isPersonal: true,

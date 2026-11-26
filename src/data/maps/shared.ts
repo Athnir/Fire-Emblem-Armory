@@ -34,7 +34,7 @@ export const CHAPTER_1: ChapterMap = {
       // Wiki: column 7, row 4, where Xander stands.
       tile: { default: [7, 10] },
       usableBy: 'Royals (Xander uses it after the first round of combat)',
-      effect: 'Creates a healing tile at the centre of the map.',
+      effect: 'Creates a healing tile at the center of the map.',
       patch: tilesBecome('ha', [[7, 7]]),
     },
   ],

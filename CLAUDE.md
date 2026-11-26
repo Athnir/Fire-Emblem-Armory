@@ -6,13 +6,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
 ## Scope
 
 - **Game data only.** Weapons, forging, shops, maps, true hit, and what supports do. Anything about specific
-  units (affinities, who supports whom, growths, builds) belongs in the partner Unit Planner
+  units (affinities, who supports whom, growths, builds) belongs in the partner app, the Roster
   (`../Fates App`), not here. Units on a map are fine: they're chapter data.
 - **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Weapon triangle,
   Maps, Supports; Battalions for Three Houses alone). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
   (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's. The picker lists every mainline
-  game in the series' order, numbered ("14. Fire Emblem Fates"), the ones not in the app greyed out in their place (Fortune's
-  Weave). With no game picked the app shows its home screen, as the Roster's does:
+  game in the series' order, numbered, by its name without "Fire Emblem" ("14. Fates", "15. Shadows of Valentia", never "Echoes";
+  "The" kept where the title has it: the user's call, 2026-11-26), the ones not in the app greyed out in their place (Fortune's
+  Weave). The Roster lists them the same way, with the same short names. With no game picked the app shows its home screen, as the Roster's does:
   what it is, the spoiler block's state and every game. It opens there on a first visit and with the block on, else on the last game.
 - **One difficulty per game, picked in the bar beside the game** (remembered per game on the device; a game with one has no
   choice). Every page shows only that difficulty's data: its maps' units, arrivals and layout, its bases' stock and forge, and the
@@ -1131,8 +1132,8 @@ A global switch (header, any game) that lets someone play along without being to
   run both armies at once; the list puts Alm's battles first where the game allows it: in Act 4, Alm reaching the Dragon's Maw before
   Duma Tower is cleared springs its trap and shuts his road on, so Celica's Act 4 comes between (`data-raw/fe15/README.md`).
 - **A game with no chapter order yet** is held back under the block, not shown in full. Turn the block off to see it.
-- **A game whose story splits (Fates) asks which route you're on** when the shared chapters run out (Proceed as
-  Birthright / Conquest / Revelation); the route can be changed in the bar. Only that route's chapters, paralogues and
+- **A game whose story splits (Fates) asks which route you're on** when the shared chapters run out (the user's pattern, 2026-11-26: the
+  route's first chapter, then the route, "Proceed to Chapter 6: Birthright", in both apps); the route can be changed in the bar. Only that route's chapters, paralogues and
   weapons are ever shown, and the route select on the weapon page goes away.
 - **A story can split more than once** (The Binding Blade: 10A or 10B after Chapter 9, Ilia or Sacae after 16x; The Blazing Blade:
   Lyn's story, then Eliwood's or Hector's, each split at Lloyd or Linus and at Kenneth or Jerme). Each split is
@@ -1194,8 +1195,9 @@ A global switch (header, any game) that lets someone play along without being to
   after the build and fails if a script or stylesheet is missing from the offline list.
 - **Updates come only from the user's tap** (the user's call): the header's "Check for updates" looks for a new version, and a found
   one waits until a second tap on "Update now" switches to it and reloads (`src/components/UpdateButton.tsx`, the PWA plugin's
-  `registerType: 'prompt'`). The app never checks, offers or reloads on its own, so a stray tap or a deploy never changes the page
-  under you.
+  `registerType: 'prompt'`). "Update now" waits five seconds for that tap, then goes back to "Check for updates" (the user's call,
+  2026-11-26). The app never checks, offers or reloads on its own, so a stray tap or a deploy never changes the page under you. The
+  Roster works the same way.
 - **A deploy that fails is urgent:** GitHub Pages stays on the last good build (the Tower maps were missing for days).
 
 ## Look and layout
@@ -1206,7 +1208,13 @@ A global switch (header, any game) that lets someone play along without being to
 - **Everything fits a phone screen.** Tapping a weapon scrolls to its datasheet. A select is never wider than the screen (the game
   picker's longest option made the whole page scroll sideways): `src/index.css`.
 - **Wording works for every game** ("Lord's start", not "Corrin's start").
-- **The map page has a colour-blind friendly switch** (the user's call, 2026-11-26), beside "Info beside the map", remembered on the
+- **The two apps match** (the user's calls, 2026-11-26, the look-over of both): the Roster's accent colors (violet for what's picked or
+  on, emerald for the spoiler block), "Spoiler block: on" / "off", the same game names, the same update button, and each calls the
+  other "the Roster" and "the Armory". The apps' own prose is American English (color, gray, armored, traveling; game terms as the
+  game spells them: Fates' own "Defense Tonic"); a weapon's range has a hyphen in every game ("1-2", `src/logic/rangeText.ts`); "vs."
+  with its period; each game's avatar goes by its default name (Corrin, Robin, Kris), never "Avatar"; the triangle tab names no weapon
+  or unit (a weapon's datasheet marks its magic and effectiveness).
+- **The map page has a colorblind-friendly switch** (the user's call, 2026-11-26), beside "Info beside the map", remembered on the
   device and off by default, so the watched maps keep their look. When it's on, nothing is told apart by colour alone, and the colours
   are Okabe and Ito's, which stay apart for red-green and blue-yellow colour blindness alike (`COLOUR_BLIND` in `src/icons/sprites.ts`,
   `ColourBlindContext`):

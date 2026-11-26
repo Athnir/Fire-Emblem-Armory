@@ -5,7 +5,7 @@ import type { Weapon } from '../types'
  * Forest's Naginatas page (https://serenesforest.net/fire-emblem-fates/inventory/naginatas/),
  * cross-checked per-weapon against Fire Emblem Wiki the same way the prior category files were.
  *
- * Category-wide passive: all Naginatas grant +1 Defence/Resistance when equipped, unless a weapon's
+ * Category-wide passive: all Naginatas grant +1 Defense/Resistance when equipped, unless a weapon's
  * own effects explicitly override it (several below do, including one that flips it negative).
  *
  * Route default: Birthright+Revelation (Hoshido category). My Castle Treasure/Rank-reward items
@@ -28,7 +28,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: false,
     forgeable: true,
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'brass-naginata',
   },
   {
@@ -42,7 +42,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'iron-naginata',
   },
   {
@@ -56,7 +56,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'steel-naginata',
   },
   {
@@ -70,7 +70,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'silver-naginata',
   },
   {
@@ -84,7 +84,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'venge-naginata',
   },
   {
@@ -99,7 +99,7 @@ export const NAGINATAS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Sword-wielding units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
     purchase: { buy: 3400, sell: 1150 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'swordcatcher',
   },
   {
@@ -114,7 +114,7 @@ export const NAGINATAS: Weapon[] = [
     reversesTriangle: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'dual-naginata',
   },
   {
@@ -128,7 +128,7 @@ export const NAGINATAS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 2700, sell: 900 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'guard-naginata',
   },
   {
@@ -143,7 +143,7 @@ export const NAGINATAS: Weapon[] = [
     isMagic: true,
     forgeable: true,
     purchase: { buy: 3300, sell: 1100 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'bolt-naginata',
   },
   {

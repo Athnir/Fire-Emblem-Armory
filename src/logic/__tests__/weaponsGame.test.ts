@@ -5,7 +5,7 @@ import { effectivenessIcons } from '../../icons/weaponIcons'
 
 /** The icon labels, as the game's effectiveness names. */
 const TARGET: Record<string, string> = {
-  'armoured units': 'armour', dragons: 'dragon', fliers: 'flying', 'mounted and beast units': 'beast', monsters: 'monster',
+  'armored units': 'armour', dragons: 'dragon', fliers: 'flying', 'mounted and beast units': 'beast', monsters: 'monster',
   'sword users': 'sword', 'lance users': 'lance', 'axe users': 'axe', 'tome users': 'tome',
 }
 
@@ -48,7 +48,7 @@ describe('weapon texts', () => {
   })
 
   // The amounts block of the item record (+0x38, HP to Res): Setsuna's Yumi takes Skill/Def/Res, as its own help text says.
-  const STAT: Record<string, string> = { Strength: 'str', Magic: 'mag', Skill: 'skl', Speed: 'spd', Luck: 'lck', Defence: 'def', Resistance: 'res' }
+  const STAT: Record<string, string> = { Strength: 'str', Magic: 'mag', Skill: 'skl', Speed: 'spd', Luck: 'lck', Defense: 'def', Resistance: 'res' }
   it("give each on-hit debuff the stats and amounts the game's item record has", () => {
     const debuffing = ALL_WEAPONS.filter((w) => w.effects.includes('On-hit debuff:'))
     expect(debuffing.length).toBe(34)

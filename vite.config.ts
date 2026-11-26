@@ -14,7 +14,7 @@ export default defineConfig(() => ({
   define: { __BUILD_TIME__: JSON.stringify(new Date().toISOString()) },
   // host: true makes the dev server reachable from a phone on the same Wi-Fi; allowedHosts adds the
   // Tailscale MagicDNS name, which Vite otherwise rejects as an unknown Host header.
-  // 5174/4174 rather than Vite's 5173/4173 defaults so this can run alongside the Unit Planner.
+  // 5174/4174 rather than Vite's 5173/4173 defaults so this can run alongside the Roster.
   server: {
     host: true,
     port: process.env.PORT ? Number(process.env.PORT) : 5174,
@@ -42,7 +42,7 @@ export default defineConfig(() => ({
       },
       manifest: {
         // An explicit app identity. Android keys installed apps on it, so it keeps this app apart from
-        // the Unit Planner (same github.io site) and from any half-finished earlier install.
+        // the Roster (same github.io site) and from any half-finished earlier install.
         id: 'fire-emblem-armory',
         name: 'Fire Emblem Armory',
         short_name: 'FE Armory',

@@ -52,7 +52,7 @@ TOWER = [(36 + i, f'Tower {i + 1}') for i in range(8)]
 RUINS = [(46 + i, f'Ruins {i + 1}') for i in range(10)]
 DIFFS = ['Easy', 'Normal', 'Hard']
 
-MOVE_NAMES = {1: 'Lords, heroes & thieves', 3: 'Paladins & great lords', 5: 'Cavaliers', 9: 'Armours', 72: 'Fliers',
+MOVE_NAMES = {1: 'Lords, heroes & thieves', 3: 'Paladins & great lords', 5: 'Cavaliers', 9: 'Armors', 72: 'Fliers',
               15: 'Infantry', 29: 'Rangers & dogs', 37: 'Mages & priests', 63: 'Fighters', 65: 'Brigands',
               66: 'Pirates', 67: 'Berserkers', 91: 'Mauthe Doogs & Tarvos', 102: 'Demon King'}
 PHASE = {0x00: 'your phase', 0x40: "the other army's phase", 0x80: 'enemy phase'}

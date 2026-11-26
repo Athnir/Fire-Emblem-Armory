@@ -49,8 +49,8 @@ describe("New Mystery of the Emblem's chapters", () => {
     expect(map('fe12-final').title).toBe('Light and Shadow')
     expect(map('fe12-ac1').title).toBe('Fall')
     expect(FE12_MAP_SET.difficulties.map((d) => d.value)).toEqual(MODES)
-    expect(map('fe12-1').defeat).toBe('Marth or the Avatar is defeated')
-    expect(map('fe12-p1').defeat).toBe('The Avatar is defeated')
+    expect(map('fe12-1').defeat).toBe('Marth or Kris is defeated')
+    expect(map('fe12-p1').defeat).toBe('Kris is defeated')
   })
 
   it('opens each gaiden chapter by a turn limit the difficulty scales (GetNormalizeTurn), or another way', () => {
@@ -65,7 +65,7 @@ describe("New Mystery of the Emblem's chapters", () => {
     const say = (id: string) => (map(id).notesOn ?? []).find((n) => n.note.startsWith('Opens if'))!.note
     expect(say('fe12-6x')).toContain('or if Rickard is in your army when it ends')
     expect(say('fe12-13x')).toContain('or if no foe has escaped the map')
-    expect(say('fe12-16x')).toContain('the Avatar is in a promoted class at level 5 or higher')
+    expect(say('fe12-16x')).toContain('Kris is in a promoted class at level 5 or higher')
     expect(say('fe12-20x')).toContain('at least 3 of Roshea, Wolf, Sedgar, Vyland and Midia')
     // Prologue VIII's end sets 3x's flag too; Chapter 20 goes on only with the Binding Shield (its ChapterNext, else BadEnd).
     expect(say('fe12-3x')).toContain('or if no more than 1 of your units fell in the prologue')
@@ -92,8 +92,8 @@ describe("New Mystery of the Emblem's maps", () => {
     expect(on('Reverse Lunatic')[0]).toContain('the foe strikes first')
   })
 
-  it("starts Prologue I with the Avatar; on Normal Jagen and the soldier come back with the tutorial's steps", () => {
-    expect(map('fe12-p1').forced).toEqual([{ name: 'Avatar', tile: [9, 1] }])
+  it("starts Prologue I with Kris; on Normal Jagen and the soldier come back with the tutorial's steps", () => {
+    expect(map('fe12-p1').forced).toEqual([{ name: 'Kris', tile: [9, 1] }])
     expect(map('fe12-p1').units.map((u) => [u.name, u.difficulties])).toEqual([
       ['Jagen', ['Hard', 'Maniac', 'Lunatic', 'Reverse Lunatic']],
       ['Soldier', ['Hard', 'Maniac', 'Lunatic', 'Reverse Lunatic']],

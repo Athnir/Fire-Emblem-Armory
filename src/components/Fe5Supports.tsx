@@ -21,7 +21,7 @@ export function Fe5Supports() {
         </li>
         <li>It adds to the weapon triangle, leadership, Charm and terrain bonuses.</li>
       </ul>
-      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Unit Planner.</p>
+      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Roster's Supports tab.</p>
     </section>
   )
 }

@@ -85,7 +85,7 @@ export function Fe10Forge({ weapon }: { weapon: TelliusWeapon }) {
           Each stat can go up or down by up to {FE10_FORGE_LIMIT} steps. Each one costs steps² × a tenth of the weapon's price, whichever way
           it goes. Mt, Hit and Wt can't drop below 1, Crit below 0.
         </li>
-        <li>Uses, rank and range stay the same as the base weapon's. You name it and pick its colour, and you can forge as many as you like per visit.</li>
+        <li>Uses, rank and range stay the same as the base weapon's. You name it and pick its color, and you can forge as many as you like per visit.</li>
       </ul>
       <details className="text-neutral-400">
         <summary className="cursor-pointer text-neutral-300">Coin cards: a Coin adds a random bonus</summary>

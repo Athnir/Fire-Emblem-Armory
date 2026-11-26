@@ -34,7 +34,8 @@ export interface ForkChoice {
   id: string
   /** As the route select names it ('Birthright', 'Ilia'). */
   label: string
-  /** The button at the split ('Proceed to Chapter 10A'); without it, "Proceed as" and the label. */
+  /** The button at the split ('Proceed to Chapter 10A'); without it, the route's first chapter and the label ('Proceed to Chapter 6:
+   * Birthright'). */
   proceed?: string
   /** The story down this route: to the end, or, with `fork`, to the route's next split. */
   story: StoryOrder

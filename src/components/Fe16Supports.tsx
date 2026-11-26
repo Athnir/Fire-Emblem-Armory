@@ -2,7 +2,7 @@ import { FE16_SUPPORTS } from '../data/fe16/fe16Supports'
 
 /**
  * Three Houses' supports: what one ally gives by its support level with the attacker, read from the game's support tables and
- * program (scripts/build-fe16-supports.py). Who supports whom belongs to the units, so it's the Unit Planner's.
+ * program (scripts/build-fe16-supports.py). Who supports whom belongs to the units, so it's the Roster's.
  */
 export function Fe16Supports() {
   const s = FE16_SUPPORTS
@@ -66,7 +66,7 @@ export function Fe16Supports() {
       </table>
       <p className="text-xs text-neutral-500">
         Not yet confirmed: which allies join (allies that could attack the target from where they stand, earlier-deployed ones first).
-        Who supports whom belongs to the units, so it's in the Unit Planner.
+        Who supports whom belongs to the units, so it's in the Roster's Supports tab.
       </p>
     </section>
   )

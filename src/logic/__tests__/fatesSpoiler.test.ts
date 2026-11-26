@@ -88,7 +88,7 @@ describe('the join chapters', () => {
 describe('My Castle buildings by chapter', () => {
   it('opens each level once its chapter is completed, so on the chapter after', () => {
     const level = (building: string, chapter: number) => buildingLevel(building, on('Birthright', chapter))
-    expect([6, 7, 13, 14, 20, 21].map((n) => level('Dawn Armoury', n))).toEqual([0, 1, 1, 2, 2, 3])
+    expect([6, 7, 13, 14, 20, 21].map((n) => level('Dawn Armory', n))).toEqual([0, 1, 1, 2, 2, 3])
     expect([8, 9, 14, 15, 20, 21].map((n) => level('Smithy', n))).toEqual([0, 1, 1, 2, 2, 3])
     expect(FATES_BUILDING_CHAPTERS.Smithy).toEqual([8, 14, 20])
   })
@@ -101,14 +101,14 @@ describe('My Castle buildings by chapter', () => {
   it("sells what a shop stocks at the level it's on, and says when it's limited", () => {
     const katana = weapon('Steel Katana')
     expect(stockedNow(katana, on('Birthright', 6))).toBeUndefined()
-    expect(stockedNow(katana, on('Birthright', 7))).toMatchObject({ shop: 'Dawn Armoury', level: 1, stock: 1 })
+    expect(stockedNow(katana, on('Birthright', 7))).toMatchObject({ shop: 'Dawn Armory', level: 1, stock: 1 })
     expect(stockedNow(katana, on('Birthright', 14))).toMatchObject({ level: 2, stock: null })
     const venge = weapon('Venge Katana')
     expect(stockedNow(venge, on('Birthright', 20))).toBeUndefined()
     expect(stockedNow(venge, on('Birthright', 21))).toMatchObject({ level: 3, stock: 1 })
-    // Conquest has no Dawn Armoury.
+    // Conquest has no Dawn Armory.
     expect(stockedNow(katana, on('Conquest', 21))).toBeUndefined()
-    expect(stockedNow(weapon('Steel Sword'), on('Conquest', 14))).toMatchObject({ shop: 'Dusk Armoury', stock: null })
+    expect(stockedNow(weapon('Steel Sword'), on('Conquest', 14))).toMatchObject({ shop: 'Dusk Armory', stock: null })
   })
 
   it("lists a shop weapon from the first level that stocks it and doesn't hint at later ones", () => {
@@ -171,7 +171,7 @@ describe('the weapon list under the block', () => {
     expect(castleLines(weapon('Bronze Sword'))).toEqual(["A prize in the Lottery Shop's Dusk Lottery at level 1 or 2."])
     expect(castleLines(weapon('Iron Katana'))).toEqual(["A prize in the Lottery Shop's Dawn Lottery at any level."])
     expect(castleLines(weapon('Brave Sword'))).toEqual(["A prize in the Lottery Shop's Dusk Lottery at level 3."])
-    // Brave Sword: the Lottery Shop's level 3 opens after Chapter 19, the Dusk Armoury's after Chapter 20.
+    // Brave Sword: the Lottery Shop's level 3 opens after Chapter 19, the Dusk Armory's after Chapter 20.
     expect(listed('Conquest', 19).has('Brave Sword')).toBe(false)
     expect(listed('Conquest', 20).has('Brave Sword')).toBe(true)
     expect(lotteryLevels(weapon('Brave Sword'), 'Birthright')).toEqual([])
@@ -333,7 +333,7 @@ describe('the shop tables', () => {
   it("cover every weapon the app says a shop sells, at the app's price", () => {
     // The amiibo shopkeepers' items are sold at any level by a visiting shopkeeper, not stocked.
     const visiting = new Set(["Marth's Spatha", "Ike's Backup", "Lucina's Estoc", "Robin's Primer"])
-    for (const w of ALL_WEAPONS.filter((x) => /Armoury|Store/.test(x.availability.source) && !visiting.has(x.name))) {
+    for (const w of ALL_WEAPONS.filter((x) => /Armory|Store/.test(x.availability.source) && !visiting.has(x.name))) {
       expect(FATES_SHOPS[w.name], w.name).toBeDefined()
       if (w.purchase) expect(FATES_SHOPS[w.name][0].buy, w.name).toBe(w.purchase.buy)
     }

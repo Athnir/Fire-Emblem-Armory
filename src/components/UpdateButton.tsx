@@ -18,7 +18,8 @@ const BUILT = new Date(__BUILD_TIME__).toLocaleString(undefined, { dateStyle: 'm
 /**
  * Looks for a new version of the app only when tapped (the user's call): the service worker waits with what it downloads
  * (registerType 'prompt'), so nothing changes under you. A found version shows "Update now", and a second tap switches to it and
- * reloads, so one stray tap never reloads the page.
+ * reloads, so one stray tap never reloads the page. "Update now" waits five seconds for that tap, then goes back to "Check for
+ * updates" (the user's call, 2026-11-26), as the Roster's does.
  */
 export function UpdateButton() {
   const [registration, setRegistration] = useState<ServiceWorkerRegistration>()
@@ -34,10 +35,10 @@ export function UpdateButton() {
     if (ready && (status === 'checking' || status === 'downloading')) setStatus('found')
   }, [ready, status])
 
-  // "Up to date" and "Couldn't check" go back to the button after a few seconds.
+  // "Up to date" and "Couldn't check" go back to the button after a few seconds, and "Update now" after five untapped.
   useEffect(() => {
-    if (status !== 'latest' && status !== 'failed') return
-    const timer = setTimeout(() => setStatus('idle'), 4000)
+    if (status !== 'latest' && status !== 'failed' && status !== 'found') return
+    const timer = setTimeout(() => setStatus('idle'), status === 'found' ? 5000 : 4000)
     return () => clearTimeout(timer)
   }, [status])
 
@@ -77,7 +78,7 @@ export function UpdateButton() {
       disabled={busy}
       title={`This version: ${BUILT}`}
       className={`rounded border px-2 py-1 text-sm ${
-        status === 'found' ? 'border-emerald-500 bg-emerald-950 text-emerald-200' : 'border-neutral-700 bg-neutral-900 text-neutral-300'
+        status === 'found' ? 'border-violet-500 bg-violet-950 text-violet-200' : 'border-neutral-700 bg-neutral-900 text-neutral-300'
       } ${busy ? 'opacity-70' : ''}`}
     >
       {LABELS[status]}

@@ -30,7 +30,7 @@ export const FE10_MAP_SET: MapSet = {
   moveClasses: FE10_MOVE_CLASSES,
   moveClassExamples: FE10_MOVE_CLASS_EXAMPLES,
   lord: 'Micaiah',
-  terrainNote: 'Fliers get no Def/Avo from terrain.',
+  terrainNote: 'Fliers get no Def or Avoid from terrain.',
   chapterLabel: label,
   mapLabel: label,
 }

@@ -21,12 +21,12 @@ from fates_lz import decompress  # noqa: E402
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'src', 'data', 'weapons', 'fatesShops.ts')
 BASE = 'https://serenesforest.net/fire-emblem-fates/my-castle/'
-# page -> the name the app uses for the shop (Dawn/Dusk Armoury sell weapons; Rod/Staff Store staves and items)
-SHOPS = {'dawn-armoury': 'Dawn Armoury', 'dusk-armoury': 'Dusk Armoury', 'rod-store': 'Rod Store', 'staff-store': 'Staff Store'}
+# page -> the name the app uses for the shop (Dawn/Dusk Armory sell weapons; Rod/Staff Store staves and items)
+SHOPS = {'dawn-armoury': 'Dawn Armory', 'dusk-armoury': 'Dusk Armory', 'rod-store': 'Rod Store', 'staff-store': 'Staff Store'}
 
 
 # Serenes Forest's spellings that differ from the game's English text, which the app uses.
-ALIASES = {'Armourslayer': 'Armorslayer', 'Short Bow': 'Mini Bow'}
+ALIASES = {'Armourslayer': 'Armorslayer', 'Short Bow': 'Mini Bow', 'Defence Tonic': 'Defense Tonic'}
 
 
 def item_name(text):
@@ -74,7 +74,7 @@ def tables(page):
 
 
 # castle_building.bin's shop names (白武器屋 = white weapon shop...) as the app names them.
-FILE_SHOPS = {'白武器屋': 'Dawn Armoury', '黒武器屋': 'Dusk Armoury', '白道具屋': 'Rod Store', '黒道具屋': 'Staff Store', '錬成屋': 'Smithy'}
+FILE_SHOPS = {'白武器屋': 'Dawn Armory', '黒武器屋': 'Dusk Armory', '白道具屋': 'Rod Store', '黒道具屋': 'Staff Store', '錬成屋': 'Smithy'}
 
 
 def file_levels():

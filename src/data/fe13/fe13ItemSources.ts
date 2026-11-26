@@ -33,7 +33,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "kit",
-      "text": "Carried by the Avatar when they join"
+      "text": "Carried by Robin when they join"
     },
     {
       "mapId": "fe13-2",
@@ -308,17 +308,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-2",
@@ -328,7 +328,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-5",
@@ -415,17 +415,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-2",
@@ -435,7 +435,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-3",
@@ -517,17 +517,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-2",
@@ -537,7 +537,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-5",
@@ -604,12 +604,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-1",
@@ -619,12 +619,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-4",
@@ -696,12 +696,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-10",
@@ -711,12 +711,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-23",
@@ -726,17 +726,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par11",
@@ -746,12 +746,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par21",
@@ -803,7 +803,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-3",
@@ -813,12 +813,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-12",
@@ -828,7 +828,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-15",
@@ -838,12 +838,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-23",
@@ -853,32 +853,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
@@ -888,12 +888,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-par18",
@@ -945,22 +945,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-6",
@@ -1117,47 +1117,47 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-8",
@@ -1167,12 +1167,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-10",
@@ -1222,17 +1222,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par6",
@@ -1319,47 +1319,47 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Southtown"
+      "text": "Sometimes sold by a traveling merchant in Southtown"
     },
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-8",
@@ -1369,12 +1369,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-12",
@@ -1409,17 +1409,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par5",
@@ -1506,17 +1506,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par6",
@@ -1531,32 +1531,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -1603,7 +1603,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-10",
@@ -1618,12 +1618,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par3",
@@ -1643,7 +1643,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par18",
@@ -1653,27 +1653,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -1725,7 +1725,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-8",
@@ -1740,12 +1740,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par13",
@@ -1760,12 +1760,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par19",
@@ -1775,22 +1775,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -1842,7 +1842,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-11",
@@ -1857,12 +1857,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par5",
@@ -1877,27 +1877,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par22",
@@ -1907,7 +1907,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -1959,7 +1959,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-6",
@@ -1979,42 +1979,42 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-par23",
@@ -2071,7 +2071,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-11",
@@ -2086,12 +2086,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par6",
@@ -2101,22 +2101,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par21",
@@ -2126,12 +2126,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -2183,7 +2183,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-11",
@@ -2198,12 +2198,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par2",
@@ -2218,32 +2218,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-par23",
@@ -2300,7 +2300,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-9",
@@ -2315,12 +2315,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par8",
@@ -2335,12 +2335,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par19",
@@ -2350,22 +2350,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -2417,7 +2417,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-14",
@@ -2432,12 +2432,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par4",
@@ -2452,17 +2452,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par20",
@@ -2472,17 +2472,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -2534,7 +2534,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant anywhere (a rare item)"
+      "text": "Sometimes sold by a traveling merchant anywhere (a rare item)"
     },
     {
       "mapId": "fe13-15",
@@ -2544,12 +2544,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-24",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mount Prism"
+      "text": "Sometimes sold by a traveling merchant in Mount Prism"
     },
     {
       "mapId": "fe13-25",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Origin Peak"
+      "text": "Sometimes sold by a traveling merchant in Origin Peak"
     },
     {
       "mapId": "fe13-par4",
@@ -2569,32 +2569,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sea-King's Throne"
+      "text": "Sometimes sold by a traveling merchant in Sea-King's Throne"
     },
     {
       "mapId": "fe13-par19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Conqueror's Whetstone"
+      "text": "Sometimes sold by a traveling merchant in Conqueror's Whetstone"
     },
     {
       "mapId": "fe13-par20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mountain Village"
+      "text": "Sometimes sold by a traveling merchant in Mountain Village"
     },
     {
       "mapId": "fe13-par21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Warriors' Tomb"
+      "text": "Sometimes sold by a traveling merchant in Warriors' Tomb"
     },
     {
       "mapId": "fe13-par22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wellspring of Truth"
+      "text": "Sometimes sold by a traveling merchant in Wellspring of Truth"
     },
     {
       "mapId": "fe13-par23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Garden of Giants"
+      "text": "Sometimes sold by a traveling merchant in Garden of Giants"
     },
     {
       "mapId": "fe13-dlc1",
@@ -2723,12 +2723,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-14",
@@ -2738,7 +2738,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-23",
@@ -2748,7 +2748,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par23",
@@ -2800,7 +2800,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-prologue",
       "kind": "kit",
-      "text": "Carried by the Avatar when they join"
+      "text": "Carried by Robin when they join"
     },
     {
       "mapId": "fe13-2",
@@ -2872,12 +2872,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-9",
@@ -2897,7 +2897,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par14",
@@ -3021,12 +3021,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-13",
@@ -3036,7 +3036,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par14",
@@ -3105,12 +3105,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-13",
@@ -3120,7 +3120,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-dlc1",
@@ -3384,22 +3384,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-12",
@@ -3409,7 +3409,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-14",
@@ -3444,12 +3444,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par9",
@@ -3459,12 +3459,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par19",
@@ -3516,22 +3516,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-8",
@@ -3556,7 +3556,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par1",
@@ -3628,7 +3628,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in West of Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in West of Ylisstol"
     },
     {
       "mapId": "fe13-15",
@@ -3658,7 +3658,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par2",
@@ -3735,12 +3735,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-12",
@@ -3750,12 +3750,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-19",
@@ -3780,7 +3780,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par3",
@@ -3790,7 +3790,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par5",
@@ -3939,12 +3939,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-12",
@@ -3954,7 +3954,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-16",
@@ -3964,37 +3964,37 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par13",
@@ -4004,12 +4004,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-par19",
@@ -4066,27 +4066,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Northroad"
+      "text": "Sometimes sold by a traveling merchant in The Northroad"
     },
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-par3",
@@ -4096,37 +4096,37 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-par20",
@@ -4178,22 +4178,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-7",
@@ -4203,7 +4203,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-9",
@@ -4223,17 +4223,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par4",
@@ -4295,22 +4295,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-7",
@@ -4320,7 +4320,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-8",
@@ -4350,17 +4350,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par4",
@@ -4432,22 +4432,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-7",
@@ -4457,7 +4457,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-8",
@@ -4482,17 +4482,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par4",
@@ -4730,7 +4730,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Longfort"
+      "text": "Sometimes sold by a traveling merchant in The Longfort"
     },
     {
       "mapId": "fe13-16",
@@ -4874,12 +4874,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-14",
@@ -4889,7 +4889,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-16",
@@ -4899,7 +4899,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par8",
@@ -4993,22 +4993,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Pass"
+      "text": "Sometimes sold by a traveling merchant in Border Pass"
     },
     {
       "mapId": "fe13-6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Ylisstol"
+      "text": "Sometimes sold by a traveling merchant in Ylisstol"
     },
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-7",
@@ -5018,7 +5018,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-9",
@@ -5038,17 +5038,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par1",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Farfort"
+      "text": "Sometimes sold by a traveling merchant in The Farfort"
     },
     {
       "mapId": "fe13-par2",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Turf"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Turf"
     },
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par4",
@@ -5110,12 +5110,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-13",
@@ -5177,32 +5177,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Arena Ferox"
+      "text": "Sometimes sold by a traveling merchant in Arena Ferox"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par7",
@@ -5212,27 +5212,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par19",
@@ -5301,27 +5301,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-19",
@@ -5331,7 +5331,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-par4",
@@ -5346,7 +5346,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par6",
@@ -5361,37 +5361,37 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-par21",
@@ -5545,12 +5545,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-24",
@@ -5607,7 +5607,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-9",
@@ -5622,7 +5622,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par3",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Peaceful Village"
+      "text": "Sometimes sold by a traveling merchant in Peaceful Village"
     },
     {
       "mapId": "fe13-par14",
@@ -5900,7 +5900,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-17",
@@ -5925,7 +5925,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par17",
@@ -5977,27 +5977,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-13",
@@ -6042,17 +6042,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
@@ -6062,7 +6062,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par18",
@@ -6186,7 +6186,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Breakneck Pass"
+      "text": "Sometimes sold by a traveling merchant in Breakneck Pass"
     },
     {
       "mapId": "fe13-11",
@@ -6196,7 +6196,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-18",
@@ -6206,22 +6206,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-par21",
@@ -6273,22 +6273,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-12",
@@ -6298,7 +6298,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-15",
@@ -6338,7 +6338,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par5",
@@ -6348,17 +6348,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par21",
@@ -6410,27 +6410,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle Courtyard"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle Courtyard"
     },
     {
       "mapId": "fe13-10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Midmire"
+      "text": "Sometimes sold by a traveling merchant in The Midmire"
     },
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-13",
@@ -6470,22 +6470,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par15",
@@ -6703,7 +6703,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Sands"
+      "text": "Sometimes sold by a traveling merchant in Border Sands"
     },
     {
       "mapId": "fe13-9",
@@ -6785,12 +6785,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Carrion Isle"
+      "text": "Sometimes sold by a traveling merchant in Carrion Isle"
     },
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-19",
@@ -6805,7 +6805,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par17",
@@ -6857,7 +6857,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-15",
@@ -6867,7 +6867,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-21",
@@ -6877,12 +6877,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par17",
@@ -7006,12 +7006,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-24",
@@ -7068,32 +7068,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-17",
@@ -7108,47 +7108,47 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par15",
@@ -7158,7 +7158,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-dlc1",
@@ -7210,22 +7210,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-16",
@@ -7235,12 +7235,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
@@ -7250,27 +7250,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par11",
@@ -7280,22 +7280,22 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-dlc1",
@@ -7342,7 +7342,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Border Wastes"
+      "text": "Sometimes sold by a traveling merchant in Border Wastes"
     },
     {
       "mapId": "fe13-11",
@@ -7352,12 +7352,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-25",
@@ -7367,17 +7367,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par10",
@@ -7387,12 +7387,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-par18",
@@ -7516,32 +7516,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Port Ferox"
+      "text": "Sometimes sold by a traveling merchant in Port Ferox"
     },
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Harbor"
+      "text": "Sometimes sold by a traveling merchant in Valm Harbor"
     },
     {
       "mapId": "fe13-16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Mila Tree"
+      "text": "Sometimes sold by a traveling merchant in The Mila Tree"
     },
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-18",
@@ -7556,7 +7556,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-par1",
@@ -7566,17 +7566,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par6",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Great Gate"
+      "text": "Sometimes sold by a traveling merchant in Great Gate"
     },
     {
       "mapId": "fe13-par7",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mila Shrine Ruins"
+      "text": "Sometimes sold by a traveling merchant in Mila Shrine Ruins"
     },
     {
       "mapId": "fe13-par8",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Dueling Grounds"
+      "text": "Sometimes sold by a traveling merchant in Dueling Grounds"
     },
     {
       "mapId": "fe13-par9",
@@ -7586,27 +7586,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par10",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Mercenary Fortress"
+      "text": "Sometimes sold by a traveling merchant in Mercenary Fortress"
     },
     {
       "mapId": "fe13-par12",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Ruins of Time"
+      "text": "Sometimes sold by a traveling merchant in The Ruins of Time"
     },
     {
       "mapId": "fe13-par13",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Law's End"
+      "text": "Sometimes sold by a traveling merchant in Law's End"
     },
     {
       "mapId": "fe13-par14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Desert Oasis"
+      "text": "Sometimes sold by a traveling merchant in Desert Oasis"
     },
     {
       "mapId": "fe13-par16",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Manor of Lost Souls"
+      "text": "Sometimes sold by a traveling merchant in Manor of Lost Souls"
     },
     {
       "mapId": "fe13-dlc1",
@@ -7663,12 +7663,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-par23",
@@ -7730,7 +7730,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-14",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Searoad"
+      "text": "Sometimes sold by a traveling merchant in The Searoad"
     },
     {
       "mapId": "fe13-19",
@@ -7745,12 +7745,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par4",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Twins' Hideout"
+      "text": "Sometimes sold by a traveling merchant in The Twins' Hideout"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par17",
@@ -7911,7 +7911,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
@@ -7921,7 +7921,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-24",
@@ -7931,17 +7931,17 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par21",
@@ -7998,12 +7998,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-24",
@@ -8018,12 +8018,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par19",
@@ -8075,12 +8075,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-24",
@@ -8090,12 +8090,12 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par20",
@@ -8194,7 +8194,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Fort Steiger"
+      "text": "Sometimes sold by a traveling merchant in Fort Steiger"
     },
     {
       "mapId": "fe13-20",
@@ -8278,7 +8278,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-21",
@@ -8288,7 +8288,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-par7",
@@ -8303,7 +8303,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par20",
@@ -8355,32 +8355,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-25",
@@ -8390,27 +8390,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par21",
@@ -8462,32 +8462,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-25",
@@ -8497,27 +8497,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par19",
@@ -8569,32 +8569,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-25",
@@ -8604,27 +8604,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par18",
@@ -8676,32 +8676,32 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-19",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle Approach"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle Approach"
     },
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-22",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Table Approach"
+      "text": "Sometimes sold by a traveling merchant in Table Approach"
     },
     {
       "mapId": "fe13-23",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Dragon's Table"
+      "text": "Sometimes sold by a traveling merchant in The Dragon's Table"
     },
     {
       "mapId": "fe13-25",
@@ -8711,27 +8711,27 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par5",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Sage's Hamlet"
+      "text": "Sometimes sold by a traveling merchant in Sage's Hamlet"
     },
     {
       "mapId": "fe13-par9",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Verdant Forest"
+      "text": "Sometimes sold by a traveling merchant in Verdant Forest"
     },
     {
       "mapId": "fe13-par11",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Wyvern Valley"
+      "text": "Sometimes sold by a traveling merchant in Wyvern Valley"
     },
     {
       "mapId": "fe13-par15",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Kidnapper's Keep"
+      "text": "Sometimes sold by a traveling merchant in Kidnapper's Keep"
     },
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par20",
@@ -8783,7 +8783,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-18",
@@ -8793,7 +8793,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-21",
@@ -8855,7 +8855,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-18",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in The Demon's Ingle"
+      "text": "Sometimes sold by a traveling merchant in The Demon's Ingle"
     },
     {
       "mapId": "fe13-20",
@@ -8941,7 +8941,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-20",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Valm Castle"
+      "text": "Sometimes sold by a traveling merchant in Valm Castle"
     },
     {
       "mapId": "fe13-24",
@@ -8951,7 +8951,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-par17",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Divine Dragon Grounds"
+      "text": "Sometimes sold by a traveling merchant in Divine Dragon Grounds"
     },
     {
       "mapId": "fe13-par20",
@@ -9015,7 +9015,7 @@ export const FE13_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe13-21",
       "kind": "merchant-later",
-      "text": "Sometimes sold by a travelling merchant in Plegia Castle"
+      "text": "Sometimes sold by a traveling merchant in Plegia Castle"
     },
     {
       "mapId": "fe13-21",

@@ -34,7 +34,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'bronze-bow',
   },
   {
@@ -49,7 +49,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'iron-bow',
   },
   {
@@ -64,7 +64,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'steel-bow',
   },
   {
@@ -79,7 +79,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (Nohr shop)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (Nohr shop)' },
     iconId: 'silver-bow',
   },
   {
@@ -95,7 +95,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'crescent-bow',
   },
   {
@@ -110,7 +110,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 2400, sell: 840 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'mini-bow',
   },
   {
@@ -125,7 +125,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 3000, sell: 1000 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'killer-bow',
   },
   {
@@ -140,7 +140,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying and Monster units', multiplier: 3 },
     purchase: { buy: 2200, sell: 800 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'blessed-bow',
   },
   {
@@ -156,7 +156,7 @@ export const BOWS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Flying units', multiplier: 3 },
     purchase: { buy: 3300, sell: 1100 },
-    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armoury (shop, limited stock)' },
+    availability: { routes: ['Conquest', 'Revelation'], source: 'Dusk Armory (shop, limited stock)' },
     iconId: 'shining-bow',
   },
   {

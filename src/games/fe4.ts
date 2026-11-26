@@ -10,7 +10,7 @@ import type { GameParts } from '.'
 const parts: GameParts = {
   weapons: Fe4Weapons,
   maps: Fe4Maps,
-  // No support levels; the Charisma and lover bonuses that stand in for them are a unit's own (the Unit Planner's).
+  // No support levels; the Charisma and lover bonuses that stand in for them are a unit's own (the Roster's).
   supports: null,
   triangle: {
     beats: FE4_BONUSES.beats,
@@ -29,7 +29,7 @@ const parts: GameParts = {
       // (unit flag 0x100, $84:D990) has one.
       rules: [
         `A unit gets a commander's leadership bonus while the commander is within ${FE4_BONUSES.reach} tiles (counting steps), unless their armies are hostile to each other.`,
-        "Every army's commander gets their own leadership bonus wherever they are (Sigurd, then Seliph, on your side).",
+        "Every army's commander gets their own leadership bonus wherever they are (your lord, on your side).",
         'It adds to the triangle and anything else; nothing is rounded.',
       ],
     },

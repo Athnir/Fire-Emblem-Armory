@@ -119,7 +119,7 @@ FLIER_AVOID, FLIER_DEF = 0x60CA11, 0x60CA44
 MOVE_GROUPS = [
     ('Lords, heroes & thieves', [1, 4, 8, 18, 52, 67]),
     ('Infantry', [2, 6, 16, 48, 54, 55, 62, 65, 66]),
-    ('Armours', [12, 14, 61]),
+    ('Armors', [12, 14, 61]),
     ('Fighters', [10, 11]),
     ('Brigands', [49]),
     ('Pirates', [50]),

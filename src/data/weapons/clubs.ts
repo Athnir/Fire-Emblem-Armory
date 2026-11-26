@@ -25,7 +25,7 @@ export const CLUBS: Weapon[] = [
     canCrit: false,
     forgeable: true,
     purchase: { buy: 500, sell: 250 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'brass-club',
   },
   {
@@ -39,7 +39,7 @@ export const CLUBS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 1000, sell: 500 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'iron-club',
   },
   {
@@ -53,7 +53,7 @@ export const CLUBS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 2000, sell: 750 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'steel-club',
   },
   {
@@ -67,7 +67,7 @@ export const CLUBS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 4000, sell: 1000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (Hoshido shop)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (Hoshido shop)' },
     iconId: 'silver-club',
   },
   {
@@ -81,7 +81,7 @@ export const CLUBS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 8000, sell: 2000 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'venge-club',
   },
   {
@@ -96,7 +96,7 @@ export const CLUBS: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     purchase: { buy: 1800, sell: 650 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'throwing-club',
   },
   {
@@ -111,7 +111,7 @@ export const CLUBS: Weapon[] = [
     canFollowUp: false,
     forgeable: true,
     purchase: { buy: 4500, sell: 1500 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'battering-club',
   },
   {
@@ -126,7 +126,7 @@ export const CLUBS: Weapon[] = [
     forgeable: true,
     effectiveness: { vs: 'Lance-wielding units', multiplier: 3, nonEffectivePenalty: { mt: -4, hit: -10 } },
     purchase: { buy: 3400, sell: 1150 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'pike-ruin-club',
   },
   {
@@ -145,7 +145,7 @@ export const CLUBS: Weapon[] = [
       routes: ['Birthright', 'Revelation'],
       // The game's files have no Dual Club drop in Conquest 19 (an earlier note here said an Oni
       // Chieftain drops one); Conquest's only copy is Chapter 10's village, listed with the map sources.
-      source: 'Dawn Armoury (shop, limited stock)',
+      source: 'Dawn Armory (shop, limited stock)',
     },
     iconId: 'dual-club',
   },
@@ -160,7 +160,7 @@ export const CLUBS: Weapon[] = [
     canCrit: true,
     forgeable: true,
     purchase: { buy: 1900, sell: 750 },
-    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armoury (shop, limited stock)' },
+    availability: { routes: ['Birthright', 'Revelation'], source: 'Dawn Armory (shop, limited stock)' },
     iconId: 'great-club',
   },
   {

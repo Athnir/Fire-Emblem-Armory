@@ -12,7 +12,7 @@ export function Home({ block, onPick }: { block: boolean; onPick: (id: string) =
         <p>
           A datasheet for each game: its weapons and where every one turns up, forging and shops, true hit, the weapon triangle, every
           map with its units, reinforcements and events, and what supports give. Each game's tools sit in its own tabs. Its partner app,
-          the Fire Emblem Roster, covers your units: who joins and when, growths, classes, skills, supports and builds.
+          the Roster, covers your units: who joins and when, growths, classes, skills, supports and builds.
         </p>
       </section>
 

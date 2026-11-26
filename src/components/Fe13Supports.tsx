@@ -74,7 +74,7 @@ export function Fe13Supports() {
           <tbody>
             {s.rows.map((r, i) =>
               i === 0 ? null : (
-                <tr key={i} className={`border-b border-neutral-800 ${i === total ? 'bg-emerald-950' : ''}`}>
+                <tr key={i} className={`border-b border-neutral-800 ${i === total ? 'bg-violet-950' : ''}`}>
                   <td className={`${CELL} text-neutral-100`}>{i}</td>
                   {r.map((v, k) => (
                     <td key={k} className={CELL}>
@@ -103,7 +103,7 @@ export function Fe13Supports() {
           {steps(s.pairUp.perLevel)}; and {s.pairUp.defender} more if the lead unit has Defender. Fractions are dropped.
         </li>
       </ul>
-      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Unit Planner.</p>
+      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Roster's Supports tab.</p>
     </section>
   )
 }

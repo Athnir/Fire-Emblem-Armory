@@ -1,7 +1,7 @@
 import type { Fe15Weapon } from '../data/fe15/fe15Types'
 
 const CELL = 'py-1 pr-2 sm:pr-3'
-const TARGETS: Record<string, string> = { horseback: 'horseback units', armour: 'armoured units', flying: 'fliers', terror: 'Terrors' }
+const TARGETS: Record<string, string> = { horseback: 'horseback units', armour: 'armored units', flying: 'fliers', terror: 'Terrors' }
 const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`)
 const marks = (silver: number, gold: number) =>
   [silver ? `${silver} silver` : '', gold ? `${gold} gold` : ''].filter(Boolean).join(' and ') || 'free'

@@ -27,7 +27,7 @@ export function Fe3Supports() {
         </li>
         <li>There's no weapon triangle to add it to: only terrain's avoid.</li>
       </ul>
-      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Unit Planner.</p>
+      <p className="text-xs text-neutral-500">Who supports whom belongs to the unit, so it's in the Roster's Supports tab.</p>
     </section>
   )
 }

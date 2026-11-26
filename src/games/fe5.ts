@@ -45,7 +45,7 @@ const parts: GameParts = {
     rules: [
       `Only the side with the advantage gets anything: +${FE5_TRIANGLE.bonus} hit and +${FE5_TRIANGLE.bonus} avoid. The other side's numbers don't change, but its hit against the higher avoid is ${FE5_TRIANGLE.bonus} lower.`,
       'Fire beats wind, wind beats thunder and thunder beats fire; light and dark magic each beat all three, and nothing beats them.',
-      "A magic sword striking from 2 tiles away counts as its magic (the Flame Sword as fire), at 1 tile as a sword.",
+      "A magic sword striking from 2 tiles away counts as its magic, at 1 tile as a sword.",
       "Weapon rank doesn't change it.",
     ],
     leadership: {

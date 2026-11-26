@@ -61,7 +61,7 @@ VILLAGE, HOUSE, CHURCH, DOOR = 18, 12, 23, 32
 # unit holding a Member Card (item 0x91) once a shop definition matches its tile and the tile is neither ($87:8B59).
 SHOP_KINDS = {26: 'Armory', 27: 'Vendor'}
 # A class in each movement group (the classes whose cost rows are the same) -> the group's name. The ballisticians never move.
-MOVE_NAMES = {0x01: 'Mounted', 0x07: 'Mounted (promoted)', 0x10: 'Fliers', 0x29: 'Infantry', 0x1A: 'Armours',
+MOVE_NAMES = {0x01: 'Mounted', 0x07: 'Mounted (promoted)', 0x10: 'Fliers', 0x29: 'Infantry', 0x1A: 'Armors',
               0x22: 'Brigands & warriors', 0x21: 'Berserkers & hunters', 0x26: 'Pirates'}
 # The dismounted forms of the mounted classes (VoltEdge VANILLA/Classes.h): infantry, but named like their mounted selves, so they're
 # left out of the movement types' examples.

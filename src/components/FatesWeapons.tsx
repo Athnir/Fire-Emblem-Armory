@@ -205,7 +205,7 @@ export function FatesWeapons() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search weapon name..."
+          placeholder="Search weapon name…"
           className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         />
       </div>

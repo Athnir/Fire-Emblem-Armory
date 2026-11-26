@@ -1,7 +1,7 @@
 import { FE15_SUPPORT_POINTS } from '../data/fe15/fe15Supports'
 
 /**
- * Echoes' supports: each pair's bonus is the pair's own (who supports whom, and with what, is the Unit Planner's), so this says only
+ * Echoes' supports: each pair's bonus is the pair's own (who supports whom, and with what, is the Roster's), so this says only
  * how a pair earns support points, read from the game's own tuning values (params.bin), and how the bonuses apply.
  */
 export function Fe15Supports() {
@@ -40,7 +40,7 @@ export function Fe15Supports() {
       </ul>
       <p className="text-xs text-neutral-500">
         Not yet confirmed: that a unit gets the bonus while its partner is within 3 tiles, and that a pair's ranks don't stack (only the
-        current rank's bonus applies). Who supports whom, and each pair's bonus, belong to the units, so they're in the Unit Planner.
+        current rank's bonus applies). Who supports whom, and each pair's bonus, belong to the units, so they're in the Roster's Supports tab.
       </p>
     </section>
   )

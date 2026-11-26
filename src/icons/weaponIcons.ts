@@ -3,7 +3,7 @@ import { ARMOR_HELM, AXE_ICON, DRAGON_HEAD, HORSE_HEAD, LANCE_ICON, MONSTER, SWO
 
 /** What a weapon's "effective against" text names, each with its own icon. */
 const TARGETS: { match: RegExp; sprite: Sprite; label: string }[] = [
-  { match: /armou?r/i, sprite: ARMOR_HELM, label: 'armoured units' },
+  { match: /armou?r/i, sprite: ARMOR_HELM, label: 'armored units' },
   { match: /dragon/i, sprite: DRAGON_HEAD, label: 'dragons' },
   { match: /flying/i, sprite: WING, label: 'fliers' },
   { match: /horse|beast/i, sprite: HORSE_HEAD, label: 'mounted and beast units' },

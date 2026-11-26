@@ -64,7 +64,7 @@ function fork(before: ChapterMap[], k: number): StoryFork {
     return {
       id: answer.toLowerCase(),
       label: `${chapter} (${answer})`,
-      proceed: `Proceed to ${chapter} (answered ${answer})`,
+      proceed: `Proceed to ${chapter}: answered ${answer}`,
       story: last ? toTheEnd(maps) : upToSplit(maps),
       ...(last ? {} : { fork: fork(maps, k + 1) }),
     }

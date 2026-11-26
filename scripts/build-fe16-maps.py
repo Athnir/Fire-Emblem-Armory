@@ -556,7 +556,7 @@ def move_groups():
     by_row = {}
     for t in range(10):
         by_row.setdefault(tuple(COSTS[t]), []).append(t)
-    names = {0: 'Infantry & armour', 2: 'Cavalry', 4: 'Mages', 5: 'Thieves & brawlers', 6: 'Fliers', 7: 'Beasts',
+    names = {0: 'Infantry & armor', 2: 'Cavalry', 4: 'Mages', 5: 'Thieves & brawlers', 6: 'Fliers', 7: 'Beasts',
              8: 'Giant Crawlers', 9: 'Giant Wolves'}
     out = []
     for row, types in by_row.items():
@@ -3738,7 +3738,7 @@ def main():
                     m['terrainOverrides'][look] = dict(m['terrainOverrides'][base])
         # A Floor's three stones named as floors, each its own (`STONES`).
         if stage in STONES:
-            m.setdefault('terrainOverrides', {}).update({'ge': {'name': 'Floor (dark stone)'}, 'gf': {'name': 'Floor (grey stone)'}})
+            m.setdefault('terrainOverrides', {}).update({'ge': {'name': 'Floor (dark stone)'}, 'gf': {'name': 'Floor (gray stone)'}})
         m['fills'] = dict(g['fills']) if g else {}
         if photo:
             present = {code for row in rows for code in row}

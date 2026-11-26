@@ -102,7 +102,7 @@ export function Fe9Forge({ weapon }: { weapon: Fe9Weapon }) {
           Each stat can be raised or lowered: Mt and Wt never go below 1, and Crit only drops while it's above 0. Lowering costs
           gold as raising does. Uses, rank and range stay the same as the base weapon's.
         </li>
-        <li>You name the weapon and pick its colour. One forged weapon per base visit.</li>
+        <li>You name the weapon and pick its color. One forged weapon per base visit.</li>
       </ul>
     </div>
   )

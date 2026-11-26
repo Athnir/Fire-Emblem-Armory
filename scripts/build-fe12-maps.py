@@ -436,13 +436,13 @@ AVATAR = 'PID_PLAYER'
 def unit_name(u):
     p, j = u['person'], u['job']
     if p['pid'] == AVATAR:
-        return 'Avatar'
+        return 'Kris'
     return (p['name'] if p['named'] else None) or j['name']
 
 
 def person_name(pid):
     if pid == AVATAR:
-        return 'the Avatar'
+        return 'Kris'
     p = next((p for p in D.persons() if p['pid'] == pid), None)
     return (p['name'] if p else None) or pid
 
@@ -597,7 +597,7 @@ def gaiden_condition(ch, number):
     """What opens a gaiden chapter, from the Ending of the chapter before: each FlagSet of its gf_<n>ｘ分岐 flag is one way, under the
     checks just before it. Returns (the turn limit or None, [other ways in words]): the chapter cleared by a turn (GetTurn() <=
     GetNormalizeTurn(n), scaled by difficulty), no foe having escaped (IsEnemyEscape), someone in your army (ForceUnitCheckPID on
-    forces 0 and 2), so many of a list (a count of them, >=), the Avatar promoted at a level (UnitIsHighJob, UnitGetLevel), or so
+    forces 0 and 2), so many of a list (a count of them, >=), Kris promoted at a level (UnitIsHighJob, UnitGetLevel), or so
     many of a chapter's own units still on the map (GetCountSamePID, kept in a local)."""
     ops = ch.s.disasm(named(ch.s, 'Ending'))
     flag = f'gf_{str(number).translate(ZENKAKU)}ｘ分岐'
@@ -624,7 +624,7 @@ def gaiden_condition(ch, number):
         if 'UnitIsHighJob' in calls:
             assert 'PID_PLAYER' in [x[2] for x in seg if x[1] == 'str'], ch.key
             level = next(x[2] for x in reversed(seg) if x[1] == 'int')
-            ways.append(f'the Avatar is in a promoted class at level {level} or higher')
+            ways.append(f'Kris is in a promoted class at level {level} or higher')
             continue
         pids = list(dict.fromkeys(x[2] for x in seg if x[1] == 'str' and x[2].startswith('PID_')))
         cmp_ = [x for x in seg if x[1] in ('op34', 'op33')]
@@ -1642,9 +1642,9 @@ def main():
             mid, chapter, heading = f'fe12-{int(key[4:])}', int(key[4:]), None
         # 'Ch. 1 Grustian Expedition', 'Prologue I Meeting', 'Endgame Light and Shadow': the heading taken off.
         name = re.sub(r'^(Ch\. \w+|Endgame|Prologue [IVX]+) ', '', title)
-        # The game is lost when Marth or the Avatar falls (script/startup.cmb's death handlers set gf_gameover).
+        # The game is lost when Marth or Kris falls (script/startup.cmb's death handlers set gf_gameover).
         on_map = {u['person']['pid'] for units in ch.groups.values() for u in units}
-        lost = ' or '.join(n_ for p_, n_ in (('PID_MARS', 'Marth'), (AVATAR, 'the Avatar')) if p_ in on_map) or 'Marth'
+        lost = ' or '.join(n_ for p_, n_ in (('PID_MARS', 'Marth'), (AVATAR, 'Kris')) if p_ in on_map) or 'Marth'
         m = {'id': mid, 'route': route, 'chapter': chapter, 'title': name, 'width': ch.w, 'height': ch.h, 'grid': [],
              'victory': WIN.get(wins.get(key), 'Seize'), 'defeat': lost[0].upper() + lost[1:] + ' is defeated', 'units': [],
              'starts': [], 'objects': [], 'objectives': [], 'changes': [], 'notes': [], 'lord': 'Marth'}
@@ -1725,7 +1725,7 @@ def main():
             u = {**u, 'at': at}
             when = '; '.join(('if ' if on else 'unless ') + FLAG_WORDS.get(flag, flag) for flag, on in conds)
             if not g.startswith('mikata') and u['team'] == 0 and u['person']['pid'] in ('PID_MARS', AVATAR) and ch.inside(u['at']):
-                # Marth or the Avatar left standing by the opening's scene (Prologue I's Avatar is its scene's e02): yours to move.
+                # Marth or Kris left standing by the opening's scene (Prologue I's Kris is its scene's e02): yours to move.
                 m.setdefault('forced', []).append({'name': unit_name(u), 'tile': ch.app(u['at'])})
                 if u['person']['pid'] == AVATAR and 'corrinStart' not in m:
                     m['corrinStart'] = ch.app(u['at'])
@@ -1733,7 +1733,7 @@ def main():
             if g.startswith('mikata'):
                 if not ch.inside(u['at']):
                     continue
-                # The lord's start: Marth's, or in the prologue chapters he isn't in, the Avatar's.
+                # The lord's start: Marth's, or in the prologue chapters he isn't in, Kris's.
                 if u['person']['pid'] == 'PID_MARS' or u['person']['pid'] == AVATAR and 'corrinStart' not in m:
                     m['corrinStart'] = ch.app(u['at'])
                 # The deployment slots: 'mikata' (a prologue chapter's second version's own, 'mikataB'), 'mikata1'...
@@ -2573,7 +2573,7 @@ def main():
                     if ground:
                         m.setdefault('standOn', {})[f'{x},{y}'] = max(sorted(set(ground)), key=ground.count)
         if not any(u['person']['pid'] == 'PID_MARS' and u['team'] == 0 for _, u, _, _ in placed):
-            m['lord'] = 'the Avatar'
+            m['lord'] = 'Kris'
         # Its villages drawn as the walled compounds the game draws (the user's call, 2026-11-22).
         m['walledVillages'] = True
         # Bridges read off the whole bridge where one is a solid rectangle, its rails along the water (the user: as Shadow Dragon's).

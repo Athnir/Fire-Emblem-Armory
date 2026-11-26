@@ -107,7 +107,7 @@ export function Fe16Battalions({ routeName }: { routeName: (m: ChapterMap) => st
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search battalion or gambit..."
+          placeholder="Search battalion or gambit…"
           className="flex-1 rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         />
       </div>
