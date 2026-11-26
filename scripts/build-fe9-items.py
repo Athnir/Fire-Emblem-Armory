@@ -233,10 +233,14 @@ def debug_group(name):
 
 
 def kit():
-    """{IID: [chapter file numbers]}: the gear each of your units brings, counted once, in the chapter it first joins: the
-    deployment roster it first appears in (`bmapNN_mikata_c`), a group placed on your side, a Join() from the shared roster
+    """{IID: [chapter file numbers]}: the gear each of your units brings, counted once, in the chapter it first joins: a group a
+    script places on your side (Ranulf's bmap24_m01_c in Ch.23's opening), the first chapters' rosters, which their openings set
+    down with InstantDisposFirst (the Prologue's Ike, Ch.1's Titania, Oscar and Boyd), a Join() from the shared roster
     (zmap/always: Calill in a base conversation), or a unit an opening hands over (Mist and Rolf in Ch.9) are yours from that
-    chapter; a recruit who joins during the battle (a talk, or the end) is yours from the next, the first base they're at."""
+    chapter; a recruit who joins during the battle (a talk, or the end) is yours from the next, the first base they're at. The
+    other rosters (`bmapNN_mikata_c`, which SallySetByGroup and Dispos lay out as the deployment slots) are templates that can
+    list a unit before it joins (Ranulf in Ch.21's, two chapters early), so the first one listing a unit counts only for a unit
+    nothing else adds."""
     import importlib.util
     from fe9_cmb import Script
     spec = importlib.util.spec_from_file_location('maps', os.path.join(os.path.dirname(__file__), 'build-fe9-maps.py'))
@@ -245,6 +249,7 @@ def kit():
     always = maps.dispos('always', 'c')
     strikes = class_strikes()
     first = {}  # PID -> (chapter file the gear is yours from, [IIDs])
+    fallback = {}  # PID -> the same, from the first deployment template listing the unit
 
     def own(u):
         """A unit's items, and a laguz's own attack, which comes with its class (Janaff's and Ulki's beaks)."""
@@ -265,7 +270,7 @@ def kit():
         handlers = script.handlers()
         before, during = [], []  # (PID, items): yours from this chapter, or from the next
         for u in files['c'].get(f'{folder}_mikata_c', []):
-            before.append((u['pid'], own(u)))
+            fallback.setdefault(u['pid'], (n, own(u)))
         for h in handlers:
             if h['i'] in maps.callees(script):
                 continue  # read through the handler that calls it, at its time
@@ -285,9 +290,17 @@ def kit():
                 elif fn in maps.DISPOS_CALLS:
                     for g in a:
                         # A cutscene's 'event' groups only stage a scene (Nasir on your side in Ch.12's).
-                        for u in groups.get(g, []) if isinstance(g, str) and '_event' not in g else []:
+                        if not isinstance(g, str) or '_event' in g:
+                            continue
+                        # A deployment template (mikata, mik...) counts only where InstantDisposFirst sets it down (the
+                        # first chapters'); Dispos('bmap22_mikata_c') only lays out Ch.21's slots, Ranulf's among them.
+                        template = g.split(folder + '_', 1)[-1].startswith('mik') and fn != 'InstantDisposFirst'
+                        for u in groups.get(g, []):
                             if u['side'] == 0:
-                                (before if at_base else during).append((u['pid'], own(u)))
+                                if template:
+                                    fallback.setdefault(u['pid'], (n, own(u)))
+                                else:
+                                    (before if at_base else during).append((u['pid'], own(u)))
                 elif fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0 and isinstance(a[0], str):
                     # Handed to your army: by an opening (before the battle), or by a talk or the chapter's end (during it).
                     (before if at_base else during).append((a[0], gear(a[0])))
@@ -295,6 +308,8 @@ def kit():
             joins(pid, n, items)
         for pid, items in during:
             joins(pid, min(n + 1, 31), items)  # the Endgame has no base after it: its joiners count there
+    for pid, (n, items) in fallback.items():
+        joins(pid, n, items)
     out = {}
     for pid, (n, items) in first.items():
         for iid in items:

@@ -186,7 +186,7 @@ def forts(m, terrain):
     if not found:
         return m
     m['grid'] = place([''.join(r) for r in grid], 'cx', 'c', {'cx', 'bc'})
-    for p in {r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2) if r[i] == 'c'}:
+    for p in sorted({r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2) if r[i] == 'c'}):  # sorted: the same output each run
         terrain.setdefault(p, terrain['w0'])
         over[p] = over['w0']
     return m

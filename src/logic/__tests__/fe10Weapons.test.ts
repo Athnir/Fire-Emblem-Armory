@@ -75,6 +75,28 @@ describe("Radiant Dawn weapons from the game's item table", () => {
     expect(FE10_WEAPONS.some((x) => x.name === 'Slim Lance')).toBe(false)
   })
 
+  it('dates gear by the join into your army, as the maps show it: the team a join names, the startup team moves, a unit looked up by PID', () => {
+    const w = (name: string) => FE10_WEAPONS.find((x) => x.name === name)!
+    // Part 3 Endgame's JoinRank('bmap0315_other', -1) keeps each record's side, 10 and 9 (the armies not being played): Skrimir
+    // and Tibarn come with their first rosters, in Part 4's Prologue and Ch.2.
+    expect(w('Fang (Lion)').kitAt).toEqual(['fe10-4-prologue'])
+    expect(w('Great Talon (Hawk)').kitAt).toEqual(['fe10-4-2'])
+    // Pelleas: Part 3 Ch.13's end joins him to team 7 (away from every army); Part 4 Ch.2's turn 2 places him on your side.
+    for (const name of ['Carreau', 'Verrine', 'Fenrir']) expect(w(name).kitAt, name).toEqual(['fe10-4-3'])
+    // Lyre fights beside you in Part 3 Ch.1 for her own team; TEAM_0305_OP brings her into your army in Part 3 Ch.4.
+    expect(w('Claw (Cat)').kitAt).toEqual(['fe10-2-2', 'fe10-3-4'])
+    // TEAM_0107_ED_00 (TeamTransferPID('PID_FRIEDA', 5)) at Part 1 Ch.6's end: Fiona brings her battle placement's gear.
+    expect(w('Steel Lance').kitAt).toContain('fe10-1-7')
+    expect(w('Javelin').kitAt).toContain('fe10-1-7')
+    // TEAM_0106_ED_00 at Part 1 Ch.5's end: Tauroneo, Zihark and Jill bring their green placements' gear, not Ch.6's roster's.
+    expect(w('Steel Axe').kitAt).toContain('fe10-1-6-1')
+    for (const name of ['Iron Axe', 'Short Spear', 'Steel Sword']) expect(w(name).kitAt, name).not.toContain('fe10-1-6-1')
+    // Volke's talk in Part 4 Ch.5 calls UnitTransferToForce(UnitGetByPID('PID_VOLKE'), 0); Gareth and Nasir join the same way at
+    // Endgame (3)'s end.
+    for (const name of ['Peshkatz', 'Stiletto', 'Silver Knife']) expect(w(name).kitAt, name).toEqual(['fe10-4-endgame-1'])
+    expect(w('Breath (Red Dragon)').kitAt).toEqual(['fe10-4-endgame-1', 'fe10-4-endgame-4'])
+  })
+
   it('says which foes a weapon no base sells can be disarmed of, never a locked one', () => {
     const steal = (name: string) => fe10ItemSources(name).filter((s) => s.how.startsWith('Steal from'))
     expect(steal('Venin Edge').map((s) => `${s.mapId}: ${s.how}`)).toContain('fe10-2-1: Steal from Myrmidon')

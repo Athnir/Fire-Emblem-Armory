@@ -335,6 +335,11 @@ describe("Path of Radiance's maps from the game files", () => {
       ['Boots', 'Coin', 'Coin', 'Guard', 'Physic', 'Shine', 'Silver Blade', 'Statue Frag', 'Stefan (with the Vague Katti)', 'White Gem'],
     )
     expect(hidden.find((o) => o.type === 'hidden' && o.contents.startsWith('Stefan'))).toMatchObject({ note: expect.stringMatching(/Lethe or Mordecai/) })
+    // Anyone else who gets there first: C16 handler 23's other branch shows him, hands that unit the Vague Katti (MindGetItem)
+    // and walks him off the map (UnitEscapeByPID).
+    expect(hidden.find((o) => o.type === 'hidden' && o.contents.startsWith('Stefan'))).toMatchObject({
+      note: expect.stringContaining('If anyone else steps here first, Stefan appears, gives that unit his Vague Katti and leaves for good.'),
+    })
     // Each sparkle sits in its dig zone, and the zone stays on the (cropped) map.
     const m = byHeading('Ch.15')
     for (const o of hidden) {
@@ -443,6 +448,12 @@ describe("Path of Radiance's maps from the game files", () => {
     const shinon = byHeading('Ch.18').units.find((u) => u.name === 'Shinon')!
     expect(shinon.drops).toEqual(['Brave Bow'])
     expect(shinon.talk).toMatch(/Rolf talks to him, then Ike defeats him/)
+    // Ch.8's Opening0 (C09 handler 12) sends Gatrie's and Shinon's items to the convoy before they leave, so each comes back with
+    // only what the setup gives a unit with no weapon.
+    expect(shinon.note).toMatch(/his items went to the convoy then, so the setup gives him a Brave Bow, which he drops, and a Vulnerary/)
+    expect(byHeading('Ch.13').units.find((u) => u.name === 'Gatrie')!.note).toMatch(/his items went to the convoy then, so the setup gives him a Steel Lance and a Vulnerary/)
+    // Normal() is true on Easy too: on both, Ch.20's opening offers Jill's talk with Shiharam only with an A support.
+    expect(byHeading('Ch.20').units.find((u) => u.name === 'Shiharam')!.talk).toMatch(/on Easy and Normal the talk is only offered/)
     // Ch.17's later sections set your whole army down.
     expect(byHeading('Ch.17-2').starts).toHaveLength(10)
     // A unit that differs between difficulties only by level is one entry.

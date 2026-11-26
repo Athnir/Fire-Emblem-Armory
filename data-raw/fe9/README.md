@@ -265,7 +265,8 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
 - Hidden items (only Ch.15's desert): an area event (kind 4) that rolls `GetRnd(101)` against the unit's
   Skill (Thieves and Assassins always win) and gives an item with `MindGetItem`. A one-tile area that sets
   a flag a later event tests before `UnitTransferToForceByPID` is Stefan's spot (Lethe or Mordecai must
-  reach it first; he brings the Vague Katti).
+  reach it first; he brings the Vague Katti). For anyone else the same event's other branch (C16 handler 23) shows him,
+  hands that unit the Vague Katti (`MindGetItem`) and walks him off the map (`UnitEscapeByPID`): he's gone for good.
 - Ch.17 is four sections on one map: `Opening18_2`-`_4` start each later section (new enemies, the goal
   via `BMSetTerm`, your chosen reinforcements via `mikata_zoen_0N`), and the reinforcement handlers test
   the `セクションN` flags. The app shows each section as its own map. A handler with no section flag
@@ -286,7 +287,9 @@ weapon's Mt is doubled. Weapon rank isn't used anywhere in hit, attack or the tr
   tile, sometimes walking it on to another; those last tiles are the sections' starts.
 - What the handlers don't say in so many words is read by hand (`BY_HAND` in `build-fe9-maps.py`, each entry citing its
   handlers): Ch.10's alarm and its prisoners, Ch.11's Black Knight, Ch.3's, Ch.9's and Ch.12's conditional joiners, Gatrie's
-  and Shinon's return (their own levels; Shinon's Brave Bow drops), Naesala and his ravens, Shiharam's talk with Jill, the
+  and Shinon's return (their own levels; Ch.8's Opening0 sent their items to the convoy, so each comes back with what the
+  setup gives a unit with no weapon, Shinon's Brave Bow dropping), Naesala and his ravens, Shiharam's talk with Jill (on Easy
+  and Normal, `Normal()` being true on both, offered only with her A support), the
   green and yellow units' notes, Ch.24's Geoffrey and Black Knight, Ch.27-2's three ways to win and the Endgame's royal.
 - The Prologue has no prep screen and nothing clears its opening scene, so its units stand where the
   scene walks them (`UnitSetPosDirByPID`, `UnitMoveDirByPID`). Boyd is the first opponent; when he
@@ -313,17 +316,22 @@ Checked against the Fire Emblem Wiki's enemy counts; the exceptions are listed i
   conversation, an opening) is that chapter's; one at the end (kind 1) or from an event during it is the next chapter's
   (Rhys's Mend after Ch.6, the Ashera Staff after Ch.22). A handler another calls (opcode 0x37) is read only through its
   caller (Ch.4's Opening0 calls the one that gives the Regal Sword), and a `UnitAddItem` to a unit the chapter places on
-  another side is that unit's (the setup gives Shinon his Brave Bow in Ch.18, and Gatrie a Steel Lance in Ch.13 if he
-  came back with no weapon). Handler kinds 4 and 5 are chests, villages and buried or random treasure, which the map data lists.
-  `kitAt` is the chapter each unit's gear is yours from, counted once, where the unit first joins: the deployment roster
-  it first appears in (`bmapNN_mikata_c`), a group an opening or base places on your side (side 0), a `Join()` from
-  zmap/always (Calill, in a base conversation before Ch.20), or a unit an opening hands over (`UnitTransferToForceByPID(pid,
-  0)`: Mist and Rolf in Ch.9) are yours from that chapter; one a talk or the chapter's end hands over is yours from the next
-  (Haar by Jill's talk in Ch.23; Geoffrey after Ch.24, where the end handler checks his PID and then calls
-  `UnitTransferToForce(unit, 0)`). A laguz brings its class's strike (Janaff's and Ulki's beaks). Left out: the rosters an
-  opening places only for a chapter started from the debug menu with no army (inside `if (!get("DBG_最初からやってる") &&
-  ForceGetCount(5) == 0)`: `bmapNN_mikata_n`/`_h`/`_m` and `always_dbg*`), and a cutscene's `_event` groups (Nasir on
-  your side in Ch.12's). The Endgame's royal is counted there (no base follows it).
+  another side is that unit's (the setup gives Shinon his Brave Bow in Ch.18, and Gatrie a Steel Lance in Ch.13, to a unit
+  with no weapon: Ch.8's Opening0 sent both men's items to the convoy, `UnitPutToWarehouse`, before they left). Handler kinds
+  4 and 5 are chests, villages and buried or random treasure, which the map data lists.
+  `kitAt` is the chapter each unit's gear is yours from, counted once, where the unit first joins: a group an opening or
+  base places on your side (side 0: Ranulf's `bmap24_m01_c` in Ch.23's Opening1), the first chapters' rosters, which their
+  openings set down with `InstantDisposFirst` (`bmapNN_mikata_c`: Ike in the Prologue; Titania, Oscar and Boyd in Ch.1), a
+  `Join()` from zmap/always (Calill, in a base conversation before Ch.20), or a unit an opening hands over
+  (`UnitTransferToForceByPID(pid, 0)`: Mist and Rolf in Ch.9) are yours from that chapter; one a talk or the chapter's end
+  hands over is yours from the next (Haar by Jill's talk in Ch.23; Geoffrey after Ch.24, where the end handler checks his PID
+  and then calls `UnitTransferToForce(unit, 0)`). The other chapters' rosters are deployment templates (`SallySetByGroup` and
+  `Dispos` lay the slots out with them) and can list a unit before it joins: Ch.21's `bmap22_mikata_c` has Ranulf in a slot
+  (its debug copies have Calill there), though nothing in C22 names him and he arrives at camp in Ch.23's opening; so the first
+  roster listing a unit counts only for a unit nothing else adds. A laguz brings its class's strike (Janaff's and Ulki's
+  beaks). Left out: the rosters an opening places only for a chapter started from the debug menu with no army (inside
+  `if (!get("DBG_最初からやってる") && ForceGetCount(5) == 0)`: `bmapNN_mikata_n`/`_h`/`_m` and `always_dbg*`), and a
+  cutscene's `_event` groups (Nasir on your side in Ch.12's). The Endgame's royal is counted there (no base follows it).
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
   list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.
 

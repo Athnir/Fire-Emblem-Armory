@@ -120,15 +120,20 @@ new game, so the same fixes don't have to be caught again. When the user settles
   carried by a recruit, or stealable.
 - **Your units' gear counts once, from the chapter each unit first joins** (`kitAt` on a weapon in Path of Radiance and Radiant
   Dawn, `kit` in Fates): the weapon page says nothing about it, the weapon simply turns up in the list at the right chapter. In Path
-  of Radiance (`build-fe9-items.py`'s `kit()`) the deployment roster a unit first appears in (`bmapNN_mikata_c`), a group placed on
-  your side, a `Join()` from the shared roster (Calill, in a base conversation) or a unit an opening hands over is yours from that
-  chapter; a recruit who joins during the battle (a talk, or the chapter's end: Haar by Jill's talk in Ch.23, Geoffrey after Ch.24)
+  of Radiance (`build-fe9-items.py`'s `kit()`) a group a script places on your side (Ranulf's in Ch.23's opening), the first
+  chapters' rosters their openings set down with `InstantDisposFirst`, a `Join()` from the shared roster (Calill, in a base
+  conversation) or a unit an opening hands over is yours from that chapter; the other rosters (`bmapNN_mikata_c`, the slots
+  `SallySetByGroup` and `Dispos` lay out) can list a unit before it joins (Ranulf in Ch.21's), so the first one listing a unit counts
+  only for a unit nothing else adds (the look-over, 2026-11-26); a recruit who joins during the battle (a talk, or the chapter's end: Haar by Jill's talk in Ch.23, Geoffrey after Ch.24)
   is yours from the next. A laguz brings its class's strike. The rosters an opening places only when a chapter is started from the
   debug menu with no army (`_mikata_n`/`_h`/`_m`, `always_dbg`) and a cutscene's `_event` groups are no one's. Radiant Dawn's
   chapter rosters (`bmapPPCC_mikata_n`/`_h`) are developer-start templates (`EvDevStart`) with the gear a unit should have by
   then, not what you carry (Micaiah's list a Thani from Part 1 Ch.3; it's a base conversation's gift before Part 1's Endgame):
-  a unit's gear counts only at its first roster, join (`JoinRank`, `SallyAddByGroupRank`, a group the battle places on your
-  side: Lehran in Endgame (5)) or hand-over (`build-fe10-items.py`'s `kit()`), never from a scene's cast (`_op`, `_ed`).
+  a unit's gear counts only at its first roster, its first join into your army (`JoinRank` or `Join` to team 5, or -1 for a record
+  of side 0, never a join to another team: Part 3 Endgame's Skrimir and Tibarn, Pelleas to team 7; `SallyAddByGroupRank`; a group the
+  battle places on your side: Lehran in Endgame (5); the startup script's `TEAM_` moves into team 5: Lyre, Fiona) or hand-over
+  (`UnitTransferToForceByPID`, or `UnitTransferToForce` on a unit `UnitGetByPID` looks up: Volke, Gareth, Nasir), with what it carries
+  in that chapter's battle (`build-fe10-items.py`'s `kit()`, the look-over, 2026-11-26), never from a scene's cast (`_op`, `_ed`).
 - **A foe's gear is on the map:** tapping a foe's tile says what it carries on the chosen difficulty (Fates, from the placement
   files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF; Awakening, each slot's level per difficulty,
   which leaves it off, steps a foe's weapon up its series or forges it, as the program's item loader does; Engage, a unit's own
@@ -1246,7 +1251,9 @@ A global switch (header, any game) that lets someone play along without being to
   or unit (a weapon's datasheet marks its magic and effectiveness). Game by game (the look-over's marks): Fates' routes in the Roster's
   colours (sage green, lavender, gold), "amiibo" as Nintendo writes it; Genealogy's First and Second generation, its Charm and its Final
   Chapter (the game's 終章, never the patch's Endgame); Engage's Emblems by name alone ("Rapier (Marth)", "Edelgard, Dimitri and
-  Claude"); Three Houses' ranks by skill ("Sword D"); Radiant Dawn's supports between any two units but the Black Knight and Lehran.
+  Claude"); Three Houses' ranks by skill ("Sword D"); Radiant Dawn's supports between any two units but the Black Knight and Lehran,
+  its chapters in full on the bars ("Part 1, Chapter 3"; lists keep "Part 1 Ch.3") and its Endgame's five parts numbered in both
+  ("Endgame (1)" to "(5)", titled "Rebirth (1)" to "(5)" as the game does).
 - **The map page has a colorblind-friendly switch** (the user's call, 2026-11-26), beside "Info beside the map", remembered on the
   device and off by default, so the watched maps keep their look. When it's on, nothing is told apart by colour alone, and the colours
   are Okabe and Ito's, which stay apart for red-green and blue-yellow colour blindness alike (`COLOUR_BLIND` in `src/icons/sprites.ts`,

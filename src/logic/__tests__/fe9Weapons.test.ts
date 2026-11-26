@@ -116,4 +116,10 @@ describe("Path of Radiance weapons from the game's item table", () => {
   it('reads drops from the weapon slots too', () => {
     expect(fe9ItemSources('Longbow')).toContainEqual(expect.objectContaining({ how: expect.stringMatching(/Dropped/i) }))
   })
+
+  it("dates a unit's gear by the script that places it on your side, not a deployment template listing it early", () => {
+    // Ch.21's roster (bmap22_mikata_c, the slots SallySetByGroup and Dispos lay out) lists Ranulf, but nothing in C22 adds him:
+    // Ch.23's Opening1 places bmap24_m01_c, Ranulf alone, as he arrives at camp. Lethe's claw is yours from Ch.10.
+    expect(w('Claw (Cat)').kitAt).toEqual(['fe9-10', 'fe9-23'])
+  })
 })

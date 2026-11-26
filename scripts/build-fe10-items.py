@@ -17,6 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fe10_files import FE10, GameData, read_dispos, read_shop, read_text  # noqa: E402
 import fe9_cmb  # noqa: E402
+import fe10_cmb  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 OUT = os.path.join(ROOT, 'src', 'data', 'fe10', 'fe10Weapons.ts')
@@ -286,17 +287,26 @@ def given():
 ROSTER = re.compile(r'bmap\d{4}[a-e]?_(?:[a-e]_)?mikata\d?_[nhc]$')
 # Calls that add a group's units to your army: a base conversation's recruits (Meg, Volug), Tormod's group.
 GROUP_JOINS = ('JoinRank', 'Join', 'SallyAddByGroupRank')
+# Your army is team 5 while a chapter is set up, and 0 is your side on the map (the other teams: fe10_cmb.team_moves).
+ARMY = (0, 5)
+# A scene's cast: the opening's, the ending's and an event's groups, and the cutscene maps' (emap).
+SCENE_CAST = re.compile(r'_(op|ed|ev)\d*_|emap')
 
 
 def kit():
-    """{IID: [chapter codes]}: the gear each of your units brings, counted once, in the chapter it first joins, in story order.
-    The chapter's own roster (ROSTER), a group a base conversation or an opening adds (GROUP_JOINS), or a unit an opening
-    hands over are yours from that chapter; one a talk or the chapter's end hands over (UnitTransferToForceByPID(pid, 0)) is
-    yours from the next, the first base it's at. Later rosters only place a unit you already have, carrying what it carries.
-    The endgame's five maps (bmap0407a-e) keep their letter."""
+    """{IID: [chapter codes]}: the gear each of your units brings, counted once, in the chapter it first joins your army, in
+    story order. The chapter's own roster (ROSTER), a group a join call adds to your army (GROUP_JOINS: to team 5, or with -1,
+    which keeps each record's own side, a unit of side 0: main.dol 0x8010c9c8), a group the battle places on your side, a unit
+    an opening hands over, or one the startup script's team moves bring into your army in an opening (TEAM_..._OP,
+    TeamTransferPID to team 5: Mordecai, Lethe and Lyre from team 9 in Part 3 Ch.4's) are yours from that chapter; one a talk or
+    the chapter's end hands over (UnitTransferToForceByPID(pid, 0), or UnitTransferToForce on the unit UnitGetByPID looked up:
+    Volke's talk in Part 4 Ch.5) or a team move at the end brings in (TEAM_..._ED: Fiona after Part 1 Ch.6) is yours from the
+    next, the first base it's at, with what it carries in the chapter's battle (not a scene's cast). Later rosters only place a
+    unit you already have, carrying what it carries. The endgame's five maps (bmap0407a-e) keep their letter."""
     maps, maps10 = script_reader(), maps_reader()
     codes = story_codes()
     strikes = class_strikes()
+    teams = fe10_cmb.team_moves(fe10_cmb.Script('startup.cmb'))
     first = {}  # PID -> (chapter code, items)
     for k, code in enumerate(codes):
         placed = [u for diff in 'nhc' for u in read_dispos(f'bmap{code}', diff)]
@@ -308,28 +318,48 @@ def kit():
             return items + ([strikes[jid_of[pid]][0]] if jid_of.get(pid) in strikes else [])
 
         def gear(pid):
-            return next((items for _, p, items in placed if p == pid), [])
+            """What a unit handed over carries: its placement in the chapter's battle, before a scene's cast's."""
+            rows = sorted(((g, items) for g, p, items in placed if p == pid), key=lambda r: bool(SCENE_CAST.search(r[0] + '_')))
+            return rows[0][1] if rows else []
         before = [(pid, items) for group, pid, items in placed if ROSTER.match(group)]
         during = []
-        # A group the battle places on your side outside the rosters joins you (Lehran in Endgame (5)); a join call adds a
-        # group whatever its side (a base conversation's recruits).
+        # A group the battle places on your side outside the rosters joins you (Lehran in Endgame (5)).
         for name, at_base in battle_groups(maps, maps10, code).items():
             for group, pid, items in placed:
                 if not ROSTER.match(group) and (re.sub(r'_[nhm]$', '', group) == name or group == name) and side.get((group, pid)) == 0:
                     (before if at_base else during).append((pid, items))
         if os.path.exists(os.path.join(FE10, 'Scripts', f'C{code}.cmb')):
             script = fe9_cmb.Script(f'C{code}.cmb')
-            for h in script.handlers():
+            hs = script.handlers()
+            for h in hs:
                 if h['i'] in maps.callees(script):
                     continue
                 at_base = h['name'].startswith('Opening') or h['kind'] == BASE_CONVERSATION
-                for fn, a in maps10.scenes_removed(maps.calls(script, h), f'bmap{code}'):
+                # Read with the maps' reader, which keeps what UnitGetByPID returns and the negated team (-1).
+                cs = maps10.calls10(script, hs, h)
+                for fn, a, _ in maps10.scenes_removed(cs, f'bmap{code}'):
                     if fn in GROUP_JOINS and a and isinstance(a[0], str):
+                        # Into your army only: a join to team 5 adds the group whatever its sides (a base conversation's
+                        # recruits); -1 keeps each record's own side (Skrimir's and Tibarn's in Part 3's Endgame are 10 and
+                        # 9, the armies not being played); SallyAddByGroupRank adds the group's units of side 0 (Tormod's).
+                        team = a[1] if len(a) > 1 else None
                         for group, pid, items in placed:
-                            if re.sub(r'_[nhm]$', '', group) == a[0] or group == a[0]:
+                            if (re.sub(r'_[nhm]$', '', group) == a[0] or group == a[0]) and (
+                                    team == 5 or (team in (-1, None) and side.get((group, pid)) == 0)):
                                 (before if at_base else during).append((pid, items))
                     elif fn == 'UnitTransferToForceByPID' and len(a) == 2 and a[1] == 0 and isinstance(a[0], str):
                         (before if at_base else during).append((a[0], gear(a[0])))
+                # Moves into your army, cutscenes or not: a unit looked up by PID and handed over (Volke's talk calls the
+                # handler that does UnitTransferToForce(UnitGetByPID('PID_VOLKE'), 0)), and the startup script's team moves
+                # (TEAM_ functions, TeamTransferPID), at the chapter's start or, from an end handler, the next.
+                for fn, a, _ in cs:
+                    if fn == 'UnitTransferToForce' and len(a) == 2 and a[1] == 0 and isinstance(a[0], tuple) and a[0][0] == 'unit':
+                        (before if at_base else during).append((a[0][1], gear(a[0][1])))
+                    elif fn.startswith('TEAM_') or (fn == 'TeamTransferPID' and len(a) == 2 and isinstance(a[0], str)):
+                        moves = teams.get(fn, []) if fn.startswith('TEAM_') else [(a[0], None, a[1])]
+                        for pid, _, to in moves:
+                            if pid and to in ARMY:
+                                (during if h['kind'] == 1 else before).append((pid, gear(pid)))
         for pid, items in before:
             first.setdefault(pid, (code, own(pid, items)))
         for pid, items in during:

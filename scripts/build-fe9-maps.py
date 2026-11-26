@@ -373,13 +373,15 @@ BY_HAND = {
     # Ch.12: Jill comes only if she was on the map at the end of Ch.11 (G_ジル仲間条件, handler 13), and flies to Ike to talk.
     13: {'joiner_when': {'Jill': " (only if she was still on the map at the end of Ch.11, where she's a foe)"},
          'joiner_talk': {'Jill': 'Recruit: she flies to Ike and starts the talk herself'}},
-    # Ch.13: Gatrie comes back as he left your army (handler 18 gives a Steel Lance and a Vulnerary if he has no weapon).
-    14: {'note_replace': {'PID_GATRIE': 'Knight, as he left your army in Ch.7 (his own level and items; a Steel Lance and a '
-                                        "Vulnerary if he has no weapon)"}},
-    # Ch.18: Shinon joins at the end only if Rolf talked to him and Ike defeated him (end handler 49). The setup (handler 14)
-    # gives him a Brave Bow, set to drop, and a Vulnerary if he has no weapon.
-    19: {'note_replace': {'PID_CHINON': 'Sniper, as he left your army in Ch.7 (his own level; a Brave Bow, which he drops, and a '
-                                        'Vulnerary if he has no weapon)'},
+    # Ch.13: Gatrie comes back at his own level. Ch.8's Opening0 (C09 handler 12) sent his items to the convoy
+    # (UnitPutToWarehouse, all eight slots: main.dol 0x800bbfd0) before moving him to team 7, so he has no weapon and handler
+    # 18 gives him a Steel Lance and a Vulnerary.
+    14: {'note_replace': {'PID_GATRIE': 'Knight, as he left your army at the start of Ch.8 (his own level; his items went to '
+                                        'the convoy then, so the setup gives him a Steel Lance and a Vulnerary)'}},
+    # Ch.18: Shinon joins at the end only if Rolf talked to him and Ike defeated him (end handler 49). His items went to the
+    # convoy as Gatrie's did, so the setup (handler 14) gives him a Brave Bow, set to drop, and a Vulnerary.
+    19: {'note_replace': {'PID_CHINON': 'Sniper, as he left your army at the start of Ch.8 (his own level; his items went to '
+                                        'the convoy then, so the setup gives him a Brave Bow, which he drops, and a Vulnerary)'},
          'drops': {'PID_CHINON': ['Brave Bow']},
          'talk': {'PID_CHINON': 'Recruit: Rolf talks to him, then Ike defeats him; he joins at the end (also talks with Mist and Rhys)'}},
     # Ch.19: Naesala can't die (SID_IMMORTAL from Opening1). Janaff's or Ulki's talk (82-83) turns him to Reyson; his talk with
@@ -391,9 +393,9 @@ BY_HAND = {
                                  "also carries a Laguz Band and a Coin, and starts transformed",
                   'PID_K_ZAKO': ". Leaves by the map's left or right edge once Naesala withdraws"}},
     # Ch.20: unless Jill has an A support with Mist or Lethe, the talk sends her over to the enemy for good (talks 26-27); on
-    # Normal the opening (handler 22) only offers it when she has one.
+    # Easy and Normal the opening (handler 22, under Normal(), which is true on Easy too) only offers it when she has one.
     21: {'talk': {'PID_SIHARAMU': 'Talk with Jill: unless she has an A support with Mist or Lethe, she goes over to the enemy for good '
-                                  "(on Normal the talk is only offered when she has one)"}},
+                                  "(on Easy and Normal the talk is only offered when she has one)"}},
     # Ch.23: the Crimean Paladins fight on your side but never attack Petrine (SEQ_ALLATK100_NOPRAGUE).
     24: {'joiner_note': {'Paladin': 'Crimean knights: they fight on your side but never attack Petrine'}},
     # Ch.24: Geoffrey stays put with his knights and joins at the end if still on the map (end handler 56); the Black Knight
@@ -1011,10 +1013,16 @@ def build_chapter(game, terrain, n, section=None):
             if moved and seekers:
                 who = game.people[moved[0]]['name']
                 gear = [game.items.get(i, i) for g, us in dispos(folder, 'c').items() for u in us if u['pid'] == moved[0] for i in u['weapons']]
+                # Anyone else who gets there first: the same handler's other branch shows him, gives that unit an item
+                # (MindGetItem: C16 handler 23 hands over the Vague Katti) and walks him off the map (UnitEscapeByPID).
+                gift = [game.items.get(a[0], a[0]) for fn, a in hcalls[other['i']] if fn == 'MindGetItem' and a]
+                walks = any(fn == 'UnitEscapeByPID' and a and a[0] == moved[0] for fn, a in hcalls[other['i']])
                 objects.append({'type': 'hidden', 'tile': tile(hh['args'][:2]), 'area': rect(*hh['args'][:4]),
                                 'contents': who + (f" (with the {gear[0]})" if gear else ''),
                                 'note': f"Move {' or '.join(seekers)} here first and {who} appears and joins you. "
-                                        f"If anyone else steps here first, {who} never comes."})
+                                        + (f"If anyone else steps here first, {who} appears, gives that unit his {gift[0]} and "
+                                           "leaves for good." if gift and walks else
+                                           f"If anyone else steps here first, {who} never comes.")})
 
     pits = []
     # Ballistae (SetShooter: x, y, facing, weapon): a bow user on the tile fires the machine that stands on

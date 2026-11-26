@@ -479,7 +479,7 @@
   }
  },
  "fe10": {
-  "frozen": "2026-11-24",
+  "frozen": "2026-11-26",
   "maps": {
    "fe10-1-prologue": "b477939975380d7cb467",
    "fe10-1-1": "11f55bdbcedad9bb1be8",
@@ -519,11 +519,11 @@
    "fe10-4-3": "34c6f371f3bc3165594f",
    "fe10-4-4": "ed8eba3e72db24ecd370",
    "fe10-4-5": "586f2387828a6672c831",
-   "fe10-4-endgame-1": "a158d6e3b8c7db1c5224",
-   "fe10-4-endgame-2": "7b86f28221c29429a1a8",
-   "fe10-4-endgame-3": "97862acf9486f48d4412",
-   "fe10-4-endgame-4": "dbd89bfcdb6a6cd209ad",
-   "fe10-4-endgame-5": "c92eb6042402089404cd"
+   "fe10-4-endgame-1": "241d93958764c2568436",
+   "fe10-4-endgame-2": "5256199441793a8d7e96",
+   "fe10-4-endgame-3": "18ddc429fefeee9c9de6",
+   "fe10-4-endgame-4": "37dd013deb8bbb212839",
+   "fe10-4-endgame-5": "a2703967490056997529"
   }
  },
  "fe11": {

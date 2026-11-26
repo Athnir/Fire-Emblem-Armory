@@ -864,6 +864,52 @@ def goals(ch):
     return win, lose
 
 
+def recruit_fee(script, hs, h, depth=0):
+    """What a recruiting talk costs, or None: (gold, whether the unit leaves the map without it). Part 4 Ch.5's talks with Volke
+    call handler 38, which sets a variable to 3000 (`load 02 ; int 3000 ; store`), plays the refusal and sends him off the map
+    (UnitRunAway, UnitEscape) if BMGetMoney() is less (op 0x31: <, as 0x34 is >=, the kill counts' test), and otherwise takes
+    the gold (BMSetMoney) and hands him over. Handlers a talk calls (op 0x37) are followed."""
+    dis = script.disasm(h)
+    env = {}
+    for k, (_, op, a) in enumerate(dis):
+        if op == 'load' and k + 2 < len(dis) and dis[k + 1][1] == 'int' and dis[k + 2][1] == '?47':
+            env[a] = dis[k + 1][2]
+        elif op == 'call' and a == 'BMGetMoney/0' and k + 2 < len(dis) and dis[k + 2][1] == 'op31':
+            nxt = dis[k + 1]
+            gold = nxt[2] if nxt[1] == 'int' else env.get(nxt[2]) if nxt[1] == 'var' else None
+            fns = {x for _, o, x in dis if o == 'call'}
+            if isinstance(gold, int) and 'BMSetMoney/1' in fns:
+                return gold, bool({'UnitEscape/1', 'UnitRunAway/1'} & fns)
+        elif op == 'stmt' and depth < 8 and int(a, 16) < len(hs) and int(a, 16) != h['i']:
+            got = recruit_fee(script, hs, hs[int(a, 16)], depth + 1)
+            if got:
+                return got
+    return None
+
+
+def area_finders(script, h):
+    """Who an area event answers to when it asks MindGetMe() which unit stopped there (Part 4 Ch.3's Stefan, C0404 handler 3,
+    `switch (MindGetMe())` over units looked up by PID, op 0x2f: ==): [(PID, the PID a Path of Radiance save must hold, or
+    None)] for each case that does something (calls a handler, sets a flag). A case under `IsInheritFE8Data() &&
+    FE8UnitCheckExistsByPID(pid)` needs a save from Path of Radiance in which that unit joined; anyone else gets nothing."""
+    dis = script.disasm(h)
+    me, env, cases = None, {}, []
+    for k, (_, op, a) in enumerate(dis):
+        if op == 'load' and k + 2 < len(dis) and dis[k + 1][1:] == ('call', 'MindGetMe/0') and dis[k + 2][1] == '?47':
+            me = a
+        elif (op == 'load' and k + 3 < len(dis) and dis[k + 1][1] == 'str' and dis[k + 2][1:] == ('call', 'UnitGetByPID/1')
+              and dis[k + 3][1] == '?47'):
+            env[a] = dis[k + 1][2]
+        elif (op == 'op2f' and me is not None and k >= 2 and dis[k - 1][1] == 'var' and dis[k - 1][2] in env
+              and dis[k - 2][1] == '?44'):
+            cases.append([env[dis[k - 1][2]], None, False])  # ?44 keeps the switch's value (MindGetMe) for the next case
+        elif cases and op == 'call' and a == 'FE8UnitCheckExistsByPID/1' and dis[k - 1][1] == 'str':
+            cases[-1][1] = dis[k - 1][2]
+        elif cases and (op == 'stmt' or (op == 'call' and a == 'set/1')):
+            cases[-1][2] = True
+    return [(pid, needs) for pid, needs, acts in cases if acts]
+
+
 def kill_goal(script):
     """'Defeat enemies' maps' kill count, from the every-action check that ends the chapter (Part 3 Ch.6:
     `Normal() ? GetNumDiedEnemies() >= 36 : ... >= 46`): (count, Easy's count), or None."""
@@ -1360,13 +1406,17 @@ def build_chapter(game, terrain, code, section=None):
     forced_pids = [a[0] for fn, a, _ in start_calls if fn == 'UnitForcedSallyByPID' and a]
     players = {u['pid'] for d in DIFFS for u in load(mikata + sally, d)}
 
-    # Talks: who can talk to whom, and whether the talk recruits.
-    talks = defaultdict(lambda: {'recruit': [], 'talk': []})
+    # Talks: who can talk to whom, and whether the talk recruits: it hands the unit over by PID, or the unit UnitGetByPID
+    # looked up (Volke's talks in Part 4 Ch.5 call handler 38: UnitTransferToForce(UnitGetByPID('PID_VOLKE'), 0)).
+    talks = defaultdict(lambda: {'recruit': [], 'talk': [], 'fee': None})
     for hh in hs:
         if hh['kind'] != 8 or len(hh['args']) < 2:
             continue
         a, b = (script.string(x) for x in hh['args'][:2])
         moved = {x[0] for fn, x, _ in hcalls[hh['i']] if fn == 'UnitTransferToForceByPID' and x}
+        moved |= {x[0][1] for fn, x, _ in hcalls[hh['i']] if fn == 'UnitTransferToForce' and len(x) == 2 and x[1] == 0
+                  and isinstance(x[0], tuple) and x[0][0] == 'unit'}
+        fee = recruit_fee(script, hs, hh)
         for speaker, target in ((a, b), (b, a)):
             if speaker not in game.people or speaker in moved:
                 continue
@@ -1374,6 +1424,8 @@ def build_chapter(game, terrain, code, section=None):
             kind = 'recruit' if target in moved else 'talk'
             if name not in talks[target][kind]:
                 talks[target][kind].append(name)
+            if kind == 'recruit' and fee:
+                talks[target]['fee'] = fee
 
     def talk_text(pid):
         t = talks.get(pid)
@@ -1381,7 +1433,14 @@ def build_chapter(game, terrain, code, section=None):
             return None
         others = [x for x in t['talk'] if x not in t['recruit']]
         if t['recruit']:
-            return f"Recruit: talk with {' or '.join(t['recruit'])}" + (f" (also talks with {', '.join(others)})" if others else '')
+            price = ''
+            if t['fee']:
+                # As the other games word a recruit for gold ("Recruit: talk with any of your units for 10,000 gold").
+                gold, leaves = t['fee']
+                who = game.people.get(pid, {}).get('name', pid)
+                price = (f" for {gold:,} gold; with less, {who} refuses" + (' and leaves the map for good' if leaves else ''))
+            return (f"Recruit: talk with {' or '.join(t['recruit'])}" + price
+                    + (f" (also talks with {', '.join(others)})" if others else ''))
         return f"Talk with {' or '.join(others)}" if others else None
 
     partners = set()  # the PIDs of the partner units (army 3) on the map or arriving
@@ -1575,7 +1634,21 @@ def build_chapter(game, terrain, code, section=None):
         """The handler's trigger as a sentence, plus any areas."""
         if hh['kind'] == 4:
             ax, ay, bx, by, who = hh['args'][:5]
-            return 'When a unit enters the marked area', [{'who': 'enemy' if who == 1 else 'player', 'rect': rect(ax, ay, bx, by)}]
+            areas = [{'who': 'enemy' if who == 1 else 'player', 'rect': rect(ax, ay, bx, by)}]
+            # An area that asks who stopped there answers only them (Stefan's tile in Part 4 Ch.3: Micaiah, or Lethe or
+            # Mordecai with a Path of Radiance save in which he joined; anyone else gets nothing).
+            finders = area_finders(script, hh)
+            if finders:
+                name = lambda p: game.people.get(p, {}).get('name', p)  # noqa: E731
+                anyone = [name(p) for p, needs in finders if not needs]
+                saved = [(name(p), needs) for p, needs in finders if needs]
+                where = 'the marked tile' if (ax, ay) == (bx, by) else 'the marked area'
+                text = f"When {' or '.join(anyone)} stops on {where}" if anyone else f'When a unit stops on {where}'
+                if saved:
+                    text += (f" ({' or '.join(n for n, _ in saved)}{' too' if anyone else ''}, only with a Path of Radiance save "
+                             f"in which {' and '.join(dict.fromkeys(name(x) for _, x in saved))} joined)")
+                return text, areas
+            return 'When a unit enters the marked area', areas
         if hh['kind'] == 5 and hh['args'][2] == 11:
             x, y = hh['args'][:2]
             return f'When the door at ({tile((x, y))[0]}, {tile((x, y))[1]}) is opened', [{'who': 'player', 'rect': rect(x, y, x, y)}]
@@ -1787,9 +1860,9 @@ def build_chapter(game, terrain, code, section=None):
     m = {
         'id': 'fe10-' + re.sub(r'[^a-z0-9]+', '-', heading.lower()).strip('-') + (f'-{section}' if section else ''),
         'route': 'Story', 'chapter': 0, 'heading': heading,
-        # The Endgame's maps are 'Endgame (1)': 'Rebirth (1)' and so on; the number shows once.
-        'title': (re.sub(r' \(\d\)$', '', ch['title']) if re.search(r'\(\d\)$', heading) else ch['title'])
-                 + (f' (part {section} of 2)' if section else ''),
+        # The game's titles (MCTppnn_2), the Endgame's five numbered as the game numbers them: 'Endgame (1)', 'Rebirth (1)'
+        # (e_common.m MCT0407a-e; one naming in both apps, the user's call, 2026-11-26).
+        'title': ch['title'] + (f' (part {section} of 2)' if section else ''),
         'width': W, 'height': H,
         'grid': [''.join(r) for r in grid],
         'victory': win, 'defeat': lose, 'objectives': objectives, 'units': units, 'starts': starts,

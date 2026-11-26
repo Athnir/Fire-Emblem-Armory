@@ -595,10 +595,26 @@ describe("Radiant Dawn's maps, from the game's own files", () => {
     expect(lekain.note).toMatch(/Leaves the map on turn 6, enemy phase.*Can't be killed/)
     // A check inside a called handler doesn't gate the waves that follow it (3-6's laguz).
     expect(byId('fe10-3-6').reinforcements!.every((g) => !/if .* is still alive/.test(String(g.when)))).toBe(true)
+    // Ch.3: Stefan's tile asks MindGetMe() who stopped there (C0404 handler 3): Micaiah, or Lethe or Mordecai only with a Path of
+    // Radiance save in which he joined; anyone else gets nothing.
+    expect(byId('fe10-4-3').joiners!.find((j) => j.name === 'Stefan')!.when).toBe(
+      'When Micaiah stops on the marked tile (Lethe or Mordecai too, only with a Path of Radiance save in which Stefan joined)',
+    )
+    // Ch.5: Volke's talks call the handler that takes 3,000 gold and hands him over (UnitTransferToForce on the unit
+    // UnitGetByPID looked up), or, with less, plays his refusal and sends him off the map (C0406 handler 38).
+    const volke = byId('fe10-4-5').units.filter((u) => u.name === 'Volke')
+    expect(volke.length).toBeGreaterThan(0)
+    for (const v of volke) {
+      expect(v.talk).toBe('Recruit: talk with Elincia or Bastian for 3,000 gold; with less, Volke refuses and leaves the map for good')
+    }
   })
 
   it("reads the Endgame: the Tower's floors, the spirits that keep warping in, Ashera, and Lehran's condition", () => {
-    expect(FE10_MAP_SET.chapterLabel(byId('fe10-4-endgame-1'))).toBe('Part 4, Endgame (1): Rebirth')
+    // The Endgame's five maps keep the game's numbered titles (MCT0407a-e: 'Rebirth (1)' to '(5)').
+    expect(FE10_MAP_SET.chapterLabel(byId('fe10-4-endgame-1'))).toBe('Part 4, Endgame (1): Rebirth (1)')
+    expect(FE10_MAPS.filter((m) => m.id.startsWith('fe10-4-endgame-')).map((m) => m.title)).toEqual(
+      [1, 2, 3, 4, 5].map((n) => `Rebirth (${n})`),
+    )
     // The Tower's floors, each with its own stats (Endgame (4)'s 防御床３ also gives Avo +15).
     const t = byId('fe10-4-endgame-4').terrain!
     expect(t.bo).toMatchObject({ def: 10, avo: 0 })

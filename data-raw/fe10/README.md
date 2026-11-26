@@ -335,9 +335,19 @@ Wii files are big-endian, like the GameCube's.
   (Part 3 Ch.13: Ike's companions, each with a Tiger or Cat in their place).
 - An army's soldiers can be named for their country, with a portrait of their own (`PID_PHOENICIS`, Tibarn's
   hawks; `PID_KILVAS`, the ravens). A PID placed 3 or more times in one group is a soldier, never a character.
-- The Endgame is five chapter records, `MCT0407a` to `MCT0407e` (maps `bmap0407a`-`e`). The `lmap01`-`12`
-  records are titled 'dummy' and their scripts aren't on the disc: terrain only, not battles. Radiant Dawn has
-  no trial maps.
+- The Endgame is five chapter records, `MCT0407a` to `MCT0407e` (maps `bmap0407a`-`e`), each with the game's own label and
+  title (e_common.m `_3` and `_2`): 'Endgame (1)', 'Rebirth (1)' to 'Endgame (5)', 'Rebirth (5)', which the maps keep (one
+  naming in both apps: the user's call, 2026-11-26). The `lmap01`-`12` records are titled 'dummy' and their scripts aren't
+  on the disc: terrain only, not battles. Radiant Dawn has no trial maps.
+- A talk recruits whoever it hands over, by PID (`UnitTransferToForceByPID(pid, 0)`) or as the unit `UnitGetByPID` looked
+  up (`UnitTransferToForce(unit, 0)`), in its own code or a handler it calls. Part 4 Ch.5's talks with Volke (39, Elincia;
+  40, Bastian) call handler 38, which sets a variable to 3000 and, if `BMGetMoney()` is less (op 0x31, `<`; 0x34 is `>=`,
+  the kill counts' test), plays the NOMONEY talk and sends him off the map (`UnitRunAway`, `UnitEscape`), else takes the
+  gold (`BMSetMoney`) and hands him over: "Recruit: talk with Elincia or Bastian for 3,000 gold" (`recruit_fee`).
+- An area that asks who stopped on it answers only them (`area_finders`): Part 4 Ch.3's Stefan tile (handler 3, one
+  tile) stores `MindGetMe()` and compares it (op 0x2f) with Micaiah, Lethe and Mordecai, each a case calling a handler
+  that places and hands him over; Lethe's and Mordecai's need `IsInheritFE8Data()` and
+  `FE8UnitCheckExistsByPID('PID_SOANEVALCKE')`, a Path of Radiance save in which he joined; anyone else gets nothing.
 - The Tower's floors: 回復床 heals 10% with Avo +15, 防御床 Def +10, 防御床２倍 Def +15 Avo +5, 魔防床 Res +10, and
   防御床３ Def +10 Avo +15 (its number is kept: other numbered floors are the same terrain). Fliers get these too.
 - A handler called with values on the stack (op 0x37) gets them as its variables 00, 01, ...: Endgame (4) and
@@ -418,11 +428,22 @@ conditions, mandatory units and items agree, except these, still to check in-gam
   A gift before the battle (a base conversation, an opening) is that chapter's; one at its end or from an event during it is
   the next chapter's; a handler another calls (opcode 0x37) is read through its caller (Part 4 Ch.4's opening calls the one
   that sends Tormod's items to the convoy and hands him Arcfire, Bolganone and Meteor).
-  `kitAt` is the chapter each unit's gear is yours from, counted once, where the unit first joins in story order: its first
-  roster (`bmapPPCC_mikata_n`/`_h`/`_c` and the lettered or numbered variants), a group a join call adds (`JoinRank`,
-  `SallyAddByGroupRank`, `Join`: a base conversation's recruits), a group the battle places on your side outside the rosters
-  (Lehran in Endgame (5), with the Ashera Staff), or a hand-over (`UnitTransferToForceByPID(pid, 0)`); one during the battle
-  (a talk, the end) is yours from the next chapter. The rosters are developer-start templates: every chapter's battle setup
+  `kitAt` is the chapter each unit's gear is yours from, counted once, where the unit first joins your army in story order:
+  its first roster (`bmapPPCC_mikata_n`/`_h`/`_c` and the lettered or numbered variants), a group a join call adds to your army
+  (`JoinRank` and `Join` to team 5, whatever the records' sides: a base conversation's recruits; with -1, which keeps each
+  record's own side, only its units of side 0, so Part 3 Endgame's `JoinRank('bmap0315_other', -1)` brings in neither
+  Skrimir, side 10, nor Tibarn, side 9, who count from their first rosters in Part 4; `SallyAddByGroupRank`'s units of side 0:
+  Tormod's group), a group the battle places on your side outside the rosters (Lehran in Endgame (5), with the Ashera Staff),
+  a hand-over (`UnitTransferToForceByPID(pid, 0)`, or `UnitTransferToForce` on the unit `UnitGetByPID` looked up: Volke's
+  talks in Part 4 Ch.5 call the handler that does it; Gareth and Nasir at Endgame (3)'s end), or the startup script's team
+  moves into team 5 (the `TEAM_` functions the chapter scripts call by name, read by `fe10_cmb.team_moves`, and
+  `TeamTransferPID`: `TEAM_0305_OP` brings Mordecai, Lethe and Lyre over from team 9 in Part 3 Ch.4's opening,
+  `TEAM_0106_ED_00` Tauroneo, Zihark and Jill at Part 1 Ch.5's end, `TEAM_0107_ED_00` Fiona at Part 1 Ch.6's). A move in an
+  opening or a base conversation counts for that chapter; one during the battle (a talk, the end, a turn: Pelleas, placed on
+  Part 4 Ch.2's turn 2 when `PelleasIsAlive()`) is yours from the next chapter, with what the unit carries in that chapter's
+  battle (its placement there, before a scene's cast: Tauroneo, Zihark and Jill bring their Part 1 Ch.5 green placements'
+  gear, not Ch.6's roster). A join call to another team isn't one (Pelleas's `JoinRank('bmap0314_pelleas', 7)` at Part 3
+  Ch.13's end, team 7 being units away from every army). The rosters are developer-start templates: every chapter's battle setup
   first calls `EvDevStart(map, roster)`, and they list the gear a unit should have by then, not what you carry (Micaiah's list
   a Thani from Part 1 Ch.3, a base conversation's gift before Part 1's Endgame; the endgame's give Micaiah a Rexaura, which
   Lekain drops). Later rosters only place a unit you already have. The opening's and ending's casts (`_op01_mikata_c`,
