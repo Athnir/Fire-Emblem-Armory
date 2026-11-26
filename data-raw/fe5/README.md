@@ -74,7 +74,15 @@ ids ended by 0), +0xB stat bonuses (pointer to 8 bytes: Str, Mag, Skl, Spd, Def,
 ## Maps (`scripts/build-fe5-maps.py`)
 
 - **Chapters**: 52-byte records at `$84:804A`, in the game's chapter order (1, 2, 2x, 3, 4, 4x, 5 ... 15, 16A, 17A, 16B, 17B, 18 ...
-  24x, Final): +9 tileset config, +15 map, +18 map changes, +21 starting positions, +24 objective markers, +35 fog vision.
+  24x, Final): +9 tileset config, +15 map, +18 map changes, +21 starting positions, +24 objective markers, +35 fog vision, +0x2A how
+  the armies stand.
+- **How the armies stand** (+0x2A, read as the chapter loads, `$84:94E6`): bit 0 makes yours and the enemy hostile to each other, bit
+  1 the enemy and the other army, bit 2 the other army and yours, each both ways (`$83:B2C2`, into `$7E:528C`). Each phase `$83:B267`
+  sets out which armies are hostile to the phase's (`$7E:51CA`, `$7E:520A`, `$7E:524A`), and the side check that every attack,
+  Capture and Steal makes, and the AI's choice of target (bank `$8D`), goes through reads them (`$83:B34F`). Most chapters are 3 (the
+  green units fight the enemy, not you) or 1 (no green units); Chapters 2x, 12, 14 and 17A are 5: the other army is hostile to yours
+  and not to the enemy. It stays green, as the game draws it, and each of its units says so in its note (Chapter 14's McCloy and
+  his Dracoknights, Chapter 17A's Misha, her Pegasus Riders and the pirates; 2x and 12 have none).
 - **Map**: compressed (the game's own decompressor, `$80:B574`, run by `scripts/fe4_cpu.py`): width, height, then a u16 per tile whose
   top 13 bits are the metatile. The terrain of each metatile is the tileset config's bytes from 0x2000 (`$83:B476` reads `$7F:2010`,
   the config being unpacked to `$7F:0010`).
@@ -151,8 +159,8 @@ nothing to visit, in one of the map's notes.
   first, then staves, then weapons, each by cost per use; the rest are lost) and lays a chest for each on 16 tiles (`$99:9147`, read
   by `$8C:BA4E`) in a random order (`$8C:B98A`; the chest is metatile 0x27). The map draws all 16 as chests; the Fire Emblem Wiki
   (The Dungeon): "anywhere from 4 to 16 chests", with the Javelin, Steel Sword, Rapier and Vulnerary in them. The four are chest
-  sources on the weapon page; with that, the Javelin and the Rapier lose their capture lines there (a foe's line is kept only where
-  nothing else gives an item: `gba_maps.write_sources`).
+  sources on the weapon page; with that, the Javelin and the Rapier lose their capture lines from Chapter 4 on (Chapter 1's Javelin
+  line stays: a foe's line goes only where something else gives the item as early on its route, `foe_lines_kept`).
 - **Other changes**, each saying what sets it off, read from its definition (turn, phase, area, flags and what sets them, a talk) and
   a script check of a named character (played with them gone, it changes nothing: "while Kempf is on the map"): Chapter 6's wall at
   (7, 6); Chapter 11's courtyard trap (Leif, or a unit carrying him, stopping in the area, while Kempf is on the map: six doors shut,
@@ -193,6 +201,35 @@ lists, the ending script and the preparations groups.
 - **Gaiden chapters**: each end script adds to the chapter number to skip its gaiden chapter; the condition before it is phrased in
   `GAIDEN` and tested against the script (Chapter 2: no village destroyed; 4: every civilian escapes; 12: fewer than 20 turns; 14:
   three of the city's houses visited). Chapter 15's exit picks 16A (west, or the church) or 16B.
+- **Flags that last from chapter to chapter**: flags 0x81-0xA8 are the 40 of the block at `$7E:496E` (`$8C:9B4B` picks the block by
+  bit 7), which only a new game clears (`$83:FC14`); the chapter's own 96, at `$7E:4973`, are cleared as each chapter starts
+  (`$83:FB32`). Escapes set some: SetFlagByCharacterTable (`$8C:A2F4`, named here) takes a table from the long parameter, [character
+  u16][flag u8] entries ended by a 0 character and a 0 word (`$8C:CD2D`), and sets the flag of the unit acting, else of the one it
+  carries (`$0E81`). Chapter 4x's escapes (yours, and the other army's when the AI's action at `$7E:402E` is 5) use the table at
+  `$FD:8F82` (Emily 137, Murphy 138, Bella 139, Cliff 140, Bowie 141, Leena 142), and each of Chapter 6's six houses tests one
+  (`$99:A8AB`: Bowie's, for the Paragon Manual; Murphy's house sets flag 10, which brings Hicks, `$99:A4EF`). Chapter 11x's
+  other-army escapes use `$99:DBC9` (Rosa 146, Sera 147, Peter 145; its opening clears them, `$99:DA37`): Chapter 12's houses test
+  Sera's (Heim's Scroll) and Peter's (Silence), and its Magic Ring's definition waits on Rosa's (`$99:DCAB`). `build_locations` plays
+  a house again with the lasting flags its definition waits on or its script tests, and what only that gives says whose escape it
+  needs ("Given at a house, if Bowie escaped in Chapter 4x"). Each lasting flag is worded by all that sets it (`lasting_words`): Fred's
+  (144) by his escape in Chapter 11 (the other army's, `$99:D1B6`) or the end script, which sets it while he's on the other army,
+  alive and not captured (`$99:D499`, `$99:D4A2`); 11x waits on it for his arrival on turn 2 (`$99:D553`) and opens only with it
+  (`$99:D4FD`). A visit's is worded by the visit (Chapter 15's church sets 161 for Leif, `$FD:AF9E`, `$FD:AFCD`; 16A's house at
+  (41, 10) waits on it).
+- **An event whose only condition is another's flag** runs right after that one (once a script ends the engine checks the list
+  again, `$8C:82DC` -> `$8C:9601`): an after-action one's time is what sets that one off (Chapter 16B's Miranda: "As soon as Leif
+  stops on the gate at (10, 11)"; Chapter 5's Group 6: "When the door at (23, 20) is opened"), with the visitor a house's script needs
+  to leave the flag set (Chapter 14's house at (23, 24) clears it for anyone but Nanna, `$FD:9B56`) and what it needs from an earlier
+  chapter. A visit counts who comes on its own flag too (`joins_of`): the house and church are drawn and noted as the visits they are
+  (Chapter 14's at (23, 24), "Homer joins your army if visited by Nanna"; 16A's at (41, 10), Schroff; 17A's church at (1, 21), Sara).
+- **A counter a chapter's turns keep**: Chapter 14 adds one to `$7E:4976` each enemy phase from turn 6 to 15 (`$FD:97C5`), and its
+  groups wait on its value (`$FD:97D8` and `$FD:97E8` while it's 0, `$FD:97F8` McCloy's Dracoknights at 3 on the other army's phase,
+  `$FD:9808` at 4, and 5 ends the chapter, `$FD:9818`). `counter_times` plays the phases in turn, each list in its order: turns 1 to
+  5's enemy phases, turn 8's other army's phase, turn 9's enemy phase.
+- **A talk that recruits only with a capture**: Karin's talk with Misha in Chapter 17A only sets flag 10 (`$FD:BFF0`); the end script
+  (also run by the seize, `$FD:BC0D`) makes Misha yours only if it's set (`$FD:C3A4`), Karin is alive and not captured (`$FD:C3AF`)
+  and Misha is held (`$FD:C3BE`, `$FD:C402`). `talks_of` finds it by playing the end script with the talk's flag and the unit held;
+  her items, like a held foe's who joins at the end (Lifis, Salem), count from the next chapter.
 - **Defeat**: Leif's death; Ced's in Chapter 23 (the death-quote handler, `$99:807C`); and in Chapters 9, 13, 14 and 20 an enemy
   reaching a tile (an enemy-phase event there calls the game over, `$80:C29D`).
 
@@ -228,6 +265,10 @@ marked with the rare things it holds (`steal`, and the map set's `takeBy: 'captu
   is held, 0x800 being a unit of yours carried off, `$83:A131`) and whose script removes or hides it (state 0x440): Mareeta in
   Chapter 5.
 - **A foe a talk recruits** isn't marked: its items come with it. One that joins only once captured (Salem in Chapter 12) is.
+- **The other army's units, where the chapter makes it hostile to yours** (Chapters 14 and 17A, +0x2A bit 2): the side check lets you
+  attack, capture and rob them, so they count as foes do (`Capture.hostile`), mounted ones once Sleep can be yours; their lines say
+  "Carried by a Pegasus Rider of the other army: capture to take it". None holds anything rare. Misha, whom Karin's talk and a
+  capture recruit, brings her items when she joins.
 - "When one of these can be yours" counts the ways of getting it other than taking it from a foe (shops, chests, villages, gifts,
   recruits), from the chapter after the first one that gives it, on the shared story or the same route.
 
@@ -239,8 +280,13 @@ weighs; an autolevelled foe's Spd is rolled, so just "a thief faster than it"). 
 come only this way, as the Fire Emblem Wiki says. A thief's reach counts only the thieves among the units the opening places, and
 leaves shut a door whose opening takes the foe away: Chapter 5's arena door sets flag 36, and right after the action an event hides
 Mareeta (`taken_when_opened`; the wiki: her Shadow Sword is stolen only through a glitch that opens the door without her leaving).
-What neither can take is said only where nothing else gives the item ('foe-held': it names who carries a foe-only weapon). Two
-weapons are foe-only: the Loptrian Fang (Raydrik and Mus, at Con 20; it weighs 20) and the Shadow Sword.
+A capture or Steal line stays where nothing else gives the item as early on its route: it goes only where another way of getting it
+comes in the same chapter or before on every route its chapter is on (`foe_lines_kept`, then `gba_maps.write_sources` with `keep`;
+a '-later' line counts from after its chapter). So Misha's Ridersbane, yours from the end of 17A, leaves its capture lines from
+Chapter 8 on, and her Wind Sword leaves 16B's on route B. A foe that joins at the chapter's end (Lifis in 2x, Salem in Chapter 12)
+brings the copy it's captured with: counted once, as it joins. What neither can take is said only where nothing else gives the item
+('foe-held': it names who carries a foe-only weapon). Two weapons are foe-only: the Loptrian Fang (Raydrik and Mus, at Con 20; it
+weighs 20) and the Shadow Sword.
 
 **What's rare.** A weapon or staff is rare when no shop sells it (Thracia 776 has no forge); an item is rare when it lasts and no shop
 keeps it in stock. The shops counted are every armory and vendor of every chapter (a shop definition whose tile is an Armory, 26, or

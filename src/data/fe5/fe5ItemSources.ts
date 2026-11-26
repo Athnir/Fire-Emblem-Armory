@@ -165,6 +165,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Javelin": [
     {
+      "mapId": "fe5-1",
+      "kind": "foe",
+      "text": "Carried by a foe Soldier: capture to take it"
+    },
+    {
       "mapId": "fe5-4",
       "kind": "chest",
       "text": "In a chest"
@@ -280,6 +285,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-15",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "kit-later",
+      "text": "Carried by Misha, who joins at the end of the chapter"
     },
     {
       "mapId": "fe5-17a",
@@ -651,14 +661,14 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-2x",
       "kind": "kit-later",
-      "text": "Carried by Lifis on joining"
+      "text": "Carried by Lifis, who joins at the end of the chapter"
     }
   ],
   "Lockpick": [
     {
       "mapId": "fe5-2x",
       "kind": "kit-later",
-      "text": "Carried by Lifis on joining"
+      "text": "Carried by Lifis, who joins at the end of the chapter"
     },
     {
       "mapId": "fe5-4",
@@ -672,6 +682,16 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Killing Edge": [
+    {
+      "mapId": "fe5-2x",
+      "kind": "foe",
+      "text": "Carried by Shiva, a foe: capture to take it"
+    },
+    {
+      "mapId": "fe5-5",
+      "kind": "foe-later",
+      "text": "Carried by a foe Swordmaster, arriving mid-chapter: capture to take it"
+    },
     {
       "mapId": "fe5-7",
       "kind": "kit",
@@ -689,6 +709,26 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Steel Bow": [
+    {
+      "mapId": "fe5-2x",
+      "kind": "foe",
+      "text": "Carried by a foe Hunter: capture to take it"
+    },
+    {
+      "mapId": "fe5-2x",
+      "kind": "foe",
+      "text": "Carried by a foe Warrior: capture to take it"
+    },
+    {
+      "mapId": "fe5-8x",
+      "kind": "foe",
+      "text": "Carried by Gomez, a foe: capture to take it"
+    },
+    {
+      "mapId": "fe5-8x",
+      "kind": "foe",
+      "text": "Carried by a foe Hunter: capture to take it"
+    },
     {
       "mapId": "fe5-9",
       "kind": "shop",
@@ -711,6 +751,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Torch": [
+    {
+      "mapId": "fe5-2x",
+      "kind": "foe",
+      "text": "Carried by a foe Warrior: capture to take it"
+    },
     {
       "mapId": "fe5-4",
       "kind": "kit",
@@ -895,6 +940,16 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Shortsword": [
     {
+      "mapId": "fe5-3",
+      "kind": "foe",
+      "text": "Carried by a foe Armored Sword: capture to take it"
+    },
+    {
+      "mapId": "fe5-3",
+      "kind": "foe-later",
+      "text": "Carried by a foe Armored Sword, arriving mid-chapter: capture to take it"
+    },
+    {
       "mapId": "fe5-4",
       "kind": "kit",
       "text": "Carried by Macha on joining"
@@ -902,9 +957,49 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Elfire": [
     {
+      "mapId": "fe5-3",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-4x",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-6",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-11x",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-13",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-16a",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
       "mapId": "fe5-17b",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe5-21",
+      "kind": "foe-later",
+      "text": "Carried by a foe Mage Knight, arriving mid-chapter: capture to take it"
     },
     {
       "mapId": "fe5-22",
@@ -914,12 +1009,37 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Chest Key": [
     {
+      "mapId": "fe5-3",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
       "mapId": "fe5-4",
       "kind": "kit",
       "text": "Carried by Macha on joining"
     }
   ],
   "Fire": [
+    {
+      "mapId": "fe5-3",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-4x",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-5",
+      "kind": "foe-later",
+      "text": "Carried by a foe Mage, arriving mid-chapter: capture to take it"
+    },
     {
       "mapId": "fe5-6",
       "kind": "shop",
@@ -999,6 +1119,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-4",
       "kind": "chest",
       "text": "In a chest"
+    },
+    {
+      "mapId": "fe5-6",
+      "kind": "village",
+      "text": "Given at a house, if Cliff escaped in Chapter 4x"
     }
   ],
   "Steel Sword": [
@@ -1019,6 +1144,21 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Thunder": [
+    {
+      "mapId": "fe5-4",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-4x",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
     {
       "mapId": "fe5-9",
       "kind": "shop",
@@ -1082,6 +1222,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Devil Axe": [
+    {
+      "mapId": "fe5-4x",
+      "kind": "foe",
+      "text": "Carried by a foe Armored Axe: capture to take it"
+    },
     {
       "mapId": "fe5-8x",
       "kind": "chest",
@@ -1151,6 +1296,101 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Physic": [
+    {
+      "mapId": "fe5-4x",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Priest: capture to take it"
+    },
+    {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Dark Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-6",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-9",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-10",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-11",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-11x",
+      "kind": "foe",
+      "text": "Carried by Oltoph, a foe: capture to take it"
+    },
+    {
+      "mapId": "fe5-13",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-14",
+      "kind": "foe",
+      "text": "Carried by a foe Priest: capture to take it"
+    },
+    {
+      "mapId": "fe5-14",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-16a",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-16b",
+      "kind": "foe",
+      "text": "Carried by a foe Sorcerer: capture to take it"
+    },
+    {
+      "mapId": "fe5-17b",
+      "kind": "foe",
+      "text": "Carried by a foe Priest: capture to take it"
+    },
+    {
+      "mapId": "fe5-21",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-21x",
+      "kind": "foe",
+      "text": "Carried by a foe Priest: capture to take it"
+    },
+    {
+      "mapId": "fe5-22",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-22",
+      "kind": "foe",
+      "text": "Carried by a foe Priest: capture to take it"
+    },
     {
       "mapId": "fe5-23",
       "kind": "village",
@@ -1234,12 +1474,32 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Jörmungandr": [
     {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Sorcerer: capture to take it"
+    },
+    {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Dark Bishop: capture to take it"
+    },
+    {
       "mapId": "fe5-12",
       "kind": "kit-later",
-      "text": "Carried by Salem on joining"
+      "text": "Carried by Salem, who joins at the end of the chapter"
     }
   ],
   "Pure Water": [
+    {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Priest: capture to take it"
+    },
+    {
+      "mapId": "fe5-6",
+      "kind": "village",
+      "text": "Given at a house, if Bella escaped in Chapter 4x"
+    },
     {
       "mapId": "fe5-7",
       "kind": "village",
@@ -1288,9 +1548,34 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Silver Bow": [
     {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe Sniper: capture to take it"
+    },
+    {
+      "mapId": "fe5-15",
+      "kind": "foe-later",
+      "text": "Carried by a foe Hunter, arriving mid-chapter: capture to take it"
+    },
+    {
+      "mapId": "fe5-16b",
+      "kind": "foe",
+      "text": "Carried by a foe Sniper: capture to take it"
+    },
+    {
       "mapId": "fe5-17b",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe5-19",
+      "kind": "foe",
+      "text": "Carried by a foe Arch Knight: capture to take it"
+    },
+    {
+      "mapId": "fe5-19",
+      "kind": "foe",
+      "text": "Carried by a foe Bow Knight: capture to take it"
     },
     {
       "mapId": "fe5-21",
@@ -1306,6 +1591,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Slim Lance": [
+    {
+      "mapId": "fe5-5",
+      "kind": "foe",
+      "text": "Carried by a foe General: capture to take it"
+    },
     {
       "mapId": "fe5-9",
       "kind": "shop",
@@ -1325,6 +1615,26 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Killer Axe": [
+    {
+      "mapId": "fe5-5",
+      "kind": "foe-later",
+      "text": "Carried by a foe Berserker, arriving mid-chapter: capture to take it"
+    },
+    {
+      "mapId": "fe5-14x",
+      "kind": "foe",
+      "text": "Carried by Eichner, a foe: capture to take it"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "foe",
+      "text": "Carried by a foe Armored Axe: capture to take it"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "foe",
+      "text": "Carried by Nicolov, a foe: a thief with more than 8 Spd and 10 Con can steal it"
+    },
     {
       "mapId": "fe5-22",
       "kind": "shop",
@@ -1357,7 +1667,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-12",
       "kind": "village",
-      "text": "Given at a house"
+      "text": "Given at a house, if Rosa escaped in Chapter 11x"
     },
     {
       "mapId": "fe5-17a",
@@ -1431,9 +1741,24 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Master Sword": [
     {
+      "mapId": "fe5-11",
+      "kind": "foe",
+      "text": "Carried by Kempf, a foe: a thief with more than 12 Spd and 15 Con can steal it"
+    },
+    {
       "mapId": "fe5-16a",
       "kind": "kit",
       "text": "Carried by Ilios on joining"
+    },
+    {
+      "mapId": "fe5-16b",
+      "kind": "foe",
+      "text": "Carried by a foe Hero: capture to take it"
+    },
+    {
+      "mapId": "fe5-17b",
+      "kind": "foe",
+      "text": "Carried by Amalda, a foe: capture to take it"
     },
     {
       "mapId": "fe5-19",
@@ -1451,6 +1776,87 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-6",
       "kind": "kit-later",
       "text": "Carried by Hicks on joining"
+    }
+  ],
+  "Master Seal": [
+    {
+      "mapId": "fe5-6",
+      "kind": "village",
+      "text": "Given at a house, if Emily escaped in Chapter 4x"
+    },
+    {
+      "mapId": "fe5-7",
+      "kind": "village",
+      "text": "Given at a house"
+    },
+    {
+      "mapId": "fe5-8",
+      "kind": "village",
+      "text": "Given at a house"
+    },
+    {
+      "mapId": "fe5-9",
+      "kind": "kit",
+      "text": "Carried by Selphina on joining"
+    },
+    {
+      "mapId": "fe5-12x",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe5-13",
+      "kind": "village",
+      "text": "Given at a house"
+    },
+    {
+      "mapId": "fe5-16a",
+      "kind": "village",
+      "text": "Given at a house"
+    },
+    {
+      "mapId": "fe5-17b",
+      "kind": "event",
+      "text": "Given to your army at the end of the chapter"
+    },
+    {
+      "mapId": "fe5-19",
+      "kind": "event",
+      "text": "Given to your army at the end of the chapter if a condition from an earlier chapter is met"
+    },
+    {
+      "mapId": "fe5-20",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe5-21x",
+      "kind": "chest",
+      "text": "In a chest"
+    },
+    {
+      "mapId": "fe5-22",
+      "kind": "shop",
+      "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe5-24x",
+      "kind": "chest",
+      "text": "In a chest"
+    }
+  ],
+  "Paragon Manual": [
+    {
+      "mapId": "fe5-6",
+      "kind": "village",
+      "text": "Given at a house, if Bowie escaped in Chapter 4x"
+    }
+  ],
+  "Od's Scroll": [
+    {
+      "mapId": "fe5-6",
+      "kind": "village",
+      "text": "Given at a house, if Leena escaped in Chapter 4x"
     }
   ],
   "Iron Lance": [
@@ -1576,6 +1982,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Silver Sword": [
     {
+      "mapId": "fe5-7",
+      "kind": "foe",
+      "text": "Carried by a foe Myrmidon: capture to take it"
+    },
+    {
       "mapId": "fe5-12x",
       "kind": "kit",
       "text": "Carried by Trude on joining"
@@ -1653,68 +2064,6 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Soldier, arriving mid-chapter: capture to take it"
     }
   ],
-  "Master Seal": [
-    {
-      "mapId": "fe5-7",
-      "kind": "village",
-      "text": "Given at a house"
-    },
-    {
-      "mapId": "fe5-8",
-      "kind": "village",
-      "text": "Given at a house"
-    },
-    {
-      "mapId": "fe5-9",
-      "kind": "kit",
-      "text": "Carried by Selphina on joining"
-    },
-    {
-      "mapId": "fe5-12x",
-      "kind": "chest",
-      "text": "In a chest"
-    },
-    {
-      "mapId": "fe5-13",
-      "kind": "village",
-      "text": "Given at a house"
-    },
-    {
-      "mapId": "fe5-16a",
-      "kind": "village",
-      "text": "Given at a house"
-    },
-    {
-      "mapId": "fe5-17b",
-      "kind": "event",
-      "text": "Given to your army at the end of the chapter"
-    },
-    {
-      "mapId": "fe5-19",
-      "kind": "event",
-      "text": "Given to your army at the end of the chapter if a condition from an earlier chapter is met"
-    },
-    {
-      "mapId": "fe5-20",
-      "kind": "chest",
-      "text": "In a chest"
-    },
-    {
-      "mapId": "fe5-21x",
-      "kind": "chest",
-      "text": "In a chest"
-    },
-    {
-      "mapId": "fe5-22",
-      "kind": "shop",
-      "text": "Sold at the vendor"
-    },
-    {
-      "mapId": "fe5-24x",
-      "kind": "chest",
-      "text": "In a chest"
-    }
-  ],
   "Venin Bow": [
     {
       "mapId": "fe5-8",
@@ -1789,6 +2138,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Baldach, a foe: a thief with more than 10 Spd and 13 Con can steal it"
     },
     {
+      "mapId": "fe5-14",
+      "kind": "foe-later",
+      "text": "Carried by a Dracoknight of the other army, arriving mid-chapter: capture to take it"
+    },
+    {
       "mapId": "fe5-16a",
       "kind": "foe",
       "text": "Carried by a foe Lance Knight: capture to take it"
@@ -1802,6 +2156,16 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-16a",
       "kind": "foe-later",
       "text": "Carried by a foe Pegasus Rider, arriving mid-chapter: capture to take it"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "foe",
+      "text": "Carried by a Pegasus Rider of the other army: capture to take it"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "kit-later",
+      "text": "Carried by Misha, who joins at the end of the chapter"
     },
     {
       "mapId": "fe5-21",
@@ -1883,6 +2247,21 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Killer Lance": [
     {
+      "mapId": "fe5-9",
+      "kind": "foe",
+      "text": "Carried by a foe Dracorider: a thief faster than it, with more than 10 Con, can steal it"
+    },
+    {
+      "mapId": "fe5-9",
+      "kind": "foe",
+      "text": "Carried by Merloch, a foe: a thief with more than 14 Spd and 10 Con can steal it"
+    },
+    {
+      "mapId": "fe5-13",
+      "kind": "foe",
+      "text": "Carried by Liszt, a foe: a thief with more than 9 Spd and 10 Con can steal it"
+    },
+    {
       "mapId": "fe5-14",
       "kind": "kit",
       "text": "Carried by Eda on joining"
@@ -1904,6 +2283,16 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Wind": [
+    {
+      "mapId": "fe5-9",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-11x",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
     {
       "mapId": "fe5-12",
       "kind": "shop",
@@ -2025,6 +2414,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Silver Lance": [
     {
+      "mapId": "fe5-10",
+      "kind": "foe",
+      "text": "Carried by Dvorak, a foe: a thief faster than it, with more than 10 Con, can steal it"
+    },
+    {
       "mapId": "fe5-13",
       "kind": "kit",
       "text": "Carried by Glade on joining"
@@ -2047,6 +2441,16 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Bridge Key": [
     {
+      "mapId": "fe5-10",
+      "kind": "foe",
+      "text": "Carried by a foe Armored Sword: capture to take it"
+    },
+    {
+      "mapId": "fe5-12",
+      "kind": "foe",
+      "text": "Carried by a foe Brigand: capture to take it"
+    },
+    {
       "mapId": "fe5-16a",
       "kind": "village",
       "text": "Given at a house"
@@ -2054,9 +2458,34 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Bolting": [
     {
+      "mapId": "fe5-10",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-11x",
+      "kind": "foe",
+      "text": "Carried by Oltoph, a foe: capture to take it"
+    },
+    {
+      "mapId": "fe5-13",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-14",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
       "mapId": "fe5-16a",
       "kind": "kit",
       "text": "Carried by Ilios on joining"
+    },
+    {
+      "mapId": "fe5-21",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
     },
     {
       "mapId": "fe5-21x",
@@ -2098,12 +2527,27 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Lightning Sword": [
     {
+      "mapId": "fe5-10",
+      "kind": "foe-later",
+      "text": "Carried by Fred, a foe, arriving mid-chapter: a thief with more than 10 Spd and 9 Con can steal it"
+    },
+    {
+      "mapId": "fe5-11",
+      "kind": "foe",
+      "text": "Carried by Fred, a foe: a thief with more than 10 Spd and 9 Con can steal it"
+    },
+    {
       "mapId": "fe5-11x",
       "kind": "kit-later",
       "text": "Carried by Fred on joining"
     }
   ],
   "Dire Thunder": [
+    {
+      "mapId": "fe5-10",
+      "kind": "foe-later",
+      "text": "Carried by Olwen, a foe, arriving mid-chapter: a thief with more than 10 Spd and 12 Con can steal it"
+    },
     {
       "mapId": "fe5-11x",
       "kind": "kit-later",
@@ -2168,9 +2612,59 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Thoron": [
     {
+      "mapId": "fe5-11",
+      "kind": "foe",
+      "text": "Carried by Kempf, a foe: a thief with more than 12 Spd and 9 Con can steal it"
+    },
+    {
       "mapId": "fe5-16a",
       "kind": "kit",
       "text": "Carried by Ilios on joining"
+    },
+    {
+      "mapId": "fe5-18",
+      "kind": "foe",
+      "text": "Carried by Gustav, a foe: a thief with more than 12 Spd and 9 Con can steal it"
+    },
+    {
+      "mapId": "fe5-19",
+      "kind": "foe",
+      "text": "Carried by Wolfe, a foe: a thief with more than 8 Spd and 9 Con can steal it"
+    },
+    {
+      "mapId": "fe5-19",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-19",
+      "kind": "foe",
+      "text": "Carried by a foe Mage Knight: capture to take it"
+    },
+    {
+      "mapId": "fe5-21x",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-21x",
+      "kind": "foe",
+      "text": "Carried by a foe Mage: capture to take it"
+    },
+    {
+      "mapId": "fe5-21x",
+      "kind": "foe-later",
+      "text": "Carried by a foe Mage, arriving mid-chapter: capture to take it"
+    },
+    {
+      "mapId": "fe5-22",
+      "kind": "foe",
+      "text": "Carried by a foe Bishop: capture to take it"
+    },
+    {
+      "mapId": "fe5-22",
+      "kind": "foe",
+      "text": "Carried by a foe Mage Knight: capture to take it"
     }
   ],
   "Venin Edge": [
@@ -2204,7 +2698,7 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe5-12",
       "kind": "kit-later",
-      "text": "Carried by Salem on joining"
+      "text": "Carried by Salem, who joins at the end of the chapter"
     }
   ],
   "Vantage Manual": [
@@ -2219,6 +2713,40 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-12",
       "kind": "kit-later",
       "text": "Carried by Mareeta on joining"
+    }
+  ],
+  "Heim's Scroll": [
+    {
+      "mapId": "fe5-12",
+      "kind": "village",
+      "text": "Given at a house, if Sera escaped in Chapter 11x"
+    }
+  ],
+  "Silence": [
+    {
+      "mapId": "fe5-12",
+      "kind": "village",
+      "text": "Given at a house, if Peter escaped in Chapter 11x"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "kit-later",
+      "text": "Carried by Sara on joining"
+    },
+    {
+      "mapId": "fe5-16b",
+      "kind": "kit-later",
+      "text": "Carried by Sara on joining"
+    },
+    {
+      "mapId": "fe5-20",
+      "kind": "village",
+      "text": "Given at a house"
+    },
+    {
+      "mapId": "fe5-23",
+      "kind": "kit",
+      "text": "Carried by Saias on joining"
     }
   ],
   "Kingmaker": [
@@ -2297,12 +2825,42 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Master Lance": [
     {
+      "mapId": "fe5-14",
+      "kind": "foe",
+      "text": "Carried by Baldach, a foe: a thief with more than 10 Spd and 16 Con can steal it"
+    },
+    {
+      "mapId": "fe5-16a",
+      "kind": "foe",
+      "text": "Carried by Brook, a foe: capture to take it"
+    },
+    {
+      "mapId": "fe5-16a",
+      "kind": "foe-later",
+      "text": "Carried by Conomor, a foe, arriving mid-chapter: capture to take it"
+    },
+    {
+      "mapId": "fe5-18",
+      "kind": "foe",
+      "text": "Carried by Gustav, a foe: a thief with more than 12 Spd and 16 Con can steal it"
+    },
+    {
       "mapId": "fe5-19",
       "kind": "kit",
       "text": "Carried by Conomor on joining"
     }
   ],
   "Master Axe": [
+    {
+      "mapId": "fe5-14",
+      "kind": "foe",
+      "text": "Carried by Paulus, a foe: capture to take it"
+    },
+    {
+      "mapId": "fe5-17a",
+      "kind": "foe",
+      "text": "Carried by Nicolov, a foe: a thief with more than 8 Spd and 16 Con can steal it"
+    },
     {
       "mapId": "fe5-18",
       "kind": "kit",
@@ -2482,6 +3040,16 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Silver Axe": [
     {
+      "mapId": "fe5-15",
+      "kind": "foe",
+      "text": "Carried by Seil, a foe: a thief with more than 16 Spd and 12 Con can steal it"
+    },
+    {
+      "mapId": "fe5-15",
+      "kind": "foe-later",
+      "text": "Carried by a foe Brigand, arriving mid-chapter: capture to take it"
+    },
+    {
       "mapId": "fe5-17b",
       "kind": "shop",
       "text": "Sold at the armory"
@@ -2579,6 +3147,11 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
+      "mapId": "fe5-18",
+      "kind": "foe",
+      "text": "Carried by Gustav, a foe: a thief with more than 12 Spd and 6 Con can steal it"
+    },
+    {
       "mapId": "fe5-22",
       "kind": "shop",
       "text": "Sold at the vendor"
@@ -2589,28 +3162,23 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-16a",
       "kind": "kit-later",
       "text": "Carried by Schroff on joining"
+    },
+    {
+      "mapId": "fe5-17b",
+      "kind": "foe",
+      "text": "Carried by Amalda, a foe: capture to take it"
     }
   ],
-  "Silence": [
+  "Wind Sword": [
     {
       "mapId": "fe5-17a",
       "kind": "kit-later",
-      "text": "Carried by Sara on joining"
+      "text": "Carried by Misha, who joins at the end of the chapter"
     },
     {
       "mapId": "fe5-16b",
-      "kind": "kit-later",
-      "text": "Carried by Sara on joining"
-    },
-    {
-      "mapId": "fe5-20",
-      "kind": "village",
-      "text": "Given at a house"
-    },
-    {
-      "mapId": "fe5-23",
-      "kind": "kit",
-      "text": "Carried by Saias on joining"
+      "kind": "foe",
+      "text": "Carried by a foe Hero: capture to take it"
     }
   ],
   "Berserk": [
@@ -2638,13 +3206,6 @@ export const FE5_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe5-final",
       "kind": "foe",
       "text": "Carried by Canis, a foe: capture to take it"
-    }
-  ],
-  "Wind Sword": [
-    {
-      "mapId": "fe5-16b",
-      "kind": "foe",
-      "text": "Carried by a foe Hero: capture to take it"
     }
   ],
   "Luna Manual": [

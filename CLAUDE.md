@@ -172,7 +172,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
     Steal takes any item, weapons included, from a foe slower than the thief, when it weighs less than the thief's Con (both held
     at 20), so a foe capture can't take is robbed instead where a thief could be ("a thief with more than 12 Spd can steal it":
     Gustav's Adept Manual, Bharat's Thrud's Scroll). What neither can take is foe-only (the Loptrian Fang, at Con 20 and Wt 20;
-    Chapter 5's Shadow Sword, whose arena door takes Mareeta away when it opens).
+    Chapter 5's Shadow Sword, whose arena door takes Mareeta away when it opens). A capture line stays where the item's other sources
+    all come later on its route or are on another route only (Misha's Ridersbane in 17A doesn't drop Chapter 8's captures), and a foe
+    that joins at the chapter's end brings the copy it's captured with, counted once, as it joins (the look-over, 2026-11-26). A green
+    army the chapter makes hostile to yours (the chapter record's +0x2A bit 2: Chapters 14 and 17A) stays green, as the game draws it,
+    each of its units saying it's hostile to yours and not to the enemy, and counts as a foe for capture.
   - Mystery of the Emblem: no stealing; a foe drops what's in its item slots (and its gold), never its weapon slots.
   - Awakening: no stealing (its skill list, SkillData's RSID_ names, has no steal skill); a foe drops what its placement record marks
     to drop.
@@ -1154,6 +1158,9 @@ A global switch (header, any game) that lets someone play along without being to
   block: a foe's spare weapon that's sold or forged anyway. A side map (a paralogue, a DLC map) is played before the chapter it
   opens at, so what arrives or is handed over on it counts from that chapter, as its chests do (`turnsUpAt`); one that opens with
   the story's last chapter (Awakening's Paralogues 18-23) still shows what it gives.
+- **A gift that waits on what an earlier chapter's unit did names whose deed it needs** (the look-over, 2026-11-26: Thracia 776's
+  flags that last between chapters, $7E:496E: 4x's escapes for Chapter 6's houses, 11x's for Chapter 12's): "Given at a house, if
+  Bowie escaped in Chapter 4x", on the map and on the weapon page.
 - **Gear and gifts count from the first base you have them at:** a recruit's own weapons from the chapter after the battle they
   join in, or from the chapter whose opening or base hands them over; a script's gift from the chapter it runs before (a base
   conversation, an opening), or from the next when it comes at a chapter's end or from an event during it (Rhys's Mend after

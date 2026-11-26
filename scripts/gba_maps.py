@@ -299,13 +299,15 @@ def mark_difficulties(sources, held, every):
                 s['difficulties'] = [d for d in every[s['mapId']] if d in on]
 
 
-def write_sources(game, title, script, sources, prefixes=(), diffs=()):
+def write_sources(game, title, script, sources, prefixes=(), diffs=(), keep=None):
     G = game.upper()
     # What a foe carries is only worth saying where nothing else gives it (it shows who carries a foe-only weapon): thieves steal
     # items, not weapons, so a weapon a foe holds and doesn't drop never reaches you. `prefixes` are kinds' prefixes that only say
     # where a source is (Echoes' 'amiibo-'): a prefixed 'foe' is still a foe's.
     # It's decided difficulty by difficulty (`diffs`, the game's, in order; a game without any has one): a foe's line keeps the
     # difficulties no other line of the item holds on, and goes where none are left. A line without `difficulties` holds on all.
+    # `keep(name, line)`, where a game gives it, keeps a foe's line whatever else gives the item (Thracia 776's capture lines, where
+    # every other line comes later on their route or on another route only).
     every = list(diffs) or ['']
 
     def bare(kind):
@@ -324,7 +326,8 @@ def write_sources(game, title, script, sources, prefixes=(), diffs=()):
             if not foe(s):
                 out[name].append(s)
                 continue
-            left = [d for d in s.get('difficulties', every) if d not in covered]
+            kept = bool(keep and keep(name, s))
+            left = [d for d in s.get('difficulties', every) if kept or d not in covered]
             if left:
                 line = {k: v for k, v in s.items() if k != 'difficulties'}
                 line['kind'] = s['kind'].replace('-generic', '')

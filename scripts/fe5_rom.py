@@ -92,20 +92,22 @@ def class_(c):
 
 def character(c):
     """A character record: +0 its base HP, or with bit 7 set an autolevel scheme (the stats are rolled as the unit is placed,
-    $83:A970); +4 its own Spd and +6 its own Con (signed; the class's base is added on top, $83:90BE)."""
+    $83:A970); +4 its own Spd and +6 its own Con (signed; the class's base is added on top, $83:90BE); +0x28 1 for women."""
     a = CHARACTERS + 48 * (c - 1)
     o = lo(a)
     b = R[o:o + 48]
     return {'id': c, 'class': b[0x2C], 'leadership': b[0x2D], 'skills1': b[0x29], 'skills2': b[0x2A], 'skills3': b[0x2B],
-            'autolevel': bool(b[0] & 0x80), 'spd': struct.unpack_from('<b', b, 4)[0], 'con': b[6]}
+            'autolevel': bool(b[0] & 0x80), 'spd': struct.unpack_from('<b', b, 4)[0], 'con': b[6], 'female': bool(b[0x28])}
 
 
 def chapter(n):
-    """A chapter record ($84:804A): its map, the tileset with the terrain table, map changes and starting positions, fog."""
+    """A chapter record ($84:804A): its map, the tileset with the terrain table, map changes and starting positions, fog, and how
+    the armies stand (+0x2A, read as the chapter loads, $84:94E6: bit 0 makes yours and the enemy hostile to each other, bit 1 the
+    enemy and the other army, bit 2 the other army and yours, each both ways, $83:B2C2)."""
     a = CHAPTERS + 52 * n
     return {
         'tileset_config': u24(a + 9), 'map': u24(a + 15), 'map_changes': u24(a + 18), 'starts': u24(a + 21), 'objective': u24(a + 24),
-        'vision': u8(a + 35), 'prep': u8(a + 36), 'min_units': u8(a + 37), 'max_units': u8(a + 38),
+        'vision': u8(a + 35), 'prep': u8(a + 36), 'min_units': u8(a + 37), 'max_units': u8(a + 38), 'relations': u8(a + 0x2A),
     }
 
 

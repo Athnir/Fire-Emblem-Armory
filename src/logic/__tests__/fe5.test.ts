@@ -12,7 +12,7 @@ import { FE5_TRIANGLE } from '../../data/fe5/fe5Triangle'
 import { FE5_WEAPONS } from '../../data/fe5/fe5Weapons'
 import type { ChapterMap } from '../../data/maps/types'
 import { rowCodes, terrainAt } from '../maps'
-import { walkFork } from '../spoiler'
+import { turnsUpAt, walkFork } from '../spoiler'
 
 const map = (id: string) => FE5_MAPS.find((m) => m.id === id)!
 const allUnits = (m: ChapterMap) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)]
@@ -100,6 +100,108 @@ describe("Thracia 776's maps", () => {
   it('says when each gaiden chapter opens', () => {
     for (const id of ['fe5-2x', 'fe5-4x', 'fe5-8x', 'fe5-11x', 'fe5-12x', 'fe5-14x', 'fe5-21x', 'fe5-24x'])
       expect(map(id).notes.some((n) => n.startsWith('Opens if')), id).toBe(true)
+  })
+
+  it("gives the houses that wait on an earlier chapter's escape, each saying whose", () => {
+    // Flags 0x81-0xA8 last from chapter to chapter ($8C:9B4B, cleared only by a new game, $83:FC14). Chapter 4x's escapes set one per
+    // child (SetFlagByCharacterTable, $8C:A2F4, the table at $FD:8F82), and each of Chapter 6's houses tests one ($99:A8AB: Bowie's
+    // for the Paragon Manual); Chapter 11x's civilians' (the table at $99:DBC9) are Chapter 12's.
+    const village = (id: string, x: number, y: number) =>
+      map(id).objects.find((o) => o.type === 'village' && o.tile[0] === x && o.tile[1] === y) as { reward: string; note?: string } | undefined
+    expect(village('fe5-6', 2, 14)?.reward).toBe('Paragon Manual, if Bowie escaped in Chapter 4x')
+    expect(village('fe5-6', 2, 8)?.reward).toBe("Od's Scroll, if Leena escaped in Chapter 4x")
+    expect(village('fe5-6', 13, 11)?.reward).toBe('Master Seal, if Emily escaped in Chapter 4x')
+    expect(village('fe5-6', 13, 17)?.note).toBe('Hicks joins your army if Murphy escaped in Chapter 4x. (A house.)')
+    expect(map('fe5-6').joiners?.find((j) => j.name === 'Hicks')?.when).toBe(
+      'When the house at (13, 17) is visited, if Murphy escaped in Chapter 4x',
+    )
+    expect(FE5_ITEM_SOURCES['Paragon Manual']).toEqual([{ mapId: 'fe5-6', kind: 'village', text: 'Given at a house, if Bowie escaped in Chapter 4x' }])
+    expect(village('fe5-12', 24, 3)?.reward).toBe("Heim's Scroll, if Sera escaped in Chapter 11x")
+    expect(village('fe5-12', 20, 18)?.reward).toBe('Silence, if Peter escaped in Chapter 11x')
+    // The Magic Ring's definition itself waits on Rosa's flag ($99:DCAB); anyone else, Olwen too without it, gets the Vulnerary.
+    expect(village('fe5-12', 8, 4)?.reward).toBe('Magic Ring if visited by Olwen and if Rosa escaped in Chapter 11x; otherwise: Vulnerary')
+    expect(map('fe5-12').notes.some((n) => n.includes('nothing to visit'))).toBe(false)
+  })
+
+  it('says what sets off an event that waits on another, and who a talk and a capture recruit', () => {
+    // Chapter 16B: only Leif's own move onto the gate Reinkoch holds brings Miranda ($99:ED8B, then $99:EDA0 on its flag).
+    expect(map('fe5-16b').joiners?.find((j) => j.name === 'Miranda')?.when).toBe('As soon as Leif stops on the gate at (10, 11)')
+    expect(map('fe5-14').joiners?.find((j) => j.name === 'Homer')?.when).toBe('When Nanna visits the house at (23, 24)')
+    expect(map('fe5-16a').joiners?.find((j) => j.name === 'Schroff')?.when).toBe(
+      'When Leif visits the house at (41, 10), if Leif visited the church at (18, 14) in Chapter 15',
+    )
+    // Chapter 17A: Karin's talk only sets flag 10; the end script makes Misha yours if it's set, Karin is alive and free and Misha
+    // is held ($FD:C3A4, $FD:C3AF, $FD:C3BE, $FD:C402), so her items are yours from the next chapter.
+    expect(map('fe5-17a').units.find((u) => u.name === 'Misha')?.talk).toBe(
+      'Recruit: talk with Karin, then capture her and hold her until the chapter ends, with Karin alive and not captured (mounted, she ' +
+        'counts as Con 20 for a capture until put to sleep)',
+    )
+    expect(FE5_ITEM_SOURCES['Wind Sword']).toContainEqual({ mapId: 'fe5-17a', kind: 'kit-later', text: 'Carried by Misha, who joins at the end of the chapter' })
+    // Chapter 11x's Fred waits on his flag from Chapter 11 (144: his escape, $99:D1B6, or the end script while he's alive and free,
+    // $99:D499), which 11x can't open without.
+    expect(map('fe5-11x').joiners?.find((j) => j.name === 'Fred')?.when).toBe(
+      'Turn 2, your phase, if Fred escaped in Chapter 11 or was alive and not captured at its end',
+    )
+  })
+
+  it("times Chapter 14's arrivals by the counter its turns keep ($7E:4976, one more each enemy phase from turn 6 to 15)", () => {
+    const groups = Object.fromEntries((map('fe5-14').reinforcements ?? []).map((g) => [g.label, g.when]))
+    expect(groups).toEqual({
+      'Group 1': 'Every enemy phase from turn 1 to 5',
+      'Group 2': 'Every enemy phase from turn 1 to 5',
+      'Group 3': 'Turn 9, enemy phase',
+    })
+    expect(map('fe5-14').joiners?.find((j) => j.name === 'McCloy')?.when).toBe("Turn 8, the other army's phase")
+  })
+
+  it('draws a visit whose event brings someone, through its own flag, as the visit it is', () => {
+    const village = (id: string, x: number, y: number) =>
+      map(id).objects.find((o) => o.type === 'village' && o.tile[0] === x && o.tile[1] === y) as { note?: string } | undefined
+    // Chapter 14's house keeps its flag only for Nanna ($FD:9B56), which brings Homer ($FD:9A30).
+    expect(village('fe5-14', 23, 24)?.note).toMatch(/^Homer joins your army if visited by Nanna\. \(A house\.\)/)
+    expect(village('fe5-16a', 41, 10)?.note).toMatch(
+      /^Schroff joins your army if visited by Leif and if Leif visited the church at \(18, 14\) in Chapter 15\./,
+    )
+    expect(village('fe5-17a', 1, 21)?.note).toBe('Sara joins your army. (A church.)')
+    for (const [id, x, y] of [['fe5-14', 23, 24], ['fe5-16a', 41, 10]] as const) {
+      expect(rowCodes(map(id).grid[map(id).height - y])[x - 1], id).toBe('oe')
+      expect(map(id).notes.some((n) => n.includes(`the house at (${x}, ${y})`)), id).toBe(false)
+    }
+  })
+
+  it("keeps a capture line where the item's other sources come later on its route or on another route only", () => {
+    // The chapter the weapon page lists an item from under the spoiler block, on a route (ChapterWeapons' firstAt).
+    const first = (item: string, route: string) => {
+      const story = walkFork(FE5_FORK, route).story
+      return story.maps[Math.min(...FE5_ITEM_SOURCES[item].map((s) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))))]?.id
+    }
+    // Misha's Ridersbane, yours from the end of 17A, leaves its capture lines from Chapter 8 on; her Wind Sword leaves 16B's on route B.
+    expect([first('Ridersbane', 'a'), first('Ridersbane', 'b')]).toEqual(['fe5-8', 'fe5-8'])
+    expect([first('Wind Sword', 'a'), first('Wind Sword', 'b')]).toEqual(['fe5-18', 'fe5-16b'])
+    // A capture line goes where another way comes as early on every route: Chapter 4's chests give a Javelin, so only Chapter 1's stays.
+    expect(FE5_ITEM_SOURCES['Javelin'].filter((s) => s.kind.startsWith('foe')).map((s) => s.mapId)).toEqual(['fe5-1'])
+    // A foe that joins at the chapter's end brings the copy it's captured with: counted once, as it joins (Lifis in 2x).
+    expect(FE5_ITEM_SOURCES["Hoðr's Scroll"]).toEqual([
+      { mapId: 'fe5-2x', kind: 'kit-later', text: 'Carried by Lifis, who joins at the end of the chapter' },
+    ])
+    // The other army's units, hostile to yours in 17A and 14, are captured as foes are (a mounted one once Sleep can be yours).
+    expect(FE5_ITEM_SOURCES['Ridersbane']).toContainEqual({ mapId: 'fe5-17a', kind: 'foe', text: 'Carried by a Pegasus Rider of the other army: capture to take it' })
+  })
+
+  it("says where the other army is hostile to yours, though drawn green: the chapter record's +0x2A bit 2", () => {
+    // $84:94E6 sets the armies' hostility from it ($83:B2C2); the side check ($83:B34F) every attack, Capture and Steal makes reads it.
+    // Chapters 2x, 12, 14 and 17A have the bit (and not bit 1: the other army and the enemy don't fight); only 14 and 17A field units.
+    const hostile = /^In this chapter the other army is hostile to yours, not to the enemy/
+    const said = (m: ChapterMap) => [
+      ...m.units.filter((u) => u.type === 'ally').map((u) => (u.note ?? '').split('. ').slice(-1)[0]),
+      ...(m.joiners ?? []).filter((j) => j.ally).map((j) => j.note ?? ''),
+    ]
+    for (const m of FE5_MAPS) {
+      const notes = said(m)
+      if (['fe5-14', 'fe5-17a'].includes(m.id)) for (const n of notes) expect(n, m.id).toMatch(hostile)
+      else for (const n of notes) expect(n, m.id).not.toMatch(hostile)
+    }
+    expect(said(map('fe5-17a'))).toHaveLength(9) // Misha, her seven Pegasus Riders and the pirates' arrival
   })
 
   it("draws Chapter 24's secret shop, the game's only one, on the door its tile is", () => {
@@ -278,7 +380,8 @@ describe("Thracia 776's foes worth capturing", () => {
       for (const u of allUnits(m)) {
         if (!u.steal) continue
         marked++
-        expect(u.type, `${m.id} ${u.name}`).not.toBe('ally')
+        // The other army's units only where the chapter makes it hostile to yours (+0x2A bit 2: Chapters 14 and 17A).
+        if (u.type === 'ally') expect(['fe5-14', 'fe5-17a'], `${m.id} ${u.name}`).toContain(m.id)
         expect(u.steal.length, `${m.id} ${u.name}`).toBeGreaterThan(0)
         for (const s of u.steal) {
           expect(u.carries, `${m.id} ${u.name}`).toContain(s)

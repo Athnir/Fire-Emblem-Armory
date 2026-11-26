@@ -57,6 +57,10 @@ ASMC = {
     0x8CA177: 'ChangeAllegianceToPlayer', 0x8CA189: 'ChangeAllegianceToEnemy', 0x8CA19B: 'ChangeAllegianceToNPC',
     0x8CA1AD: 'ChangeAllegiance', 0x8CA1C7: 'ChangeAllegianceToPlayerIfHeld', 0x8CA1FA: 'Mount', 0x8CA203: 'Dismount',
     0x8CA20C: 'IsUnitHeld', 0x8CA238: 'IsUnitHeldByEnemy',
+    # Named here, traced in the code: sets the flag the table at the long parameter gives the acting unit ($0E6F), else the unit it
+    # carries ($0E81, read through $83:901C) (character_flags; the lookup is $8C:CD2D, the flag set by $8C:9B26). The escapes'
+    # scripts call it (Chapter 4x's children, Chapter 11x's civilians: flags an earlier chapter's houses test).
+    0x8CA2F4: 'SetFlagByCharacterTable',
     0x8CA343: 'RemoveUnit', 0x8CA36B: 'PromoteUnit', 0x8CA376: 'PromoteUnitSilent', 0x8CA385: 'SetUnitPosition',
     0x8CA464: 'SetUnitState', 0x8CA486: 'UnsetUnitState', 0x8CA4B1: 'CheckUnitStateSet', 0x8CA4E0: 'CheckUnitStateUnset',
     0x8CA541: 'CheckAbleToTalk', 0x8CA652: 'ActiveUnitCheckUnitState', 0x8CA6A1: 'ActiveUnitCheckCarrying', 0x8CA6F3: 'CountOwnedItem',
@@ -175,6 +179,16 @@ def unit_group(ptr):
             'ai': tuple(b[16:20]), 'state': 0, 'group': ptr,
         })
         a += 20
+    return out
+
+
+def character_flags(ptr):
+    """The table SetFlagByCharacterTable ($8C:A2F4) reads: [character u16][flag u8] entries, ended by a 0 character followed by a
+    0 word ($8C:CD2D). [(character, flag)]."""
+    out, a = [], ptr
+    while ptr and (u16(a) or u16(a + 2)):
+        out.append((u16(a), u8(a + 2)))
+        a += 3
     return out
 
 
@@ -396,6 +410,12 @@ class Run:
                       'CountEnemyUnitsUncapturedAlive', 'CountNPCUnitsUncapturedAlive', 'CountAllUnitsUncapturedAliveWithHidden',
                       'CheckUnitExists'):
             truth = c not in self.world.dead and (name == 'CountAllUnitsAlive' or c not in self.world.captured)
+        elif name == 'SetFlagByCharacterTable':
+            # The acting unit's flag from the table (the unit it carries isn't modelled).
+            flag = dict(character_flags(self.mem.get(LONG_PARAM, 0))).get(self.word(SELECTED))
+            if flag:
+                self.world.flags.add(flag)
+                self.flag_sets.append(flag)
         elif name in ('GiveActiveUnitItem', 'GiveActiveUnitItemCurrentDurability'):
             self.items.append((self.mem.get(PARAM1, 0) & 0xFF, self.word(SELECTED) or None))
             truth = True

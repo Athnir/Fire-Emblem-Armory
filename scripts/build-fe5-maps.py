@@ -600,9 +600,61 @@ def flag_words(ch, flag):
     return None
 
 
+STANDARD = {fe.TURN, fe.PHASE, fe.CURSOR_X, fe.CURSOR_Y, fe.TILE_X, fe.TILE_Y, fe.SELECTED}
+
+
+def counter_times(ch, kind, e):
+    """When a turn definition that waits on a counter runs, in words ('Turn 8, the other army's phase'), or None: a byte of WRAM
+    that other turn definitions add to (Chapter 14's $7E:4976, one more each enemy phase from turn 6 to 15, $FD:97C5: two groups
+    come while it's 0, McCloy's Dracoknights at 3, a group at 4, and 5 ends the chapter). The phases are played in turn, each list
+    in its order (once a script ends, the engine goes on down it: $8C:82DC)."""
+    counted = [a for c, a in e['conds'] if c == 0x05 and a[0] not in STANDARD]
+    if kind != 'turn' or not counted:
+        return None
+    addr = counted[0][0]
+    adds = [sum(a[1] for _, c, a in fe.reachable(d['ptr']) if c in (0x15, 0x16, 0x17) and a[0] == addr) for d in ch.defs['turn']]
+    if not any(adds):
+        return None
+
+    def holds(d, t, p, value):
+        for c, a in d['conds']:
+            if (c == 0x06 and a[0] == fe.TURN and a[1] != t or c == 0x06 and a[0] == fe.PHASE and a[1] != p
+                    or c == 0x0C and a[0] == fe.TURN and not a[1] <= t <= a[2] or c == 0x05 and a[0] == addr and a[1] != value):
+                return False
+        return True
+    value, seen, done = 0, [], set()
+    for t in range(1, 65):
+        for p in (0x00, 0x40, 0x80):
+            for d, add in zip(ch.defs['turn'], adds):
+                if (d['flag'] and d['flag'] in done) or not (add or d is e) or not holds(d, t, p, value):
+                    continue
+                value += add
+                if d is e:
+                    seen.append((t, p))
+                if d['flag']:
+                    done.add(d['flag'])
+    phases = {p for _, p in seen}
+    if len(phases) != 1:
+        return None
+    p, turns = phases.pop(), [t for t, _ in seen]
+    if len(turns) == 1:
+        return f'Turn {turns[0]}, {PHASES[p]}'
+    if turns != list(range(turns[0], turns[-1] + 1)):
+        return None
+    each = {0x00: 'player phase', 0x40: 'enemy phase', 0x80: 'phase of the other army'}[p]
+    return f'Every {each} from turn {turns[0]} to {turns[-1]}'
+
+
 def event_words(ch, kind, e, depth=0):
     """When an event runs, in words, and the map areas whose entry triggers it."""
     conds = e['conds']
+    if depth == 0 and kind == 'after_action' and len(conds) == 1 and conds[0][0] == 0x0D:
+        # Its only condition is another event's flag: it runs right after that event (once a script ends the engine checks the
+        # list again, $8C:82DC -> $8C:9601), so it's said as what sets that event off (Chapter 16B's Miranda, once Leif stops on
+        # the gate).
+        said = setter_clause(ch, conds[0][1][0])
+        if said:
+            return said
     turn = [a for c, a in conds if c == 0x06 and a[0] == fe.TURN]
     span = [a for c, a in conds if c == 0x0C and a[0] == fe.TURN]
     phase = phase_of(conds)
@@ -612,7 +664,10 @@ def event_words(ch, kind, e, depth=0):
     once = bool(e['flag'])
     each = {0x00: 'player phase', 0x40: 'enemy phase', 0x80: "phase of the other army"}.get(phase, 'turn')
     lead = f'The first {each}' if once else f'Every {each}'
-    if turn:
+    counted = counter_times(ch, kind, e)
+    if counted:
+        parts.append(counted)
+    elif turn:
         parts.append(f'Turn {turn[0][1]}' + (f', {p}' if p else ''))
     elif span:
         a, b = span[0][1], span[0][2]
@@ -623,15 +678,21 @@ def event_words(ch, kind, e, depth=0):
     tile = coords_of(conds)
     if area and kind in ('after_action', 'before_action', 'turn'):
         parts.append('when one of your units enters the marked area')
-    elif tile and kind in ('after_action', 'before_action'):
+    elif tile and kind == 'after_action':
+        # Who it waits for is the acting unit's character, where the definition names one (Chapter 16B's gate: Leif's own move).
+        parts.append(f'as soon as {who_words(conds)} stops {where_words(ch, conds, named=True)}')
+    elif tile and kind == 'before_action':
         parts.append(f'when a unit moves onto ({tile[0]}, {ch.h - tile[1]})')
     if kind == 'talk':
         a, b = next((a for c, a in conds if c in (0x00, 0x01)), (0, 0))
         parts.append(f'when {name_of(a)} talks to {name_of(b)}')
     if kind == 'location' and tile:
-        parts.append(f'when the tile at ({tile[0]}, {ch.h - tile[1]}) is visited')
+        parts.append(f'when {place_words(ch, conds)}')
     for c, a in conds:
-        if c == 0x0D and depth == 0:
+        if c == 0x0D and depth == 0 and a[0] in LASTING_WORDS:
+            # A flag an earlier chapter sets (Chapter 11x's Fred waits on his from Chapter 11, $99:D553).
+            parts.append(f'if {LASTING_WORDS[a[0]]}')
+        elif c == 0x0D and depth == 0:
             w = flag_words(ch, a[0])
             if w and w[0] != 'During the chapter':
                 parts.append(f'after this: {w[0][0].lower() + w[0][1:]}')
@@ -656,18 +717,21 @@ def event_words(ch, kind, e, depth=0):
 
 
 def talks_of(ch, units=None):
-    """{name: 'Recruit: talk with Leif'} from the talk events (a talk whose script makes the second character yours recruits), and
-    the items talks give. `units`: everyone the chapter brings onto the map, so the talk finds who it recruits."""
-    found, gifts = {}, []
+    """{name: 'Recruit: talk with Leif'} from the talk events (a talk whose script makes the second character yours recruits), the
+    items talks give, and the names of those a talk leads to join only at the chapter's end (held_join: their items come with them
+    from the next chapter). `units`: everyone the chapter brings onto the map, so the talk finds who it recruits."""
+    found, gifts, later = {}, [], set()
     for e in ch.defs['talk']:
         pair = next((a for c, a in e['conds'] if c in (0x00, 0x01)), None)
         if not pair:
             continue
         a, b = pair
         run = fe.Run(fe.World(active=a), units=units, mem={fe.TARGET: b}).run(e['ptr'])
-        t = found.setdefault(name_of(b), {'recruit': [], 'talk': [], 'gives': []})
+        t = found.setdefault(name_of(b), {'recruit': [], 'held': [], 'talk': [], 'gives': []})
         if b in run.recruits:
             t['recruit'].append(name_of(a))
+        elif (held := held_join(ch, e, a, b, units)):
+            t['held'].append(held)
         else:
             t['talk'].append(name_of(a))
             t['gives'] += [item_name(i) for i, _ in run.items]
@@ -676,9 +740,35 @@ def talks_of(ch, units=None):
     for name, t in found.items():
         if t['recruit']:
             out[name] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(t['recruit']))
+        elif t['held']:
+            out[name] = t['held'][0]
+            later.add(name)
         elif t['talk']:
             out[name] = 'Talk with ' + ' or '.join(dict.fromkeys(t['talk'])) + (f" (gives {', '.join(t['gives'])})" if t['gives'] else '')
-    return out, gifts
+    return out, gifts, later
+
+
+def held_join(ch, e, a, b, units):
+    """The words for a talk that recruits no one then and there but is what the end script waits for, or None: the end script makes
+    the second character yours only once the talk's flag is set and your army holds them (Chapter 17A's Misha: $FD:C3A4 tests Karin's
+    talk, $FD:C3BE that Misha is held, $FD:C402 makes her yours), and only while the talker is alive and free ($FD:C3AF). A mounted
+    unit counts as Con 20 for a capture until sleep knocks it off its mount (Capture, below)."""
+    if not e['flag']:
+        return None
+
+    def joins(**kw):
+        return b in fe.Run(fe.World(active=LEIF, **kw), units=units).run(ch.ev['ending']).recruits
+    talked = {e['flag']}
+    if not joins(flags=talked, held={b}) or joins(flags=talked) or joins(held={b}):
+        return None
+    who = r.character(b)
+    her, she = ('her', 'she') if who['female'] else ('him', 'he')
+    out = f'Recruit: talk with {name_of(a)}, then capture {her} and hold {her} until the chapter ends'
+    if not joins(flags=talked, held={b}, dead={a}) and not joins(flags=talked, held={b}, captured={a}):
+        out += f', with {name_of(a)} alive and not captured'
+    if who['class'] in MOUNTS:
+        out += f' (mounted, {she} counts as Con 20 for a capture until put to sleep)'
+    return out
 
 
 # --- capture: what a foe holds that one of your units can capture it for ---
@@ -780,10 +870,15 @@ class Capture:
         self.gone = removed_on_capture(ch, present)
         self.behind = taken_when_opened(ch, present)
 
+    def hostile(self, u):
+        """A unit yours can attack, capture and rob: a foe, or the other army's where the chapter makes it hostile to yours (Chapters
+        14 and 17A: hostile_notes). By the capture rule it counts as a foe does, whichever army it's on."""
+        return u['side'] == fe.ENEMY or u['side'] == fe.NPC and bool(self.ch.rec['relations'] & OTHER_ARMY_HOSTILE)
+
     def loot(self, u, entry):
         """The rare things (named as `carries` names them) a foe holds that capturing it takes: weapons and staves no shop sells,
         and lasting items no shop keeps in stock. None for a foe a talk recruits: its items come with it."""
-        if u['side'] != fe.ENEMY or (entry.get('talk') or '').startswith('Recruit'):
+        if not self.hostile(u) or (entry.get('talk') or '').startswith('Recruit'):
             return []
         rare = list(dict.fromkeys(item_name(i) for i in u['items'] if i not in self.sold and lasting(i)))
         return rare if rare and self.can_capture(u) else []
@@ -912,7 +1007,13 @@ def foe_source(source, map_id, u, entry, later, capture):
     """What a foe carries is yours once you capture it (capturing takes everything it holds), or a thief steals it. What neither can
     take is said too ('foe-held'), so a weapon only such foes carry is listed as foe-only, with who carries it."""
     tail = ', arriving mid-chapter' if later else ''
-    who = f"{entry['name']}, a foe{tail}" if entry['type'] in ('boss', 'named') else f"a foe {entry['name']}{tail}"
+    named = entry['type'] in ('boss', 'named') or entry['type'] == 'ally' and not entry.get('generic')
+    if entry['type'] == 'ally':
+        # The other army's, where the chapter makes it hostile to yours (Capture.hostile): drawn green, as the game draws it.
+        a = 'an' if entry['name'][0] in 'AEIOU' else 'a'
+        who = f"{entry['name']} of the other army{tail}" if named else f"{a} {entry['name']} of the other army{tail}"
+    else:
+        who = f"{entry['name']}, a foe{tail}" if named else f"a foe {entry['name']}{tail}"
     captured = capture.can_capture(u)
     for i in u['items']:
         if captured:
@@ -922,14 +1023,16 @@ def foe_source(source, map_id, u, entry, later, capture):
         else:
             kind, how = 'foe-held', 'neither capture nor Steal can take it'
         kind += '-later' if later else ''
-        source(i, map_id, kind if entry['type'] in ('boss', 'named') else kind + '-generic', f'Carried by {who}: {how}')
+        source(i, map_id, kind if named else kind + '-generic', f'Carried by {who}: {how}', of=u['char'])
 
 
 def few_carried(maps):
     """Each foe's `steal` keeps a weapon or staff only when fewer than FEW_CARRY foes you can capture hold it in the whole game
-    (each one placed on a map, start units and arrivals alike, counted before this pass); a lasting item stays whatever its count."""
+    (each one placed on a map, start units and arrivals alike, counted before this pass); a lasting item stays whatever its count.
+    The other army's units count where they're marked (hostile to yours: Capture.hostile)."""
     def foes(m):
-        return [u for u in m['units'] + [x for g in m.get('reinforcements', []) for x in g['units']] if u['type'] != 'ally']
+        return [u for u in m['units'] + [x for g in m.get('reinforcements', []) for x in g['units']]
+                if u['type'] != 'ally' or u.get('steal')]
     carried = {}
     for m in maps:
         for u in foes(m):
@@ -952,7 +1055,9 @@ def with_loot(e, u, capture):
     return e
 
 
-def build_units(ch, m, source, run, talks, capture):
+def build_units(ch, m, source, run, talks, capture, later=frozenset()):
+    """The units the opening places. `later`: those a talk leads to join only at the chapter's end (talks_of): build_recruits counts
+    their items, from the next chapter."""
     h = m['height']
     forced = []
     for u in run.units:
@@ -970,9 +1075,10 @@ def build_units(ch, m, source, run, talks, capture):
             e['note'] = f"{e['note']}. Out of sight in a closed room until the room opens"
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit'):
-            for i in u['items']:
-                source(i, m['id'], 'kit', f"Carried by {e['name']} on joining", who=u['char'])
-        elif u['side'] == fe.ENEMY:
+            if e['name'] not in later:
+                for i in u['items']:
+                    source(i, m['id'], 'kit', f"Carried by {e['name']} on joining", who=u['char'])
+        elif capture.hostile(u):
             foe_source(source, m['id'], u, e, False, capture)
     if forced:
         m['forced'] = forced
@@ -996,15 +1102,17 @@ def everyone(ch, opening):
 
 def build_recruits(ch, m, source, opening):
     """Characters an event (any of the chapter's, the end scene included) makes yours: their own items join with them. A foe held by
-    your army at the end can join too (Lifis in Chapter 2x), so the scripts are played with every character held."""
+    your army at the end can join too (Lifis in Chapter 2x), so the scripts are played with every character held, and with every talk
+    had (an end script can wait for one: Chapter 17A's Misha joins at its end only once Karin talked to her, $FD:C3A4)."""
     carried = {u['char']: u['items'] for u in opening.units}
     ptrs = [(kind, e) for kind, defs in ch.defs.items() if kind != 'shop' for e in defs]
     ptrs.append(('ending', {'ptr': ch.ev['ending'], 'conds': []}))
     present = list(opening.units)
+    talked = {e['flag'] for e in ch.defs['talk'] if e['flag']}
 
     def play(kind, e):
         pair = next((a for c, a in e['conds'] if c in (0x00, 0x01)), None)
-        world = fe.World(active=pair[0] if pair else LEIF, held=set(NAMES))
+        world = fe.World(active=pair[0] if pair else LEIF, held=set(NAMES), flags=talked)
         return fe.Run(world, units=present, mem={fe.TARGET: pair[1]} if pair else {}).run(e['ptr'])
 
     # Everyone any event brings onto the map, so a later talk can find them (Ced arrives on a turn and joins by a talk).
@@ -1019,12 +1127,14 @@ def build_recruits(ch, m, source, opening):
         for c in run.recruits:
             if is_generic(c) or not carried.get(c):
                 continue
-            words = f'Carried by {name_of(c)}, who joins at the end of the chapter' if kind == 'ending' else f'Carried by {name_of(c)} on joining'
+            # The end script, or an event that ends the chapter (the seize, which runs it: Chapter 17A's gate, $FD:BC0D).
+            words = (f'Carried by {name_of(c)}, who joins at the end of the chapter' if kind == 'ending' or run.ended
+                     else f'Carried by {name_of(c)} on joining')
             for i in carried[c]:
                 source(i, m['id'], 'kit-later', words, who=c)
 
 
-def build_arrivals(ch, m, source, talks, start_flags, capture):
+def build_arrivals(ch, m, source, talks, start_flags, capture, later=frozenset()):
     h = m['height']
     groups, joiners, n = [], [], 0
     for kind in ('turn', 'after_action', 'before_action', 'talk', 'location'):
@@ -1053,8 +1163,9 @@ def build_arrivals(ch, m, source, talks, start_flags, capture):
                 groups.append(g)
                 for u, entry in zip(foes, g['units']):
                     if (entry.get('talk') or '').startswith('Recruit'):
-                        for i in u['items']:
-                            source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'])
+                        if entry['name'] not in later:
+                            for i in u['items']:
+                                source(i, m['id'], 'kit-later', f"Carried by {entry['name']} on joining", who=u['char'])
                     else:
                         foe_source(source, m['id'], u, entry, True, capture)
             for u in friends:
@@ -1069,10 +1180,13 @@ def build_arrivals(ch, m, source, talks, start_flags, capture):
                         j['generic'] = True
                     if name_of(u['char']) in talks:
                         j['talk'] = talks[name_of(u['char'])]
-                recruit = u['side'] == fe.PLAYER or (j.get('talk') or '').startswith('Recruit')
+                recruit = u['side'] == fe.PLAYER or (j.get('talk') or '').startswith('Recruit') and j['name'] not in later
                 if recruit and not generic:
                     for i in u['items']:
                         source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", who=u['char'])
+                elif not (j.get('talk') or '').startswith('Recruit') and capture.hostile(u):
+                    # The other army's, hostile to yours in this chapter: what it carries is taken as a foe's is.
+                    foe_source(source, m['id'], u, {'type': 'ally', 'name': j['name'], 'generic': generic}, True, capture)
                 if j not in joiners:
                     joiners.append(j)
     if groups:
@@ -1116,18 +1230,53 @@ def build_locations(ch, m, source):
         if t == DOOR:
             m['objects'].append({'type': 'door', 'tile': app})
             continue
-        plain, special, items, joins = '', {}, [], []
+        # What a visit gives anyone and what only some visitors get; and, each with its condition, what it gives only once an
+        # earlier chapter did something (lasting flags, LASTING_WORDS: the definition waits on one, or its script tests one).
+        plain, special, items = '', {}, []
+        plain_if, special_if, items_if = [], {}, []
+        joined = {}   # (who has to visit, or None; what an earlier chapter has to have done, or '') -> the characters it brings
         for e in events:
             visitor = visitor_of(e['conds'])
+            gate = [a[0] for c, a in e['conds'] if c == 0x0D and a[0] in LASTING_WORDS]
+            need = lasting_need(e)
             run = fe.Run(fe.World(active=visitor or LEIF)).run(e['ptr'])
-            w = words_of(run)
-            items += [i for i, _ in run.items]
-            joins += [name_of(u['char']) for _, grp in run.loads for u in grp if u['side'] == fe.PLAYER]
+            # Chapter 6's six houses test what Chapter 4x's children did ($99:A8AB: Bowie's escape, flag 141, for the Paragon
+            # Manual); Chapter 12's what Chapter 11x's civilians did, and its Magic Ring waits on Rosa's (146, $99:DCAB).
+            full = fe.Run(fe.World(active=visitor or LEIF, flags=need)).run(e['ptr']) if need else run
+            cond = ' and '.join(LASTING_WORDS[f] for f in need)
+            got = [] if gate else [i for i, _ in run.items]
+            more = minus([i for i, _ in full.items], got)
+            w = words_of(run) if not gate else ''
+            wx = ', '.join([item_name(i) for i in more] + [f'{g} gold' for g in minus(full.gold, [] if gate else run.gold)])
+            items += got
+            items_if += [(i, cond) for i in more]
+            if phase_of(e['conds']) != 0x40:
+                # Who it makes yours, those that come once its own flag is set too, played for the one visitor whose visit leaves
+                # that flag set where the script clears it for anyone else (Chapter 14's house at (23, 24) keeps it only for Nanna,
+                # $FD:9B56, and then Homer comes, $FD:9A30).
+                by, jrun, jfull = visitor, run, full
+                if e['flag'] and not visitor:
+                    ok, kept_by = keeper(e, e['flag'], need)
+                    if ok and kept_by:
+                        by = kept_by
+                        jrun = fe.Run(fe.World(active=by)).run(e['ptr'])
+                        jfull = fe.Run(fe.World(active=by, flags=need)).run(e['ptr']) if need else jrun
+                who = name_of(by) if by else None
+                came = [] if gate else joins_of(ch, jrun, e)
+                joined.setdefault((who, ''), []).extend(came)
+                for c in joins_of(ch, jfull, e):
+                    if c not in came:
+                        joined.setdefault((who, cond), []).append(c)
             if visitor:
                 if w:
                     special.setdefault(w, []).append(name_of(visitor))
-            elif w and not plain:
-                plain = w
+                if wx:
+                    special_if.setdefault((wx, cond), []).append(name_of(visitor))
+            else:
+                if w and not plain:
+                    plain = w
+                if wx:
+                    plain_if.append(f'{wx}, if {cond}')
         if t in CHEST_TILES or any(c == 0x09 for e in events for c, _ in e['conds']):
             # A chest definition (VANILLA_CHEST: its tile in the ROM), or a chest tile: Chapter 24's Kia chest is under the roof of
             # the room a change opens.
@@ -1136,12 +1285,23 @@ def build_locations(ch, m, source):
                 source(i, m['id'], 'chest', 'In a chest')
             continue
         parts = [f"{w} if visited by {' or '.join(dict.fromkeys(names))}" for w, names in special.items()]
-        reward = '; '.join(parts + ([f'anyone else: {plain}' if parts else plain] if plain else []))
+        parts += [f"{w} if visited by {' or '.join(dict.fromkeys(names))} and if {c}" for (w, c), names in special_if.items()]
+        anyone = '; '.join(([plain] if plain else []) + list(dict.fromkeys(plain_if)))
+        reward = '; '.join(parts + ([f"{'otherwise' if special_if else 'anyone else'}: {anyone}" if parts else anyone]
+                                    if anyone else []))
+        place = 'Given at a village' if t == VILLAGE else 'Given at a house' if t in (HOUSE, 24) else 'Given at a church'
         if t in (VILLAGE, HOUSE, CHURCH, 24, 42):
-            if not reward and not joins:
+            if not reward and not any(joined.values()):
                 continue
             o = {'type': 'village', 'tile': app, 'reward': reward}
-            notes = [f"{' and '.join(dict.fromkeys(joins))} {'joins' if len(set(joins)) == 1 else 'join'} your army."] if joins else []
+            notes = []
+            # Who joins with no condition first, then who joins only for a visitor or once an earlier chapter did something.
+            for (who, c), xs in sorted(joined.items(), key=lambda kv: kv[0] != (None, '')):
+                names = list(dict.fromkeys(name_of(x) for x in xs))
+                ifs = ([f'visited by {who}'] if who else []) + ([c] if c else [])
+                if names:
+                    notes.append(f"{' and '.join(names)} {'joins' if len(names) == 1 else 'join'} your army"
+                                 + (f" if {' and if '.join(ifs)}" if ifs else '') + '.')
             if t == HOUSE:
                 notes.append('(A house.)')
             elif t in (CHURCH, 42):
@@ -1150,12 +1310,15 @@ def build_locations(ch, m, source):
                 o['note'] = ' '.join(notes)
             m['objects'].append(o)
             for i in items:
-                source(i, m['id'], 'village', 'Given at a village' if t == VILLAGE else 'Given at a house' if t == HOUSE
-                       else 'Given at a church')
-        elif items:
+                source(i, m['id'], 'village', place)
+            for i, c in items_if:
+                source(i, m['id'], 'village', f'{place}, if {c}')
+        elif items or items_if:
             m['objects'].append({'type': 'hidden', 'tile': app, 'area': app + app, 'contents': reward})
             for i in items:
                 source(i, m['id'], 'hidden', 'Hidden on the map')
+            for i, c in items_if:
+                source(i, m['id'], 'hidden', f'Hidden on the map, if {c}')
     for e in ch.defs['shop']:
         tile = coords_of(e['conds'])
         if not tile or not standable(ch, tile):
@@ -1273,9 +1436,13 @@ def tiles_words(ch, tiles):
     return words[0] if len(words) == 1 else ', '.join(words[:-1]) + ' and ' + words[-1]
 
 
-def where_words(ch, conds):
-    """Where an after-action definition looks: 'on (7, 7)', 'on (7, 7) or (8, 7)', 'in the area from (5, 21) to (11, 24)'."""
+def where_words(ch, conds, named=False):
+    """Where an after-action definition looks: 'on (7, 7)', 'on (7, 7) or (8, 7)', 'in the area from (5, 21) to (11, 24)'; with
+    `named`, a tile by the terrain the game gives it ('on the gate at (10, 11)')."""
     tile, area = coords_of(conds), area_of(conds)
+    if tile and named:
+        t = ch.tile_terrain(*tile)
+        return f"on the {PLACES.get(t) or TERRAIN[t][1].lower()} at {app_xy(ch, tile)}"
     if tile:
         return 'on ' + app_xy(ch, tile)
     x1, y1, x2, y2 = area
@@ -1307,9 +1474,8 @@ def gold_of(ptr):
     return None
 
 
-def setter_words(ch, flag):
-    """What sets a flag, in words ('one of your units stops in the area from ...'): the definition whose own flag it is, else a
-    script that sets it (Chapter 17B's gate house, paid)."""
+def setter_of(ch, flag):
+    """(kind, definition) of the event that sets a flag: the one whose own flag it is, else one whose script sets it, or None."""
     found = None
     for kind, defs in ch.defs.items():
         for e in defs:
@@ -1320,6 +1486,13 @@ def setter_words(ch, flag):
             for e in defs:
                 if kind != 'shop' and e['conds'] and any(c == 0x0C and a[0] == flag for _, c, a in fe.reachable(e['ptr'])):
                     found = found or (kind, e)
+    return found
+
+
+def setter_words(ch, flag):
+    """What sets a flag, in words ('one of your units stops in the area from ...'): the definition whose own flag it is, else a
+    script that sets it (Chapter 17B's gate house, paid)."""
+    found = setter_of(ch, flag)
     if not found:
         return None
     kind, e = found
@@ -1330,6 +1503,234 @@ def setter_words(ch, flag):
         where = ('the house at ' if ch.tile_terrain(*coords_of(e['conds'])) in VISITED else '') + app_xy(ch, coords_of(e['conds']))
         return f'{gold:,} gold is paid at {where}' if gold else f'{where} is visited'
     return None
+
+
+# Flags with bit 7 set last from chapter to chapter: they're the 40 of the block at $7E:496E ($8C:9B4B picks the block by that bit),
+# which only a new game clears ($83:FC14), where the chapter's own 96, at $7E:4973, are cleared as each chapter starts ($83:FB32).
+LASTING = 0x80
+# What sets each lasting flag a later chapter waits on, in words ('Bowie escaped in Chapter 4x'): lasting_words, which main() reads
+# into it before the maps are built.
+LASTING_WORDS = {}
+NOBODY = 0xFFFE  # a character no unit has: an event played for any other visitor
+PLACES = {VILLAGE: 'village', HOUSE: 'house', CHURCH: 'church', 24: 'house', 42: 'church'}
+
+
+def chapter_name(n):
+    return 'the Final Chapter' if HEADINGS[n] == 'Final' else HEADINGS[n].replace('Ch.', 'Chapter ')
+
+
+def set_by_scripts(chapters):
+    """{flag: [(chapter index, kind, definition)]}: every definition whose script can set the flag (SET_FLAG), the end scripts'
+    included where a definition runs them."""
+    out = {}
+    for ch in chapters:
+        for kind, defs in ch.defs.items():
+            if kind == 'shop':
+                continue
+            for e in defs:
+                for f in {a[0] for _, c, a in fe.reachable(e['ptr']) if c == 0x0C}:
+                    out.setdefault(f, []).append((ch.n, kind, e))
+    return out
+
+
+def escape_flags(chapters):
+    """{flag: [(chapter index, character)]}: the lasting flags a unit's escape sets. An escape's script stores a table to the long
+    parameter and calls SetFlagByCharacterTable ($8C:A2F4), which sets the flag the table gives the unit escaping, or the unit it
+    carries out (Chapter 4x's children, 137 to 142, the table at $FD:8F82; Chapter 11's Fred, 144; Chapter 11x's civilians, 145 to
+    147, at $99:DBC9)."""
+    out = {}
+    for ch in chapters:
+        for kind, defs in ch.defs.items():
+            if kind == 'shop':
+                continue
+            for e in defs:
+                table = None
+                for _, c, a in sorted(fe.reachable(e['ptr'])):
+                    if c in (0x0F, 0x10, 0x11) and a[0] & 0xFFFF == fe.LONG_PARAM:
+                        table = a[1]
+                    elif c in (0x1B, 0x1C, 0x1D) and fe.ASMC.get(a[0]) == 'SetFlagByCharacterTable' and table:
+                        for who, flag in fe.character_flags(table):
+                            if flag & LASTING and (ch.n, who) not in out.get(flag, []):
+                                out.setdefault(flag, []).append((ch.n, who))
+    return out
+
+
+def script_setter_words(chapters, n, kind, e, flag):
+    """How a definition's script sets a lasting flag, in words, or None where that can't be said: a visit ('Leif visited the church
+    at (18, 14) in Chapter 15': Chapter 15's church, whose visit by Leif ends the chapter, sets 161 at $FD:AFCD, and a house in 16A
+    waits on it), worded with the visitor the script needs (keeper); or a chapter's end with someone alive and free, (character,
+    chapter index): Chapter 11's end script sets Fred's 144 only while he's on the other army, alive and not captured ($99:D499)."""
+    ch, tile = chapters[n], coords_of(e['conds'])
+    if kind == 'location' and tile and ch.tile_terrain(*tile) in PLACES:
+        ok, who = keeper(e, flag)
+        return f"{place_words(ch, e['conds'], who, past=True)} in {chapter_name(n)}" if ok else None
+    active = visitor_of(e['conds']) or LEIF
+    run = fe.Run(fe.World(active=active)).run(e['ptr'])
+    if not (run.ended and flag in run.flag_sets):
+        return None
+    targets = [a[1] for _, cmd, a in sorted(fe.reachable(e['ptr'])) if cmd in (0x0F, 0x10, 0x11) and a[0] & 0xFFFF == fe.TARGET]
+    for c in dict.fromkeys(targets):
+        if flag not in fe.Run(fe.World(active=active, dead={c})).run(e['ptr']).flag_sets:
+            return c, n
+    return None
+
+
+def lasting_words(chapters):
+    """{flag: words} for the lasting flags, where all that sets one can be said ('Bowie escaped in Chapter 4x', 'Fred escaped in
+    Chapter 11 or was alive and not captured at its end')."""
+    escapes, scripted = escape_flags(chapters), set_by_scripts(chapters)
+    out = {}
+    for flag in sorted(set(escapes) | {f for f in scripted if f & LASTING}):
+        alive, visits = [], []
+        for n, kind, e in scripted.get(flag, []):
+            said = script_setter_words(chapters, n, kind, e, flag)
+            if said is None:
+                break
+            (visits if isinstance(said, str) else alive).append(said)
+        else:
+            people = {}
+            for n, c in escapes.get(flag, []):
+                people.setdefault(c, []).append(f'escaped in {chapter_name(n)}')
+            for c, n in alive:
+                own = any(x == n for x, who in escapes.get(flag, []) if who == c)
+                people.setdefault(c, []).append('was alive and not captured at its end' if own else
+                                                f'was alive and not captured at the end of {chapter_name(n)}')
+            out[flag] = ' or '.join([f"{name_of(c)} {' or '.join(ws)}" for c, ws in people.items()] + visits)
+    return out
+
+
+def place_words(ch, conds, who=None, past=False):
+    """A location definition's tile and what's done there, by the terrain the game gives it: 'the house at (13, 17) is visited',
+    'Nanna visits the house at (23, 24)', 'the door at (23, 20) is opened' ('was visited', 'visited' with `past`)."""
+    tile = coords_of(conds)
+    t = ch.tile_terrain(*tile)
+    if any(c == 0x05 and a[0] == fe.TILE_X for c, a in conds):
+        what, done = ('drawbridge', 'lowered') if t == DRAWBRIDGE else ('door', 'opened')
+        return f"the {what} at {app_xy(ch, tile)} {'was' if past else 'is'} {done}"
+    where = f"the {PLACES.get(t, 'tile')} at {app_xy(ch, tile)}"
+    if who:
+        return f"{name_of(who)} {'visited' if past else 'visits'} {where}"
+    return f"{where} {'was' if past else 'is'} visited"
+
+
+def leaves_flag(e, flag, active, flags=()):
+    """Whether an event leaves `flag` set once it runs for `active` with `flags` set: its script sets it, or it's the event's own
+    flag (set as the event runs) and the script doesn't clear it."""
+    run = fe.Run(fe.World(active=active, flags=flags)).run(e['ptr'])
+    return flag not in run.flag_clears if flag == e['flag'] else flag in run.flag_sets
+
+
+def keeper(e, flag, flags=()):
+    """(whether a visit can leave `flag` set, the visitor it needs): the definition's own visitor, else one its script compares the
+    acting unit with (Chapter 14's house at (23, 24) keeps its flag only for Nanna, $FD:9B56; Chapter 15's church sets 161 only for
+    Leif, $FD:AF9E), else None, where anyone will do."""
+    visitor = visitor_of(e['conds'])
+    if visitor:
+        return leaves_flag(e, flag, visitor, flags), visitor
+    if leaves_flag(e, flag, NOBODY, flags):
+        return True, None
+    for c in dict.fromkeys(a[1] for _, cmd, a in sorted(fe.reachable(e['ptr'])) if cmd in (0x0A, 0x0B) and a[0] == fe.SELECTED):
+        if leaves_flag(e, flag, c, flags):
+            return True, c
+    return False, None
+
+
+def lasting_need(e):
+    """The lasting flags with words (LASTING_WORDS) an event's definition waits on or its script tests."""
+    return sorted({a[0] for c, a in e['conds'] if c == 0x0D and a[0] in LASTING_WORDS}
+                  | {a[0] for _, c, a in fe.reachable(e['ptr']) if c == 0x0E and a[0] in LASTING_WORDS})
+
+
+def lasting_conds(e, flag, active):
+    """The lasting flags an event needs to leave `flag` set: those its definition waits on, and those its script tests that it
+    doesn't without (Chapter 6's house at (13, 17) sets flag 10 only once Murphy escaped in 4x, $99:A773)."""
+    gate = [a[0] for c, a in e['conds'] if c == 0x0D and a[0] in LASTING_WORDS]
+    every = set(lasting_need(e))
+    return gate + [f for f in sorted(every - set(gate)) if not leaves_flag(e, flag, active, every - {f})]
+
+
+def setter_clause(ch, flag):
+    """(when, areas) for an event whose only condition is `flag`: it runs as soon as the event that sets the flag does, so it's said
+    as what sets that one off, with what it needs from an earlier chapter; None where that can't be said."""
+    found = setter_of(ch, flag)
+    if not found:
+        return None
+    kind, e = found
+    conds, areas = e['conds'], None
+    tile, area = coords_of(conds), area_of(conds)
+    if kind == 'after_action' and (tile or area):
+        active = visitor_of(conds) or LEIF
+        text = f"As soon as {who_words(conds)} stops {where_words(ch, conds, named=True)}"
+        if area:
+            areas = [{'who': 'player', 'rect': rect_to_app(*area, ch.h - 1)}]
+    elif kind == 'location' and tile:
+        ok, who = keeper(e, flag, lasting_need(e))
+        if not ok:
+            return None
+        active = who or NOBODY
+        text = f'When {place_words(ch, conds, who)}'
+    elif kind == 'talk':
+        a, b = next((a for c, a in conds if c in (0x00, 0x01)), (0, 0))
+        active = a
+        text = f'When {name_of(a)} talks to {name_of(b)}'
+    else:
+        return None
+    need = lasting_conds(e, flag, active)
+    if need:
+        text += ', if ' + ' and '.join(LASTING_WORDS[f] for f in need)
+    return text, areas
+
+
+def joins_of(ch, run, e=None):
+    """Who a visit makes yours (characters): the groups its script loads on your side, and those an event waiting on a flag it sets
+    loads (Chapter 6's house at (13, 17) sets flag 10, and right after the action Hicks comes, $99:A4EF), its own flag `e`'s too,
+    set as it runs, where the script leaves it set (16A's house at (41, 10): Schroff, $FD:B2FD; 17A's church at (1, 21): Sara)."""
+    out = [u['char'] for _, grp in run.loads for u in grp if u['side'] == fe.PLAYER]
+    own = [e['flag']] if e is not None and e['flag'] and e['flag'] not in run.flag_clears else []
+    for f in list(run.flag_sets) + own:
+        if f & LASTING:
+            continue
+        for kind, defs in ch.defs.items():
+            if kind in ('shop', 'location'):
+                continue
+            for d in defs:
+                if any(c == 0x0D and a[0] == f for c, a in d['conds']):
+                    then = fe.Run(fe.World(active=LEIF, flags={f})).run(d['ptr'])
+                    if not then.ended:
+                        out += [u['char'] for _, grp in then.loads for u in grp if u['side'] == fe.PLAYER]
+    return out
+
+
+def minus(xs, ys):
+    """xs, less one of each of ys."""
+    left = list(xs)
+    for y in ys:
+        if y in left:
+            left.remove(y)
+    return left
+
+
+# How the armies stand in a chapter (the chapter record's +0x2A, fe5_rom.chapter's 'relations'): bit 2 makes the other army and yours
+# hostile to each other, bit 1 the other army and the enemy. Each phase $83:B267 sets out the armies hostile to the phase's, and the
+# side check ($83:B34F) reads them: the Capture and Steal targets ($87:9AF7, $87:9A27), the hostile units in reach ($87:8781) and the
+# AI's choice of target (bank $8D) go through it.
+OTHER_ARMY_HOSTILE, OTHER_ARMY_AND_ENEMY = 0x04, 0x02
+
+
+def hostile_notes(ch, m):
+    """Says, on each of the other army's units, that it's hostile to yours where the chapter makes it so (Chapters 14 and 17A; 2x and
+    12 have none of its units): drawn green, as the game draws it."""
+    rel = ch.rec['relations']
+    if not rel & OTHER_ARMY_HOSTILE:
+        return
+    text = (f"In this chapter the other army is hostile to yours{'' if rel & OTHER_ARMY_AND_ENEMY else ', not to the enemy'}: its "
+            'units and yours can attack each other, and yours can capture them.')
+    for u in m['units']:
+        if u['type'] == 'ally':
+            u['note'] = f"{u['note']}. {text}"
+    for j in m.get('joiners', []):
+        if j.get('ally'):
+            j['note'] = f"{j['note']} {text}" if j.get('note') else text
 
 
 def when_words(ch, kind, e):
@@ -1756,14 +2157,48 @@ def story():
     return out
 
 
+ROUTES = {'Story': ('A', 'B'), 'A': ('A',), 'B': ('B',)}   # the routes a chapter is on
+
+
+def foe_lines_kept(sources, owner):
+    """{(item, map id, kind, text)}: the lines of what a foe carries (capture, or a thief's Steal) that stay though something else
+    gives the item (the user's call): those on a route where nothing else gives it as early. A capture line goes only where another
+    way of getting the item comes in the same chapter or before it on every route its chapter is on, so Misha's items, yours from the
+    end of 17A, leave the Ridersbane's capture lines from Chapter 8 on and the Wind Sword's in 16B. gba_maps.write_sources drops the
+    rest of the foe lines where anything else gives the item. A line ending in '-later' counts from after its chapter. `owner`:
+    {line: character} for the lines of a unit's own items; a foe that joins at the chapter's end (Lifis in 2x, Salem in Chapter 12)
+    brings the same copy it's captured with, which counts once, as it joins."""
+    at = {map_id: (n, route) for n, map_id, route in story()}
+
+    def when(s):
+        return at[s['mapId']][0] + (0.5 if '-later' in s['kind'] else 0)
+
+    def key(name, s):
+        return name, s['mapId'], s['kind'], s['text']
+    out = set()
+    for name, lst in sources.items():
+        others = [s for s in lst if not s['kind'].startswith('foe')]
+        for s in lst:
+            if not others or not s['kind'].startswith('foe'):
+                continue
+            mine = owner.get(key(name, s))
+            if mine is not None and any(o['mapId'] == s['mapId'] and owner.get(key(name, o)) == mine for o in others):
+                continue
+            if any(all(x not in ROUTES[at[o['mapId']][1]] or when(o) > when(s) for o in others) for x in ROUTES[at[s['mapId']][1]]):
+                out.add(key(name, s))
+    return out
+
+
 def main():
     titles, goals = title_and_goals()
     maps, sources, used = [], {}, set()
     joined = {'A': set(), 'B': set()}
     state = {'route': 'Story', 'joining': {}, 'n': 0}
     got = []  # (item, chapter index, route) for each way of getting an item that isn't taking it from a foe
+    owner = {}  # (item, map id, kind, text) -> the character whose own items the line is (foe_lines_kept)
 
-    def source(item, map_id, kind, words, who=None):
+    def source(item, map_id, kind, words, who=None, of=None):
+        """`who`: the character a recruit's line is (its items count once, where it first joins); `of`: a foe's, for its line."""
         if not kind.startswith('foe'):
             got.append((item, state['n'], state['route']))
         if who is not None:
@@ -1776,11 +2211,15 @@ def main():
         lst = sources.setdefault(item_name(item), [])
         if entry not in lst:
             lst.append(entry)
+        if who is not None or of is not None:
+            owner.setdefault((item_name(item), map_id, kind, words), who if who is not None else of)
 
     chapters = [Chapter(n) for n in range(35)]
     check_gaiden(chapters)
     sold = ordinary_stock(chapters)
     closed_rooms = False
+    # What sets the flags that last from chapter to chapter, for the events of later chapters that wait on them.
+    LASTING_WORDS.update(lasting_words(chapters))
 
     def yours_by(n, route, items):
         """Whether one of `items` can be yours by chapter n: given in an earlier chapter of the shared story or of n's route."""
@@ -1844,7 +2283,7 @@ def main():
         closed_rooms |= bool(ch.closed)
         random_chests(ch, m, source, run)
         present = everyone(ch, run)
-        talks, gifts = talks_of(ch, present)
+        talks, gifts, later = talks_of(ch, present)
         for i, a, b in gifts:
             source(i, map_id, 'talk', f'{name_of(a)} talks to {name_of(b)}')
         m['starts'] = [to_app(t, h) for t in starts_of(ch, run)]
@@ -1852,10 +2291,11 @@ def main():
         thief = (all(any(has_steal(c) for c in joined[x]) for x in (['A', 'B'] if route == 'Story' else [route]))
                  or any(has_steal(u['char']) for u in run.units if u['side'] == fe.PLAYER))
         capture = Capture(ch, run, present, sold, yours_by(n, route, SLEEP_ITEMS), yours_by(n, route, WARP_ITEMS), thief)
-        build_units(ch, m, source, run, talks, capture)
+        build_units(ch, m, source, run, talks, capture, later)
         if not m['starts'] and 'corrinStart' in m:
             m['starts'] = [m['corrinStart']]
-        build_arrivals(ch, m, source, talks, set(run.world.flags), capture)
+        build_arrivals(ch, m, source, talks, set(run.world.flags), capture, later)
+        hostile_notes(ch, m)
         build_recruits(ch, m, source, run)
         build_locations(ch, m, source)
         lone_houses(m)
@@ -1911,7 +2351,9 @@ def main():
     for name, lst in sources.items():
         if any(not x['kind'].startswith('foe-held') for x in lst):
             sources[name] = [x for x in lst if not x['kind'].startswith('foe-held')]
-    gm.write_sources(GAME, TITLE, SCRIPT, sources)
+    # A capture (or Steal) line stays where nothing else gives the item as early on its route (foe_lines_kept).
+    kept = foe_lines_kept(sources, owner)
+    gm.write_sources(GAME, TITLE, SCRIPT, sources, keep=lambda name, s: (name, s['mapId'], s['kind'], s['text']) in kept)
 
 
 if __name__ == '__main__':
