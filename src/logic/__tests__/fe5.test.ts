@@ -188,6 +188,33 @@ describe("Thracia 776's maps", () => {
     expect(FE5_ITEM_SOURCES['Ridersbane']).toContainEqual({ mapId: 'fe5-17a', kind: 'foe', text: 'Carried by a Pegasus Rider of the other army: capture to take it' })
   })
 
+  it('marks looters with the torch badge: what their movement AI goes for, and the exits they leave by after', () => {
+    // Movement command 8 goes for the nearest church, village or house, and a chest for a unit with a free slot and a Chest Key, or a
+    // Lockpick and Steal ($8D:9640, $8D:B88C); the raze action runs the tile's events ($8D:851D). Command 2 hands over to an AI whose
+    // command 0x0F leaves by an escape point ($8D:C07E, the chapter's list at $8F:8706).
+    const looters = (m: ChapterMap) =>
+      [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units), ...(m.joiners ?? [])].filter((u) => u.looter)
+    for (const m of FE5_MAPS) {
+      for (const u of looters(m)) {
+        expect(u.note, `${m.id} ${u.name}`).toMatch(/\bgoes for the (?:nearest )?\w/i)
+        for (const [x, y] of u.goesTo ?? []) expect(x >= 1 && x <= m.width && y >= 1 && y <= m.height, `${m.id} ${u.name}`).toBe(true)
+      }
+    }
+    const brigands = map('fe5-12').units.filter((u) => u.looter)
+    expect(brigands).toHaveLength(8)
+    expect(brigands[0].note).toMatch(/; goes for the houses, razing what it reaches$/)
+    // The villages a foe can raze name the looters on the map at the start.
+    const house = map('fe5-12').objects.find((o) => o.type === 'village' && o.tile[0] === 24 && o.tile[1] === 3) as { note?: string }
+    expect(house.note).toMatch(/Brigand can raze it before you visit\.$/)
+    // Chapter 12x's thieves hold Chest Keys: one chest each, then off the map.
+    expect(map('fe5-12x').units.find((u) => u.looter)).toMatchObject({
+      note: expect.stringMatching(/goes for the nearest chest and empties it, then leaves the map by an exit$/),
+      goesTo: [[12, 15], [16, 15], [23, 15], [3, 11], [11, 11], [21, 9]],
+    })
+    // The other army's pirates in 17A raid on their own phase, where none of its raze events fires (they wait for the enemy phase).
+    expect(map('fe5-17a').joiners?.find((j) => j.name === 'Pirate')?.note).toMatch(/but razes nothing/)
+  })
+
   it("says where the other army is hostile to yours, though drawn green: the chapter record's +0x2A bit 2", () => {
     // $84:94E6 sets the armies' hostility from it ($83:B2C2); the side check ($83:B34F) every attack, Capture and Steal makes reads it.
     // Chapters 2x, 12, 14 and 17A have the bit (and not bit 1: the other army and the enemy don't fight); only 14 and 17A field units.

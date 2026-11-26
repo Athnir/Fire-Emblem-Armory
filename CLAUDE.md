@@ -1193,7 +1193,9 @@ A global switch (header, any game) that lets someone play along without being to
   chapter's end, a win or a boss's fall gives ("Clearing it adds Roy", Three Houses' battalions, the GBA games' end gifts), no loss
   condition naming someone still to come (Radiant Dawn's "after arriving"), no map change an arrival makes, no pot's effect (its kind
   only) and no boulder's path. Taps still preview a door, a vein or a wall; chests', villages' and talks' notes stay. A note keeps
-  who a unit is and what it holds, clause by clause, so a talk riding on an arrival's sentence stays.
+  who a unit is and what it holds, clause by clause, so a talk riding on an arrival's sentence stays. A recruit's talk stays whole,
+  even naming someone still to come (Genealogy's Altena, "once Travant is defeated after Leif's talk": the user's call, 2026-11-26,
+  recruit notes are the exception).
 - **A DLC side story is off until its switch is ticked** (the user's call, 2026-11-26: any paid DLC is off by default, what's free on):
   Engage's Expansion Pass (Fell Xenologue and the Divine Paralogues: "Show the Expansion Pass") and Three Houses' Cindered Shadows, one
   switch per game for the weapon page, the map page and the battalions (`src/logic/sideStories.ts`, a map set's `sideStory.also` for

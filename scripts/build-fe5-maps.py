@@ -1070,6 +1070,8 @@ def build_units(ch, m, source, run, talks, capture, later=frozenset()):
                 source(i, m['id'], 'kit', f"Carried by {name_of(u['char'])} on joining", who=u['char'])
             continue
         e = with_loot(unit_entry(u, h, talks.get(name_of(u['char']))), u, capture)
+        if raider_of(u):
+            e['_raid'] = raider_of(u)   # said once the map's villages and chests are in (settle_raiders)
         if ch.tile_terrain(*u['tile']) == ROOF:
             # Placed under a roof: hidden in its room ($83:9620, state 0x1040) until a change over its tile is made ($84:95BA).
             e['note'] = f"{e['note']}. Out of sight in a closed room until the room opens"
@@ -1162,6 +1164,8 @@ def build_arrivals(ch, m, source, talks, start_flags, capture, later=frozenset()
                     g['areas'] = areas
                 groups.append(g)
                 for u, entry in zip(foes, g['units']):
+                    if raider_of(u):
+                        entry['_raid'] = raider_of(u)
                     if (entry.get('talk') or '').startswith('Recruit'):
                         if entry['name'] not in later:
                             for i in u['items']:
@@ -1187,6 +1191,8 @@ def build_arrivals(ch, m, source, talks, start_flags, capture, later=frozenset()
                 elif not (j.get('talk') or '').startswith('Recruit') and capture.hostile(u):
                     # The other army's, hostile to yours in this chapter: what it carries is taken as a foe's is.
                     foe_source(source, m['id'], u, {'type': 'ally', 'name': j['name'], 'generic': generic}, True, capture)
+                if u['side'] != fe.PLAYER and raider_of(u):
+                    j['_raid'] = raider_of(u)
                 if j not in joiners:
                     joiners.append(j)
     if groups:
@@ -1993,12 +1999,13 @@ def walkable_ground(tid):
 
 def raze_notes(m):
     """What a foe can raze, said where it stands (the user's call: no raze toggle): in its village's note, or for houses and
-    churches with nothing to visit, in one of the map's notes."""
-    unvisited = []
+    churches with nothing to visit, in one of the map's notes. Returns the villages (objects) a foe can raze."""
+    unvisited, razable = [], []
     for (x, y), words in m.pop('_razes', []):
         visit = next((o for o in m['objects'] if o['type'] == 'village' and o['tile'] == [x, y]), None)
         if visit:
             visit['note'] = ((visit.get('note') or '') + ' ' + words).strip()
+            razable.append(visit)
         else:
             unvisited.append(((x, y), words))
     if unvisited:
@@ -2006,6 +2013,103 @@ def raze_notes(m):
                 for (x, y), w in sorted(unvisited, key=lambda t: (t[0][1], t[0][0]))]
         m['notes'].append('A foe standing on a house or church with nothing to visit can raze it on the enemy phase, and it falls '
                           f"to ruins: {', '.join(what[:-1]) + ' and ' + what[-1] if len(what) > 1 else what[0]}.")
+    return razable
+
+
+# --- raiders: what a unit's movement AI goes for ---
+#
+# A unit record's second AI byte (the unit's +0x3B, $83:95F9) picks a movement script from the table at $8F:81AF (a u16 pointer into
+# bank $8F per AI below 0x2B, $8D:81F5); the handlers of its commands sit at $8D:8234. Read here:
+#   0x08 go for the nearest church, village or house (terrain 0x17, 0x12, 0x0C), and chests (0x21, 0x2B) for a unit with a free
+#        seventh item slot and a Chest Key, or a Lockpick and Steal ($8D:B88C; the lists at $8D:9665 and $8D:966B), with the AI's
+#        action 4 ($8D:9682). There the raze action ($83:F6F6 -> $8D:851D) runs the tile's location events ($8C:9CBD), so a foe razes
+#        what the chapter's raze events (the enemy phase's) lay in ruins, and empties a chest (the chests' events check no phase).
+#        Byte 1 is how many raids before it steps on (counted in the third AI byte, $8D:859C; 0 never), and with nothing left it
+#        steps on ($8D:96D4);
+#   0x02 hand over to other AIs (bytes 1-2 the action AI, byte 3 the movement AI; 0x00FF and 0xFF keep them: $8D:97F7);
+#   0x0F make for an escape point and leave the map ($8D:98FB -> $8D:C07E: the AI's action 5, at the point $8D:C26F picks from the
+#        chapter's list, $8F:8706 for foes on the enemy phase and $8F:874C for the others: a u16 pointer per chapter into bank $8F, to
+#        [x][y][z] entries ended by x = 0).
+RAID, HAND_OVER, LEAVE = 0x08, 0x02, 0x0F
+MOVE_SCRIPTS, ESCAPES = 0x8F81AF, {fe.ENEMY: 0x8F8706, fe.NPC: 0x8F874C}
+CHEST_KEY, LOCKPICK = 0x88, 0x8B
+
+
+def raider_of(u):
+    """What a unit's movement AI does where it raids, from its script's start: {'raids': how many before it steps on (0: until none is
+    left), 'leaves': whether it then leaves the map, 'chests': whether it goes for chests too}; else None."""
+    ai = u['ai'][1]
+    if u['side'] == fe.PLAYER or ai >= 0x2B:
+        return None
+    a = 0x8F0000 | r.u16(MOVE_SCRIPTS + 2 * ai)
+    if r.u8(a) != RAID:
+        return None
+    out = {'raids': r.u8(a + 1), 'leaves': False,
+           'chests': len(u['items']) < 7 and (CHEST_KEY in u['items'] or LOCKPICK in u['items'] and has_steal(u['char']))}
+    if r.u8(a + 4) == HAND_OVER and r.u8(a + 7) != 0xFF:
+        out['leaves'] = r.u8(0x8F0000 | r.u16(MOVE_SCRIPTS + 2 * r.u8(a + 7))) == LEAVE
+    return out
+
+
+def escape_points(ch, side):
+    """The chapter's escape points for a side's units, as (x, y) from the top left."""
+    p, out = r.u16(ESCAPES[side] + 2 * ch.n), []
+    a = 0x8F0000 | p
+    while p and r.u8(a):
+        out.append((r.u8(a), r.u8(a + 1)))
+        a += 3
+    return out
+
+
+def settle_raiders(ch, m, razable):
+    """The looter badge on each raider and what it goes for (its note), the exits it leaves by (`goesTo`), and on each village a foe
+    can raze the raiders on the map at the start that go for it, as the GBA games say theirs (gba_ai.settle). The other army's
+    raids run on its own phase, where no raze event of the chapter fires (Chapter 17A's pirates)."""
+    h, w = m['height'], m['width']
+    # What the map has to raid: the raid list's terrains on the map as the battle starts (a house with nothing to visit too), and
+    # the chests (Chapter 24's Kia chest, in the room a change opens).
+    there = {t for row in ch.terrain[1:] for t in row[1:]}
+    places = [(one, many) for t, one, many in ((VILLAGE, 'village', 'villages'), (HOUSE, 'house', 'houses'), (CHURCH, 'church', 'churches'))
+              if t in there]
+    chests = any(o['type'] == 'chest' for o in m['objects'])
+    other_razes = any(phase_of(e['conds']) in (None, 0x80) and fe.Run(fe.World(active=NOBODY)).run(e['ptr']).edits
+                      for e in ch.defs['location'] if coords_of(e['conds']) and ch.tile_terrain(*coords_of(e['conds'])) in PLACES)
+    every = ([(u, True) for u in m['units']] + [(u, False) for g in m.get('reinforcements', []) for u in g['units']]
+             + [(j, False) for j in m.get('joiners', [])])
+
+    def listed(words, last):
+        return words[0] if len(words) == 1 else ', '.join(words[:-1]) + f' {last} ' + words[-1]
+    raiders = []
+    for u, at_start in every:
+        a = u.pop('_raid', None)
+        kinds = places + ([('chest', 'chests')] if a and a['chests'] and chests else [])
+        if not a or not kinds:
+            continue
+        side = fe.NPC if u.get('ally') or u.get('type') == 'ally' else fe.ENEMY
+        many = listed([k[1] for k in kinds], 'and')
+        does = ('razes or empties' if places and kinds[-1][0] == 'chest' else 'empties' if not places else 'razes')
+        doing = {'razes or empties': 'razing or emptying', 'empties': 'emptying', 'razes': 'razing'}[does]
+        if side == fe.NPC and places and not other_razes:
+            what = f"goes for the {many}, but razes nothing: the chapter's raze events wait for the enemy phase"
+        elif a['raids'] == 1:
+            what = f"goes for the nearest {listed([k[0] for k in kinds], 'or')} and {does} it"
+        else:
+            what = f'goes for the {many}, {doing} ' + (f"up to {NUMBER.get(a['raids'], a['raids'])} of them" if a['raids'] else
+                                                       'what it reaches')
+        exits = [p for p in (to_app(t, h) for t in escape_points(ch, side)) if 1 <= p[0] <= w and 1 <= p[1] <= h]
+        if a['leaves'] and exits:
+            what += ', then leaves the map by an exit'
+            u['goesTo'] = exits
+        u['looter'] = True
+        note = u.get('note') or ''
+        u['note'] = (f'{note} {what[0].upper()}{what[1:]}.' if note.endswith('.') else f'{note}; {what}' if note
+                     else what[0].upper() + what[1:])
+        if at_start and side == fe.ENEMY:
+            raiders.append(u['name'])
+    if raiders:
+        raze = f"{' or '.join(dict.fromkeys(raiders))} can raze it before you visit."
+        for o in razable:
+            o['note'] = f"{o['note']} {raze}"
 
 
 def build_changes(ch, m, run):
@@ -2299,7 +2403,7 @@ def main():
         build_recruits(ch, m, source, run)
         build_locations(ch, m, source)
         lone_houses(m)
-        raze_notes(m)
+        settle_raiders(ch, m, raze_notes(m))
         if n in GAIDEN:
             m['notes'].append(GAIDEN[n])
         end = fe.Run(fe.World()).run(ch.ev['ending'])

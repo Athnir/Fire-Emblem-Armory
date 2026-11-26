@@ -151,6 +151,22 @@ nothing to visit, in one of the map's notes.
   breaks one; Chapter 14's four and Chapter 20's six fall only to a foe's raze. Chapter 21x's three have no definition and never break
   (a note says so). The Fire Emblem Wiki (The Onslaught): the gates and chipped walls "can be broken by an enemy that moves to do so ...
   and turns the terrain into wasteland".
+- **Looters** (`raider_of`, `settle_raiders`: the torch badge, as the GBA games' `gba_ai.py`): a unit's movement AI (record +0x11,
+  the unit's +0x3B, `$83:95F9`) picks a script from `$8F:81AF` (a u16 pointer into bank `$8F` per AI below 0x2B, `$8D:81F5`; the
+  commands' handlers at `$8D:8234`). Command 8 goes for the nearest church, village or house (terrain 0x17, 0x12, 0x0C), and chests
+  (0x21, 0x2B) for a unit with a free seventh slot and a Chest Key, or a Lockpick and Steal (`$8D:B88C`; the lists at `$8D:9665` and
+  `$8D:966B`), with the AI's action 4 and the raze above (`$8D:9682`); on a chest the key is used and the chest's events, which check
+  no phase, give it its item. Its byte 1 is how many raids before it steps on (counted in the third AI byte, `$8D:859C`; 0 never), and
+  with nothing left it steps on (`$8D:96D4`). Command 2 hands over to other AIs (bytes 1-2 the action AI, byte 3 the movement AI;
+  0x00FF and 0xFF keep them, `$8D:97F7`); movement AI 0x0B's command 0x0F leaves by an escape point (`$8D:98FB` -> `$8D:C07E`, the
+  AI's action 5, at the point `$8D:C26F` picks from the chapter's list: `$8F:8706` for foes on the enemy phase, `$8F:874C` for the
+  others, a u16 pointer per chapter to [x][y][z] entries ended by x = 0). The raiders' AIs: 0x05 (raids until none is left, then
+  leaves), 0x06 (one raid, then leaves), 0x23 (three, then leaves), 0x09 (raids until none is left, then charges: action and movement
+  AI 0). Each says what its map has to raid ("goes for the houses, razing what it reaches"; Chapter 12x's thieves, "goes for the
+  nearest chest and empties it, then leaves the map by an exit", the exits outlined), and each village a foe can raze names the raiders
+  on the map at the start ("Brigand can raze it before you visit"). The other army raids on its own phase, where no raze event of
+  Chapter 17A fires (they check the enemy phase): its pirates "raze nothing". Cracked walls have their own command (0x10, the list at
+  `$8D:9680`: terrain 0x26), whose units aren't looters.
 - **The openings' changes**: Chapter 2 starts with a village in ruins (the Fire Emblem Wiki: "the one destroyed in the opening
   cutscene"), Chapter 11 with six of its doors open (the trap shuts them), Chapter 11x with its bottom door open; Chapter 3's opening
   opens a door and shuts it again. **Chapter 4's chests**: the opening takes the items of your units on the map (Leif and Lifis; the
@@ -316,8 +332,12 @@ Not confirmed:
 - Map changes:
   - Where movement AI 0x28 takes the civilian Chapter 24 picks on turn 5 (the Fire Emblem Wiki: to the Kia room's door), and how its
     reaching a wall tile runs the location event there (no raze, door or chest action targets a wall).
-  - Which foes raze: the raze action is the AI's action 4 (`$83:F6F6`), but which AI scripts choose it wasn't traced; the changes say
-    a foe "can" raze.
+  - Which foes raze: the looters' movement AIs are traced (Looters, above), but a foe whose AI does something else could still stand
+    on a house by its own route and raze it (whether the raze action is chosen outside command 8 wasn't traced); the changes say any
+    foe "can" raze.
+  - Looters: where a raider without a target left goes (0x09 charges: action and movement AI 0), whether its raid of a house with no
+    raze event counts as one (the count is kept after the events run, `$8D:858F`), and what a raid that changes nothing leaves the
+    17A pirates doing next.
   - That after-action events run after any army's units act (Chapter 6's and 17A's walls check no phase and say "a unit"; the call,
     `$83:8A6B`, wasn't traced back).
   - On fog maps, that the Unlock staff needs the tile seen (the visibility map, `$7E:8DCB`, read as the target list is made).
