@@ -558,7 +558,7 @@ describe("Echoes' small stone forts drawn whole, as Gaiden's", () => {
       const m = FE15_MAPS.find((mm) => mm.id === id)!
       return rowCodes(m.grid[m.height - y])[x - 1]
     }
-    expect([at('fe15-1-7', 21, 27), at('fe15-1-7', 22, 26), at('fe15-1-7', 22, 25)]).toEqual(['qa', 'bb', 'tc'])
+    expect([at('fe15-1-7', 21, 27), at('fe15-1-7', 22, 26), at('fe15-1-7', 22, 25)]).toEqual(['qa', 'nd', 'tc'])
     expect([at('fe15-3c-4', 11, 12), at('fe15-3c-4', 13, 12), at('fe15-3c-4', 11, 10), at('fe15-3c-4', 13, 10)]).toEqual(['qa', 'qc', 'qg', 'qi'])
     expect(FE15_TERRAIN.qa).toEqual(FE15_TERRAIN.wx)
   })
@@ -579,15 +579,66 @@ describe("Echoes' swamps, cliffs and ground as its art draws them", () => {
 
   it("colours its water the app's blue where its art's isn't, and marks the stairs the art shows", () => {
     expect(map('fe15-1-9').fills?.tg).toBeUndefined()
-    expect(map('fe15-4a-4a').decor).toEqual({ '3,9': 'stairs', '10,9': 'stairs' })
+    expect(Object.entries(map('fe15-4a-4a').decor ?? {}).filter(([, k]) => k === 'stairs')).toEqual([['3,9', 'stairs'], ['10,9', 'stairs']])
   })
 })
 
-// The review of 2026-11-22: Duma Temple's trenches are pits (a gap in the game, not bridges or gates).
+// The review of 2026-11-22: Duma Temple's trenches are a gap in the game, not bridges or gates; the review of 2026-11-25: the void.
 describe("Echoes' Duma Temple trenches", () => {
-  it("draws the Lich's U and the White Dragon's H as pits", () => {
-    const pits = (id: string) => Object.entries(FE15_MAPS.find((m) => m.id === id)?.wallLooks ?? {}).filter(([, k]) => k === 'pit').length
-    expect(pits('fe15-5-1c')).toBe(7)
-    expect(pits('fe15-5-1e')).toBe(11)
+  it("draws the Lich's U and the White Dragon's H as the void, a drop into the dark", () => {
+    const voids = (id: string) => Object.entries(FE15_MAPS.find((m) => m.id === id)?.wallLooks ?? {}).filter(([, k]) => k === 'void').length
+    expect(voids('fe15-5-1c')).toBe(7)
+    expect(voids('fe15-5-1e')).toBe(11)
+  })
+})
+
+// The review of 2026-11-25: what one of its letters joins drawn as the game names each kind.
+describe("Echoes' tiles drawn as the game names them", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  const decorOf = (id: string, kind: string) => Object.entries(map(id).decor ?? {}).filter(([, k]) => k === kind).map(([t]) => t)
+  it("draws its supplies (補給) as supplies with a fort's numbers, on every map (none of its battles has a fort)", () => {
+    expect(FE15_TERRAIN.nd).toMatchObject({ name: 'Supplies', avo: 40, heal: 5 })
+    expect(FE15_TERRAIN.nd!.move).toEqual(FE15_TERRAIN.bb!.move)
+    expect(FE15_MAPS.flatMap((m) => m.grid.flatMap(rowCodes)).filter((c) => c === 'nd').length).toBe(132)
+    expect(FE15_MAPS.some((m) => m.grid.flatMap(rowCodes).includes('bb'))).toBe(false)
+  })
+  it('draws rocks (岩) and stones (積み石) as heaps of stones, torches (篝火) as candlesticks', () => {
+    expect(decorOf('fe15-3c-8', 'stones')).toHaveLength(7)
+    expect(decorOf('fe15-4a-9', 'stones')).toContain('10,9')
+    expect(decorOf('fe15-4c-4', 'stones')).toHaveLength(4)
+    expect(decorOf('fe15-5-1a', 'torch').sort()).toEqual(['12,12', '12,4', '4,12', '4,4'])
+    expect(decorOf('fe15-5-1b', 'torch').sort()).toEqual(['12,2', '12,6', '2,2', '2,6'])
+  })
+  it("draws its thick pillars (太柱) as pillars, a block two by two one great pillar, those in the map's outer wall as the wall", () => {
+    expect(decorOf('fe15-5-1a', 'thickPillar')).toEqual(expect.arrayContaining(['13,7', '4,8']))
+    expect(map('fe15-5-1a').looksAs?.['5,1']).toBe('w0')
+    expect(codes('fe15-5-1a')[(16 - 1) * 15 + 5]).toBe('w0') // (6, 1), the wall it's drawn as
+    expect(decorOf('fe15-5-1b', 'thickPillar')).toEqual(expect.arrayContaining(['5,6', '2,8']))
+    expect(decorOf('fe15-2-7b', 'thickPillar')).toHaveLength(8)
+    for (const t of ['7,7', '7,13', '13,13', '13,7']) expect(decorOf('fe15-6-4c', 'thickPillar')).toContain(t)
+    for (const t of ['10,10', '10,5', '4,10', '4,5']) expect(decorOf('fe15-x-1', 'thickPillar')).toContain(t)
+    expect(decorOf('fe15-x-2', 'thickPillar')).toContain('3,4')
+    // a pillar among a ship's decks stays its mast
+    expect(map('fe15-2-4').decor?.['8,5']).toBeUndefined()
+  })
+  it('draws the caverns (空洞) its art leaves black as the void, and its towers (塔) as the ramparts round them', () => {
+    expect(map('fe15-4a-4c').wallLooks?.['5,8']).toBe('void')
+    expect(Object.values(map('fe15-6-4b').wallLooks ?? {}).filter((k) => k === 'void')).toHaveLength(27)
+    expect(map('fe15-6-4c').wallLooks).toBeUndefined() // its caverns are its art's tan
+    expect(map('fe15-4a-11').looksAs?.['9,9']).toBe('wx')
+    for (const t of ['12,15', '14,15', '6,15']) expect(map('fe15-4c-3').looksAs?.[t]).toBe('wx')
+  })
+  it("draws Duma's altar's cave as Gaiden's: rock along the cave, partitions its faces, the walls beyond the void", () => {
+    const m = map('fe15-5-2')
+    expect([m.wallLooks?.['19,15'], m.looksAs?.['19,16']]).toEqual(['rock', 'wt'])
+    expect(m.wallLooks?.['1,28']).toBe('void')
+  })
+  it("draws Rigel Falls' bridges as stone, railed along their sides, and 2-4's gangplanks with their boards along them", () => {
+    const m = map('fe15-4a-8')
+    expect([m.grid[m.height - 17].slice(4, 6), m.grid[m.height - 17].slice(10, 12)]).toEqual(['t8', 'nc'])
+    expect(FE15_TERRAIN.nc).toMatchObject({ avo: 20 })
+    expect(m.bridgeSpans?.['6,17']).toBe('ns')
+    expect(map('fe15-2-4').bridgeSpans).toEqual({ '12,8': 'ew', '12,7': 'ew', '4,7': 'ew', '4,8': 'ew' })
+    expect(map('fe15-x-2').wallLooks?.['7,8']).toBe('stone')
   })
 })

@@ -303,8 +303,9 @@ def town(m, terrain):
 # (`qa`-`qi`) round what's inside it (the user's calls: as the DS games' castles, then a design of its own rather than a castle's
 # towers, the same in the remake).
 SMALL_FORT = 9
-FORT_PARTS = {'wx', 'b0', 'bb', 'tc', 'bv'}
-FORT_INSIDE = {'bb', 'tc', 'bv'}
+# A fort's tile or the supplies Echoes names apart from forts (`nd`), its stairs, gate and castle floor.
+FORT_PARTS = {'wx', 'b0', 'bb', 'nd', 'tc', 'bv'}
+FORT_INSIDE = {'bb', 'nd', 'tc', 'bv'}
 INDOORS = {'t1', 't3', 'w0', 'w9', 'wy', 'b3', 'wx'}
 
 

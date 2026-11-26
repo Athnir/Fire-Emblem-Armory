@@ -243,4 +243,10 @@ of its tiles, softened as the Tellius minimaps' are) and the plain tiles its art
 where 45% of its pixels are the paler, less green one). `build-fe15-maps.py` applies it: those tiles take Ground's code (`ga`) but keep
 the game's name for them. The kinds the game names apart are codes of their own: plain (草原) `t0`, ground and earth (地面, 地) `ga`, town
 (街) `gb`, floor (床) `t1`, snow (雪原) `t2`, deck (甲板) `t3`; a wall or tower (壁, 塔) `w0`, rock (岩) `wt`, inferno (業火) `wp`, the ship's
-hull (船体) `w9`, a rampart (城壁) `wx`.
+hull (船体) `w9`, a rampart (城壁) `wx`. The supplies (補給: every fort-like tile its battles have; the 砦 Fort and the orange tree are on none) are `nd`, a fort's
+numbers drawn as supplies, and the broken bridge (壊れた橋, Rigel Falls') `nc`, a castle tile's numbers drawn as a stone bridge.
+Where one letter joins several kinds, `build-fe15-maps.py`'s `game_looks` draws each by its row in the map's own grid: thick
+pillars (太柱) as pillars (a block two by two one great pillar; a block in the outer wall as the wall; by a deck a mast), torches (篝火)
+as candlesticks, rocks (岩) and stones (積み石) as heaps of stones, caverns (空洞) the render leaves black and the royal chambers'
+trenches as the void, towers (塔) in ramparts as the ramparts, and Duma's altar's cave as Gaiden's (its walls along the cave rock,
+its partitions the rock's faces, the rest the void).

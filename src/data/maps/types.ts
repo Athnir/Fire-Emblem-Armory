@@ -333,7 +333,8 @@ export interface ChapterMap {
    * opens in a wall and a stone bridge's side under its deck (Gaiden's, which play as the walls they are), bones lying on the ground
    * (Mystery of the Emblem's deserts), an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24), stairs on a
    * floor or path (Mystery of the Emblem's, which play as the tile they're on), rocks where the game's bones lie (Awakening's Chapter 9,
-   * whose scene draws rocks there). */
+   * whose scene draws rocks there), Echoes' heaps of stones, thick pillars (one great pillar a block two by two) and torches (drawn as
+   * candlesticks: the user). */
   decor?: Record<
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
@@ -341,7 +342,7 @@ export interface ChapterMap {
     | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab' | 'ice' | 'frozenFountain'
     | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
     | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown'
-    | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad'
+    | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad' | 'stones' | 'thickPillar' | 'torch'
   >
   /** The blocks its roofs and stalls are drawn over, (x0, x1, y0, y1) each, where buildings side by side would join into one block of
    * one paint (Three Houses': each building block parted into the rectangles a roof covers, the user's call: roofs as Fates' are). */
@@ -445,7 +446,10 @@ export interface ChapterMap {
    * wall the art draws as something else: a low stone wall (the GBA games' fences), rock (Gaiden's cave walls' faces, which fliers
    * cross), a ship's wooden wall (The Blazing Blade's cabins), bricks in its own colour (Thracia 776's lit roofs), a ship's wood
    * (Path of Radiance's masts, cabins and hulls). */
-  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar' | 'stone' | 'rock' | 'ship' | 'bricks' | 'wood' | 'pit' | 'fence' | 'timber' | 'cliff' | 'sky'>
+  wallLooks?: Record<string, 'sandbags' | 'wall' | 'pillar' | 'stone' | 'rock' | 'ship' | 'bricks' | 'wood' | 'pit' | 'fence' | 'timber' | 'cliff' | 'sky' | 'void'>
+  /** Tiles drawn with another code's look (its colour, its pattern and texture), their own numbers kept: Echoes' towers set in its
+   * ramparts drawn as the ramparts (the user: keep the walls one look), its cave's walls along the cave as its rock, as Gaiden's are. */
+  looksAs?: Record<string, TerrainCode>
   /** What each odds-and-ends tile holds, by the 3D model on it (the Tellius maps): "x,y" -> its kind. */
   props?: Record<string, 'candle' | 'box' | 'barrel' | 'cart' | 'flowerpot' | 'statue' | 'pillar' | 'sandbags' | 'gold' | 'roof'>
   /** A town packed so close that its houses show only their roofs (Radiant Dawn's Part 1 Ch.1 and Ch.3): every house tile a roof but a

@@ -1125,6 +1125,24 @@ export const BOULDER: Sprite = {
   ],
 }
 
+/** A heap of a few stones no unit crosses (Echoes' Rock and Stones, the shrines' heaps: the user, a few stones, not one boulder like
+ * the pushable rocks or rubble's three small pebbles): a stone on two at its foot. */
+export const STONE_PILE: Sprite = {
+  palette: { o: '#2b2724', g: '#8a8580', l: '#c4beb6', d: '#5e5954' },
+  rows: [
+    '..........',
+    '....ooo...',
+    '...olggo..',
+    '...ogggdo.',
+    '.ooooddoo.',
+    'olllgoolgo',
+    'olgggdolgo',
+    'ogggddogdo',
+    '.oddddoddo',
+    '..oooo.oo.',
+  ],
+}
+
 /** A gold glint: something buried here to dig up. */
 export const BURIED: Sprite = {
   palette: { y: '#c2410c', w: '#fff7ed' },
@@ -5398,6 +5416,24 @@ export const THICKET: Sprite = {
   ],
 }
 
+/** Coral (Echoes' sea shrine, which plays as its pillars: the user's review, drawn as what the game names it): red branches fanning up
+ * from its foot, their tips lit. */
+export const CORAL: Sprite = {
+  palette: { o: '#4a1a10', r: '#d2452a', R: '#9c2c18', y: '#f2a05a' },
+  rows: [
+    '..y...y...',
+    '.oro.oro.y',
+    '.oro.oro.o',
+    'yoroooro.o',
+    'oorrrrRoro',
+    '.oorrRRro.',
+    '...orRRo..',
+    '..yorRo...',
+    '...oRRo...',
+    '..oooooo..',
+  ],
+}
+
 /** A church (Genealogy of the Holy War: it heals a unit standing in it at the start of the turn): a chapel under its cross. */
 export const CHURCH: Sprite = {
   palette: { y: '#f2d27a', r: '#6f5a8c', R: '#4e3f63', w: '#e8e0d0', d: '#6b4a2a', o: '#2b2430' },
@@ -7037,6 +7073,24 @@ export const SUPPLY_BOXES: Sprite = {
   ],
 }
 
+/** Supplies that work as a fort (Echoes' 補給, which the game names apart from its forts: the user's call, a supply tile, not a fort;
+ * Gaiden's forts, which they remake, in the final pass): a grain sack tied with a red cord before a crate, in Echoes' warm orange. */
+export const SUPPLY_CACHE: Sprite = {
+  palette: { o: '#3b2614', w: '#c8783e', W: '#9a5428', l: '#e6a466', s: '#ecd09a', S: '#b8935c', t: '#a33a22' },
+  rows: [
+    '....oooooo',
+    '.tt.ollllo',
+    '..t.owwwwo',
+    '.osooWWWWo',
+    'osssowwwwo',
+    'ossssoWWWo',
+    'osssSowwwo',
+    'osssSoooo.',
+    'oSSSSo....',
+    '.oooo.....',
+  ],
+}
+
 /** An army's tent drawn whole (Radiant Dawn's camps: the user's review, tents with their door mats, not blocks), by place as a
  * house's pieces: its canvas sagging between three flagged poles along the top, seamed, a scalloped valance, and the entrance in
  * the front's middle. */
@@ -7489,6 +7543,24 @@ export const PILLAR_TOP: Sprite = {
     'oBBBBBBBBo',
     'oooooooooo',
   ],
+}
+
+/** A great pillar no unit enters seen from above, two tiles by two (Echoes' thick pillars, 太柱, in blocks: the user's review), as
+ * PILLAR_TOP drawn large: a round column's top on its square base; `quarter` its piece (a top left, b top right, c bottom left,
+ * d bottom right). */
+export function bigPillarPiece(quarter: 'a' | 'b' | 'c' | 'd'): Sprite {
+  const [ox, oy] = { a: [0, 0], b: [10, 0], c: [0, 10], d: [10, 10] }[quarter]
+  const rows = Array.from({ length: 10 }, (_, j) =>
+    Array.from({ length: 10 }, (_, i) => {
+      const [x, y] = [ox + i, oy + j]
+      if (x === 0 || x === 19 || y === 0 || y === 19) return 'o'
+      const [dx, dy] = [x - 9.5, y - 9.5]
+      const d = Math.hypot(dx, dy)
+      if (d < 6.6) return dx + dy < -5 ? 'l' : dx + dy > 2.5 ? 'C' : 'c'
+      if (d < 7.8) return 'o'
+      return x >= 17 || y >= 17 ? 'B' : 'b'
+    }).join(''))
+  return { palette: PILLAR_TOP.palette, rows }
 }
 
 /** A beach umbrella seen from above, two tiles by two (Awakening's Summer and Harvest Scrambles): its canopy in white and yellow
@@ -8132,4 +8204,6 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(ARENA_PIECES).map(([k, v]) => [`ARENA_PIECE_${k}`, v])),
   STAIRS_DOWN, SMALL_SHOP,
   ...Object.fromEntries(Object.entries(SMALL_SHOP_SIGN).map(([k, v]) => [`SMALL_SHOP_SIGN_${k}`, v])),
+  STONE_PILE, CORAL, SUPPLY_CACHE,
+  ...Object.fromEntries((['a', 'b', 'c', 'd'] as const).map((q) => [`BIG_PILLAR_${q}`, bigPillarPiece(q)])),
 }

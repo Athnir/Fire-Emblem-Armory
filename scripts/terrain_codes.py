@@ -62,6 +62,9 @@ CODES = {
     # cliffs), and a castle floor the art draws as a stone bridge's deck (Gaiden's Regal: the slabs in its river).
     'na': 'Cliff (plays as a mountain)', 'nb': "Ship's raised deck (plays as a mountain)",
     'nc': 'Stone bridge (plays as a castle floor)',
+    # Supplies the game names apart from its forts though they work as one (Echoes' 補給; Gaiden's forts, which Echoes' supplies
+    # remake: the user's call, a supply tile, not a fort), with a fort's numbers.
+    'nd': 'Supplies (plays as a fort)',
     'xa': 'Obstacle (no unit enters)',
     # Healing.
     'ha': 'Healing tile', 'hb': 'Healing thicket', 'hc': 'Chamber', 'hd': 'Healing jar', 'he': 'Beside a healing jar',
@@ -263,6 +266,9 @@ GAME['fe15'] = {
     '.': 't0', 'e': 'ga', 'u': 'gb', 'O': 't1', 'n': 't2', 'D': 't3', '0': 'w0', '%': 'wt', 'P': 'wp', '9': 'w9', 'N': 'wx', 'J': 'df',
     # Its cliffs (崖) work as its mountains, drawn as the rock they are (the user: rows of mountains read wrong).
     'V': 'na',
+    # Its supplies (補給) work as a fort, drawn as supplies (the user: they're not really forts); its broken bridges (壊れた橋) the stone
+    # bridge they are (a castle tile's numbers), and a bridge its art builds of stone stone (the bridge's numbers).
+    'U': 'nd', 'B': 'nc', '=': 't8',
 }
 
 # Shadow Dragon (scripts/build-fe11-maps.py): its sea and peaks let only some classes over (pirates, fliers); floors are indoor

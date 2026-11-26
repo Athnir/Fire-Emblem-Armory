@@ -43,19 +43,23 @@ LOAD, SETTING, OPENING, COMPLETE, TURN, TURN2, REINFORCE, CONDITION, TALK = 0x07
 # Kinds that work alike but the game names and draws apart keep their own codes (the user's call, as the Tellius games' by their terrain
 # names): plain (草原), ground and earth (地面, 地: dirt), town (街: paving), floor (床), snow (雪原) and deck (甲板); a wall (壁) or tower
 # (塔) a castle's, rock (岩), inferno (業火) as molten lava; the ship's hull (船体) a ship's side, a rampart (城壁) a castle fliers cross;
-# its poison swamp (毒沼) a swamp that hurts, apart from its lava (溶岩: the user, only fire that hurts is the cracked magma).
+# its poison swamp (毒沼) a swamp that hurts, apart from its lava (溶岩: the user, only fire that hurts is the cracked magma). Its
+# supplies (補給) work as a fort but are drawn as supplies, and its broken bridges (壊れた橋) as the stone bridge they are, with a castle
+# tile's numbers (the user's review, 2026-11-25).
 LETTER = {
     0: '#', 1: '.', 2: 'e', 3: 'f', 4: 'f', 5: 's', 6: 'w', 7: 'w', 8: 'm', 9: 'C', 10: 'b', 11: 'a', 12: 'T', 13: '0', 14: 'K',
-    15: 'S', 16: 'N', 17: 'd', 18: '#', 19: 'F', 20: 'F', 21: 'F', 22: 'H', 23: 'G', 24: 'e', 25: 'u', 26: 'u', 28: '%',
+    15: 'S', 16: 'N', 17: 'd', 18: '#', 19: 'U', 20: 'F', 21: 'F', 22: 'H', 23: 'G', 24: 'e', 25: 'u', 26: 'u', 28: '%',
     29: '#', 30: 'Y', 31: '.', 32: 'O', 33: 'J', 34: 'C', 35: '#', 36: 'C', 37: '#', 39: 'Y', 40: 'Y', 41: 'Z', 42: 'V',
-    43: 'l', 44: 'n', 45: 'r', 46: 'Q', 47: '0', 48: 'R', 49: 'd', 50: 'P', 51: 'T', 52: 'D', 53: '9', 54: 'w',
+    43: 'l', 44: 'n', 45: 'r', 46: 'Q', 47: '0', 48: 'R', 49: 'd', 50: 'P', 51: 'B', 52: 'D', 53: '9', 54: 'w',
 }
 LETTER_NAME = {
     '.': 'Plain', 'e': 'Ground', 'u': 'Town', 'O': 'Floor', 'n': 'Snow', 'D': 'Deck', '0': 'Wall', '%': 'Rock', 'P': 'Inferno',
     '9': 'Ship', 'N': 'Rampart', 'b': 'Bridge', 'S': 'Stairs', 'f': 'Forest', 's': 'Desert', 'w': 'River / shoal', 'm': 'Mountain / cliff',
-    'C': 'Peak / rampart / cavern', 'a': 'Sea', 'Z': 'Sky', 'l': 'Partition', 'r': 'Rubble', 'T': 'Castle tile / broken bridge',
-    'K': 'Bulwark', 'F': 'Fort / supplies / orange tree', 'H': 'Lava', 'J': 'Swamp', 'V': 'Cliff', 'G': 'Grave', 'Y': 'Pillar / thicket / coral',
-    'Q': 'Sigil', 'R': 'Ruin', 'd': 'Door', '#': 'Wall / rock / pillar',
+    'C': 'Peak / rampart / cavern', 'a': 'Sea', 'Z': 'Sky', 'l': 'Partition', 'r': 'Rubble', 'T': 'Castle tile', 'B': 'Bridge',
+    'K': 'Bulwark', 'F': 'Fort / orange tree', 'U': 'Supplies', 'H': 'Lava', 'J': 'Swamp', 'V': 'Cliff', 'G': 'Grave',
+    'Y': 'Pillar / thicket / coral', 'Q': 'Sigil', 'R': 'Ruin', 'd': 'Door', '#': 'Wall / rock / pillar',
+    # A bridge its art builds of stone (no row of its own: the builder's, encode_grid).
+    '=': 'Bridge',
 }
 FLIERS = 15  # the movement cost row every flying class uses (Data/Terrain.bin's COST_飛行)
 
@@ -252,6 +256,11 @@ def tile_names(win, g):
 
 def grid_rows(win, g):
     return [''.join(LETTER[g[y][x]] for x in range(win.x1, win.x2)) for y in range(win.y1, win.y2)]
+
+
+def id_rows(win, g):
+    """The window's Data/Terrain.bin rows, top row first as the grid's: what each tile is, where one letter joins several kinds."""
+    return [[g[y][x] for x in range(win.x1, win.x2)] for y in range(win.y1, win.y2)]
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------
@@ -628,7 +637,8 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
     win = Window(win)
     groups = dispos(dispos_key or key)
     m = {'id': mid, 'route': route, 'heading': heading, 'chapter': chapter, 'title': title, 'location': location,
-         'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g), 'terrainOverrides': tile_names(win, g)}
+         'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g), 'terrainOverrides': tile_names(win, g),
+         '_ids': id_rows(win, g)}
     doors = doors_of(ch, win, g) if ch else []
     rule = 'rout'
     if ch:
@@ -843,7 +853,8 @@ def dungeon_maps(base, n, act, route, key, facts_of):
         facts = facts_of(mid)
         title = f'{name}: skirmishes' + (f' ({len(maps) + 1})' if len(fields) > 1 else '')
         m = {'id': mid, 'route': route, 'heading': heading, 'chapter': n, 'title': title, 'location': name,
-             'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g), 'terrainOverrides': tile_names(win, g)}
+             'width': win.x2 - win.x1, 'height': win.y2 - win.y1, 'grid': grid_rows(win, g), 'terrainOverrides': tile_names(win, g),
+             '_ids': id_rows(win, g)}
         m['starts'] = [win.app(*u['end']) for u in groups.get('Player', []) if win.inside(*u['end'])]
         m['units'] = []
         m['victory'] = 'Rout the enemy'
@@ -1050,7 +1061,7 @@ def unit_facts(entries, facts, later=False):
 def refight_map(first, rid, title, layouts, notes, unconfirmed, groups_note):
     """A battle's later fights on its map: the layouts (label, when, units) as groups, in the third list."""
     m = {'id': rid, **{k: v for k, v in first.items() if k in ('route', 'heading', 'chapter', 'location', 'width', 'height', 'grid',
-                                                                 'terrainOverrides', 'starts', 'corrinStart', 'lord', 'defeat')}}
+                                                                 'terrainOverrides', 'starts', 'corrinStart', 'lord', 'defeat', '_ids')}}
     m.update({'title': title, 'units': [], 'victory': 'Rout the enemy', 'objectives': [], 'objects': [], 'changes': [],
               'notes': notes, 'unconfirmed': unconfirmed, 'randomSpawns': True, 'groupsNote': groups_note, '_list': 'skirmishes'})
     m['reinforcements'] = [{'id': f'{rid}-{i + 1}', 'label': label, 'when': when, 'units': [{**u, 'from': u['tile']} for u in units]}
@@ -1291,6 +1302,8 @@ def main():
     info, groups = build_terrain()
     # A small stone fort's pieces (encode_grid) work as the ramparts they stand on.
     info.update({'q' + p: dict(info['wx']) for p in 'abcdefghi'})
+    # A bridge its art builds of stone (encode_grid) works as its bridges do.
+    info['t8'] = dict(info['tb'])
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: job_label(j) for i, j in enumerate(JOBS.rows)}, fliers='')
     src = defaultdict(list)  # IID -> sources (the Rusted copies share a name but each evolves into its own weapon)
     name_iid = {}
@@ -1688,11 +1701,128 @@ def own_name(code):
 DECOR = {'fe15-4a-4a': {(3, 9): 'stairs', (10, 9): 'stairs'}}
 DIRT = {'fe15-3a-4': [(6, 3)]}
 # Duma Temple's trenches (the user, Act 5's Lich and White Dragon maps: a gap in the game, not a bridge): its walls inside the map's
-# edge drawn as a pit, their numbers kept.
+# edge drawn as the void, a drop into the dark (the user's second look: black, as its caverns), their numbers kept.
 PIT_MAPS = {'fe15-5-1c', 'fe15-5-1e'}
+
+# What one letter joins, drawn as the game names each (the user's review, 2026-11-25), by Data/Terrain.bin row.
+WALL, RAMPART, ROCK, THICK_PILLAR, CAVERN, STONES, TORCH, PARTITION, TOWER = 13, 16, 28, 29, 34, 35, 37, 43, 47
+# Its caves drawn as Gaiden draws its own (the user: Duma's altar's walls 'like in 2'): the walls along the cave its rock, its
+# partitions the rock's faces a step darker, the walls beyond them the void; the rock its cave's brown, lifted (its photos' is all but
+# black).
+CAVES = {'fe15-5-2': '#7a6249'}
+# Its bridges built of stone (the user: Rigel Falls' broken bridge, stone, not wood): stone bridges (t8, the bridge's numbers), the
+# broken bridge's tiles their deck, each railed only along its sides over the river, never across the break.
+STONE_BRIDGES = {'fe15-4a-8'}
+# Gangplanks whose boards run along them, from the ship up to the shore (the user: 2-4's (12, 8) turned the wrong way).
+PLANKS_ALONG = {'fe15-2-4'}
+# A partition its art builds as a low wall of the walls round it (Celica's ordeal's barrier, the user: not a fence).
+STONE_PARTITIONS = {'fe15-x-2': [(7, 8)]}
+
+
+def components(tiles):
+    """The tiles (a set of (x, y)) joined side by side, as lists."""
+    left, out = set(tiles), []
+    while left:
+        part, todo = [], [left.pop()]
+        while todo:
+            t = todo.pop()
+            part.append(t)
+            for n in ((t[0] + 1, t[1]), (t[0] - 1, t[1]), (t[0], t[1] + 1), (t[0], t[1] - 1)):
+                if n in left:
+                    left.remove(n)
+                    todo.append(n)
+        out.append(part)
+    return out
+
+
+def lightness(hexc):
+    r, g, b = (int(hexc[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    return (max(r, g, b) + min(r, g, b)) / 2
+
+
+def game_looks(m, ids):
+    """The looks of what one letter joins, by each tile's game terrain (`ids`: its rows, top first)."""
+    w, h = m['width'], m['height']
+    at = {(x, y): ids[h - y][x - 1] for y in range(1, h + 1) for x in range(1, w + 1)}
+    code = {(x, y): m['grid'][h - y][2 * (x - 1):2 * x] for y in range(1, h + 1) for x in range(1, w + 1)}
+
+    def key(t):
+        return f'{t[0]},{t[1]}'
+
+    def near(t):
+        return [(t[0] + dx, t[1] + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy]
+
+    decor, looks, as_ = m.setdefault('decor', {}), m.setdefault('wallLooks', {}), m.setdefault('looksAs', {})
+    # Thick pillars (太柱): a block of them in the map's outer wall that wall (the user: Duma Temple's along its edge, the lighter
+    # (6, 1) kind); one on a ship its mast (MapViewer's, by the deck beside it); else pillars, a block two by two one great pillar.
+    for part in components({t for t, i in at.items() if i == THICK_PILLAR}):
+        if any(code.get((t[0] + dx, t[1] + dy)) == 't3' for t in part for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            continue
+        edge = any(t[0] in (1, w) or t[1] in (1, h) for t in part)
+        if edge and any(at.get(n) == WALL for t in part for n in near(t)):
+            as_.update({key(t): 'w0' for t in part})
+        else:
+            decor.update({key(t): 'thickPillar' for t in part})
+    has_ramparts = any(v == RAMPART for v in at.values())
+    for t, i in at.items():
+        # Torches (篝火) are candlesticks (the user's word); rocks (岩) and stones (積み石) heaps of a few stones (the user: stones and
+        # rubble, not cliffs or bricks).
+        if i == TORCH:
+            decor[key(t)] = 'torch'
+        elif i in (ROCK, STONES):
+            decor[key(t)] = 'stones'
+        # A cavern (空洞) the art leaves black is the void, a drop into the dark (the user: not a black cliff).
+        elif i == CAVERN and code[t] == 'wb' and lightness((m.get('fills') or {}).get('wb', '#ffffff')) < 0.06:
+            looks[key(t)] = 'void'
+        # A tower (塔) set in ramparts is drawn as them (the user: keep the walls one look, though its art is lighter).
+        elif i == TOWER and has_ramparts:
+            as_[key(t)] = 'wx'
+    if m['id'] in PIT_MAPS:
+        # every wall inside the map's edge: the trench (Lich's U, the White Dragon's H)
+        for (x, y), c in code.items():
+            if 1 < x < w and 1 < y < h and c in ('w0', 'wx'):
+                looks[key((x, y))] = 'void'
+    if m['id'] in CAVES:
+        m.setdefault('fills', {})['wt'] = CAVES[m['id']]
+        for t, i in at.items():
+            if i == PARTITION:
+                looks[key(t)] = 'rock'
+            elif i == WALL:
+                if any(at.get(n) not in (None, WALL) for n in near(t)):
+                    as_[key(t)] = 'wt'
+                else:
+                    looks[key(t)] = 'void'
+    for t in STONE_PARTITIONS.get(m['id'], []):
+        looks[key(t)] = 'stone'
+        fills = m.setdefault('fills', {})
+        if 'w0' in fills:
+            fills['wg'] = fills['w0']
+    if m['id'] in STONE_BRIDGES:
+        m['grid'] = [''.join('t8' if r[i:i + 2] == 'tb' else r[i:i + 2] for i in range(0, len(r), 2)) for r in m['grid']]
+        code = {t: ('t8' if c == 'tb' else c) for t, c in code.items()}
+        stone = ('t8', 'nc')
+
+        def land(ts):
+            return sum(1 for t in ts if t in code and code[t] not in stone and code[t] not in ('tg', 'we', 'wl'))
+
+        for part in components({t for t, c in code.items() if c in stone}):
+            # Its span runs to the land at its ends: north and south, or east and west.
+            ns = land([(t[0], t[1] + 1) for t in part] + [(t[0], t[1] - 1) for t in part])
+            ew = land([(t[0] + 1, t[1]) for t in part] + [(t[0] - 1, t[1]) for t in part])
+            m.setdefault('bridgeSpans', {}).update({key(t): 'ns' if ns >= ew else 'ew' for t in part})
+    if m['id'] in PLANKS_ALONG:
+        for part in components({t for t, c in code.items() if c == 'tb'}):
+            # A gangplank running north to south has its boards upright (drawn as a span east to west), one running east to west its
+            # boards laid along it.
+            tall = len({t[1] for t in part}) > len({t[0] for t in part})
+            m.setdefault('bridgeSpans', {}).update({key(t): 'ew' if tall else 'ns' for t in part})
+    for k in ('decor', 'wallLooks', 'looksAs'):
+        if not m[k]:
+            del m[k]
 
 
 def encode_grid(m):
+    ids = m.pop('_ids', None)
     m['grid'] = [''.join(encode(GAME, c) for c in row) for row in m['grid']]
     # Its small stone forts drawn whole, as Gaiden's are (map_pieces.small_forts).
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
@@ -1707,13 +1837,8 @@ def encode_grid(m):
     art_ground.apply(m, g, own_name)
     for (x, y), kind in DECOR.get(m['id'], {}).items():
         m.setdefault('decor', {})[f'{x},{y}'] = kind
-    if m['id'] in PIT_MAPS:
-        # every wall inside the map's edge: the trench (Lich's U, the White Dragon's H)
-        h = m['height']
-        for y in range(2, h):
-            for x in range(2, m['width']):
-                if m['grid'][h - y][2 * (x - 1):2 * x] in ('w0', 'wx'):
-                    m.setdefault('wallLooks', {})[f'{x},{y}'] = 'pit'
+    if ids:
+        game_looks(m, ids)
     if not m.get('terrainOverrides'):
         m.pop('terrainOverrides', None)
     return m
