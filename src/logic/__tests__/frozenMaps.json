@@ -301,8 +301,8 @@
    "fe7-e-29": "1893124a6970a88557a1",
    "fe7-e-29x": "00ab98ed3e87f1cfca42",
    "fe7-e-30": "d29dcbfc92aff9ef49a5",
-   "fe7-e-final": "e115d4a60db592bccdff",
-   "fe7-e-final-2": "1a2ca1b3e71c0a9b26b6",
+   "fe7-e-final": "ba1baf61cff2d53fc33f",
+   "fe7-e-final-2": "e6052fa7af327fa784a0",
    "fe7-h-11": "325a58b7522854c5a7a8",
    "fe7-h-12": "37a712da0fc58f30be36",
    "fe7-h-13": "71c3782a5ce4a0db7327",
@@ -335,12 +335,12 @@
    "fe7-h-31x": "11c2bec4a11e4b51fdcb",
    "fe7-h-32": "c80065a6aeb25958f7c7",
    "fe7-h-32x": "cd0c7d646d78cf819bb2",
-   "fe7-h-final": "e115d4a60db592bccdff",
-   "fe7-h-final-2": "1a2ca1b3e71c0a9b26b6"
+   "fe7-h-final": "ba1baf61cff2d53fc33f",
+   "fe7-h-final-2": "e6052fa7af327fa784a0"
   }
  },
  "fe8": {
-  "frozen": "2026-11-24",
+  "frozen": "2026-11-26",
   "maps": {
    "fe8-prologue": "b8b89dc114271d83187a",
    "fe8-1": "591acc6fe1281bd71d92",
@@ -366,13 +366,13 @@
    "fe8-eirika-20": "960a5037eb32d9b3ce85",
    "fe8-eirika-final": "1df80c6bc6e62b43d997",
    "fe8-eirika-final-2": "c5c035dac363098ffa56",
-   "fe8-ephraim-9": "efaacbb86b21e9a5c36c",
+   "fe8-ephraim-9": "48458f9317d73dedf64f",
    "fe8-ephraim-10": "67eef95499d967181d1e",
    "fe8-ephraim-11": "c966fa7533ee0dd72d9a",
    "fe8-ephraim-12": "994c778475ea6c1ae588",
-   "fe8-ephraim-13": "db798379bd03ae9c04a8",
+   "fe8-ephraim-13": "c7e1e800d6dbdd604d3f",
    "fe8-ephraim-14": "a4a782aeeb2ecfdb8fdf",
-   "fe8-ephraim-15": "d795f999d23aac643008",
+   "fe8-ephraim-15": "8f53e50a424158c91582",
    "fe8-ephraim-16": "da1982653c605f8ea002",
    "fe8-ephraim-17": "b748e79a10580f1ec0eb",
    "fe8-ephraim-18": "65e5f5293f85048052eb",

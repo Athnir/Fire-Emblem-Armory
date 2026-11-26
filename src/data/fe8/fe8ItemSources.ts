@@ -251,6 +251,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-12",
+      "kind": "kit-later",
+      "text": "Carried by Ewan on joining"
+    },
+    {
+      "mapId": "fe8-eirika-12",
       "kind": "shop",
       "text": "Sold at the vendor"
     },
@@ -315,9 +320,19 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Gerik on joining"
     },
     {
+      "mapId": "fe8-ephraim-14",
+      "kind": "kit-later",
+      "text": "Carried by Knoll, who joins at the end of the chapter"
+    },
+    {
       "mapId": "fe8-ephraim-15",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe8-ephraim-16",
+      "kind": "kit",
+      "text": "Carried by Myrrh on joining"
     },
     {
       "mapId": "fe8-ephraim-20",
@@ -469,11 +484,6 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory"
     },
     {
-      "mapId": "fe8-eirika-19",
-      "kind": "kit",
-      "text": "Carried by Rausten on joining"
-    },
-    {
       "mapId": "fe8-ephraim-10",
       "kind": "kit-later",
       "text": "Carried by Cormag on joining"
@@ -487,11 +497,6 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe8-ephraim-17",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe8-ephraim-19",
-      "kind": "kit",
-      "text": "Carried by Rausten on joining"
     },
     {
       "mapId": "fe8-2",
@@ -1025,6 +1030,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe8-ephraim-15",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe8-ephraim-16",
+      "kind": "kit",
+      "text": "Carried by Myrrh on joining"
     },
     {
       "mapId": "fe8-ephraim-17",
@@ -1795,6 +1805,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe8-eirika-12",
+      "kind": "kit-later",
+      "text": "Carried by Ewan on joining"
+    },
+    {
+      "mapId": "fe8-eirika-12",
       "kind": "shop",
       "text": "Sold at the vendor"
     },
@@ -2348,6 +2363,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
+      "mapId": "fe8-ephraim-14",
+      "kind": "kit-later",
+      "text": "Carried by Knoll, who joins at the end of the chapter"
+    },
+    {
       "mapId": "fe8-ephraim-15",
       "kind": "shop",
       "text": "Sold at the vendor"
@@ -2736,6 +2756,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
     }
   ],
   "Energy Ring": [
+    {
+      "mapId": "fe8-eirika-12",
+      "kind": "kit-later",
+      "text": "Carried by Ewan on joining"
+    },
     {
       "mapId": "fe8-ephraim-13",
       "kind": "drop",
@@ -4636,6 +4661,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
+      "mapId": "fe8-ephraim-14",
+      "kind": "kit-later",
+      "text": "Carried by Knoll, who joins at the end of the chapter"
+    },
+    {
       "mapId": "fe8-ephraim-17",
       "kind": "drop",
       "text": "Dropped by Lyon"
@@ -4772,6 +4802,11 @@ export const FE8_ITEM_SOURCES: Record<string, ItemSource[]> = {
   "Dragonstone": [
     {
       "mapId": "fe8-eirika-16",
+      "kind": "kit",
+      "text": "Carried by Myrrh on joining"
+    },
+    {
+      "mapId": "fe8-ephraim-16",
       "kind": "kit",
       "text": "Carried by Myrrh on joining"
     }

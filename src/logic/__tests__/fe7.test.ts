@@ -388,11 +388,12 @@ describe("The Blazing Blade's weapons, triangle and supports", () => {
     expect(erik('Horseslayer').map((s) => s.difficulties)).toEqual([['Hard']])
     // Fiora brings an Axereaver on Hard.
     expect(FE7_ITEM_SOURCES['Axereaver'].filter((s) => s.text === 'Carried by Fiora on joining').map((s) => s.difficulties)).toEqual([['Hard'], ['Hard']])
-    // Nothing else gives a Spear or an Aura on Hard, or a Purge on Normal, so the foes who carry them there are said (on that one).
+    // Nothing else gives an Aura on Hard, or a Purge on Normal, so the foes who carry them there are said (on that one).
     const on = (item: string, d: string) => FE7_ITEM_SOURCES[item].filter((s) => !s.difficulties || s.difficulties.includes(d))
-    expect(on('Spear', 'Hard').every((s) => s.kind === 'foe' || s.kind.startsWith('foe-'))).toBe(true)
-    expect(on('Spear', 'Hard').map((s) => s.text)).toContain('Carried by Darin, a foe')
     expect(on('Aura', 'Hard').map((s) => s.text)).toContain('Carried by Kenneth, a foe')
+    // Vaida brings her Spear when a talk recruits her in Cog of Destiny, on both difficulties, so no foe's Spear is said: Eubans's
+    // drop on Normal stays.
+    expect(FE7_ITEM_SOURCES['Spear'].map((s) => `${s.mapId} ${s.kind}`)).toEqual(['fe7-e-21 drop', 'fe7-e-27 kit-later', 'fe7-h-22 drop', 'fe7-h-29 kit-later'])
     expect(on('Purge', 'Normal').length).toBeGreaterThan(0)
     // Lyn's story is played on Normal only: its lines say nothing about difficulty.
     for (const list of Object.values(FE7_ITEM_SOURCES)) for (const s of list) if (s.mapId.startsWith('fe7-lyn')) expect(s.difficulties).toBeUndefined()
@@ -433,5 +434,62 @@ describe("The Blazing Blade's maps, the user's notes (2026-11-23)", () => {
     for (const m of FE7_MAPS) for (const rule of ['wideBridges', 'deckShops', 'sandYards', 'clearSigns'] as const) expect(m[rule], `${m.id} ${rule}`).toBe(true)
     // Eliwood 13's short bridge two tiles tall in a river running north to south: laid east to west.
     expect(wideBridgeSpans(map('fe7-e-13')).get('11,2')).toBe('ew')
+  })
+})
+
+describe("The Blazing Blade's look-over fixes (the user's marks, 2026-11-26)", () => {
+  const where = (item: string, text: RegExp) => (FE7_ITEM_SOURCES[item] ?? []).filter((s) => text.test(s.text)).map((s) => `${s.mapId} ${s.kind}`)
+  const groups = (id: string) => map(id).reinforcements ?? []
+
+  it("plays both answers of Pale Flower of Darkness's turn-10 check: Harken, or Karel", () => {
+    // Kenneth's version (0x0807D4ED): Harken if at most one of flags 9-11 is set, which the three promoted foes' deaths set.
+    const harken = groups('fe7-e-25-kenneth').find((g) => g.units.some((u) => u.name === 'Harken'))!
+    expect(harken.when).toBe('Turn 10, your phase, if at most one of the Sage at (4, 12), the Druid at (3, 24) and the Bishop at (14, 13) is defeated')
+    expect(harken.units[0].talk).toBe('Recruit: talk with Eliwood or Hector or Oswin or Lowen or Marcus or Isadora')
+    expect(map('fe7-e-25-kenneth').joiners!.find((j) => j.name === 'Karel')!.when).toBe(
+      'Turn 10, your phase, if two or more of the Sage at (4, 12), the Druid at (3, 24) and the Bishop at (14, 13) are defeated',
+    )
+    // Jerme's (0x0807D529): Harken if at most 3 of flags 9-0x11 are set, the nine doors' own.
+    expect(groups('fe7-h-27-jerme').find((g) => g.units.some((u) => u.name === 'Harken'))!.when).toBe('Turn 10, your phase, if at most three of its nine doors are opened')
+    expect(map('fe7-h-27-jerme').joiners!.find((j) => j.name === 'Karel')!.when).toBe('Turn 10, your phase, if four or more of its nine doors are opened')
+    expect(where('Brave sword', /Harken/)).toEqual(['fe7-e-25-kenneth kit-later', 'fe7-e-25-jerme kit-later', 'fe7-h-27-kenneth kit-later', 'fe7-h-27-jerme kit-later'])
+  })
+
+  it("places Karla in Hector's 31x if Bartre is deployed as a Warrior of Lv 5 or more, and says what their fight does", () => {
+    const karla = map('fe7-h-31x').joiners!.find((j) => j.name === 'Karla')!
+    expect(karla.when).toBe('Turn 1, your phase, if Bartre is deployed as a Warrior of Lv 5 or more')
+    expect(karla.talk).toBe(
+      'Recruit: talk with Bartre: if Bartre holds a weapon he can use, the two fight, and she joins your army if both survive it (one who falls dies); without one, she leaves the map',
+    )
+    expect(where('Wo Dao', /Karla/)).toEqual(['fe7-h-31x kit-later'])
+  })
+
+  it("plays Cog of Destiny's turn events with their areas' flags set, pass by pass: Vaida's on the first", () => {
+    for (const id of ['fe7-e-27', 'fe7-h-29']) {
+      expect(groups(id).length, id).toBe(6)
+      for (const g of groups(id)) expect(g.areas, `${id} ${g.id}`).toHaveLength(1)
+      const vaida = groups(id).find((g) => g.units.some((u) => u.name === 'Vaida'))!
+      expect(vaida.when).toBe('Your phase, the turn after one of your units stops in the marked area, unless more than 49 foes are on the map')
+      expect(vaida.areas).toEqual([{ who: 'player', rect: [1, 12, 16, 27] }])
+      // Her load is skipped once her death (any chapter) has set flag 0x89.
+      expect(vaida.units.find((u) => u.name === 'Vaida')!.note).toBe('Lv 9 Wyvern Lord; placed only if not defeated in an earlier chapter')
+    }
+    expect(groups('fe7-e-27')[0].when).toBe('Your phase, 1, 3, 5 and 7 turns after one of your units stops in the marked area')
+    expect(where('Spear', /Vaida/)).toEqual(['fe7-e-27 kit-later', 'fe7-h-29 kit-later'])
+  })
+
+  it("has Nils join at the end of Cog of Destiny, and Matthew and Serra in Eliwood's Chapter 12", () => {
+    // New Resolve's opening makes Nils a unit in the not-yet-joined state (0x72 with 0x10000); Ninis's Grace and the Elixir are
+    // Ninian's. Cog of Destiny's end loads him with the record's Vulnerary.
+    for (const item of ["Ninis's Grace", 'Elixir']) expect(where(item, /Nils/), item).toEqual([])
+    expect(where('Vulnerary', /Nils/)).toEqual(['fe7-lyn-7 kit', 'fe7-e-27 kit-later', 'fe7-h-29 kit-later'])
+    // Chapter 12's turn 4 loads them as yours; 0x6F only hides your units, so they're yours from Chapter 13 (not 16x's reload).
+    expect(where('Lockpick', /Matthew/)).toEqual(['fe7-lyn-6 kit-later', 'fe7-e-12 kit-later', 'fe7-h-11 kit'])
+    expect(where('Heal', /Serra/)).toEqual(['fe7-lyn-5 kit-later', 'fe7-e-12 kit-later', 'fe7-h-12 kit'])
+  })
+
+  it("names the Final Chapter's two maps by their goals, the game's own text", () => {
+    expect([map('fe7-e-final').title, map('fe7-e-final-2').title]).toEqual(['Light (Defeat the dark druid, Nergal)', 'Light (Defeat the ancient fire dragon)'])
+    expect(map('fe7-h-19x-2').heading).toBe('Ch.19x pt 2')
   })
 })

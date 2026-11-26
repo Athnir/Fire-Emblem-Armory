@@ -233,8 +233,9 @@ class Chapter:
         run.run(self.ev['opening'])
         if run.prep:
             # The preparations screen: your army deploys on its group's tiles (the same group on every difficulty), the units the
-            # opening put on the map with it.
-            run.units = [u for u in run.units if u['side'] != 'player']
+            # opening put on the map before it with it; those the opening places after it stay where it leaves them (Tana in
+            # Ephraim's Chapter 9; Eirika, Innes and Saleh in Ephraim's 15, 0x089FC890).
+            run.units = [u for u in run.units if u['side'] != 'player' or u.get('after_prep')]
             run.load(self.ev['army'], army=True)
         for e in self.turns:
             if self.is_opening(e) and fe.ROM.is_ptr(e['ptr']):
@@ -438,11 +439,16 @@ def build_units(ch, m, source):
         if not army:
             m['starts'] = [m['corrinStart']]
     forced = []
-    # A unit the opening scene loads as yours joins here, even when it leaves the map before the battle.
+    # A unit the opening scene loads as yours joins here, even when it leaves the map before the battle; not a cutscene's (a load's
+    # variant 1, as Ewan, Cormag and Myrrh in the scenes of the routes' Chapters 10 and 11), nor one the same run deletes again (0x34
+    # variants 13-15: Chapter 19's Knight, an army's 'Rausten' with no portrait, struck down in its opening scene, 0x089F8524), nor a
+    # character an army's name stands for.
     for d, run in runs.items():
-        for _, grp, in_army in run.loads:
+        for (_, grp, in_army), variant in zip(run.loads, run.variants):
+            if in_army or variant == 1:
+                continue
             for g in grp:
-                if g['side'] == 'player' and not in_army:
+                if g['side'] == 'player' and g['char'] not in run.deleted and personal(g['char']):
                     for i in g['items']:
                         source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'], ds=[d])
     prep = runs['Normal'].prep
@@ -450,8 +456,12 @@ def build_units(ch, m, source):
         if u['army']:
             continue
         if u['side'] == 'player':
-            if u['char'] != lord_id and not prep:
+            # Forced: what a chapter without preparations places, and what one with them places after the screen.
+            if u['char'] != lord_id and (not prep or u.get('after_prep')):
                 f = {'name': NAMES.get(u['char'], '?'), 'tile': gm.to_app(u['tile'], h)}
+                # On the difficulties it stands there on, where not all (Chapter 3: Easy's opening moves Neimi, 0x089F12E0).
+                if len(ds) < len(DIFFS):
+                    f['difficulties'] = ds
                 if f not in forced:
                     forced.append(f)
             for i in u['items']:
@@ -907,9 +917,12 @@ def build_locations(ch, m, source):
             text = f'Given to {NAMES.get(who, "your army")} at the end of the chapter if {cond}'
             source(i, m['id'], 'event-later', text)
             m['notes'].append(f'{item_name(i)}: {text[0].lower() + text[1:]}.')
-    for _, grp, _ in end.loads:
+    # Who joins there: the end's loads for yours, and those an end scene makes while another map is up (0x25: Knoll at the end of
+    # Ephraim's Chapter 14, 0x089FC414, on map 0x46), a cutscene's variant 1 left out.
+    offmap = [(ptr, grp, None) for ptr, grp, v in end.offmap if v != 1]
+    for _, grp, _ in end.loads + offmap:
         for u in grp:
-            if u['side'] == 'player':
+            if u['side'] == 'player' and personal(u['char']):
                 for i in u['items']:
                     source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')}, who joins at the end of the chapter",
                            who=u['char'])
@@ -1273,8 +1286,10 @@ def main():
         # Looters and the units that leave the map, with the exits they head for.
         gba_ai.settle(m, AI, entry, lambda xy: gm.to_app(xy, h))
         gba_doors.note_closings(m, closings)
-        loaded = {g['char'] for d in DIFFS for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
-                  if g['side'] == 'player'}
+        # Who the opening has joined: its loads for yours but a cutscene's (variant 1: Myrrh on Ephraim's Chapter 11's ship, who
+        # joins in 16), whose units stay yours (not deleted again).
+        loaded = {g['char'] for d in DIFFS for run in [ch.opening(d)] for (_, grp, in_army), v in zip(run.loads, run.variants)
+                  if not in_army and v != 1 for g in grp if g['side'] == 'player' and g['char'] not in run.deleted}
         joined[route] |= set(joining) | loaded
         del m['lordId']
         # What the art shows on a tile its terrain doesn't say (the user's calls): the rope coils on Chapter 9's ship, its sides in the

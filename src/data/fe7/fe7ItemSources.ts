@@ -45,6 +45,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-12",
+      "kind": "kit-later",
+      "text": "Carried by Matthew on joining"
+    },
+    {
+      "mapId": "fe7-e-12",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -78,11 +83,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-15",
       "kind": "shop",
       "text": "Sold at the armory"
-    },
-    {
-      "mapId": "fe7-e-16x",
-      "kind": "kit",
-      "text": "Carried by Matthew on joining"
     },
     {
       "mapId": "fe7-e-17",
@@ -279,6 +279,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe7-e-12",
+      "kind": "kit-later",
+      "text": "Carried by Serra on joining"
+    },
+    {
+      "mapId": "fe7-e-12",
       "kind": "shop",
       "text": "Sold at the vendor"
     },
@@ -357,6 +362,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-23-linus",
       "kind": "shop",
       "text": "Sold at the vendor"
+    },
+    {
+      "mapId": "fe7-e-27",
+      "kind": "kit-later",
+      "text": "Carried by Nils, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-e-28",
@@ -484,6 +494,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-25",
       "kind": "kit-later",
       "text": "Carried by Farina on joining"
+    },
+    {
+      "mapId": "fe7-h-29",
+      "kind": "kit-later",
+      "text": "Carried by Nils, who joins at the end of the chapter"
     },
     {
       "mapId": "fe7-h-31x",
@@ -1302,6 +1317,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the vendor"
     },
     {
+      "mapId": "fe7-e-12",
+      "kind": "kit-later",
+      "text": "Carried by Serra on joining"
+    },
+    {
       "mapId": "fe7-e-13",
       "kind": "shop",
       "text": "Sold at the vendor"
@@ -2059,8 +2079,8 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Matthew on joining"
     },
     {
-      "mapId": "fe7-e-16x",
-      "kind": "kit",
+      "mapId": "fe7-e-12",
+      "kind": "kit-later",
       "text": "Carried by Matthew on joining"
     },
     {
@@ -4843,6 +4863,16 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by a foe Cavalier"
     },
     {
+      "mapId": "fe7-e-27",
+      "kind": "foe-later",
+      "text": "Carried by a foe Cavalier arriving mid-chapter"
+    },
+    {
+      "mapId": "fe7-e-27",
+      "kind": "foe-later",
+      "text": "Carried by a foe Wyvern Rider arriving mid-chapter"
+    },
+    {
       "mapId": "fe7-e-29",
       "kind": "foe-later",
       "text": "Carried by a foe Knight arriving mid-chapter"
@@ -4907,6 +4937,19 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Normal"
       ]
+    },
+    {
+      "mapId": "fe7-h-29",
+      "kind": "foe-later",
+      "text": "Carried by a foe Cavalier arriving mid-chapter",
+      "difficulties": [
+        "Normal"
+      ]
+    },
+    {
+      "mapId": "fe7-h-29",
+      "kind": "foe-later",
+      "text": "Carried by a foe Wyvern Rider arriving mid-chapter"
     },
     {
       "mapId": "fe7-h-31",
@@ -4990,14 +5033,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Spear": [
     {
-      "mapId": "fe7-e-19",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
       "mapId": "fe7-e-21",
       "kind": "drop",
       "text": "Dropped by Eubans",
@@ -5006,36 +5041,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
-      "mapId": "fe7-e-21",
-      "kind": "foe",
-      "text": "Carried by Eubans, a foe",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe7-e-22x",
-      "kind": "foe",
-      "text": "Carried by a foe General",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe7-e-24",
-      "kind": "foe",
-      "text": "Carried by Vaida, a foe",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe7-h-20",
-      "kind": "foe",
-      "text": "Carried by Darin, a foe",
-      "difficulties": [
-        "Hard"
-      ]
+      "mapId": "fe7-e-27",
+      "kind": "kit-later",
+      "text": "Carried by Vaida on joining"
     },
     {
       "mapId": "fe7-h-22",
@@ -5046,44 +5054,9 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     },
     {
-      "mapId": "fe7-h-22",
-      "kind": "foe",
-      "text": "Carried by Eubans, a foe",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe7-h-23x",
-      "kind": "foe",
-      "text": "Carried by a foe General",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe7-h-25",
-      "kind": "foe",
-      "text": "Carried by Pascal, a foe",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe7-h-26",
-      "kind": "foe",
-      "text": "Carried by Vaida, a foe",
-      "difficulties": [
-        "Hard"
-      ]
-    },
-    {
-      "mapId": "fe7-h-31",
-      "kind": "foe",
-      "text": "Carried by a foe General",
-      "difficulties": [
-        "Hard"
-      ]
+      "mapId": "fe7-h-29",
+      "kind": "kit-later",
+      "text": "Carried by Vaida on joining"
     }
   ],
   "Elixir": [
@@ -5099,11 +5072,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-e-19",
       "kind": "shop",
       "text": "Sold at the secret shop"
-    },
-    {
-      "mapId": "fe7-e-20",
-      "kind": "kit",
-      "text": "Carried by Nils on joining"
     },
     {
       "mapId": "fe7-e-20",
@@ -5170,11 +5138,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-20",
       "kind": "shop",
       "text": "Sold at the secret shop"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "kit",
-      "text": "Carried by Nils on joining"
     },
     {
       "mapId": "fe7-h-21",
@@ -5431,28 +5394,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "In a chest"
     }
   ],
-  "Ninis's Grace": [
-    {
-      "mapId": "fe7-e-20",
-      "kind": "kit",
-      "text": "Carried by Nils on joining"
-    },
-    {
-      "mapId": "fe7-e-20",
-      "kind": "kit",
-      "text": "Carried by Ninian on joining"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "kit",
-      "text": "Carried by Nils on joining"
-    },
-    {
-      "mapId": "fe7-h-21",
-      "kind": "kit",
-      "text": "Carried by Ninian on joining"
-    }
-  ],
   "Poison bow": [
     {
       "mapId": "fe7-e-20",
@@ -5666,6 +5607,18 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Normal"
       ]
+    }
+  ],
+  "Ninis's Grace": [
+    {
+      "mapId": "fe7-e-20",
+      "kind": "kit",
+      "text": "Carried by Ninian on joining"
+    },
+    {
+      "mapId": "fe7-h-21",
+      "kind": "kit",
+      "text": "Carried by Ninian on joining"
     }
   ],
   "Wyrmslayer": [
@@ -6149,6 +6102,28 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
+  "Brave sword": [
+    {
+      "mapId": "fe7-e-25-kenneth",
+      "kind": "kit-later",
+      "text": "Carried by Harken on joining"
+    },
+    {
+      "mapId": "fe7-e-25-jerme",
+      "kind": "kit-later",
+      "text": "Carried by Harken on joining"
+    },
+    {
+      "mapId": "fe7-h-27-kenneth",
+      "kind": "kit-later",
+      "text": "Carried by Harken on joining"
+    },
+    {
+      "mapId": "fe7-h-27-jerme",
+      "kind": "kit-later",
+      "text": "Carried by Harken on joining"
+    }
+  ],
   "Wo Dao": [
     {
       "mapId": "fe7-e-25-kenneth",
@@ -6169,6 +6144,11 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-27-jerme",
       "kind": "kit-later",
       "text": "Carried by Karel on joining"
+    },
+    {
+      "mapId": "fe7-h-31x",
+      "kind": "kit-later",
+      "text": "Carried by Karla on joining"
     }
   ],
   "Talisman": [
@@ -6611,26 +6591,6 @@ export const FE7_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe7-h-final",
       "kind": "drop",
       "text": "Dropped by Lloyd"
-    }
-  ],
-  "Brave sword": [
-    {
-      "mapId": "fe7-e-final",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
-    },
-    {
-      "mapId": "fe7-h-32x",
-      "kind": "foe",
-      "text": "Carried by a foe Hero",
-      "difficulties": [
-        "Normal"
-      ]
-    },
-    {
-      "mapId": "fe7-h-final",
-      "kind": "foe",
-      "text": "Carried by Linus, a foe"
     }
   ],
   "Basilikos": [

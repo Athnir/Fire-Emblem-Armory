@@ -239,9 +239,13 @@ class Run:
         cmds = script(ptr)
         labels = {args[0]: k for k, (_, op, args) in enumerate(cmds) if op == 0x1B}
         k = 0
+        # The flags whose being set would have skipped what's played now: a 0x22 not taken, to a label further on (Chapter 15's
+        # opening places Perceval only while flags 0x71 and 0x6F are clear). A loaded unit keeps them as 'unless'.
+        skips = []
         for _ in range(limit):
             a, op, args = cmds[k]
             jump = None
+            skips = [(f, end) for f, end in skips if end > k]
             if op in (0x00, 0x01):
                 return self
             if op == 0x1C:
@@ -259,14 +263,18 @@ class Run:
                 v = args[1] in self.world.flags
                 if (op == 0x22) == v:
                     jump = args[0]
+                elif op == 0x22 and labels.get(args[0], -1) > k:
+                    skips.append((args[1], labels[args[0]]))
             elif op == 0x24:
                 if self.world.active == args[1]:
                     jump = args[0]
             elif op in (0x12, 0x13):
                 group = unit_group(args[0])
                 self.loads.append((op, args[0], group))
+                unless = sorted({f for f, _ in skips})
                 for u in group:
-                    self.units.append({**u, 'tile': u['end'], 'group': args[0], 'army': op == 0x13})
+                    self.units.append({**u, 'tile': u['end'], 'group': args[0], 'army': op == 0x13,
+                                       **({'unless': unless} if unless else {})})
             elif op == 0x0D:
                 src, dst = tile(args[0]), tile(args[1])
                 u = next((u for u in self.units if u['tile'] == src), None)

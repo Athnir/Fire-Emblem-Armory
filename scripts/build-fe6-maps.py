@@ -326,11 +326,30 @@ def area_who(e):
     return 'a unit of any army'
 
 
+VILLAGE_TILES = {3, 4}  # Village, Closed village
+VISIT = 0x0E             # a location event's visit command (byte 10)
+
+
+def visit_kind(ch, e):
+    """'village' or 'house': what a visit event stands on, by its tile's terrain. A type 6 is a village's; a type 5 with the visit
+    command is a house's, but Chapter 23's at (23, 9), where Karel waits, stands on a village (terrain 3)."""
+    if e['type'] == 6:
+        return 'village'
+    grid = getattr(ch, 'grid', None)
+    x, y = e['b'][0], e['b'][1]
+    return 'village' if grid and grid[y][x] in VILLAGE_TILES else 'house'
+
+
+def visitors(ptr):
+    """The characters a visit's script tells apart (0x24: goto if the acting unit is one)."""
+    return sorted({args[1] for _, op, args in fe.script(ptr) if op == 0x24})
+
+
 def place(ch, e):
     """'the village at (4, 19)': what a location event's tile is, named as the map shows it."""
     x, y = e['b'][0] + 1, ch.h - e['b'][1]
     if e['type'] == 5:
-        kind = 'seize point' if e['b'][2] == 0x0F else 'house'
+        kind = 'seize point' if e['b'][2] == 0x0F else visit_kind(ch, e) if e['b'][2] == VISIT else 'house'
     else:
         kind = {6: 'village', 7: 'chest', 8: 'door', 10: 'shop'}.get(e['type'], 'tile')
     return f'the {kind} at ({x}, {y})'
@@ -484,6 +503,7 @@ def main():
         gba_ground.looks('fe6', tileset, art, tiles, grid, letters)
         letter_of = lambda t: gba_walls.letter('fe6', tileset, entry, t, terrain_of(t), TERRAIN[terrain_of(t)][0])  # noqa: E731
         ch = Chapter(entry, map_id, h)
+        ch.grid = grid  # the terrain under each tile, which names a visit's village or house (visit_kind)
         doors = doors_of(ch, changes)
         events = changes_of(ch, changes)
         # The opening's changes are made before the battle: the map starts with them.
@@ -640,12 +660,18 @@ def talks_of(ch):
         else:
             continue
         events.append((e, a, b, conds))
+    selfs = {}
     for e, a, b, conds in events:
         run = fe.Run(fe.World(active=a)).run(e['ptr'])
-        t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'green': [], 'talk': [], 'gives': [], 'when': None, 'b': b})
-        who = NAMES.get(a, '?')
         cmds = fe.script(e['ptr'])
         sides = [args for _, op, args in cmds if op == 0x2B]
+        if [a, 0] in sides and [b, 0] not in sides:
+            # The talk makes its first character yours (Chapter 4's, Clarine with Roy). Only that one can start it (the Talk
+            # check tests the acting unit, then the target: 0x0802111C -> 0x0806AF4C), so it's said on them, by what their AI does.
+            selfs.setdefault(NAMES.get(a, '?'), (a, b))
+            continue
+        t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'green': [], 'talk': [], 'gives': [], 'when': None, 'b': b})
+        who = NAMES.get(a, '?')
         for c, side in sides:
             if c != b and side == 64:
                 ch.squads[c] = NAMES.get(b, '?')
@@ -697,7 +723,68 @@ def talks_of(ch):
             listed = ' and '.join(kinds) if len(kinds) < 3 else ', '.join(kinds[:-1]) + ' and ' + kinds[-1]
             text += f"; {listed} turn{'s' if len(squad) == 1 else ''} green with {name}"
         out[name] = text
+    for name, (a, b) in selfs.items():
+        out.setdefault(name, self_talk(ch, a, b))
     return out
+
+
+# An AI script's 0x01 command calls the routine at +8 with the argument at +0xC; this one takes a pair of characters and has the
+# first's unit talk to the second's (0x0802EA74 sets the AI's action 8, which runs the talk event: 0x0802F064 -> 0x0806AF90).
+AI_TALK = 0x08033869
+AI_GO_TO = 0x0D  # an AI script command: move toward the character in byte 4
+
+
+def ai_talk(u):
+    """The character a unit's movement AI walks it to and talks to on its own: its second AI byte's script has a 0x0D toward that
+    character, then a 0x01 calling AI_TALK with the unit's own character and that one (Clarine's 0x0B in Chapter 4, at 0x085C9488:
+    toward Roy, then the pair at 0x0810DB18, Clarine and Roy). None otherwise."""
+    if not u.get('ai'):
+        return None
+    p = AI.u32(AI.u32(AI.cfg['ai2']) + 4 * u['ai'][1])
+    if not 0x08000000 <= p < 0x08800000:
+        return None
+    toward = None
+    for k in range(64):
+        c = R[p - 0x08000000 + 16 * k:p - 0x08000000 + 16 * k + 16]
+        if c[0] == AI_GO_TO:
+            toward = c[4]
+        elif c[0] == 0x01 and struct.unpack_from('<I', c, 8)[0] == AI_TALK:
+            arg = struct.unpack_from('<I', c, 12)[0] - 0x08000000
+            if R[arg] == u['char'] and R[arg + 1] == toward:
+                return toward
+        elif c[0] == gba_ai.RESTART:
+            break
+    return None
+
+
+def pronouns(c):
+    """(she, her, her, herself) or (he, him, his, himself), by the character's female ability (+0x28, 0x4000: Clarine, Sue, Fir)."""
+    return ('she', 'her', 'her', 'herself') if rom.character(c)['abilities'] & 0x4000 else ('he', 'him', 'his', 'himself')
+
+
+def records_of(ch, c):
+    """Every unit record of a character the chapter's groups hold: the starting enemies' and those its scripts load."""
+    out = [u for u in fe.unit_group(ch.ev['enemies']) if u['char'] == c]
+    for e in ch.turns + ch.talks + ch.misc + ch.locations:
+        if 0x08000000 < e['ptr'] < 0x08800000 and e['type'] not in (7, 10):
+            try:
+                cmds = fe.script(e['ptr'])
+            except AssertionError:
+                continue
+            out += [u for _, op, args in cmds if op in (0x12, 0x13) for u in fe.unit_group(args[0]) if u['char'] == c]
+    return out
+
+
+def self_talk(ch, a, b):
+    """'Recruit: she talks to Roy herself, her AI walking her to him on the other army's phase': a talk that makes its first
+    character yours, which only that character starts, as its movement AI does (ai_talk)."""
+    she, her, her_, herself = pronouns(a)
+    him = pronouns(b)[1]
+    text = f"Recruit: {she} talks to {NAMES.get(b, '?')} {herself}"
+    rec = next((u for u in records_of(ch, a) if ai_talk(u) == b), None)
+    if rec:
+        text += f", {her_} AI walking {her} to {him} on {PHASE[0x40] if rec['side'] == 'npc' else PHASE[0x80]}"
+    return text
 
 
 def conds_text(ch, conds, b, events):
@@ -779,6 +866,10 @@ def build_units(ch, m, source):
             e['type'] = 'boss'
         if len(ds) == 1:
             e['difficulties'] = ds
+        unless = placed_unless(ch, u) if u.get('unless') and personal(u['char']) else None
+        if unless:
+            # The opening skips the load once an earlier chapter recruited the character or it died (Perceval, Chapter 15).
+            e['note'] = f"{e['note']}; {unless}"
         m['units'].append(e)
         if (e.get('talk') or '').startswith('Recruit') and '(' not in e['talk']:
             # A foe a talk recruits joins mid-battle: what it carries is yours from the next chapter.
@@ -817,6 +908,47 @@ def build_units(ch, m, source):
         g['when'] = ({d: w.replace('{boss}', named or 'the boss') for d, w in g['when'].items()} if isinstance(g['when'], dict)
                      else g['when'].replace('{boss}', named or 'the boss'))
 
+
+
+def death_flags(c):
+    """The flags a character's death sets in any chapter (the death quotes: scripts/gba_bosses.py's table)."""
+    at, size, read, anywhere = gba_bosses.TABLES['fe6']
+    out, o = set(), at - 0x08000000
+    while R[o]:
+        char, chap, flag = read(R, o)
+        if char == c and chap == anywhere and flag:
+            out.add(flag)
+        o += size
+    return out
+
+
+def recruited_in(entry, c, flag):
+    """The story chapters before this one whose talks recruit a character (0x2B to your side) and set a flag as they do (0x34)."""
+    out = []
+    for e2, _, _, heading, _ in STORY:
+        if e2 == entry:
+            break
+        for e in fe.event_list(fe.events_of(e2)['talk']):
+            if 0x08000000 < e['ptr'] < 0x08800000 and e['type'] == 4:
+                cmds = fe.script(e['ptr'])
+                if [c, 0] in [a for _, op, a in cmds if op == 0x2B] and [flag] in [a for _, op, a in cmds if op == 0x34]:
+                    out.append('Chapter ' + heading[len('Ch.'):])
+                    break
+    return list(dict.fromkeys(out))
+
+
+def placed_unless(ch, u):
+    """'placed only if he wasn't recruited in Chapter 13 and hasn't been defeated': what the opening asks before it places a unit,
+    the flags it skips the load on (fe6_events.Run's 'unless'): the character's death's, or the one an earlier chapter's talk sets as
+    it recruits the character (Chapter 15's Perceval: 0x71, set by Chapter 13's talks, and 0x6F, his death's). None for a flag that
+    isn't either."""
+    c, flags = u['char'], set(u.get('unless', ()))
+    dead = flags & death_flags(c)
+    chapters = [x for f in sorted(flags - dead) for x in recruited_in(ch.entry, c, f)]
+    if not flags or flags - dead - {f for f in flags if recruited_in(ch.entry, c, f)}:
+        return None
+    said = ([f"wasn't recruited in {' or '.join(dict.fromkeys(chapters))}"] if chapters else []) + (["hasn't been defeated"] if dead else [])
+    return f'placed only if {pronouns(c)[0]} ' + ' and '.join(said)
 
 
 def flag_events(ch, flag):
@@ -922,26 +1054,45 @@ def stops_with_boss(e):
         return False
 
 
+def plays_of(ch, e, only):
+    """[(the runs by difficulty, what brings them or None)]: an event played on each difficulty it fires on (a script can test for
+    Hard mode itself: Chapter 5's area event places its four foes on Hard only). A visit that brings no one for the plain visitor is
+    played for each visitor its script tells apart (0x24), those who bring the same units together: Chapter 23's village, which
+    brings Karel when Fir or Bartre visits."""
+    def play(active=None):
+        return {d: fe.Run(fe.World(hard=d == 'Hard', turn=e['b'][0] if e['type'] in (2, 3) else 1, active=active)).run(e['ptr'])
+                for d in ([only] if only else DIFFS)}
+    base = play()
+    if any(run.loads for run in base.values()) or e['type'] not in (5, 6):
+        return [(base, None)]
+    by = {}
+    for c in visitors(e['ptr']):
+        on = play(c)
+        key = tuple((u['char'], u['tile'], u['side']) for run in on.values() for u in run.units)
+        if key:
+            by.setdefault(key, (on, []))[1].append(NAMES.get(c, '?'))
+    return [(on, f"When {' or '.join(who)} visits {place(ch, e)}") for on, who in by.values()] or [(base, None)]
+
+
 def build_arrivals(ch, m, source, talks):
     h = m['height']
     groups, joiners = [], []
     events = [(e, 'Hard' if e['type'] == 3 else None) for e in ch.turns if not Chapter.is_opening(e, e['type'] == 3)]
     events += [(e, None) for e in ch.talks + ch.misc + ch.locations if e['type'] in (1, 4, 5, 6, 11, 13)]
     n = 0
+    plays = []
     for e, only in events:
         if not (0x08000000 < e['ptr'] < 0x08800000):
             continue
-        # Played on each difficulty it fires on: a script can test for Hard mode itself (Chapter 5's area event places its four
-        # foes on Hard only).
-        on = {}
         try:
-            for d in ([only] if only else DIFFS):
-                on[d] = fe.Run(fe.World(hard=d == 'Hard', turn=e['b'][0] if e['type'] in (2, 3) else 1)).run(e['ptr'])
+            plays += [(e, on, said) for on, said in plays_of(ch, e, only)]
         except AssertionError:
             continue
+    for e, on, said in plays:
         if not any(run.loads for run in on.values()):
             continue
         when, areas = arrival_of(ch, e)
+        when = said or when
         if e['type'] == 13:
             for f in unsaid_flags(ch, fe.check(rom.u32(e['at'] + 8))):
                 note = (f"The groups that wait on flag {f} stop once it's set as well; no event in the chapter sets it, and what does "
@@ -996,6 +1147,11 @@ def build_arrivals(ch, m, source, talks):
                         j['generic'] = True
                     if NAMES.get(u['char']) in talks:
                         j['talk'] = talks[NAMES.get(u['char'])]
+                        if j['talk'].startswith('Recruit') and '(' not in j['talk']:
+                            # A green unit a talk recruits joins mid-battle, as a foe does: what it carries is yours from the
+                            # next chapter (Clarine's Heal and Vulnerary, Chapter 4).
+                            for i in u['items']:
+                                source(i, m['id'], 'kit-later', f"Carried by {j['name']} on joining", ds=ds)
                     ai = gba_ai.of(AI, u, rom.character(u['char'])['abilities'] | rom.class_(class_of(u))['abilities'])
                     if ai:
                         j['_ai'] = ai
@@ -1067,7 +1223,7 @@ def build_locations(ch, m, source):
             m['objects'].append({'type': 'shop', 'tile': tile, 'kind': SHOP[cmd], 'stock': [item_name(i) for i in stock]})
             for i in stock:
                 source(i, m['id'], 'shop', f"Sold at the {SHOP[cmd].lower()}")
-        elif (t == 6 or (t == 5 and cmd == 0x0E)) and 0x08000000 < e['ptr'] < 0x08800000:
+        elif (t == 6 or (t == 5 and cmd == VISIT)) and 0x08000000 < e['ptr'] < 0x08800000:
             # A village the opening closes (the brigand's in Chapter 1: the map change on it or the tile above) is gone.
             if t == 6 and ({(x, y), (x, y - 1)} & getattr(ch, 'closed', set())):
                 continue
@@ -1075,18 +1231,30 @@ def build_locations(ch, m, source):
             run = fe.Run(fe.World()).run(e['ptr'])
             closes = [to_app(v, h) for c in run.map_changes for v in ((c[0], c[1]), (c[0], c[1] + 1)) if v in villages and v != (x, y)]
             joins = [NAMES.get(u['char'], '?') for _, _, grp in run.loads for u in grp if u['side'] == 'player']
-            if t == 5 and not reward and not joins:
+            # Who joins only for the visitors the script tells apart (0x24), played once for each (Chapter 23's village: Karel, for
+            # Fir or Bartre; anyone else is told no one there wishes to join).
+            only = {}
+            if not joins:
+                for c in visitors(e['ptr']):
+                    vr = fe.Run(fe.World(active=c)).run(e['ptr'])
+                    who = tuple(NAMES.get(u['char'], '?') for _, _, grp in vr.loads for u in grp if u['side'] == 'player')
+                    if who:
+                        only.setdefault(who, []).append(NAMES.get(c, '?'))
+            kind = visit_kind(ch, e)
+            if t == 5 and not reward and not joins and not only:
                 continue
             o = {'type': 'village', 'tile': tile, 'reward': reward}
             notes = ([f"{' and '.join(joins)} {'joins' if len(joins) == 1 else 'join'} your army."] if joins else [])
+            notes += [f"{' and '.join(who)} {'joins' if len(who) == 1 else 'join'} your army if visited by {' or '.join(by)}."
+                      for who, by in only.items()]
             notes += [f'Visiting it closes the village at ({c[0]}, {c[1]}).' for c in closes]
-            if t == 5:
+            if kind == 'house':
                 notes.append('(A house.)')
             if notes:
                 o['note'] = ' '.join(notes)
             m['objects'].append(o)
             for i in items:
-                source(i, m['id'], 'village', 'Given at a village' if t == 6 else 'Given at a house')
+                source(i, m['id'], 'village', 'Given at a village' if kind == 'village' else 'Given at a house')
     if seize:
         what = 'the throne' if 'throne' in m['victory'].lower() else 'the gate'
         m['objectives'].append({'type': 'seize', 'tiles': seize, 'label': f'Seize {what} with Roy'})

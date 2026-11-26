@@ -2523,7 +2523,11 @@ export function MapViewer({ set }: { set: MapSet }) {
   const hasStandIns = [...map.units, ...(map.reinforcements ?? []).flatMap((g) => g.units), ...(map.joiners ?? []), ...(map.forced ?? [])].some(
     (u) => u.standIn,
   )
-  const cast = useMemo(() => (standIns ? withStandIns(map) : map), [map, standIns])
+  const cast = useMemo(() => {
+    const m = standIns ? withStandIns(map) : map
+    // A forced unit stands on its tile on the difficulties it says (The Sacred Stones' Chapter 3: Neimi is moved on Easy alone).
+    return m.forced?.some((f) => f.difficulties) ? { ...m, forced: m.forced.filter((f) => !f.difficulties || f.difficulties.includes(difficulty)) } : m
+  }, [map, standIns, difficulty])
   // The map's states through its turns, and every change made in the one shown: the previewed ones, and its turns' up to `step`.
   const steps = useMemo(() => mapSteps(map), [map])
   const active = useMemo(

@@ -36,6 +36,22 @@ def boss_down(game, R, chapter):
         o += size
 
 
+def death_flags(game, R, chapter):
+    """{character: flag} the death of each character sets in this chapter (its index in the game's chapter table), as the lookup
+    finds it: the first of the character's entries for the chapter or any chapter whose flag isn't set yet (FE6 0x0806B6B0, FE7
+    0x08079368), so Vaida's any-chapter entry (0x89) comes before her Unfulfilled Heart one (2). `chapter` None: the any-chapter
+    entries alone. (boss_down reads every entry; for the skull it comes to the same: Unfulfilled Heart's Vaida is its only boss.)"""
+    at, size, read, anywhere = TABLES[game]
+    out, o = {}, at - 0x08000000
+    while True:
+        char, chap, flag = read(R, o)
+        if not char:
+            return out
+        if chap == anywhere or (chapter is not None and chap == chapter):
+            out.setdefault(char, flag)
+        o += size
+
+
 def settle(m, down, plain):
     """Leaves the skull on the chapter's own boss only, in place. Each unit entry carries `_char` (and `_leaves` when the chapter's
     script takes it off the map), which this removes; `plain(char)`: a generic character, a plain foe once it's no boss."""

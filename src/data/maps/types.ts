@@ -505,8 +505,9 @@ export interface ChapterMap {
   corrinStart?: Tile
   /** Whose starting tile `corrinStart` is, where it isn't the game's one lord (Radiant Dawn's change with each Part). */
   lord?: string
-  /** Units besides Corrin the game deploys for you: on a fixed tile, or (no tile) wherever you place them. */
-  forced?: { name: string; tile?: Tile; standIn?: Pick<StandIn, 'name' | 'when'> }[]
+  /** Units besides Corrin the game deploys for you: on a fixed tile, or (no tile) wherever you place them. `difficulties`: the ones
+   * it stands there on, where not all (The Sacred Stones' Chapter 3: the opening moves Neimi on Easy alone). */
+  forced?: { name: string; tile?: Tile; standIn?: Pick<StandIn, 'name' | 'when'>; difficulties?: Difficulty[] }[]
   objects: MapObject[]
   changes: MapChange[]
   /** Short facts only (who can't deploy, when reinforcements come), not strategy. */

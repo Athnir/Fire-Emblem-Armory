@@ -36,7 +36,8 @@ What the engine does was read in the program code (Thumb, capstone):
       0x3E-0x42 call a routine (the ones that clear the map are followed: CLEAR_OTHERS and the rest below);
       0x23 / 0x24 move the unit on a tile to another; 0x25 move it along a path; 0x26 / 0x27 / 0x2B / 0x2F move a character to a
       tile; 0x28 / 0x2C along a path; 0x29 to another character's tile; 0x65 change a character's side; 0x6A-0x6F remove a unit
-      (by tile or character); 0x5B give the acting unit an item; 0x5C give a character an item; 0x5E give gold; 0x5F / 0x61 /
+      (by tile or character; one of yours is only hidden, staying in your army); 0x72 set a unit's state bits (0x10000: not yet
+      joined); 0x5B give the acting unit an item; 0x5C give a character an item; 0x5E give gold; 0x5F / 0x61 /
       0x62 / 0x64 make a map change (its id in the high half, 0x8000 masked off; 0xFFFF the event's own), 0x60 the change at a tile
       (the high half: x, y), 0x63 only redraws; 0x76 / 0x77 set / clear a flag (the high half); 0x81 go to a chapter (the high half);
       0x9D / 0x9E set the fog's vision (the high half, signed: 0 lifts the fog, below 0 the chapter record's own).
@@ -153,9 +154,18 @@ def _imm(op):
     return int(op.split('#')[1], 0)
 
 
+IS_FLAG = 0x080798F8      # a flag is set (a local one up to 0x63, else a global one)
+GET_UNIT = 0x08017D34     # a character's unit
+COUNT_FOES = 0x08079FB0   # how many enemy units (0x81-0xBF) are alive
+BARTRE_DEPLOYED = 0x08079D20  # Bartre (9) is deployed (0x08079CE0 with r0 = 9)
+ITEM_ATTRIBUTES = 0x0801727C  # an item's attributes (bit 0: a weapon)
+CAN_WIELD = 0x08016380        # the unit can wield the item
+
+
 def check(addr):
     """What a check routine tests, read from its code: ('in_army', char), ('no_enemy',), ('lyn_played',), ('player_phase',),
-    ('turn_over', n), ('units_in', rects), or ('code', addr) when it does something else."""
+    ('turn_over', n), ('units_in', rects), ('flags_at_most', flags, n), ('foes_over', n), ('deployed_as', char, class, level),
+    ('holds_weapon', char), or ('code', addr) when it does something else."""
     if addr == NO_ENEMY:
         return ('no_enemy',)
     if addr == LYN_PLAYED:
@@ -164,6 +174,9 @@ def check(addr):
         return ('player_phase',)
     ins = thumb(addr, 24)
     calls = [i for i, x in enumerate(ins) if x[1] == 'bl']
+    shaped = _counted_flags(addr) or _foes_over(ins, calls) or _deployed_as(ins, calls) or _holds_weapon(ins, calls)
+    if shaped:
+        return shaped
     # push; movs r0, #c; bl IN_ARMY
     if calls and ins[calls[0]][2] == f'#{IN_ARMY:#x}' and ins[calls[0] - 1][1] == 'movs' and ins[calls[0] - 1][2].startswith('r0'):
         return ('in_army', _imm(ins[calls[0] - 1][2]))
@@ -183,6 +196,60 @@ def check(addr):
     return ('code', addr)
 
 
+def _counted_flags(addr):
+    """('flags_at_most', flags, n): a routine that counts how many of its flags are set (movs r0, #flag; bl IS_FLAG, one each) and
+    answers 1 when that's at most n (cmp r4, #n, then bgt to the 0, or ble to the 1): Pale Flower of Darkness's turn-10 checks,
+    0x0807D4ED (flags 9-11, at most 1) and 0x0807D529 (flags 9-0x11, at most 3)."""
+    ins = thumb(addr, 80)
+    end = next((k for k, x in enumerate(ins) if x[1] == 'bx'), None)
+    if end is None:
+        return None
+    ins = ins[:end + 1]
+    calls = [k for k, x in enumerate(ins) if x[1] == 'bl']
+    if len(calls) < 2 or any(ins[k][2] != f'#{IS_FLAG:#x}' or ins[k - 1][1] != 'movs' or not ins[k - 1][2].startswith('r0, #')
+                             for k in calls):
+        return None
+    cmp = next((k for k, x in enumerate(ins) if x[1] == 'cmp' and x[2].startswith('r4, #')), None)
+    if cmp is None or ins[cmp + 1][1] not in ('bgt', 'ble'):
+        return None
+    flags = tuple(_imm(ins[k - 1][2]) for k in calls)
+    n = _imm(ins[cmp][2])
+    # bgt jumps past the 1 (it's set just before the cmp as 0, then to 1): either way, 1 when the count is at most n.
+    return ('flags_at_most', flags, n)
+
+
+def _foes_over(ins, calls):
+    """('foes_over', n): bl COUNT_FOES; cmp r0, #n; bhi to the 1 (0x0807A409: more than 49 foes on the map)."""
+    if len(calls) == 1 and ins[calls[0]][2] == f'#{COUNT_FOES:#x}':
+        cmp = next((x for x in ins[calls[0]:calls[0] + 5] if x[1] == 'cmp' and x[2].startswith('r0, #')), None)
+        if cmp:
+            return ('foes_over', _imm(cmp[2]))
+    return None
+
+
+def _deployed_as(ins, calls):
+    """('deployed_as', char, class, level): movs r0, #char; bl GET_UNIT; bl BARTRE_DEPLOYED; the unit's class (+4 of its class,
+    ldrb [r0, #4]) compared with the class; its level (+8) compared with one under the level: Hector's 31x's 0x0807D9E5, Bartre
+    deployed as a Warrior of Lv 5 or more."""
+    if len(calls) < 2 or ins[calls[0]][2] != f'#{GET_UNIT:#x}' or ins[calls[1]][2] != f'#{BARTRE_DEPLOYED:#x}':
+        return None
+    char = _imm(ins[calls[0] - 1][2])
+    cls = next((k for k in range(calls[1], len(ins)) if ins[k][1] == 'ldrb' and ins[k][2].endswith('#4]')), None)
+    cmps = [x for x in ins[cls:] if x[1] == 'cmp' and x[2].startswith('r0, #')] if cls else []
+    if len(cmps) < 2:
+        return None
+    return ('deployed_as', char, _imm(cmps[0][2]), _imm(cmps[1][2]) + 1)
+
+
+def _holds_weapon(ins, calls):
+    """('holds_weapon', char): movs r0, #char; bl GET_UNIT, then each of its items tested as a weapon (ITEM_ATTRIBUTES & 1) it
+    can wield (CAN_WIELD): Hector's 31x's 0x0807DA15, before Bartre's fight with Karla."""
+    targets = [ins[k][2] for k in calls]
+    if calls and targets[0] == f'#{GET_UNIT:#x}' and f'#{ITEM_ATTRIBUTES:#x}' in targets and f'#{CAN_WIELD:#x}' in targets:
+        return ('holds_weapon', _imm(ins[calls[0] - 1][2]))
+    return None
+
+
 class Run:
     """Plays one script against a `world` (World below): collects the unit groups it loads (with the tiles units end on once the
     scripted moves are done), gifts, gold, side changes, map changes, flags and the chapter it goes to."""
@@ -196,6 +263,8 @@ class Run:
         self.next_chapter = []
         self.recruits = []
         self.removed = []
+        self.benched = []       # your units a script took off the map: hidden, still in your army (0x6B, 0x6D, 0x6F)
+        self.unjoined = set()   # characters given the not-yet-joined state (0x72 with 0x10000)
         self.flags_set = []
         self.checks = []
         self.map_changes = []   # ('id', n), ('tile', (x, y)) or ('own', None): the change the event's tile holds
@@ -224,7 +293,8 @@ class Run:
             if same and (u['side'] == 'player' or same['side'] == 'player'):
                 same.update({'tile': u['end'], 'start': u['start'], 'side': u['side'], 'group': ptr, 'army': army})
                 continue
-            self.units.append({**u, 'tile': u['end'], 'group': ptr, 'army': army})
+            unless = getattr(self, '_unless', [])
+            self.units.append({**u, 'tile': u['end'], 'group': ptr, 'army': army, **({'unless': unless} if unless else {})})
 
     def run(self, ptr, limit=5000):
         cmds = script(ptr)
@@ -232,9 +302,14 @@ class Run:
         w_ = self.world
         k, skip = 0, 0
         back = None  # the one place a call comes back to (0xCB keeps it at +0x34 / +0x38; an end returns there, 0x0800EC40)
+        # The flags whose being set would have skipped what's played now: a 0x4C not taken, to a label further on (Cog of Destiny
+        # loads Vaida only while 0x89, her death's flag, is clear). A unit loaded then keeps them as 'unless'.
+        skips = []
         for _ in range(limit):
             a, op, w, args = cmds[k]
             hi = w >> 16
+            skips = [x for x in skips if x[2] is cmds and x[1] > k]
+            self._unless = sorted({x[0] for x in skips})
             if skip:
                 skip -= 1
                 k += 1
@@ -245,6 +320,7 @@ class Run:
                     cmds, labels, k = back
                     back = None
                     continue
+                self._unless = []  # a load made outside a script (a chapter's own groups) skips nothing
                 return self
             if op in (0x58, 0xCB) and ROM.is_ptr(args[0]):
                 # 0x58 goes on in another script (0x0800D91C); 0xCB calls it and comes back after (0x0800FD7C).
@@ -271,6 +347,8 @@ class Run:
             elif op in (0x4C, 0x4D):
                 if (op == 0x4C) == (args[1] in w_.flags):
                     jump = args[0]
+                elif op == 0x4C and labels.get(args[0], -1) > k:
+                    skips.append((args[1], labels[args[0]], cmds))
             elif op == 0x4E:
                 if (w_.active == (args[1] & 0xFF)) == bool(hi):
                     jump = args[0]
@@ -342,6 +420,16 @@ class Run:
                 if u:
                     self.units.remove(u)
                     self.removed.append(args[0] & 0xFF)
+                    if u['side'] == 'player':
+                        # Off the map, but still in your army: a unit of yours is only hidden (state |= 9: 0x6B and 0x6D for a
+                        # character among your units, 0x0800DF50 and 0x0800E058; 0x6F for any unit, 0x0800E16C), as Matthew and
+                        # Serra are once they've left Eliwood's Chapter 12, to be deployed from Chapter 13.
+                        self.benched.append(u['char'])
+            elif op == 0x72:
+                # Sets a unit's state bits (0x0800E1C4); 0x10000 is the loader's not-yet-joined state (0x0800A618, 0x08079954):
+                # New Resolve's opening makes Nils a unit so, and he joins only when Cog of Destiny's end loads him.
+                if args[1] & 0x10000:
+                    self.unjoined.add(args[0] & 0xFF)
             elif op == 0x65:
                 char, side = args[0] & 0xFF, args[1]
                 if side == 0:
@@ -400,7 +488,7 @@ class World:
     not in your army (yet)."""
 
     def __init__(self, mode='Eliwood', hard=False, dead=(), flags=(), active=None, turn=1, phase=0, skipping=False,
-                 lyn_played=True, enemies_left=True, away=()):
+                 lyn_played=True, enemies_left=True, away=(), answers=None):
         self.mode = mode
         self.hard = hard
         self.dead = set(dead)
@@ -412,9 +500,15 @@ class World:
         self.skipping = skipping
         self.lyn_played = lyn_played
         self.enemies_left = enemies_left
+        # A check's answer set by the caller, to play the other branch (Hector's 31x with Bartre deployed as a Warrior).
+        self.answers = dict(answers or {})
 
     def answer(self, c):
         kind = c[0]
+        if c in self.answers:
+            return self.answers[c]
+        if kind == 'flags_at_most':
+            return sum(f in self.flags for f in c[1]) <= c[2]
         if kind == 'in_army':
             return c[1] not in self.dead and c[1] not in self.away
         if kind == 'no_enemy':

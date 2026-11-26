@@ -191,6 +191,24 @@ describe("The Binding Blade's maps", () => {
         'Recruit: talk with Klein, or with Shanna once Klein is yours, after an earlier talk while Klein was still a foe; ' +
           "Shanna's talk once Klein is yours, without that earlier talk, turns Thea green instead; the 4 Peg Knights turn green with Thea",
       )
+    // Chapter 4's talk (Clarine, Roy) makes its first character yours (0x2B Clarine to 0), and only she can start it (the Talk
+    // check tests the acting unit first): her AI (0x0B: toward Roy, then the AI talk routine with the pair Clarine, Roy) does.
+    const clarine = map('fe6-4').joiners!.find((j) => j.name === 'Clarine')!
+    expect(clarine.talk).toBe("Recruit: she talks to Roy herself, her AI walking her to him on the other army's phase")
+    // The opening places Perceval in Chapter 15 only while flags 0x71 (Chapter 13's recruiting talks) and 0x6F (his death) are clear.
+    expect(allUnits(map('fe6-15')).find((u) => u.name === 'Perceval')!.note).toBe(
+      "Lv 5 Paladin; placed only if he wasn't recruited in Chapter 13 and hasn't been defeated",
+    )
+  })
+
+  it("plays a village's script for each visitor it names: Chapter 23's brings Karel for Fir or Bartre", () => {
+    // The visit event (type 5, the visit command) stands on a village tile, so it's called a village, not a house.
+    expect(objects(map('fe6-23'), 'village')).toEqual([
+      { type: 'village', tile: [23, 9], reward: '', note: 'Karel joins your army if visited by Fir or Bartre.' },
+    ])
+    expect(map('fe6-23').joiners).toEqual([
+      { name: 'Karel', tile: [23, 8], from: [23, 9], group: 'e669570', when: 'When Fir or Bartre visits the village at (23, 9)' },
+    ])
   })
 
   it("holds the chests, villages and buried items Serenes Forest's item-locations page lists (the patch's names)", () => {
@@ -329,6 +347,10 @@ describe("The Binding Blade's item sources", () => {
       for (const s of list) expect(['event', 'talk'].includes(s.kind), `${name} ${s.mapId} ${s.kind}`).toBe(false)
     // Fa joins at the end of Chapter 15, so Fa's stone counts from Chapter 16.
     expect(sources('Divinestone', 'kit-later')).toEqual(['fe6-15 Carried by Fae, who joins at the end of the chapter'])
+    // A green unit a talk recruits mid-battle brings its items, yours from the next chapter: Clarine's (her own talk with Roy),
+    // and Karel's, whom Chapter 23's village brings in on a visit.
+    expect(sources('Heal', 'kit-later')).toContain('fe6-4 Carried by Clarine on joining')
+    expect(sources('Wo Dao', 'kit-later')).toContain('fe6-23 Carried by Karel on joining')
   })
 
   it('lists what anything gives or a unit carries, and marks what only foes carry', () => {

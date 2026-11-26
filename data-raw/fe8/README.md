@@ -128,7 +128,15 @@ three of the enemies for a skirmish on the chapter's map; the opening and ending
   (0x0800F914). The loader leaves out your characters who have died unless the load says otherwise (0x0800F528).
 - **A chapter's start:** the opening scene (cutscenes load other chapters' maps, 0x25, and clear everyone afterwards, 0x34 variants
   A-C); where it calls the preparations screen (0x3E), your army goes to the deploy group's tiles (after the lord's, its characters are
-  placeholders). Then every turn-1 event on your phase runs.
+  placeholders), and the units of yours the opening places after the screen stay where it leaves them, forced (Tana in Ephraim's
+  Chapter 9; Eirika, Innes and Saleh in Ephraim's 15, 0x089FC890). Then every turn-1 event on your phase runs. A forced unit the
+  difficulties place apart says which (Chapter 3 has no preparations, and Easy's opening moves Neimi: CHECK.7, then MOVE at
+  0x089F12E0).
+- **Who an opening brings:** its loads for your side, but not a load's variant 1 (0x2C's low nibble; the cutscenes', as the Roster's
+  join finder reads it: Ewan, Cormag and Myrrh in the routes' Chapters 10 and 11), nor a unit the same run deletes (0x34 variants
+  13-15, ClearUnit 0x080177F4) without placing it again (Chapter 19's 'Rausten' Knight, struck down in its opening scene), nor a
+  character an army's name stands for. An end scene's load made while it has another map up (0x25) still makes the unit yours (Knoll
+  at the end of Ephraim's Chapter 14, 0x089FC414 on map 0x46): what it carries counts from the next chapter.
 - **Rewards on a condition:** an end scene is played twice, once as things stand and once with everyone it asks about alive and every
   unit of the other army left; what only the second gives is said with the condition read from its checks (the characters whose death
   loses it, each tried dead in turn; how many of the other army it needs left). Chapter 6's Orion's Bolt, Ephraim's Chapter 10's Knight

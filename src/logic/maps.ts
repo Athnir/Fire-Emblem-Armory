@@ -226,7 +226,7 @@ export function withStandIns(map: ChapterMap): ChapterMap {
       const { standIn: _, talk: _t, generic: _n, ...place } = j
       return { ...place, name, ...(talk ? { talk } : {}), ...(generic ? { generic } : {}), note: `${note ? `${note}. ` : ''}Stands here if ${when}.` }
     }),
-    forced: map.forced?.map((f) => (f.standIn ? { name: f.standIn.name, tile: f.tile } : f)),
+    forced: map.forced?.map((f) => (f.standIn ? { name: f.standIn.name, tile: f.tile, ...(f.difficulties ? { difficulties: f.difficulties } : {}) } : f)),
   }
 }
 

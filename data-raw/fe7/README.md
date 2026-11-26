@@ -86,7 +86,8 @@ and difficulty throughout. `scripts/gba_rom.py` reads FE7 and FE8 alike.
   data; +0x8C the goal.
 - Entries 0-11 are Lyn's story (8 is 7x); 12-47 Eliwood's and Hector's (13 "Another Journey", 18 "Talons Alight", 25 "A Glimpse in
   Time", 33 "Crazed Beast", 41 "The Berserker", 45 "The Value of Life" are Hector's only; 40 "Valorous Roland" Eliwood's only; 31 / 32
-  are Chapter 23 against Lloyd / Linus, 35 / 36 Chapter 25 against Kenneth / Jerme; 46 / 47 the two parts of the Final Chapter). 48-64
+  are Chapter 23 against Lloyd / Linus, 35 / 36 Chapter 25 against Kenneth / Jerme; 46 / 47 the Final Chapter's two maps, one chapter
+  in the game, "Final Chapter: Light" on both, so each is told apart by its own goal, the game's text at +0x8C). 48-64
   are event-only entries (endings), 65 "VS" and 66 "test"; none is listed.
 - The map (LZ77) and its terrain work as in FE6. Map changes: 12-byte records (id, x, y, width, height, 3 unused, tiles pointer) up to
   id 0xFF.
@@ -163,10 +164,27 @@ and ending scenes.
   story was played, your phase. The gaiden conditions are read from each end script (the checks before each "go to chapter", 0x81; every
   gaiden also asks "Embark on side quest?", and a "no" skips it): 7x and 18x by turn count (0x56: within 15), 32x within 20, 13x a flag
   set by the north-western village, 26x a flag set when Nino talks to Jaffar. Where a condition is a routine of its own (16x's Caelin
-  soldiers, 19xx's Nils at level 7 or more and Kishuna defeated, 22x's Hawkeye and EXP over 699, Lloyd or Linus by the lords' levels),
+  soldiers, 19x pt 2's Nils at level 7 or more and Kishuna defeated, 22x's Hawkeye and EXP over 699, Lloyd or Linus by the lords' levels),
   the numbers are the code's and the wording Serenes Forest's. Kenneth or Jerme: 0x0807D4C1 totals a measure (0x080A01DC) for Guy,
   Dorcas, Bartre and Raven against Erk, Lucius, Renault, Priscilla and Serra (the game's lists at 0x08CB8984, 0x08CB898E); the first
   group's higher total gives Jerme. That the measure is EXP gained is Serenes Forest's.
+- **Branches played both ways:** a check whose answer the generator can name is played with each answer, each one's units under its
+  condition. Pale Flower of Darkness's turn 10 (Harken or Karel): against Kenneth 0x0807D4ED counts flags 9-11, which the three promoted
+  foes' deaths set (the death quotes for the chapter), and answers 1, Harken, at most one; against Jerme 0x0807D529 counts flags 9-0x11,
+  the nine doors' own, at most 3. Hector's 31x opening places Karla if Bartre is deployed (0x08079D20) as a Warrior (class 0x13) of Lv 5
+  or more (0x0807D9E5); her talk with Bartre (flag 9) fights the two (0x97, 0x0800E948) if he holds a weapon he can use (0x0807DA15),
+  else she leaves; the type-1 event on flag 9 then, with Bartre acting, kills him at 0 HP (0x72 state 4), takes her off at 0 HP, or
+  makes her yours (0x65).
+- **Turn events that wait on an area:** Cog of Destiny's four (turns 1-99, your phase) go past their loads unless an area's flag is
+  set, and re-arm themselves each turn, counting their passes in flags; the event list sets an event's own flag before starting its
+  script (0x08078100). Each is played pass by pass with the area's flag set: a pass is a turn after a unit of yours first stops in the
+  area. Vaida's comes on the first pass unless her death's flag (0x89, any chapter) is set or more than 49 foes are alive (0x0807A409,
+  counting 0x81-0xBF with 0x08079FB0).
+- **Taking units off the map:** 0x6B and 0x6D delete a unit, but only hide (state |= 9) a character among your units (0x0800DE98);
+  0x6F hides any unit (0x0800E16C). A unit of yours taken off stays in your army: Matthew and Serra, loaded with Hector on Eliwood's
+  Chapter 12's turn 4, walk off and are deployed from Chapter 13. 0x72 sets a unit's state bits (0x0800E1C4); 0x10000 is the loader's
+  not-yet-joined state, which New Resolve's opening gives Nils, so he joins only when Cog of Destiny's end loads him (and the loader
+  gives him his record's items, 0x080178F4).
 - **Drops:** as a unit is made (0x08017826), it gets state 0x1000 when its character's or its class's abilities (+0x28) have
   0x08000000; when a unit in that state is defeated its last item goes to your army (0x0802FA22), and the menus mark that item
   (0x0802F5F8). The maps list each foe's drop and the weapon page counts it as a way to get the item.

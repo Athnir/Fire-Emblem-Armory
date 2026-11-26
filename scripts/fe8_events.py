@@ -165,11 +165,14 @@ class Run:
         self.slots = [0] * 14
         self.queue = []
         self.loads = []
+        self.variants = []        # each load's variant (0x2C's low nibble), in the order of `loads`: 1 is the cutscenes'
+        self.offmap = []          # (ptr, group, variant): loads made while a scene has another map up (0x25), no one on this one
         self.items = []           # (item, who): who is a character id, or None for the acting unit
         self.gold = []
         self.next_chapter = []
         self.recruits = []
         self.removed = []
+        self.deleted = set()      # characters 0x34 variants 13-15 removed and no load placed again (ClearUnit: 0x080177F4)
         self.flags_set = []
         self.checks = []
         self.map_changes = []
@@ -190,7 +193,7 @@ class Run:
             return self.slots[2] & 0xFF
         return v
 
-    def load(self, ptr, army=False, keep_dead=False):
+    def load(self, ptr, army=False, keep_dead=False, variant=0):
         if not ROM.is_ptr(ptr):
             return
         group = unit_group(ptr)
@@ -198,6 +201,7 @@ class Run:
             # The loader leaves out your characters who have died (0x0800F528).
             group = [u for u in group if not (u['side'] == 'player' and u['char'] in self.world.dead)]
         self.loads.append((ptr, group, army))
+        self.variants.append(variant)
         for u in group:
             if army:
                 # A deployment group's records are slots: after the first (the lord), the characters are placeholders.
@@ -206,12 +210,15 @@ class Run:
                 self.place(u, ptr, army)
 
     def place(self, u, ptr, army=False):
-        # A unit for a character already on the map is that unit (the loader reuses it); anything else is a new unit.
+        # A unit for a character already on the map is that unit (the loader reuses it); anything else is a new unit. One placed
+        # after the preparations screen (0x3E) says so: it stands where the opening leaves it (Tana in Ephraim's Chapter 9).
+        after = {'after_prep': True} if self.prep else {}
+        self.deleted.discard(u['char'])
         same = self.unit_of(u['char']) if u['char'] < 0x40 else None
         if same:
-            same.update({'tile': u['end'], 'start': u['start'], 'side': u['side'], 'group': ptr, 'army': army})
+            same.update({'tile': u['end'], 'start': u['start'], 'side': u['side'], 'group': ptr, 'army': army, **after})
             return
-        self.units.append({**u, 'tile': u['end'], 'group': ptr, 'army': army})
+        self.units.append({**u, 'tile': u['end'], 'group': ptr, 'army': army, **after})
 
     def answer(self, sub, args):
         """A check (0x19 / 0x33 / 0x03): what it leaves in s12."""
@@ -317,7 +324,11 @@ class Run:
             elif cmd == 0x2C and sub in (0, 1, 2):
                 ptr = s[2] if arg32 & 0x80000000 else arg32
                 if self.map == self.chapter:
-                    self.load(ptr, keep_dead=args[0] == 1)
+                    self.load(ptr, keep_dead=args[0] == 1, variant=sub)
+                elif ROM.is_ptr(ptr):
+                    # While a scene has another map up: no one stands on the chapter's, but the units are made all the same (an
+                    # end scene's hand-over: Knoll at the end of Ephraim's Chapter 14, on map 0x46).
+                    self.offmap.append((ptr, unit_group(ptr), sub))
             elif cmd == 0x2F:
                 u = self.unit_of(self.who(args[1]))
                 kind = sub & 7
@@ -361,6 +372,7 @@ class Run:
                     if u:
                         self.units.remove(u)
                         self.removed.append(c)
+                        self.deleted.add(c)
             elif cmd == 0x37:
                 if sub == 0:
                     self.items.append((s[3] & 0xFF, self.who(args[0])))

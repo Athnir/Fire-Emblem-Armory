@@ -51,6 +51,8 @@ LORD = {'Lyn': 3, 'Eliwood': 1, 'Hector': 2}
 DEFEAT = {'Lyn': 'Lyn is defeated', 'Eliwood': 'Eliwood or Hector is defeated', 'Hector': 'Eliwood or Hector is defeated'}
 # The two versions of Chapter 23 (Eliwood) / 24 (Hector) and of 25 / 27: who the story pits you against.
 VERSION = {31: 'Lloyd', 32: 'Linus', 35: 'Kenneth', 36: 'Jerme'}
+# The Final Chapter's two maps (one chapter in the game, its two battles in turn).
+FINAL_MAPS = (46, 47)
 
 # When the story reaches a chapter that not everyone plays: read from the end scripts' checks before each "go to chapter"; every
 # gaiden is also offered with "Embark on side quest?". Where the check is a routine of its own, the wording is Serenes Forest's.
@@ -369,9 +371,37 @@ def talk_effects(ch, e, run):
     return list(dict.fromkeys(out))
 
 
+DUEL = 0x97  # a scripted battle between the two characters its arguments name (0x0800E948: each one's unit, then the battle)
+
+
+def pronoun(c, which):
+    """'she' / 'he', 'her' / 'him' by the character's female ability (+0x28, 0x4000: Karla, Vaida)."""
+    female = bool(r.u32(char_record(c) + 0x28) & 0x4000)
+    return {'subject': ('she', 'he'), 'object': ('her', 'him')}[which][0 if female else 1]
+
+
+def duel_of(ch, e, a, b):
+    """'Recruit: talk with Bartre: if Bartre holds a weapon he can use, the two fight, and she joins your army if both survive it
+    (one who falls dies); without one, she leaves the map': a talk whose script has the two fight (DUEL), and whose own flag a later
+    event waits on (type 1) that makes the second yours (0x65) unless one of them fell. Hector's 31x: Karla's talk (flag 9), its
+    fight only if Bartre holds a weapon he can use (0x0807DA15), else she goes; then the flag-9 event, with Bartre acting: at 0 HP he
+    dies (0x72 state 4), Karla at 0 HP is gone, else she's yours. None for any other talk."""
+    cmds = fe.script(e['ptr'])
+    if not any(op == DUEL and args[:2] == [a, b] for _, op, _, args in cmds):
+        return None
+    after = [x for x in ch.misc if x['type'] == 1 and (x['b'][0] | x['b'][1] << 8) == e['flag'] and r.is_ptr(x['ptr'])]
+    if not any(op == 0x65 and (args[0] & 0xFF) == b and args[1] == 0 for x in after for _, op, _, args in script_cmds(x['ptr'])):
+        return None
+    armed = ('holds_weapon', a) in [fe.check(args[1]) for _, op, _, args in cmds if op in (0x48, 0x49)]
+    she, he = pronoun(b, 'subject'), pronoun(a, 'subject')
+    text = f"Recruit: talk with {NAMES.get(a, '?')}: " + (f"if {NAMES.get(a, '?')} holds a weapon {he} can use, " if armed else '')
+    text += f'the two fight, and {she} joins your army if both survive it (one who falls dies)'
+    return text + (f'; without one, {she} leaves the map' if armed else '')
+
+
 def talks_of(ch):
     """{name: 'Recruit: talk with Eliwood or Hector'} from the talk events this story allows; a talk that doesn't recruit says what
-    else it does ('Talk with Nino (opens Chapter 26x)')."""
+    else it does ('Talk with Nino (opens Chapter 26x)'), and one that recruits after a fight says how (duel_of: Karla)."""
     found = {}
     for e in ch.talks:
         pair = talk_pair(e)
@@ -382,7 +412,10 @@ def talks_of(ch):
         t = found.setdefault(NAMES.get(b, '?'), {'recruit': [], 'talk': [], 'gives': [], 'does': []})
         who = NAMES.get(a, '?') if a else 'anyone'
         cmds = fe.script(e['ptr'])
-        if b in run.recruits or any(op == 0x65 and (args[0] & 0xFF) == b and args[1] == 0 for _, op, _, args in cmds):
+        duel = duel_of(ch, e, a, b)
+        if duel:
+            t['duel'] = duel
+        elif b in run.recruits or any(op == 0x65 and (args[0] & 0xFF) == b and args[1] == 0 for _, op, _, args in cmds):
             t['recruit'].append(who)
         else:
             t['talk'].append(who)
@@ -390,7 +423,9 @@ def talks_of(ch):
             t['does'] += talk_effects(ch, e, run)
     out = {}
     for name, t in found.items():
-        if t['recruit']:
+        if t.get('duel'):
+            out[name] = t['duel']
+        elif t['recruit']:
             out[name] = 'Recruit: talk with ' + ' or '.join(dict.fromkeys(t['recruit']))
         else:
             what = ([f"gives {', '.join(t['gives'])}"] if t['gives'] else []) + list(dict.fromkeys(t['does']))
@@ -449,11 +484,12 @@ def build_units(ch, m, source, diffs):
             m['starts'] = [m['corrinStart']]
     forced = []
     # A unit the opening scene loads as yours joins here, even when it leaves the map before the battle (Athos in the Final
-    # Chapter, with the legendary weapons) or the preparations put it on a deployment tile.
+    # Chapter, with the legendary weapons) or the preparations put it on a deployment tile; not one it gives the not-yet-joined
+    # state (New Resolve's Nils, 0x72 with 0x10000: he joins at the end of Cog of Destiny, with the items that load gives him).
     for d, run in runs.items():
         for _, grp, in_army in run.loads:
             for g in grp:
-                if g['side'] == 'player' and not in_army:
+                if g['side'] == 'player' and not in_army and g['char'] not in run.unjoined:
                     for i in g['items']:
                         source(i, m['id'], 'kit', f"Carried by {NAMES.get(g['char'], '?')} on joining", who=g['char'], ds=[d])
     for u, ds, lv in placed.values():
@@ -714,22 +750,137 @@ def hard_notes(ch, m, diffs):
     m.setdefault('notesOn', []).append({'note': note, 'difficulties': ['Hard']})
 
 
+NUMBER_WORDS = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine'}
+BRANCHES = ('flags_at_most', 'deployed_as')  # the checks a branch is played both ways on (fe7_events.check)
+
+
+def branch_check(ptr):
+    """The one check of a kind the generator can answer both ways that a script branches on (0x48 / 0x49), or None."""
+    found = {fe.check(args[1]) for _, op, _, args in fe.script(ptr) if op in (0x48, 0x49)}
+    found = [c for c in found if c[0] in BRANCHES]
+    assert len(found) <= 1, (hex(ptr), found)
+    return found[0] if found else None
+
+
+def condition_words(ch, c, answer):
+    """A check's answer in words, for the units its branch brings: 'at most one of the Sage at (4, 12), the Bishop at (14, 13) and
+    the Druid at (3, 24) is defeated' (each flag a death's that sets it in this chapter: the death quotes, scripts/gba_bosses.py),
+    'four or more of its nine doors are opened' (each flag a door's own), 'Bartre is deployed as a Warrior of Lv 5 or more'."""
+    if c[0] == 'deployed_as':
+        _, char, cls, lv = c
+        assert answer
+        return f"{NAMES.get(char, '?')} is deployed as {gm.article(CLASSES.get(cls, '?'))} of Lv {lv} or more"
+    _, flags, n = c
+    doors = {e['flag'] for e in ch.locations if e['type'] == 8}
+    if set(flags) <= doors:
+        things, verb = f'its {NUMBER_WORDS[len(flags)]} doors', 'opened'
+    else:
+        deaths = gba_bosses.death_flags('fe7', R, ch.entry)
+        start = ch.opening(False).units
+        named = []
+        for f in flags:
+            c_ = next(k for k, v in deaths.items() if v == f)
+            u = next(u for u in start if u['char'] == c_)
+            named.append(f"the {CLASSES.get(class_of(u), '?')} at ({u['tile'][0] + 1}, {ch.h - u['tile'][1]})")
+        things, verb = ', '.join(named[:-1]) + ' and ' + named[-1], 'defeated'
+    if answer:
+        return f"at most {NUMBER_WORDS[n]} of {things} {'is' if n == 1 else 'are'} {verb}"
+    return f'{NUMBER_WORDS[n + 1]} or more of {things} are {verb}'
+
+
+def area_waited(ch, e):
+    """The area event a turn event waits on: its script's first command goes past it unless the flag that area sets as it fires
+    is set (Cog of Destiny's four, each on its own area), or None."""
+    cmds = fe.script(e['ptr'])
+    if e['type'] != 2 or not cmds or cmds[0][1] != 0x4D:
+        return None
+    return next((x for x in flag_events(ch, cmds[0][3][1]) if x['type'] in (11, 12, 13) and area_allowed(x, ch.mode)), None)
+
+
+def passes_text(passes):
+    """'Your phase, 1, 3, 5 and 7 turns after one of your units stops in the marked area'."""
+    if passes == [1]:
+        return 'the turn after'
+    nums = [str(p) for p in passes]
+    return (', '.join(nums[:-1]) + ' and ' + nums[-1] if len(nums) > 1 else nums[0]) + ' turns after'
+
+
+def plays_of(ch, e, diffs):
+    """[(the runs by difficulty, when, its arrival's key)]: how an event's units come (when None: arrival_of's words, the plain
+    play). Two kinds are played otherwise:
+      - a script that branches on a check the generator can answer both ways (branch_check) is played with each answer, each
+        answer's units (those the other answer doesn't place) under its condition: Pale Flower of Darkness's turn 10, Harken or
+        Karel (0x0807D4ED, 0x0807D529); Hector's 31x's opening, Karla if Bartre is deployed as a Warrior of Lv 5 or more
+        (0x0807D9E5), which the opening's plain play leaves out;
+      - a turn event that waits on an area (area_waited) and re-arms itself each turn, counting its passes in flags, is played pass
+        by pass with the area's flag set, the event's own set as it fires (the event list sets it, then starts the script:
+        0x08078100): a pass is a turn after a unit first stops in the area, each set of units one arrival with its passes (Cog of
+        Destiny's four areas)."""
+    def play(hard, **kw):
+        return fe.Run(ch.world(hard, turn=e['b'][0] if e['type'] == 2 else 1, **kw)).run(e['ptr'])
+
+    ds = [d for d in diffs if e['type'] != 2 or condition_ok(e, ch.mode, d == 'Hard')]
+    c = branch_check(e['ptr'])
+    if c:
+        out = []
+        runs = {ans: {d: play(d == 'Hard', answers={c: ans}) for d in ds} for ans in (True, False)}
+        for ans in (True, False):
+            if Chapter.is_opening(e) and not ans:
+                continue  # the opening's own play: the map's units at the start
+            for d in ds:
+                other = {(u['char'], u['tile']) for u in runs[not ans][d].units}
+                runs[ans][d].units = [u for u in runs[ans][d].units if (u['char'], u['tile']) not in other]
+            out.append((runs[ans], f"{turn_text(e)}, if {condition_words(ch, c, ans)}", (e['at'], ans)))
+        return out
+    area = area_waited(ch, e)
+    if not area:
+        return [({d: play(d == 'Hard') for d in ds}, None, e['at'])]
+    flag = fe.script(e['ptr'])[0][3][1]
+    # Each difficulty's passes, each pass's units; then the passes with the same units on a difficulty are one arrival.
+    by = {}
+    for d in ds:
+        w = ch.world(d == 'Hard', flags={flag})
+        for p in range(1, 31):
+            if e['flag'] in w.flags:
+                break
+            w.flags.add(e['flag'])
+            w.turn = p
+            run = fe.Run(w).run(e['ptr'])
+            if run.units:
+                key = tuple((u['char'], class_of(u), u['tile'], tuple(u['items'])) for u in run.units)
+                by.setdefault(d, {}).setdefault(key, ([], run))[0].append(p)
+    out = {}
+    for d, keys in by.items():
+        for passes, run in keys.values():
+            words = f"Your phase, {passes_text(passes)} {area_who(area)} stops in the marked area"
+            # A guard on the units the game can hold (0x0807A409: more than 49 foes alive, the load is skipped).
+            over = next((x[1] for x, v in run.checks if x[0] == 'foes_over' and not v), None)
+            if over is not None:
+                words += f', unless more than {over} foes are on the map'
+            # One arrival per first pass: the same first pass on two difficulties is one group, its units per difficulty.
+            runs, whens = out.setdefault(passes[0], ({}, {}))
+            runs[d], whens[d] = run, words
+    return [(runs, whens, (e['at'], first)) for first, (runs, whens) in sorted(out.items())]
+
+
 def build_arrivals(ch, m, source, talks, diffs):
     h = m['height']
     groups, joiners = [], []
     events = [e for e in ch.turns if not Chapter.is_opening(e) and e['ptr'] != ch.ev['opening']]
+    # An opening that branches on a check the generator can answer both ways: its other answer's units come on a condition
+    # (Hector's 31x: Karla). A turn event from turn 1 on that waits on an area plays at the start too, with nothing to place yet
+    # (Cog of Destiny's four).
+    events += [e for e in ch.turns if Chapter.is_opening(e) and r.is_ptr(e['ptr']) and e['ptr'] != ch.ev['opening']
+               and (branch_check(e['ptr']) or area_waited(ch, e))]
     # Type 14 fires when a check routine says so (Hector's 32x: its group on Hector Normal and Hard).
     events += [e for e in ch.talks + ch.misc + ch.locations if e['type'] in (1, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16)]
     n = 0
+    plays = []
     for e in events:
         if not r.is_ptr(e['ptr']) or not area_allowed(e, ch.mode) or (e['type'] in (3, 4) and not talk_allowed(e, ch.mode)):
             continue
-        on = {}
-        for d in diffs:
-            hard = d == 'Hard'
-            if e['type'] == 2 and not condition_ok(e, ch.mode, hard):
-                continue
-            on[d] = fe.Run(ch.world(hard, turn=e['b'][0] if e['type'] == 2 else 1)).run(e['ptr'])
+        plays += [(e, on, said, arrival) for on, said, arrival in plays_of(ch, e, diffs)]
+    for e, on, said, arrival in plays:
         if not any(run.loads for run in on.values()):
             continue
         # A script that goes on to the next chapter is the chapter's end: whoever it places is that scene's cast, not a unit on
@@ -737,6 +888,11 @@ def build_arrivals(ch, m, source, talks, diffs):
         if all(run.next_chapter for run in on.values()):
             continue
         when, areas = arrival_of(ch, e)
+        waited = area_waited(ch, e) if e['type'] == 2 else None
+        if waited:
+            areas = [{'who': 'player', 'rect': gm.rect_to_app(tuple(waited['b'][:4]), ch.h)}]
+        if said:
+            when = said
         # One group per difficulty where they differ; one where they're the same.
         by_units = {}
         for d, run in on.items():
@@ -744,6 +900,9 @@ def build_arrivals(ch, m, source, talks, diffs):
             by_units.setdefault(key, (run, []))[1].append(d)
         for run, ds in by_units.values():
             only = ds if len(ds) < len(diffs) else None
+            # A play's words can differ by difficulty (Cog of Destiny's passes); one sentence where they're the same.
+            said_on = {d: when[d] if isinstance(when, dict) else when for d in ds}
+            words = ({d: said_on[d] for d in ds} if only or len(set(said_on.values())) > 1 else said_on[ds[0]])
             foes = [u for u in run.units if u['side'] == 'enemy']
             friends = [u for u in run.units if u['side'] != 'enemy']
             # What each unit carries and drops on each of the group's difficulties, as (item, difficulty): the same units can hold
@@ -758,15 +917,20 @@ def build_arrivals(ch, m, source, talks, diffs):
                         ch.leveled(v)
             if foes:
                 n += 1
-                g = {'id': f'g{n}', 'label': f'Group {n}', 'when': ({d: when for d in only} if only else when),
+                g = {'id': f'g{n}', 'label': f'Group {n}', 'when': words,
                      'units': [{**unit_entry(u, h, talks.get(NAMES.get(u['char'], '?')), levels[id(u)]), 'from': gm.to_app(u['start'], h)}
                                for u in foes]}
+                for u, entry in zip(foes, g['units']):
+                    if personal(u['char']) and set(u.get('unless', ())) & {gba_bosses.death_flags(GAME, R, None).get(u['char'])}:
+                        # The script skips the load once the character's death (any chapter) has set its flag (Vaida in Cog of
+                        # Destiny: 0x89).
+                        entry['note'] = f"{entry['note']}; placed only if not defeated in an earlier chapter"
                 if areas:
                     g['areas'] = areas
                 if only:
                     for u in g['units']:
                         u['difficulties'] = only
-                g['_event'] = e['at']  # one group per arrival (gba_maps.one_per_arrival)
+                g['_event'] = arrival  # one group per arrival (gba_maps.one_per_arrival)
                 groups.append(g)
                 for u, entry in zip(foes, g['units']):
                     if (entry.get('talk') or '').startswith('Recruit'):
@@ -788,7 +952,7 @@ def build_arrivals(ch, m, source, talks, diffs):
                     continue
                 named = has_portrait(u['char'])
                 j = {'name': NAMES.get(u['char'], '?') if named else CLASSES.get(class_of(u), '?'), 'tile': gm.to_app(u['tile'], h),
-                     'from': gm.to_app(u['start'], h), 'group': f"e{e['at']:x}", 'when': ({d: when for d in only} if only else when)}
+                     'from': gm.to_app(u['start'], h), 'group': f"e{e['at']:x}", 'when': words}
                 if areas:
                     j['areas'] = areas
                 if u['side'] == 'npc':
@@ -808,6 +972,15 @@ def build_arrivals(ch, m, source, talks, diffs):
                         source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(u['char'], '?')} on joining", who=u['char'], ds=[d])
                 if j not in joiners:
                     joiners.append(j)
+            # Units of yours the script takes off the map again stay in your army (fe7_events.Run's benched): none of them is on the
+            # map, but what they carry is yours from the next chapter (Matthew and Serra leave Eliwood's Chapter 12 once they've
+            # spoken, and Chapter 13 deploys them).
+            for d in ds:
+                for c in dict.fromkeys(on[d].benched):
+                    rec = next((g for _, grp, _ in on[d].loads for g in grp if g['char'] == c and g['side'] == 'player'), None)
+                    if rec and c not in on[d].unjoined:
+                        for i in rec['items']:
+                            source(i, m['id'], 'kit-later', f"Carried by {NAMES.get(c, '?')} on joining", who=c, ds=[d])
     if groups:
         m['reinforcements'] = gm.one_per_arrival(groups, diffs)
     if joiners:
@@ -927,8 +1100,10 @@ def story():
             head, title = heading_title(text)
             if entry in VERSION:
                 title = f'{title} (vs. {VERSION[entry]})'
-            if entry == 47:
-                title = f'{title} (part 2)'
+            if entry in FINAL_MAPS:
+                # One chapter on two maps, both titled "Final Chapter: Light" (text 0x5B4) with no "part 2" in the game: each map
+                # is told apart by its own goal, the game's text (+0x8C).
+                title = f'{title} ({r.text(r.u16(rec + 0x8C))})'
             number = int(re.match(r'Ch\.([0-9]+)', head).group(1)) if head.startswith('Ch.') else (0 if head == 'Prologue' else 33)
             slug = {'Lyn': 'lyn', 'Eliwood': 'e', 'Hector': 'h'}[mode]
             tail = head.replace('Ch.', '').replace(' pt 2', '-2').lower() if head.startswith('Ch.') else head.lower()
@@ -1076,8 +1251,8 @@ def main():
         # Looters and the units that leave the map, with the exits they head for.
         gba_ai.settle(m, AI, entry, lambda xy: gm.to_app(xy, h))
         gba_doors.note_closings(m, closings)
-        loaded = {g['char'] for d in (False, True) for _, grp, in_army in ch.opening(d).loads if not in_army for g in grp
-                  if g['side'] == 'player'}
+        loaded = {g['char'] for d in (False, True) for run in [ch.opening(d)] for _, grp, in_army in run.loads if not in_army
+                  for g in grp if g['side'] == 'player' and g['char'] not in run.unjoined}
         joined[mode] |= set(joining) | loaded | (other_version or set())
         # Its fences as its art draws them, and its villages as the buildings in them.
         gm.art_looks(GAME, tileset, after, grid, m)

@@ -97,6 +97,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-11a",
+      "kind": "kit-later",
+      "text": "Carried by Echidna on joining"
+    },
+    {
+      "mapId": "fe6-11a",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -104,6 +109,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-10b",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe6-11b",
+      "kind": "kit-later",
+      "text": "Carried by Geese on joining"
     },
     {
       "mapId": "fe6-14",
@@ -433,6 +443,16 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Trec on joining"
+    },
+    {
+      "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Noah on joining"
+    },
+    {
+      "mapId": "fe6-7",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -530,6 +550,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-4",
+      "kind": "kit-later",
+      "text": "Carried by Clarine on joining"
+    },
+    {
+      "mapId": "fe6-4",
       "kind": "shop",
       "text": "Sold at the vendor"
     },
@@ -547,6 +572,16 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-6",
       "kind": "foe-later",
       "text": "Carried by Cath, a foe arriving mid-chapter"
+    },
+    {
+      "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Trec on joining"
+    },
+    {
+      "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Noah on joining"
     },
     {
       "mapId": "fe6-7",
@@ -697,6 +732,16 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Zelot on joining"
+    },
+    {
+      "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Trec on joining"
+    },
+    {
+      "mapId": "fe6-7",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -831,6 +876,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-4",
+      "kind": "kit-later",
+      "text": "Carried by Clarine on joining"
+    },
+    {
+      "mapId": "fe6-4",
       "kind": "shop",
       "text": "Sold at the vendor"
     },
@@ -940,6 +990,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-10b",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe6-11b",
+      "kind": "kit-later",
+      "text": "Carried by Geese on joining"
     },
     {
       "mapId": "fe6-12x",
@@ -1135,6 +1190,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-3",
       "kind": "foe-later",
       "text": "Carried by Slater, a foe arriving mid-chapter"
+    },
+    {
+      "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Zelot on joining"
     },
     {
       "mapId": "fe6-7",
@@ -1356,6 +1416,16 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Zelot on joining"
+    },
+    {
+      "mapId": "fe6-7",
+      "kind": "kit-later",
+      "text": "Carried by Noah on joining"
+    },
+    {
+      "mapId": "fe6-7",
       "kind": "shop",
       "text": "Sold at the armory"
     },
@@ -1393,6 +1463,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-19b",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe6-20b",
+      "kind": "kit-later",
+      "text": "Carried by Dayan on joining"
     },
     {
       "mapId": "fe6-23",
@@ -1845,6 +1920,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-17b",
       "kind": "shop",
       "text": "Sold at the armory"
+    },
+    {
+      "mapId": "fe6-20b",
+      "kind": "kit-later",
+      "text": "Carried by Dayan on joining"
     },
     {
       "mapId": "fe6-20b",
@@ -2732,6 +2812,11 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-19b",
       "kind": "village",
       "text": "Given at a village"
+    },
+    {
+      "mapId": "fe6-23",
+      "kind": "kit-later",
+      "text": "Carried by Karel on joining"
     }
   ],
   "Restore": [
@@ -2868,6 +2953,18 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-23",
       "kind": "shop",
       "text": "Sold at the vendor"
+    }
+  ],
+  "Brave axe": [
+    {
+      "mapId": "fe6-10a",
+      "kind": "kit-later",
+      "text": "Carried by Geese on joining"
+    },
+    {
+      "mapId": "fe6-11b",
+      "kind": "kit-later",
+      "text": "Carried by Bartre on joining"
     }
   ],
   "Devil axe": [
@@ -3698,18 +3795,6 @@ export const FE6_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe6-21x",
       "kind": "foe",
       "text": "Carried by a foe Hero"
-    },
-    {
-      "mapId": "fe6-22",
-      "kind": "foe",
-      "text": "Carried by a foe Hero"
-    }
-  ],
-  "Brave axe": [
-    {
-      "mapId": "fe6-20ax",
-      "kind": "foe",
-      "text": "Carried by a foe Warrior"
     },
     {
       "mapId": "fe6-22",

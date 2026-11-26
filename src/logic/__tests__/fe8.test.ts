@@ -160,8 +160,14 @@ describe("The Sacred Stones' maps", () => {
     for (const [name, list] of Object.entries(FE8_ITEM_SOURCES))
       for (const s of list) {
         expect(['event', 'talk'].includes(s.kind), `${name} ${s.mapId} ${s.kind}`).toBe(false)
-        if (s.text.endsWith('at the end of the chapter') || s.text.includes('at the end of the chapter if')) expect(s.kind, `${name} ${s.mapId}`).toBe('event-later')
+        // A gift at the end is `event-later`; what a unit who joins at the end carries is `kit-later` (Knoll, whom the end of
+        // Ephraim's Chapter 14 loads while its scene has map 0x46 up).
+        if (s.text.endsWith('at the end of the chapter') || s.text.includes('at the end of the chapter if'))
+          expect(s.kind, `${name} ${s.mapId}`).toBe(s.text.includes(', who joins at the end') ? 'kit-later' : 'event-later')
       }
+    expect(FE8_ITEM_SOURCES['Nosferatu'].map((s) => `${s.mapId} ${s.kind} ${s.text}`)).toContain(
+      'fe8-ephraim-14 kit-later Carried by Knoll, who joins at the end of the chapter',
+    )
     // Joshua joins by a talk in Chapter 5: the Killing Edge Joshua brings counts from Chapter 6.
     expect(FE8_ITEM_SOURCES['Killing Edge'].find((s) => s.text === 'Carried by Joshua on joining')).toMatchObject({ mapId: 'fe8-5', kind: 'kit-later' })
   })
@@ -498,5 +504,29 @@ describe("The Sacred Stones' maps, the user's notes (2026-11-23)", () => {
     // The Ruins 9's fire vents the user saw in the art and not on the map are Hard's (the review draws each map's first difficulty).
     const hard = map('fe8-ruins-9').objects.filter((o) => o.type === 'trap' && o.difficulties?.join() === 'Hard')
     expect(hard.some((o) => o.tile[0] === 2 && o.tile[1] === 21)).toBe(true)
+  })
+})
+
+describe("The Sacred Stones' look-over fixes (the user's marks, 2026-11-26)", () => {
+  const lines = (item: string, who: string) => (FE8_ITEM_SOURCES[item] ?? []).filter((s) => s.text.includes(who)).map((s) => `${s.mapId} ${s.kind}`)
+
+  it("leaves out the opening's scenes: Chapter 19's 'Rausten' Knight and the cutscenes' loads", () => {
+    // LOAD.1 places the Knight (0xCE, an army's name with no portrait) on your side and UNITSET.15 deletes him in the same scene.
+    expect(lines('Iron Lance', 'Rausten')).toEqual([])
+    for (const list of Object.values(FE8_ITEM_SOURCES)) for (const s of list) expect(s.text, s.mapId).not.toMatch(/Carried by Rausten/)
+    // Myrrh's scenes on Ephraim's ship (variant 1) aren't a join, so the Dragonstone she brings counts in Chapter 16 on both routes.
+    expect(lines('Dragonstone', 'Myrrh')).toEqual(['fe8-eirika-16 kit', 'fe8-ephraim-16 kit'])
+    // Ewan's scene in Eirika's Chapter 11 isn't either: his visit in Chapter 12 brings his items.
+    expect(lines('Fire', 'Ewan')).toContain('fe8-eirika-12 kit-later')
+  })
+
+  it("keeps the units an opening places after the preparations screen, and Neimi on her own difficulties' tile", () => {
+    const forced = (id: string) => (FE8_MAPS.find((m) => m.id === id)!.forced ?? []).map((f) => `${f.name} ${f.tile?.join(',')}${f.difficulties ? ` ${f.difficulties.join('/')}` : ''}`)
+    expect(forced('fe8-ephraim-9')).toEqual(['Tana 12,20'])
+    expect(forced('fe8-ephraim-15')).toEqual(['Eirika 13,16', 'Innes 14,15', 'Saleh 12,15'])
+    // Chapter 3 has no preparations; Easy's opening moves Neimi (CHECK.7, then MOVE at 0x089F12E0).
+    expect(forced('fe8-3').filter((f) => f.startsWith('Neimi'))).toEqual(['Neimi 4,7 Easy', 'Neimi 2,6 Normal/Hard'])
+    // Tana joins on Ephraim's Chapter 9 with no items; Chapter 10's group is the deploy template for her unit, no new copy.
+    for (const item of ['Steel Lance', 'Javelin']) expect(lines(item, 'Tana').filter((l) => l.startsWith('fe8-ephraim')), item).toEqual([])
   })
 })

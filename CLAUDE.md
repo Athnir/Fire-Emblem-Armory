@@ -982,7 +982,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Neutral armies** (Genealogy of the Holy War's third relation: an army neither hostile nor friendly to yours) get a marker colour
   of their own, matched to the game's, and turn red or green when a script turns them; each unit's note says when (the user's call).
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
-  deployments (fixed tile or not), and joiners.
+  deployments (fixed tile or not), and joiners. Units an opening places after the preparations screen are forced (The Sacred Stones'
+  Tana in Ephraim's Chapter 9, Eirika, Innes and Saleh in his Chapter 15), and a forced unit can stand there on some difficulties only
+  (`difficulties`: Chapter 3's Neimi, moved on Easy alone).
 - **Difficulties:** one entry where they're the same. Never repeat identical text per difficulty. Where only a level changes (The
   Sacred Stones' generic foes gain or lose the chapter's levels per difficulty; Path of Radiance's, 2 more on Easy; Radiant Dawn's,
   2 more on Hard; The Blazing Blade's, where a difficulty's own group gives another), the unit's data says its Normal level with the
@@ -1022,6 +1024,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
   'Renais Cit.' units survive"). A gift is under only the checks whose branch holds it: one that guards a scene or a join before the
   gifts doesn't make them conditional (Awakening's Paralogue 22), and stacked thresholds each say their own ("if Inigo defeats 3 or
   more foes and survives"). Who a gift goes to is said where the script hands it to a unit ("to Tiki").
+- **A chapter's script is played every way it can go** (the look-over, 2026-11-26, the GBA games): a visit that brings someone only
+  for some visitors once per visitor its script names, saying who ("Karel joins your army if visited by Fir or Bartre"; a visit named by
+  its tile's terrain); a branch on a check the code settles both ways, each answer's units under its condition (Harken or Karel, by
+  the promoted foes defeated or the doors opened; Karla, if Bartre is deployed as a Warrior of Lv 5 or more); a turn event that waits
+  on an area pass by pass, the area drawn (Cog of Destiny). A talk only its first character can start (its script makes that character
+  yours) is said on that character, worded from its AI (Clarine walks to Roy herself). A unit of yours a script takes off the map stays
+  yours, its gear counted from the next chapter (Matthew and Serra in Eliwood's Chapter 12); a unit in the not-yet-joined state or a
+  cutscene's load is no join (Nils before Cog of Destiny's end, Chapter 19's Rausten Knight).
 - **A talk says when it opens**, from the game's talk table where it has one (Genealogy's chapter data +6: "Recruit: talk with
   Sigurd, once you seize Genoa"; Altena's talk with Leif "only if Leif and Finn are both in your army as the chapter starts"), and
   talks the game closes together say only one can be held ("Only one of Iuchar and Iucharba joins: talking to either closes the

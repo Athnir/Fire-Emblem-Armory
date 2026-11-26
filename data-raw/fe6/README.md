@@ -174,16 +174,24 @@ What the generator reads from them:
   Cavaliers and Sniper). A coded talk's check asks more first (`check`: a flag, a character still another army's through CHAR_ON_MAP
   or yours through ALIVE): Shanna's three with Thea in 10B and 11A (0x0806BB35/69/9D) talk while Klein is a foe, then recruit once
   Klein is yours after that talk, or only turn Thea green without it. Talks are matched by name, since a foe version of a character
-  has its own id.
+  has its own id. A talk whose script makes its first character yours (Chapter 4's, Clarine with Roy: 0x2B Clarine to 0) is said on
+  that character: only it can start the talk (the Talk check tests the acting unit, then the target: 0x0802111C -> 0x0806AF4C), and
+  its movement AI does (her second AI byte, 0x0B at 0x085C9488: 0x0D toward Roy, then 0x01 calling 0x08033869 with the pair at
+  0x0810DB18, Clarine and Roy, which sets the AI's talk action, 8, through 0x0802EA74).
 - **Villages and houses:** the items, gold or recruits their scripts give, per visitor where the script asks who's visiting
-  (Chapter 10B). A village the opening closes (map change on it or the tile above: Chapter 1's raided village) is left out; a
-  village that closes another says so (Chapter 9's pair, which also picks 10A or 10B).
+  (0x24: Chapter 10B's), each visitor's play its own: Chapter 23's visit (type 5, the visit command 0x0E, on a village tile, so a
+  village) brings Karel for Fir or Bartre, and anyone else hears no one there wishes to join. A village the opening closes (map change
+  on it or the tile above: Chapter 1's raided village) is left out; a village that closes another says so (Chapter 9's pair, which
+  also picks 10A or 10B).
+- **What an opening skips:** a 0x22 not taken toward a label further on marks what's loaded before that label as placed only while
+  the flag is clear (`Run`'s `unless`). Chapter 15's opening places Perceval only while 0x71 (Chapter 13's recruiting talks set it)
+  and 0x6F (his death's, any chapter) are clear, and his note says so.
 - **Hidden items** (Chapter 14's sand): area events that give an item. Anyone stopping in the area on your phase: a thief always
   finds it, anyone else when a random number divided by 11 leaves 0 (0x0806D028); the Guiding ring only for Sophia.
 - **End of chapter:** items handed to a character (Durandal, the Binding Blade) and who joins (Fa, so her stone counts from the next
   chapter). Each gift is yours from the next chapter (kind `event-later`), as are a talk's gift mid-battle (`talk-later`: Lilina's
-  Thunder) and what a foe a talk recruits carries (`kit-later`: Raigh's Nosferatu, Perceval's lance and sword); an opening's gift
-  would be `gift`, from its chapter (none here).
+  Thunder) and what a foe or green unit a talk recruits carries (`kit-later`: Raigh's Nosferatu, Perceval's lance and sword,
+  Clarine's Heal, the Wo Dao Karel brings from Chapter 23's village); an opening's gift would be `gift`, from its chapter (none here).
 - **The story:** the end scripts' "go to chapter" commands and their checks give the gaiden conditions and Chapter 9's split
   (flags 7 and 8: the two north-eastern villages). The 17A / 17B split is a code check (0x0806C5A8); its wording is Serenes
   Forest's (Thea and Juno's EXP against Sue and Sin's).
