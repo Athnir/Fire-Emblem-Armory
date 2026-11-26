@@ -606,7 +606,15 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Grassland never paving; a town's Plain its paving (`PAVED_PLAIN`: 31's grey road up its middle and tan stone paths, `gf`, a64's
   lawns `gg`), the open country's grass and dirt (a62); chests, forts, levers and onagers on the ground round them (their photo
   colours are the HUD's); boards for Verdant Wind 29's wooden platform and Chapter 7's stage (`gi`, wood brown); bridges drawn whole
-  (`wideBridges`); the dark halls' floors a clear step over their walls as drawn and no wall the void (`APART`). On every 3D game's map its walls
+  (`wideBridges`); the dark halls' floors a clear step over their walls as drawn and no wall the void (`APART`). The user's third look
+  (2026-11-26): its craters, which take 20% of HP a turn, the cracked magma; its Avo Floor a gold ring round a dot (chevrons read as a
+  ledge's); Chapter 4's altars its candle stands, one right over a pillar that pillar's top (`ALTAR_CANDLES`), Chapter 5's two
+  impassable tiles candlesticks; Chapter 10's altar platform paved (`STONE_BOXES`), Chapter 3's night path traced by eye on the photos
+  (`DIRT_PATHS`), a82's (11, 20) dirt (`GROUND_FIXES`); Silver Snow 20's grey paths parted from its tan courtyards by warmth alone;
+  Crimson Flower 32's roofs all grey and 35's all brown (`ROOF_PAINT`); 36's water one colour, its ground a clear step over it
+  (`ONE_WATER`); rubble set in walls drawn as them (`looksAs`); ruins varied tile to tile, a wall's stub among fallen drums, blocks and
+  arches (`variedRuins`); a77's rocks one outcrop (decor 'outcrop'); fire orbs, ballistae and stairs on the ground round them, tile by
+  tile (`standOn`: their photo colour the HUD's or a carpet's). On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
   ground and wall codes).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
@@ -746,7 +754,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   sigil pattern over three tiles by three, each tile's piece by its place in its sigil's box (a frame knotted at its corners, a diamond,
   a square at the heart: the user, a 3x3 pattern with no symbols in it). A roof drawn as the void (all but black) has no shingles
   (Thracia 776's unlit roofs: the user, black with red squiggles). Fire that hurts is the cracked magma in every
-  game, Engage's flames on the ground too; what doesn't hurt never looks like fire (Three Houses' craters a scorched pit). The legend's
+  game, Engage's flames on the ground too; what doesn't hurt never looks like fire (Three Houses' craters, which take 20% of HP a turn, the cracked magma too). The legend's
   tiles carry the same textures.
 - **No map's colour is too dark to see on the dark page** (the user's call: night maps, Revelation's dark castles, Awakening's
   Chapter 1): every colour of a map's own darker than 0.3 lightness is drawn lifted into 0.22 to 0.3, a dark grey or brown, in order

@@ -1416,9 +1416,47 @@ describe("Three Houses' maps as its stages draw them", () => {
     expect(at('fe16-29-vw', 4, 24)).toBe('gi')
     expect(codes('fe16-7-be').filter((c) => c === 'gi').length).toBe(19)
     expect(terrainInfo(map('fe16-7-be'), 'gi').name).toBe('Floor')
-    expect(map('fe16-a77').decor).toMatchObject({ '5,17': 'grave', '13,12': 'rock', '15,16': 'rock' })
+    expect(map('fe16-a77').decor).toMatchObject({ '5,17': 'grave', '12,12': 'outcrop', '13,12': 'outcrop', '13,13': 'outcrop', '15,16': 'rock' })
     // its bridges drawn whole, a rail along each side over the water (Silver Snow 22's, a67's at (8, 13))
     for (const id of ['fe16-22-ss', 'fe16-a67']) expect(map(id).wideBridges, id).toBe(true)
+  })
+
+  // The user's third look (2026-11-26).
+  it("paves Chapter 10's altar platform, traces Chapter 3's night path, and gives a82's (11, 20) the dirt round it", () => {
+    for (const [x, y] of [[8, 17], [10, 19], [12, 20], [8, 16]]) expect(at('fe16-10', x, y), `${x},${y}`).toBe('gb')
+    expect(map('fe16-10').decor?.['7,20']).toBe('pillar')
+    for (const [x, y] of [[15, 10], [9, 12], [18, 8], [22, 6]]) expect(at('fe16-3', x, y), `${x},${y}`).toBe('ga')
+    expect(at('fe16-a82', 11, 20)).toBe('ga')
+  })
+
+  it("draws its craters, which take 20% of HP a turn, as the cracked magma, and Chapter 4's altars as its candlesticks", () => {
+    expect(codes('fe16-15-ss')).toContain('dh')
+    expect(FE16_TERRAIN.dh!.note).toMatch(/20% of max HP/)
+    const d = map('fe16-4-be').decor ?? {}
+    expect([d['10,20'], d['10,21'], d['1,13'], d['5,20']]).toEqual(['candle', 'candle', 'candle', 'candle'])
+    // one right over a pillar is that pillar's top
+    expect([d['6,21'], d['9,21']]).toEqual(['pillar', 'pillar'])
+    expect([map('fe16-5').decor?.['9,14'], map('fe16-5').decor?.['13,14']]).toEqual(['candle', 'candle'])
+  })
+
+  it("paints every roof of Crimson Flower 32 grey and of 35 brown, and parts Silver Snow 20's grey paths from its tan courtyards", () => {
+    const roofs = (id: string) => new Set(Object.values(map(id).decor ?? {}).filter((k) => k.startsWith('roof-')))
+    expect(roofs('fe16-32-cf')).toEqual(new Set(['roof-grey']))
+    expect(roofs('fe16-35-cf')).toEqual(new Set(['roof-brown']))
+    expect(codes('fe16-20-ss').filter((c) => c === 'ge').length).toBeGreaterThan(200)
+  })
+
+  it("gives Crimson Flower 36's water one colour, its ground a clear step over it", () => {
+    const f = visibleFills(map('fe16-36-cf').fills)
+    expect(new Set([f.we, f.wl, f.tg]).size).toBe(1)
+    for (const g of ['te', 't0', 'tw'] as const) expect(lightness(f[g]!) - lightness(f.we!), g).toBeGreaterThan(0.09)
+  })
+
+  it("draws rubble set in Chapter 6's walls as the walls, a77's rocks one outcrop, ruins varied, and Silver Snow 24's fire orb, ballista and stairs on the floor", () => {
+    expect([map('fe16-6').looksAs?.['18,11'], map('fe16-6').looksAs?.['6,18']]).toEqual(['wa', 'wa'])
+    for (const id of ['fe16-9', 'fe16-37-cf']) expect(map(id).variedRuins, id).toBe(true)
+    const on = map('fe16-24-ss').standOn ?? {}
+    expect([on['3,18'], on['23,18'], on['13,17']]).toEqual(['tw', 'tw', 'tw'])
   })
 
   it("draws the Prologue's razed house as a ruin, and keeps the desert stage's plain and walls apart from its sand (the user's calls)", () => {

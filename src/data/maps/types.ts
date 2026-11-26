@@ -342,7 +342,7 @@ export interface ChapterMap {
     | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab' | 'ice' | 'frozenFountain'
     | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
     | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown'
-    | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad' | 'stones' | 'thickPillar' | 'torch'
+    | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad' | 'stones' | 'thickPillar' | 'torch' | 'outcrop'
   >
   /** The blocks its roofs and stalls are drawn over, (x0, x1, y0, y1) each, where buildings side by side would join into one block of
    * one paint (Three Houses': each building block parted into the rectangles a roof covers, the user's call: roofs as Fates' are). */
@@ -441,6 +441,9 @@ export interface ChapterMap {
   /** Tiles drawn in ruins though their terrain stands (a Fates challenge battle's houses whose villages are spent: the user's call),
    * by tile key: the house's own tiles, and its village before it as rubble-strewn ground. */
   ruins?: string[]
+  /** Its ruins' pieces varied tile to tile, a ruin's wall among fallen drums, blocks and arch stones (Three Houses': the user, other
+   * rubble tiles to break them up). */
+  variedRuins?: true
   /** What a wall that shares its numbers with other kinds is, by the 3D model on it (Radiant Dawn's: its fences, sandbags and outer
    * walls are one terrain, as its pillars and castle walls are): "x,y" -> sandbags, a low outer wall or a pillar; a fence has none. A
    * wall the art draws as something else: a low stone wall (the GBA games' fences), rock (Gaiden's cave walls' faces, which fliers

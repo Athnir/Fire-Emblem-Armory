@@ -10,7 +10,7 @@ import type { Sprite } from '../icons/sprites'
 import {
   ACID_BOG, ALLY, ARROW_TRAP, BALLISTA, GAS_VENT, BOULDER, CALTROPS, COAST, COMMON_PARTNER, FISSURE, MUCK, PARTNER, SIGIL, TRAIL, WARD, BURIED, EVENT_TILE, CAPTURE_BADGE, STEAL_BADGE, CASTLE, CHEST, COMMON_ALLY, COMMON_ENEMY, COMMON_PAIR, CRACK, DOOR, DROP_BADGE, DRAGON_VEIN, FORT, GATE, HEAL, HOUSE, JOINER, LEDGE, NAMED_ENEMY, PILLAR, PIT,
   REINFORCEMENT, NAMED_REINFORCEMENT, BOSS_REINFORCEMENT, RUBBLE, SKULL, SNOW_PEAK, STAIRS, SUPPLIES, TORCH, FLAME, HEAL_FLOOR, DEF_FLOOR, RES_FLOOR, SPIKES, TREE, THICK_WOOD, THICKET, CHURCH, OLD_GATE, GATEWAY, RUBBLE_WALL, ICE_BLOCK, VASE_MEDICINE, VASE_POISON, ARMORY, VENDOR, SECRET_SHOP, ARENA, PEAK,
-  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, CREST_STONE, HEALTH_PIPS, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
+  BULWARK, GRAVE, FELL_FLOOR, SHINY, COTTAGE, SNAG, CREST_STONE, HEALTH_PIPS, FLOOR_TRAP, ONAGER, FIRE_ORB,
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST, TUNNEL, VILLAGE_PIECES, VILLAGE_VARIANTS, CASTLE_PIECES, TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES,
   HOUSE_PIECES, HOUSE_SIDE_PIECES, FOUNTAIN_PIECES, ROOFTOP_PIECES, ROOFTOP_DOORS, CHIMNEY, HOUSE_VARIANTS, HOUSE_FRONT, MARKET_STALL, CRATES, ODDS_AND_ENDS, CANDLESTICK, PROP_SPRITES, FLOOR_PATTERNS, COAST_VARIANTS, SNOW_TREE, SNOW_THICK_WOOD, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, LAVA_POOL, CHURCH_PIECES, CAMP_PIECES, WATCHTOWER,
   CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT, VILLAGE_HOUSE, WALLED_VILLAGE, RUINED_VILLAGE_TOP, RUINED_VILLAGE_FRONT,
@@ -1200,7 +1200,11 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
   }
   // A house in ruins (a Fates challenge's, its village spent; Engage's ruined villages) is a ruin's walls; its village before it no
   // house but rubble-strewn ground (GroundDetail's stones).
-  if (at && map.ruins?.includes(tileKey(at))) return /^r[a-r]$/.test(code) || code === 'oe' || code[0] === 'w' ? RUINS : undefined
+  if (at && map.ruins?.includes(tileKey(at))) {
+    if (!(/^r[a-r]$/.test(code) || code === 'oe' || code[0] === 'w')) return undefined
+    // A map's ruins varied tile to tile (`variedRuins`: Three Houses', the user): a wall's stub among fallen drums, blocks and arches.
+    return map.variedRuins ? [RUINS, ...RUBBLE_VARIANTS][variety(at[0], at[1])] : RUINS
+  }
   if (at && map.rooftops && roofAt(map, at)) return rooftopOf(map, at)
   // A tile the user marked as no house is odds and ends (the user: the packed towns' odd tiles are small objects), its own terrain kept.
   if (at && map.rooftops?.houses?.[tileKey(at)] === 0) return TERRAIN_SPRITE.o4
@@ -1817,11 +1821,11 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   'roof-slate': canopyPiece('slate', 0, 0, 1, 1), 'roof-grey': canopyPiece('grey', 0, 0, 1, 1), 'roof-tan': canopyPiece('tan', 0, 0, 1, 1),
   'roof-green': canopyPiece('green', 0, 0, 1, 1), 'roof-brown': canopyPiece('brown', 0, 0, 1, 1),
   roundYurt: roundYurtPiece(1, 1, 3, 3), zenGarden: zenGardenPiece(1, 1), cherry: CHERRY_TREE, walledHouse: VILLAGE_HOUSE.middleFront,
-  stones: STONE_PILE, thickPillar: PILLAR_TOP, torch: CANDLESTICK,
+  stones: STONE_PILE, thickPillar: PILLAR_TOP, torch: CANDLESTICK, outcrop: BOULDER,
 }
 /** Decor drawn in place of its tile's own icon: rocks where the game's bones lie, barrels, and Fates' big trees, boulders, rubble,
  * crates, stalls, roofs, yurts, gardens and walled house over its rubble and buildings. */
-const REPLACES_ICON = new Set(['rock', 'barrel', 'cherry', 'rubble', 'crates', 'pillar', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch',
+const REPLACES_ICON = new Set(['rock', 'barrel', 'cherry', 'rubble', 'crates', 'pillar', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch', 'outcrop',
   'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
   'roof-tan', 'roof-green', 'roof-brown'])
 /** Ground of planks: a ship's deck, a pier's or a hall's boards, a road of boards, a wooden pedestal. */
@@ -1829,7 +1833,7 @@ const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
 const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table', 'candelabra', 'garden', 'tree', 'slab', 'ice',
   'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
-  'roof-tan', 'roof-green', 'roof-brown', 'roundYurt', 'zenGarden', 'cherry', 'walledHouse', 'warpSigil', 'warpPad', 'stones', 'thickPillar', 'torch'])
+  'roof-tan', 'roof-green', 'roof-brown', 'roundYurt', 'zenGarden', 'cherry', 'walledHouse', 'warpSigil', 'warpPad', 'stones', 'thickPillar', 'torch', 'outcrop'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 /** What's drawn over a tile (`decor`); in a block the user turned round (`mirror`), its partner's across the block, flipped (Radiant
  * Dawn's Part 3 Ch.12's carriage, the user: it faced away from its horse). */
@@ -1843,6 +1847,12 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const kind = map.decor?.[tileKey([x, y])]
   const same = (dx: number, dy: number) => map.decor?.[tileKey([x + dx, y + dy])] === kind
   if (kind === 'crates') return crateOrHeap(map, [x, y], CRATES)
+  // One stone outcrop over its tiles, whatever their shape (Three Houses' a77: the user, one outcrop), each tile's boulder open toward
+  // the others.
+  if (kind === 'outcrop') {
+    const [u, d, l, r] = [same(0, 1), same(0, -1), same(-1, 0), same(1, 0)]
+    return u || d || l || r ? boulderPiece(!u, !l, !r, !d, variety(x, y)) : BOULDER
+  }
   // Thick pillars two tiles by two are one great pillar (Echoes' 太柱: the user, 2x2 pillars), a lone one its top on its base.
   if (kind === 'thickPillar') {
     const [x0, x1, y0, y1] = blocks2x2(map, 'thickPillar').get(tileKey([x, y])) ?? [x, x, y, y]
@@ -2196,7 +2206,7 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
   b8: TREE, hg: HEAL, ow: CREST_STONE,
   // Its floor traps and craters, and the siege engines a unit fires: onagers and fire orbs (Fates' fire orbs too). (Its swamp is mud,
   // drawn as Radiant Dawn's bog: GroundDetail.)
-  dg: FLOOR_TRAP, dh: CRATER, ox: ONAGER, og: FIRE_ORB,
+  dg: FLOOR_TRAP, dh: LAVA_CRACK, ox: ONAGER, og: FIRE_ORB,
   // Engage's effects laid over a tile (Dragon Vein terrain, miasma), each a badge over the tile's own icon.
   ea: FOG, eb: FOG, ec: PUDDLE, ed: PUDDLE, ee: STONE_PILLARS, eg: MIASMA, eh: MIASMA, ei: FROST,
   // Fire that hurts is the cracked magma in every game (the user's call: Engage's flames on the ground too); fire that doesn't is
@@ -3718,7 +3728,7 @@ function Legend({
     }
     // A code whose every tile is drawn as rocks (Awakening's Chapter 9's bones) is the rocks' line.
     if ((map.decor || map.looksAs) && map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== l ||
-      ['rock', 'ice', 'frozenFountain', 'cherry', 'rubble', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch'].includes(map.decor?.[tileKey([x + 1, map.height - i])] ?? '') ||
+      ['rock', 'ice', 'frozenFountain', 'cherry', 'rubble', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch', 'outcrop'].includes(map.decor?.[tileKey([x + 1, map.height - i])] ?? '') ||
       !!map.looksAs?.[tileKey([x + 1, map.height - i])] ||
       /^(stall|roof)-/.test(map.decor?.[tileKey([x + 1, map.height - i])] ?? ''))))
       continue
@@ -3794,6 +3804,7 @@ function Legend({
     walledHouse: 'House (no unit enters)', warpSigil: 'Sigil: it sends a unit standing on it to its platform',
     warpPad: 'Warp platform: where a sigil sends a unit',
     stones: 'Heap of stones (no unit enters)', thickPillar: 'Pillar (no unit enters)', torch: 'Torch (no unit enters)',
+    outcrop: 'Rock outcrop (no unit enters)',
   }
   // A roof over a building fliers cross (Three Houses') says so, with the building's name.
   const roofLabel = (kind: string) => {

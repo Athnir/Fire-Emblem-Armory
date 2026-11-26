@@ -51,6 +51,16 @@ def photo_fills(rows, photo):
     return out
 
 
+def lit_fill(rows, photo, code):
+    """A code's colour from its lit tiles alone, the lighter half of them in the photos (Silver Snow 20's paths, half in the shadow of
+    its buildings: the user, the stone tiles' colours)."""
+    cs = np.array([rgb for c, r, *rgb in photo if r < len(rows) and c < len(rows[r]) and rows[r][c] == code], float)
+    if not len(cs):
+        return None
+    lit = cs[cs.mean(1) >= np.median(cs.mean(1))]
+    return '#%02x%02x%02x' % tuple(int(round(v)) for v in np.median(lit, axis=0))
+
+
 def _lab(rgb):
     """CIE Lab of an sRGB colour (0-255)."""
     v = np.array(rgb, float) / 255
@@ -174,8 +184,9 @@ RUIN_STAGES = {9: ('w7',), 25: ('w7',), 21: ('wt',)}
 # A map's roofs where the photos show no clear colour: its slate, else grey stone (the user: roofs as Fates' are, so the buildings
 # stand out from the ground).
 ROOF_DEFAULT = {13: 'slate', 26: 'slate'}
-# A map whose roofs are all one, whatever the photos read: Verdant Wind 29's wooden palisade, Crimson Flower 31's and 34's red tiles.
-ROOF_PAINT = {21: 'brown', 12: 'red', 14: 'red'}
+# A map whose roofs are all one, whatever the photos read: Verdant Wind 29's wooden palisade, Crimson Flower 31's and 34's red tiles,
+# 32's grey slate and 35's brown (the user's third look: the other colours were the walls and grass the photos sampled).
+ROOF_PAINT = {21: 'brown', 12: 'red', 14: 'red', 16: 'grey', 23: 'brown'}
 # Where the game's Plain is a town's paving (the user: Crimson Flower 31's road and paths, Silver Snow 22's, a63's and a64's city
 # streets, a83's castle cobbles): its paving; 'grass', with its lawns (a64's (8, 9) and (7, 7)); ('road', x0, x1), its grey road
 # those columns and the rest its tan stone paths (31's: the user, '(12, 6) to (14, 1) should be stone ... the path is a tan stone
@@ -184,22 +195,42 @@ PAVED_PLAIN = {12: ('road', 12, 14), 18: 'one', 32: 'one', 33: 'grass', 35: 'one
 COUNTRY_PLAIN = {36}
 # Grass the photos show brown under a sunset (Crimson Flower 34: the user, the grass missing) drawn as grass, its hue turned green.
 GREEN_GRASS = {14, 33, 36}
-# Floor its lighter stone paths cross (Silver Snow 20: the user): in the top-down colours, a Floor tile this light (L*) and this neutral
-# (b* at most) is the path, `ge` with the Floor's numbers.
-LIGHT_PATHS = {17: (44, 6)}
+# Floor its grey stone paths cross (Silver Snow 20: the user, then the stone tiles' colours again: its courtyards tan, its paths
+# grey-blue, in shade too): in the top-down colours, a Floor tile this light (L*) and this neutral (b* at most) is the path, `ge`
+# with the Floor's numbers.
+LIGHT_PATHS = {17: (0, 7)}
 # Bridges and floors drawn as boards (`gi`, their own numbers): Verdant Wind 29's wooden platform (the user: a wood structure, no
 # railings), Chapter 7's wooden stage that burns (the game's Floor that turns to fire: the user, the structure is wood).
 BOARDS = {21: (10,), 7: (79,)}
 # Stairs going up where a map draws the rest of its lone stairs going down (Silver Snow 24: the user).
 STAIRS_UP = {'fe16-24-ss': [(13, 27), (13, 28), (5, 21), (21, 21)]}
-# Tiles drawn as what the user saw there, their numbers kept (a77: (5, 17) a grave among the ruins, (13, 12) and (15, 16) stones).
-TILE_DECOR = {29: {(5, 17): 'grave', (13, 12): 'rock', (15, 16): 'rock'}}
+# Tiles drawn as what the user saw there, their numbers kept (a77: (5, 17) a grave among the ruins, (15, 16) a stone, (12, 12) to
+# (13, 13) one stone outcrop; Chapter 5's impassable (9, 14) and (13, 14) candlesticks).
+TILE_DECOR = {29: {(5, 17): 'grave', (12, 12): 'outcrop', (13, 12): 'outcrop', (13, 13): 'outcrop', (15, 16): 'rock'},
+              5: {(9, 14): 'candle', (13, 14): 'candle'}}
 # Icons that stand on the ground round them: a photo's colour there is the HUD's or the icon's, not the ground's (the user: Chapter 2's
 # chest on purple, a64's yellow strongholds, a82's fort).
 ICON_ON_GROUND = ('oa', 'bb', 'ov', 'ox')
 # Maps whose floors and walls the viewer's dark lift draws too close (the user: Chapters 5 and 6, Silver Snow 13, Crimson Flower 37;
 # Chapters 4 and 11 the same), by battle map: every ground kept a clear step over the walls as drawn, and no wall the void.
 APART = {4, 5, 6, 11, 13, 25}
+# The user's third look (2026-11-26). Plain within these boxes (x0, x1, y0, y1) the stone the photos show, its paving `gb` with the
+# Plain's numbers (Chapter 10's altar platform: the user, stone but for its pillars).
+STONE_BOXES = {10: [(7, 13, 16, 20)]}
+# A dirt path too dark at night to sort by colour, traced by eye on the photos (Chapter 3's: the user, more of the path through
+# (15, 10)): by row, the columns it crosses, its grass and plain drawn as dirt.
+DIRT_PATHS = {3: {13: (6, 10), 12: (7, 12), 11: (10, 13), 10: (12, 15), 9: (14, 17), 8: (16, 19), 7: (18, 21), 6: (20, 23),
+                  5: (21, 24), 4: (23, 25)}}
+# Its water one colour, the light all that changes, and its ground a clear step over it (Crimson Flower 36: the user, water and floor
+# blended).
+ONE_WATER = {24}
+# Altars that are candle stands (Chapter 4's, lit in the photos: the user, candlesticks); one right over a pillar is that pillar's top.
+ALTAR_CANDLES = {4}
+# Ground the user set by hand: a82's lone Plain at (11, 20) the dirt round it (the user: not a stone tile).
+GROUND_FIXES = {34: {(11, 20): 'ga'}}
+# Icons set on the ground round them tile by tile: a fire orb, a ballista and stairs, whose colour in the photos is the HUD's or a
+# carpet's (Silver Snow 24's, the user: their background).
+STAND_ON_GROUND = ('og', 'of', 'tc')
 
 
 def top_colours(top):
@@ -293,9 +324,10 @@ def woody(hexc):
     return '#%02x%02x%02x' % tuple(round(v * 255) for v in colorsys.hls_to_rgb(28 / 360, min(l, 0.5), max(s, 0.32)))
 
 
-def apart(fills, present):
+def apart(fills, present, below=None):
     """Every ground a clear step (0.1) over the walls as the viewer draws them (colours under 0.3 lightness lifted into 0.22-0.3:
-    src/logic/mapFills.ts), and no wall the void (under 0.06: drawn black)."""
+    src/logic/mapFills.ts), and no wall the void (under 0.06: drawn black). `below`: the codes kept under the ground instead of the
+    walls (a map's water, `one_water`)."""
     def hls(c):
         return colorsys.rgb_to_hls(*(int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)))
 
@@ -304,7 +336,7 @@ def apart(fills, present):
 
     def drawn(l):
         return 0.22 + l * (0.08 / 0.3) if l < 0.3 else l
-    walls = [c for c in EMU_WALLS + ('w7',) if c in fills and c in present]
+    walls = [c for c in (below or EMU_WALLS + ('w7',)) if c in fills and c in present]
     for c in walls:
         h, l, s = hls(fills[c])
         if l < 0.07:
@@ -319,6 +351,22 @@ def apart(fills, present):
                 # Its chroma kept, not its saturation (a lighter colour at one saturation turns neon).
                 to = top + 0.1
                 fills[c] = hexc(h, to, min(1, s * (1 - abs(2 * l - 1)) / (1 - abs(2 * to - 1))))
+
+
+def one_water(fills, rows, photo):
+    """Every water kind on the map one colour, the median of all its water tiles in the photos (the app's blue where that isn't blue),
+    and every ground a clear step over it as drawn (`apart`)."""
+    col = {(c, r): rgb for c, r, *rgb in photo}
+    tiles = [col[(c, r)] for r in range(len(rows)) for c in range(len(rows[r])) if rows[r][c] in EMU_WATER and (c, r) in col]
+    present = {code for row in rows for code in row}
+    if not tiles:
+        return
+    r, g, b = (int(round(v)) for v in np.median(np.array(tiles, float), axis=0))
+    for c in EMU_WATER:
+        fills.pop(c, None)
+        if c in present and b - max(r, g) >= 12:
+            fills[c] = '#%02x%02x%02x' % (r, g, b)
+    apart(fills, present, below=tuple(c for c in EMU_WATER if c in fills))
 
 
 # The houses its stages show razed, a ruin's walls (x0, y0, x1, y1 in map tiles): the Prologue's at (11, 13), the user's call.
@@ -3546,6 +3594,9 @@ def main():
                     x, y = c + 1, b.h - r
                     if kind in KIND_DECOR and not (kind == 63 and altars > 1):
                         decor[f'{x},{y}'] = KIND_DECOR[kind]
+                    if kind == 63 and stage in ALTAR_CANDLES:
+                        below = b.rows[r + 1][c][0] if r + 1 < b.h else None
+                        decor[f'{x},{y}'] = 'pillar' if below == 34 else 'candle'
                     if (x, y) in TILE_DECOR.get(stage, {}):
                         decor[f'{x},{y}'] = TILE_DECOR[stage][(x, y)]
                     if kind in BREAKABLE:
@@ -3634,6 +3685,18 @@ def main():
             dirt = [(x, y) for x, y in g['dirt'] if rows[len(rows) - y][x - 1] == 'ta']
         for x, y in dirt:
             rows[len(rows) - y][x - 1] = 'ga'
+        hh = len(rows)
+        for y, (x0, x1) in DIRT_PATHS.get(stage, {}).items():
+            for x in range(x0, x1 + 1):
+                if rows[hh - y][x - 1] in ('t0', 'ta'):
+                    rows[hh - y][x - 1] = 'ga'
+        for x0, x1, y0, y1 in STONE_BOXES.get(stage, []):
+            for y in range(y0, y1 + 1):
+                for x in range(x0, x1 + 1):
+                    if rows[hh - y][x - 1] in ('t0', 'ta', 'ga', 'gg'):
+                        rows[hh - y][x - 1] = 'gb'
+        for (x, y), code in GROUND_FIXES.get(stage, {}).items():
+            rows[hh - y][x - 1] = code
         # The open country's Plain that isn't dirt is its grass (a62: the user, grass and dirt only).
         if country:
             rows = [['gg' if code == 'ta' else code for code in row] for row in rows]
@@ -3651,6 +3714,10 @@ def main():
             # earlier pass found: card 3's)
             m['fills'].update({k: v for k, v in emu.get(m['id'], {}).items() if k in present or k in later})
             m['fills'].update(photo_fills(rows, photo))
+            # A Floor's stone paths, and a night path traced by eye, in the colour of their lit tiles, not their shade's.
+            for paths, code in ((LIGHT_PATHS, 'ge'), (DIRT_PATHS, 'ga')):
+                if stage in paths and lit_fill(rows, photo, code):
+                    m['fills'][code] = lit_fill(rows, photo, code)
             # An icon on the ground stands on the ground round it, not the HUD's or its own colour in the photos.
             for code in ICON_ON_GROUND:
                 m['fills'].pop(code, None)
@@ -3663,6 +3730,8 @@ def main():
             emu_separate(m['fills'], present)
             if stage in APART:
                 apart(m['fills'], present)
+            if stage in ONE_WATER:
+                one_water(m['fills'], rows, photo)
             # A breakable wall with no wall round it is a plain wall's stones in its own colour.
             if 'wz' in m['fills'] and 'wa' not in present:
                 m['fills']['wa'] = m['fills']['wz']
@@ -3684,6 +3753,8 @@ def main():
         tiles += [f'{c + 1},{h - r}' for r, row in enumerate(rows) for c, code in enumerate(row) if code in RUIN_STAGES.get(stage, ())]
         if tiles:
             m['ruins'] = list(dict.fromkeys(tiles))
+            # its pieces varied tile to tile (the user: other rubble tiles to break it up, Chapter 9's and Crimson Flower 37's)
+            m['variedRuins'] = True
         colours = top_colours(tops.get(str(stage), []))
         default = ROOF_DEFAULT.get(stage, 'grey')
         seen, boxes = set(m.get('ruins', [])), []
@@ -3713,6 +3784,30 @@ def main():
                     boxes.append([c0 + 1, c0 + w, h - (r0 + hh - 1), h - r0])
         if boxes:
             m['decorBoxes'] = boxes
+        # Rubble set in a map's walls is drawn as the walls round it, its numbers kept: it has no HP, nothing breaks it (Chapter 6's: the
+        # user, walls?).
+        def wallish(code):
+            return code[0] == 'w' and code not in ('wj', 'wl', 'we')
+        for r, row in enumerate(rows):
+            for c, code in enumerate(row):
+                if code != 'wj':
+                    continue
+                nb = [rows[r + dr][c + dc] for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1))
+                      if 0 <= r + dr < h and 0 <= c + dc < len(row) and wallish(rows[r + dr][c + dc])]
+                if len(nb) >= 2:
+                    m.setdefault('looksAs', {})[f'{c + 1},{h - r}'] = max(sorted(set(nb)), key=nb.count)
+        # A fire orb, a ballista and stairs stand on the ground round them, tile by tile: their colour in the photos is the HUD's or a
+        # carpet's (`STAND_ON_GROUND`).
+        grounds = EMU_GROUNDS + ('ge', 'gf', 'gg', 'gi', 'b9', 'bo', 'bq')
+        for r, row in enumerate(rows):
+            for c, code in enumerate(row):
+                if code not in STAND_ON_GROUND:
+                    continue
+                nb = [rows[r + dr][c + dc] for dr in (-1, 0, 1) for dc in (-1, 0, 1)
+                      if (dr or dc) and 0 <= r + dr < h and 0 <= c + dc < len(row)]
+                ground = [n for n in nb if n in grounds and n not in STAND_ON_GROUND]
+                if ground:
+                    m.setdefault('standOn', {})[f'{c + 1},{h - r}'] = max(sorted(set(ground)), key=ground.count)
         # Its bridges each drawn whole, a rail along each side over the water (the user: Silver Snow 22's, a67's at (8, 13)).
         if any(code in ('tb', 'wo') for row in rows for code in row):
             m['wideBridges'] = True

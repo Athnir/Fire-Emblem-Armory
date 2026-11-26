@@ -1283,21 +1283,22 @@ export const HEAL_FLOOR: Sprite = {
  * takes its own design for each kind (`floorPattern`). */
 export const FLOOR_PATTERNS: Record<'def' | 'def2' | 'res' | 'heal' | 'ward' | 'avo', Sprite[]> = {
   // A floor that gives Avoid where the map's Def floors look alike (Three Houses' Avo Floor beside its Cover: the user, two kinds of
-  // tile drawn alike): gold chevrons, two to a tile, a column of them where the floor runs on.
+  // tile drawn alike): a gold ring round a dot, joined corner to corner by faint studs (the user's third look: not chevrons, which
+  // read as a ledge's).
   avo: [
     {
       palette: { t: 'rgba(250, 210, 110, 0.6)', l: 'rgba(255, 240, 190, 0.22)' },
       rows: [
         'l........l',
+        '...tttt...',
+        '..t....t..',
+        '.t......t.',
+        '.t..tt..t.',
+        '.t..tt..t.',
         '.t......t.',
         '..t....t..',
-        '...t..t...',
-        '....tt....',
+        '...tttt...',
         'l........l',
-        '.t......t.',
-        '..t....t..',
-        '...t..t...',
-        '....tt....',
       ],
     },
   ],
@@ -2571,25 +2572,6 @@ export const FLOOR_TRAP: Sprite = {
     '.oggrrggo.',
     '.og.gg.go.',
     '.oooooooo.',
-    '..........',
-  ],
-}
-
-/** A crater (Three Houses' Ailell: Prt -1, Avoid -20, 20% of HP a turn): a scorched rim around a glowing pit. */
-export const CRATER: Sprite = {
-  // A scorched pit, its rim of thrown-up earth lit along the top (the user: only a tile that hurts looks like fire, the cracked
-  // magma; a crater doesn't hurt).
-  palette: { k: '#2a221c', b: '#5a4a3c', l: '#8a7660', d: '#3e322a' },
-  rows: [
-    '..........',
-    '...llll...',
-    '..lbbbbl..',
-    '.lbkkkkbb.',
-    '.lbkddkkb.',
-    '.bbkdddkb.',
-    '.bbkkkkbb.',
-    '..bbbbbb..',
-    '...bbbb...',
     '..........',
   ],
 }
@@ -5346,7 +5328,7 @@ export const ALL_SPRITES = {
   SNOW_TREE, SNOW_THICK_WOOD, CRATES, ODDS_AND_ENDS, CANDLESTICK, LAVA_POOL, DEF_SIGIL, DEF2_SIGIL, RES_SIGIL, WATCHTOWER, CHURCH_FRONT_PLAIN, CAMP_FRONT_PLAIN, DOOR_MAT,
   ...Object.fromEntries(Object.entries(VILLAGE_VARIANTS).flatMap(([k, vs]) => vs.map((v, i) => [`VILLAGE_VARIANT_${k}${i}`, v]))),
   FOG, PUDDLE, STONE_PILLARS, MIASMA, FROST,
-  SWAMP, FLOOR_TRAP, CRATER, ONAGER, FIRE_ORB,
+  SWAMP, FLOOR_TRAP, ONAGER, FIRE_ORB,
   TOWN_HOUSE, MOUNTAIN, LAVA_CRACK, BARREL, BONES, PILLAR, TREE, VASE_MEDICINE, VASE_POISON, FORT, GATE, HOUSE, CHEST, DOOR, STAIRS, RUBBLE, RUINS,
   CRACKED_WALL,
   SNOW_PEAK, HEAL, DRAGON_VEIN, SKULL, ALLY, NAMED_ENEMY, COMMON_ENEMY, COMMON_PAIR, DROP_BADGE, CAPTURE_BADGE, STEAL_BADGE,
