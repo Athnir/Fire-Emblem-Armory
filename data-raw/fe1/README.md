@@ -112,20 +112,28 @@ MMC4: bank n at $8000-$BFFF, bank 15 fixed at $C000-$FFFF. Addresses below are b
   tile but a village marked c 0x20 / 0x10 / 0x08: Chapter 11's gate has a tile drawn as grass), a village (terrain code 2), else a
   house, which only talks. a (3:$9B46) is what it gives: 0 nothing; 1-0x77 an item (a − 1), into the visitor's items, else to storage;
   0x78-0x7F gold (100, 200, 500, 1000, 1500, 2000, 3000, 5000; 3:$9C6E); 0x80 the chapter's village recruit (3:$9466, u16 pointers
-  by chapter − 1: whole 27-byte records); 0x81 / 0x82 characters 0x27 / 0x26 (Samson and Arran, Chapter 16); 0x84 (Chapter 22's
-  village): a visitor holding the Starsphere and the Lightsphere gives them up for Starlight. Seizing gives what its tile's a says:
-  1500 gold (Chapter 3), a Silver Sword (Chapter 4), Parthia (Chapter 12), Elice and her Aum (Chapter 23).
+  by chapter − 1: whole 27-byte records); 0x81 the same first record and 0x82 the second (27 bytes on, 3:$9D58), each giving nothing
+  (message 5) while another character is in your army (3:$9B51-$9BA9, through 3:$8D6D): 0x81 while 0x27 (Samson) is, 0x82 while 0x26
+  (Arran) is, so Chapter 16's (7, 19) gives Arran and (10, 19) Samson, one or the other; 0x84 (Chapter 22's village): a visitor
+  holding the Starsphere and the Lightsphere (its own items, 3:$9BD4) gives them up for Starlight. Only Marth visits a village (tile
+  0xA5) or seizes (3:$9AEA: the acting character must be 1; a Thief, class 9, opens only chests, 3:$9B28). Seizing gives what its
+  tile's a says: 1500 gold (Chapter 3), a Silver Sword (Chapter 4), Parthia (Chapter 12), Elice and her Aum (Chapter 23).
 - **Reinforcements** (3:$959C, u16 pointers by chapter − 1; 3:$91D0): the foes' 11-byte records. Byte +8: bit 7 clear, the unit arrives
   on that turn; set, every turn after (+8 & 0x7F) up to the chapter's last at 3:$A44E. It arrives only if its tile is free.
-- **Talks** (15:$EDB5 the talkers, $EDC4 the foe each talks to, $EDE0 the character it becomes; 3:$9F4E): Caeda to Castor, Navarre,
-  Jake, Lorenz and Roger; Julian to Rickard; Bantu to Tiki; Marth to Maria, Xane and Darros; Lena to Matthis; Midia to Astram; Merric
-  to Wendell (and Ogma to foe 0xBE, セイバー, whom no chapter has). The recruit becomes your unit with its two items at full uses
-  (3:$8E52).
+- **Talks** (15:$EDB5 the talkers, $EDC4 the foe each talks to, $EDE0 the character it becomes; the Talk command, 3:$9F42, state 0
+  at 3:$9F4E): the unit you moved must be the talker ($76F4), the foe on one of its four sides (3:$9FC8). Caeda to
+  Castor, Navarre, Jake, Lorenz and Roger; Julian to Rickard; Bantu to Tiki; Marth to Maria, Xane and Darros; Lena to Matthis; Midia
+  to Astram; Merric to Wendell (and Ogma to foe 0xBE, セイバー, whom no chapter has). The recruit becomes your unit with its two items
+  at full uses (3:$8E52).
 - **Recruits with a condition** (3:$A3C1, a list number by chapter − 1, u16 pointers at 3:$A3DA; 3:$8CE0): 4-byte entries [foe][the
-  character it becomes][a third byte][a character that must be in your army, 0 none]: Darros (Ch2), Wendell (Ch5), Rickard (Ch6),
-  Maria and Minerva (Ch10; Minerva only with Maria), Catria and Palla (Ch14; only with Minerva), Xane (Ch16), Est (Ch18; only with
-  Minerva). Minerva, Catria, Palla and Est are reinforcements, and a reinforcement on this list with its character missing doesn't
-  come (3:$91EC, the army check at 3:$8D6D).
+  character it becomes][the message shown, 3:$8DC0 into $77F1][a character that must be in your army, 0 none]: Darros (Ch2), Wendell
+  (Ch5), Rickard (Ch6), Maria and Minerva (Ch10; Minerva only with Maria), Catria and Palla (Ch14; only with Minerva), Xane (Ch16),
+  Est (Ch18; only with Minerva). No talk: 3:$8CE0 runs only in the enemy phase's foe loop (bank 3 entry 0, 3:$800C; state 3 at
+  3:$8270, over the foes at $7078), after each foe's whole action (3:$8317 through the state table at 3:$8CCE), and takes the foe in
+  when one of the four tiles round where it stopped ($05C0 / $05C1) holds marker 0x2A (3:$8EC4), a class-21 unit on your side: a Lord,
+  Marth. So Minerva, Catria, Palla and Est, whom the talk table doesn't name, join only by ending an enemy-phase move next to Marth;
+  Darros, Maria and Xane by Marth's talk or so; Wendell by Merric's talk or so, Rickard by Julian's. Minerva, Catria, Palla and Est
+  are reinforcements, and a reinforcement on this list with its character missing doesn't come (3:$91EC, the army check at 3:$8D6D).
 - **Drops**: the battle keeps a foe's second item (+20) as its drop (6:$AD79 into $0328), and when the foe is defeated, the unit that
   beat it gets it at full uses (6:$935E, then 6:$B10A: the first free slot, else the full-inventory menu). Its first item, the one it
   fights with, is never obtained. Seen in Mesen: Gazzak, set to 1 HP beside Marth, dropped his Vulnerary but not his Steel Axe, and two
@@ -160,8 +168,9 @@ Not confirmed:
 - Doors and secret shops were read in the code, not played: whether a foe opens a door (only the Item command's keys were traced),
   and that $0500/$0501 hold the moved unit's tile when the command menu is built (6:$BAFF sets them from the unit's +17/+16 when
   it's picked, 6:$8D71 keeps the tile the cursor picks in $0506/$0507, and the walk steps them there, 6:$BDA0).
-- Who talks to the recruits with a condition (3:$A3DA): the routine that reads the list (3:$8CE0) doesn't check the talker, and its
-  third byte isn't one (Jagen's number for Catria); they're taken to be Marth's, as Nintendo Wire's recruitment guide has them.
+- The recruits with a condition (3:$A3DA) were read in the code, not played: that a foe which attacks fights before it joins (the
+  check runs after its whole action), and whether a recruit who has died still blocks Chapter 16's other village (3:$8D6D passes over
+  a record whose +0x12 is 0xFF).
 - Fortify: its handler only flags the staff (15:$D26E, the flag $035A changes the animation); "every ally" is the wikis'.
 - Imhullu: its use handler (effect 11, 15:$D1DD) and the "protected by a magic shield" text suggest it wards off all but Starlight; not
   traced, so the weapon page says nothing about it.

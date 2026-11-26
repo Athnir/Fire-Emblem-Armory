@@ -2,11 +2,14 @@ import { storyOrder } from '../../logic/spoiler'
 import type { MapSet, StoryOrder } from '../maps/mapSet'
 import type { ChapterMap } from '../maps/types'
 import { FE2_MAPS } from './fe2Maps'
-import { FE2_OPENS } from './fe2Opens'
+import { FE2_LISTS, FE2_OPENS } from './fe2Opens'
 import { FE2_MOVE_CLASSES, FE2_MOVE_CLASS_EXAMPLES } from './fe2Terrain'
 
 /** The story: each chapter's battles on the world map, Alm's army's first where both armies have their own (Chapters 3 and 4). */
-const MAIN = FE2_MAPS.filter((m) => m.heading !== 'Dungeons')
+const MAIN = FE2_MAPS.filter((m) => m.heading !== 'Dungeons' && !FE2_LISTS[m.id])
+/** The optional battles: of the two deserts before Fort Geeth Celica's army fights one (the other's army withdraws), so the south
+ * desert is listed apart, as Echoes' is (CLAUDE.md), opening with the story's next battle. */
+const SIDE = FE2_MAPS.filter((m) => FE2_LISTS[m.id] === 'optional')
 /** The towns' and dungeons' encounters: a list of their own, each opening with the story battle after the one beside its place. */
 const DUNGEONS = FE2_MAPS.filter((m) => m.heading === 'Dungeons')
 
@@ -18,9 +21,10 @@ const short = (m: ChapterMap) =>
 const words = { name, short }
 
 /** Every map, for naming a source's chapter on the weapon page. */
-export const FE2_STORY = storyOrder([...MAIN, ...DUNGEONS], words)
+export const FE2_STORY = storyOrder([...MAIN, ...SIDE, ...DUNGEONS], words)
 
-/** The spoiler block's story: the world map's battles; each encounter opens with the story battle after the one beside its place. */
+/** The spoiler block's story: the world map's battles; each encounter opens with the story battle after the one beside its place,
+ * and each optional battle with the story's next. */
 export const FE2_BLOCK: StoryOrder = (() => {
   const story = storyOrder(MAIN, words)
   const index = new Map(MAIN.map((m, i) => [m.id, i]))
@@ -29,9 +33,11 @@ export const FE2_BLOCK: StoryOrder = (() => {
 
 const label = (m: ChapterMap) => (m.heading === 'Dungeons' ? name(m) : `${name(m)}: ${m.title}`)
 
-/** Gaiden on the map page: the story in one list, the dungeons' encounters in another; one difficulty (the game has no modes). */
+/** Gaiden on the map page: the story in one list, the optional battles in the second, the dungeons' encounters in the third; one
+ * difficulty (the game has no modes). */
 export const FE2_MAP_SET: MapSet = {
   maps: FE2_MAPS,
+  extras: { label: 'Optional battles', maps: SIDE },
   third: { label: 'Dungeons', maps: DUNGEONS },
   difficulties: [{ value: 'Normal', label: 'Normal' }],
   moveClasses: FE2_MOVE_CLASSES,

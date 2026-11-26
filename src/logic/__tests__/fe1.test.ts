@@ -66,8 +66,23 @@ describe("Shadow Dragon and the Blade of Light's maps", () => {
     const talk = (id: string, name: string) => allUnits(map(id)).find((u) => u.name === name)?.talk
     expect(talk('fe1-3', 'Navarre')).toBe('Recruit: talk with Caeda')
     expect(talk('fe1-13', 'Astram')).toBe('Recruit: talk with Midia')
-    expect(talk('fe1-14', 'Catria')).toBe('Recruit: talk with Marth (only with Minerva in your army)')
     expect(talk('fe1-19', 'Tiki')).toBe('Recruit: talk with Bantu')
+    // The chapter's list of recruits with a condition (3:$A3DA) names no talker: its reader (3:$8CE0) runs in the enemy phase's foe
+    // loop (3:$8317) and takes the foe in when it stops beside a Lord's marker (3:$8EC4), so Minerva, Catria, Palla and Est, whom no
+    // talk names, join only so, and the talk table's talkers alone start a talk (Merric with Wendell, never Marth).
+    expect(talk('fe1-14', 'Catria')).toBe('Recruit: joins on the enemy phase on ending a move next to Marth (only with Minerva in your army)')
+    expect(talk('fe1-10', 'Minerva')).toBe('Recruit: joins on the enemy phase on ending a move next to Marth (only with Maria in your army)')
+    expect(talk('fe1-5', 'Wendell')).toBe('Recruit: talk with Merric, or it joins on the enemy phase on ending a move next to Marth')
+    expect(talk('fe1-2', 'Darros')).toBe('Recruit: talk with Marth, or it joins on the enemy phase on ending a move next to Marth')
+  })
+
+  it("has Chapter 16's two villages give Arran or Samson, not both (3:$9B51-$9BA9, $9D58), and only Marth visit (3:$9AEA)", () => {
+    type Village = Extract<MapObject, { type: 'village' }>
+    const villages = (m: ChapterMap) => m.objects.filter((o): o is Village => o.type === 'village')
+    const at = (x: number, y: number) => villages(map('fe1-16')).find((o) => sameTile(o.tile, [x, y]))
+    expect(at(7, 19)?.note).toBe('Arran joins your army. Not while Samson is in your army: Arran or Samson, not both. Only Marth can visit it.')
+    expect(at(10, 19)?.note).toBe('Samson joins your army. Not while Arran is in your army: Samson or Arran, not both. Only Marth can visit it.')
+    for (const m of FE1_MAPS) for (const o of villages(m)) expect(o.note, `${m.id} ${o.tile}`).toMatch(/Only Marth can visit it/)
   })
 })
 

@@ -99,11 +99,20 @@ Eyeball). The Gradivus heals its holder too (special 10), which Serenes leaves o
   chapters' tables and the towns each army reaches, the Unit Planner's joins).
 - Death events (15:$F18D, [foe][kind][value]): kind 0 sets a spawn point's level ($6D93[v >> 3] = v & 7) or a pending army ($6D2C:
   Desaix's death sends composition 32, Tatarrah's, to node 32); 1 a town's flag event; 2 takes a foe off the battle (list v at 15:$F20C:
-  Slayde and Desaix each when the other falls, Barth's Brigands with him, Delthea when Tatarrah falls, Jedah when Mogall #87 does); 3 a
-  march (8:$A484).
+  Slayde and Desaix each when the other falls, Barth's Brigands with him, Delthea when Tatarrah falls, Jedah when Mogall #87 does); 3
+  $6D92 |= v << 6 (9:$8CAB), read by the world map at 7:$A484: the two deserts before Fort Geeth (nodes 22 and 23, which alone lead
+  to it), each led by one recruit, Deen in the north and Sonya in the south. The leader Celica's army beats dies (15:$F1B7 / $F1B1:
+  flag event 28 or 29 takes them out of Fort Geeth's town, and v sets bit 7 or 6); with one bit set, the world map's next enemy phase
+  finds the other desert's army (7:$A478), runs the fallen one's flag event again, sets both bits (7:$A4D3) and marches that army to
+  node 61, Fort Geeth's town (7:$A4D8), and an enemy army that reaches a town node leaves the world map (7:$9C41, then 7:$9BFA), so
+  the other desert's battle is never fought. Its leader waits in the town (room 13), recruited by a talk open from the start (13:$B5A9:
+  scripts 24 and 25; flag events 51 and 52 close both). So Deen joins if Celica's army takes the south desert, Sonya if the north:
+  the north desert stays in the story and the south is listed with the optional battles, both saying so.
 - Monster spawn points (8:$9F0A): nine, each with a town node (15:$F11B), a world node (15:$F124) and by level a [composition, chance %]
   (8:$931F[x] + 2 x (level - 1)); said on the world node's map.
-- Guests (15:$F150 / 15:$F16B -> 15:$F178): playable characters on your side at a battle node.
+- Guests (15:$F150 / 15:$F16B -> 15:$F178): playable characters on your side at a battle node. What a guest brings counts from the
+  battle it fights in (`kit-later`): Palla and Catria fight at Sofia Shore, and their talks at S. Sofia open only when Garth falls
+  there (15:$F1C3: flag event 37, 10:$81B4; 15:$FB8F opens no talk in that town before).
 - Drops: a foe's held item always drops to the unit that beats it (6:$AA4B). A foe holding nothing may drop 15:$F225's item for its
   kind ([foe | $80][chance][item]): two rolls, both under the chance, in Chapters 1-4, while the chapter's count of such drops is below
   15:$F23E's (2, 4, 7, 10).

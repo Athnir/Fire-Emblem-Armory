@@ -1,8 +1,11 @@
 import { FE15_SUPPORT_POINTS } from '../data/fe15/fe15Supports'
 
+const NUMBER_WORDS: Record<number, string> = { 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' }
+
 /**
  * Echoes' supports: each pair's bonus is the pair's own (who supports whom, and with what, is the Roster's), so this says only
- * how a pair earns support points, read from the game's own tuning values (params.bin), and how the bonuses apply.
+ * how a pair earns support points, read from the game's own tuning values (params.bin), and how the bonuses apply, read from the
+ * program (0x3111b0: scripts/build-fe15-supports.py).
  */
 export function Fe15Supports() {
   const p = FE15_SUPPORT_POINTS
@@ -37,10 +40,18 @@ export function Fe15Supports() {
       <h2 className="font-semibold text-neutral-100">Support bonuses</h2>
       <ul className="list-disc space-y-1 pl-5">
         <li>Each pair's bonus (to hit, crit, avoid and crit avoid) is that pair's own, by rank C, B and A; some pairs have one from the start.</li>
+        <li>
+          A unit gets a partner's bonus while that partner, in its own army, stands 1 to {p.reach} tiles (counted in steps) from the tile it
+          fights from, attacking or defending (0x3111b0). Foes' pairs count too.
+        </li>
+        <li>Only the pair's current rank counts: each rank's row is the whole bonus at that rank, so ranks don't stack.</li>
+        <li>
+          Several partners in reach add up, with no cap; the forecast shows the {NUMBER_WORDS[p.forecast] ?? p.forecast} that give the
+          most.
+        </li>
       </ul>
       <p className="text-xs text-neutral-500">
-        Not yet confirmed: that a unit gets the bonus while its partner is within 3 tiles, and that a pair's ranks don't stack (only the
-        current rank's bonus applies). Who supports whom, and each pair's bonus, belong to the units, so they're in the Roster's Supports tab.
+        Who supports whom, and each pair's bonus, belong to the units, so they're in the Roster's Supports tab.
       </p>
     </section>
   )

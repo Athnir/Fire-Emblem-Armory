@@ -367,7 +367,7 @@ def guests():
 
 def death_events():
     """[(foe, kind, value)] (15:$F18D): kind 0 a spawn point's level or a pending spawn, 1 a town's flag event, 2 the listed foe
-    leaves the battle (15:$F20C), 3 a march (8:$A484)."""
+    leaves the battle (15:$F20C), 3 $6D92 |= value << 6 (9:$8CAB), read by the world map's 7:$A484 (the deserts' withdrawal)."""
     out, p = [], 0xF18D
     while R.u8(FIXED, p) != 0xFF:
         out.append(tuple(R.read(FIXED, p, 3)))

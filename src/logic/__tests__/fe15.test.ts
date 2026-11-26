@@ -414,14 +414,25 @@ describe("Echoes' foes' orders and the battles' events", () => {
     expect(unit('fe15-4c-6', 'Jedah').note).toMatch(/Warps out at the start of turn 6's enemy phase, and every Mogall goes with him\./)
     expect(unit('fe15-3a-8', 'Delthea').note).toMatch(/Once Tatarrah falls, she turns green and warps out/)
     expect(unit('fe15-5-2', 'Duma').note).toMatch(/Once he's hurt, from the next enemy phase he goes for your nearest unit\./)
-    // Data/Event's joins are a yes or no at the place the battle opens.
-    for (const name of ['Valbar', 'Kamui', 'Leon']) expect(unit('fe15-2-4', name).note).toMatch(/Can be recruited inside the Pirate Fort/)
+    // Data/Event's joins are a yes or no at the place the battle opens, named as the game names the place (MID_<place>) and the room
+    // its sheet reaches the join from (MID_拠点_<place>_<room>).
+    for (const name of ['Valbar', 'Kamui', 'Leon']) expect(unit('fe15-2-4', name).note).toMatch(/Can be recruited in Pirate Throne Interior \(Entrance\) after the battle/)
+    expect(unit('fe15-3a-4', 'Mathilda').note).toMatch(/Can be recruited in Desaix's Fortress Interior \(Dungeon\)/)
+    expect(unit('fe15-3a-8', 'Delthea').note).toMatch(/recruited in Sluice Gate Interior \(Entrance\), unless she was defeated/)
+    expect(unit('fe15-3c-1', 'Palla').note).toMatch(/Can be recruited in Zofia Harbor \(Entrance\)/)
     expect(map('fe15-4c-3').notes).toContain('Conrad joins your army at the end of the battle.')
-    expect(map('fe15-4a-6').notes[0]).toMatch(/if Zeke lives, he can then be recruited in a house in Rigel Village\.$/)
-    for (const id of ['fe15-3c-4', 'fe15-3c-5']) expect(map(id).notes[0]).toMatch(/Deen, from the north; Sonya, from the south/)
+    expect(map('fe15-4a-6').notes[0]).toMatch(/^If Tatiana was rescued in Nuibaba's Abode Interior \(Dungeon 1\), .*if Zeke lives, he can then be recruited in Rigelian Village \(House 1\)\.$/)
+    // Deen and Sonya wait in Grieth's Citadel's War Room, not its prison (作戦室_フェード前 adds their portraits), one or the other.
+    for (const id of ['fe15-3c-4', 'fe15-3c-5']) {
+      expect(map(id).notes[0]).toMatch(/Deen, from the north; Sonya, from the south\) can then be recruited by a talk in Grieth's Citadel Interior \(War Room\)\. Only one of them joins\.$/)
+      expect(map(id).notes[0]).not.toMatch(/prison/)
+    }
+    expect(FE15_ITEM_SOURCES['Brave Sword'].map((s) => s.text)).toEqual(
+      expect.arrayContaining(['Dropped by Deen, in the north desert', "Carried by Deen when they join, if Celica's army takes the south desert"]),
+    )
     expect(map('fe15-4a-10').notes).toContain(
-      "If the request for five Steel Lances made at Grieth's Citadel was fulfilled, Slayde and the Barons at (13, 22), (17, 22), " +
-        '(21, 22), (25, 22) each get a Steel Lance.',
+      "If the request for five Steel Lances made in Grieth's Citadel Interior (War Room) was fulfilled, Slayde and the Barons at (13, 22), " +
+        '(17, 22), (21, 22), (25, 22) each get a Steel Lance.',
     )
     // Rigel Castle's script wakes every foe once Hard's Rudolf wakes; what wakes him is still to confirm.
     expect(map('fe15-4a-11').notes).toContain("On Hard, Rudolf and the six Bow Knights don't act until woken, and once Rudolf is, every foe is.")
@@ -521,8 +532,10 @@ describe("Echoes' battle numbers", () => {
     expect(trueHit('hybrid-fates', 30).trueHitBasisPoints).toBe(3000)
   })
 
-  it("reads the support points from the game's tuning values", () => {
-    expect(FE15_SUPPORT_POINTS).toEqual({ deployed: 1, distance: [1, 1, 0, 0], staff: 2, perBattle: 20 })
+  it("reads the support points from the game's tuning values, and the bonuses' reach from the program", () => {
+    // 0x3111b0 counts a partner 1 to 3 steps from the tile the unit fights from (cmp r0, #3 at 0x3112fc on the distance less 1),
+    // and the forecast's portraits show four (0x314bf0), every partner in reach being added.
+    expect(FE15_SUPPORT_POINTS).toEqual({ deployed: 1, distance: [1, 1, 0, 0], staff: 2, perBattle: 20, reach: 3, forecast: 4 })
   })
 
   it('has no difficulty but Normal and Hard', () => {

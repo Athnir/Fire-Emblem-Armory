@@ -1210,12 +1210,12 @@ export const FE1_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe1-16",
       "kind": "kit",
-      "text": "Carried by Samson on joining"
+      "text": "Carried by Arran on joining"
     },
     {
       "mapId": "fe1-16",
       "kind": "kit",
-      "text": "Carried by Arran on joining"
+      "text": "Carried by Samson on joining"
     },
     {
       "mapId": "fe1-18",

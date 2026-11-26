@@ -2048,7 +2048,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-4",
       "kind": "drop",
-      "text": "Dropped by Deen"
+      "text": "Dropped by Deen, in the north desert"
     },
     {
       "mapId": "fe15-x-1",
@@ -2063,7 +2063,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-6",
       "kind": "kit-later",
-      "text": "Carried by Deen when they join"
+      "text": "Carried by Deen when they join, if Celica's army takes the south desert"
     },
     {
       "mapId": "fe15-3a-3",
@@ -2090,7 +2090,7 @@ export const FE15_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe15-3c-6",
       "kind": "kit-later",
-      "text": "Carried by Sonya when they join"
+      "text": "Carried by Sonya when they join, if Celica's army takes the north desert"
     },
     {
       "mapId": "fe15-3a-3",

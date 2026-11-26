@@ -23,7 +23,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Finish one game across every tab before starting the next.** Fortune's Weave is skipped (too new for
   solid data).
 - **Notes state data, not observations or strategy.** "Elise is ill" and how reinforcements arrive are data;
-  "watch out for the archers" is not.
+  "watch out for the archers" is not. A place or room a note names goes by the game's own name (the user's call, 2026-11-26: Echoes'
+  world map and its rooms, `MID_<place>` and the room its event sheet reaches the join from, "Pirate Throne Interior (Entrance)");
+  Gaiden keeps its ROM's place names.
 - **No per-map source notes.** Sources are listed once, in the README.
 - **The armory is a datasheet: everything the game has goes in,** even content behind something the user may lack (Echoes' amiibo
   dungeons, Fates' amiibo items) and DLC they don't own. DLC missing from the user's files is never obtained: it's taken from the wikis
@@ -95,7 +97,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Echoes rolls hit as Fates does (one 0-9999 number, curved from 50 up), has no weapon triangle, triples an effective weapon's Mt (an
   effective art triples only its own Mt bonus), and its terrain heals and hurts by HP, not a percentage. Shadow Dragon and the Blade of
   Light rolls hit with a random byte × 2 / 5 held at 100 (a hit at or below the displayed hit, never at 0), triples an effective
-  weapon's Mt, has no weapon triangle and no supports, and its fliers always fight as if in the sky (no Avoid from terrain).
+  weapon's Mt, has no weapon triangle and no supports, and its fliers always fight as if in the sky (no Avoid from terrain); only
+  Marth visits a village (a Thief only opens chests), and a recruit with no talk in its talk table joins on the enemy phase when it
+  ends a move next to Marth (3:$8CE0, its condition list naming no talker).
   Gaiden rolls hit with a random byte scaled to 0-99, a hit below the displayed hit (so h lands ceil(2.56 h) in 256), triples an
   effective weapon's Mt, has no weapon triangle and no supports, heals 5 HP each turn on its forts and from any item of special 10
   (rings, Blessed and legendary weapons: 3:$90F0), hurts 5 on its swamps, and its fliers fight on no terrain (no Avoid).
@@ -190,7 +194,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Each copy of a weapon is counted once.** A unit's starting items are a source in the chapter it first joins a story or route,
   never again where a script only loads it back onto the map (FE7's openings reload your units every chapter without
   preparations; the loader reuses the unit, so it's no new copy). Alternatives count once each (10A or 10B; either version of a
-  split chapter). What a foe holds is only said for a weapon nothing else gives (the GBA games' thieves can't steal weapons).
+  split chapter). A copy that comes one way or the other is listed both ways, each row saying which (the user's call, 2026-11-26:
+  the deserts' Deen and Sonya, "Dropped by Deen, in the north desert", "Carried by Deen on joining, if Celica's army takes the south
+  desert"). What a foe holds is only said for a weapon nothing else gives (the GBA games' thieves can't steal weapons).
   Tested per game (`fe7.test.ts`: no one joins a story twice). Every game with routes (FE8, Three Houses) does the same.
 - **"Where it turns up" is one row per way of getting it, per story or route, with the chapters in a row:** "Sold at the armory
   (Eliwood's story): Ch.12, Ch.13, Ch.14", never a line per shop (`src/logic/sourceRows.ts`; a game with routes names them in
@@ -249,8 +255,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **The second dropdown holds what's optional:** post-game maps and chapters you can skip once they're
   unlocked: Fates' paralogues (Mozu's, the children's recruitments), DLC, and trial maps; Echoes' battles the world map lets you
   leave unfought (another way on, no move check needing them), Act 6 and the amiibo ordeals (the user's call). Of two alternatives
-  where only one is fought (Echoes' two deserts before Grieth's Citadel), one stays in the story and the other is listed here, both
-  saying so.
+  where only one is fought (Echoes' two deserts before Grieth's Citadel, Gaiden's before Fort Geeth: the leader Celica's army beats
+  there falls, the other's army withdraws to the fort and its leader joins by a talk), one stays in the story and the other is listed
+  here, both saying so.
 - **Fates' challenge battles are a third dropdown ("Challenges"), a list of their own:** a rerun of every chapter's or
   paralogue's map the game lets you scout (its chapter record's flag and route mask, not just an encounter file: Chapter 2
   has one but can't be scouted), on Birthright and Revelation (Conquest has none). A chapter's

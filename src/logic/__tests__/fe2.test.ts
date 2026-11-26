@@ -95,11 +95,21 @@ describe("Gaiden's weapons against Serenes Forest's tables", () => {
     expect(where('Lightning Sword')).toContain('In a chest at S. Fort')
     expect(where('Royal Sword')).toContain("In a chest at Tozeh's Fort")
     expect(where('Dracoshield')).toContain('Dropped by Desaix')
-    expect(where('Brave Sword')).toContain('Carried by Deen on joining')
+    // One desert's leader falls and the other joins (7:$A484), so each copy says which way it comes; both are counted.
+    expect(where('Brave Sword')).toEqual(expect.arrayContaining(['Dropped by Deen, in the north desert', "Carried by Deen on joining, if Celica's army takes the south desert"]))
+    expect(where('Steel Shield')).toEqual(expect.arrayContaining(['Dropped by Sonya, in the south desert', "Carried by Sonya on joining, if Celica's army takes the north desert"]))
     // Astra, Sol and Luna only drop at random from monsters holding nothing (15:$F225).
     for (const name of ['Astra', 'Sol', 'Luna']) expect(where(name).every((t) => t.startsWith('Sometimes dropped by')), name).toBe(true)
     expect(FE2_LISTED.find((w) => w.name === 'Tentacle')?.foeOnly).toBe(true)
     expect(FE2_LISTED.find((w) => w.name === 'Falchion')?.foeOnly).toBeUndefined()
+  })
+
+  it("counts a guest's items from the battle it fights in: Palla's and Catria's from Sofia Shore, whose Garth opens their talks", () => {
+    // They fight as guests at Sofia Shore (15:$F181) and are talked to at S. Sofia once Garth falls (15:$F1C3: flag event 37), so
+    // what they bring counts from the battle after it, not from Seb (beside S. Sofia too).
+    expect(FE2_ITEM_SOURCES.Javelin).toContainEqual({ mapId: 'fe2-3c-1', kind: 'kit-later', text: 'Carried by Palla on joining' })
+    expect(FE2_ITEM_SOURCES['Angel Ring']).toContainEqual({ mapId: 'fe2-3c-1', kind: 'kit-later', text: 'Carried by Catria on joining' })
+    expect(Object.values(FE2_ITEM_SOURCES).flat().some((s) => /Palla|Catria/.test(s.text) && s.mapId === 'fe2-2-8')).toBe(false)
   })
 })
 
@@ -108,9 +118,23 @@ describe("Gaiden's battles", () => {
     const story = FE2_BLOCK.maps.map((m) => m.id)
     expect(story.filter((id) => id.startsWith('fe2-1-'))).toHaveLength(7)
     expect(story.filter((id) => id.startsWith('fe2-3a-'))).toHaveLength(7)
-    expect(story.filter((id) => id.startsWith('fe2-3c-'))).toHaveLength(8)
+    // Celica's eight, but the south desert, which is listed apart (below).
+    expect(story.filter((id) => id.startsWith('fe2-3c-'))).toHaveLength(7)
     expect(story.at(-1)).toBe('fe2-5-1')
     expect(FE2_MAP_SET.third!.maps.every((m) => m.heading === 'Dungeons' && m.id.startsWith('fe2-d'))).toBe(true)
+  })
+
+  it('fights one of the two deserts before Fort Geeth: the north in the story, the south with the optional battles, both saying so', () => {
+    // The fallen leader's death sets $6D92 bit 6 or 7 (9:$8CAB); the world map then marches the other desert's army to Fort Geeth's
+    // town (7:$A484), and an army that reaches a town leaves the world map (7:$9C41), so the other battle never comes.
+    expect(map('fe2-3c-4').title).toBe('N. Desert')
+    expect(map('fe2-3c-5').title).toBe('S. Desert')
+    expect(map('fe2-3c-4').notes[0]).toMatch(/^You fight this battle or the S\. Desert battle, not both: .*Only one of them joins\.$/)
+    expect(map('fe2-3c-5').notes[0]).toMatch(/^You fight this battle or the N\. Desert battle, not both: .*Only one of them joins\.$/)
+    expect(FE2_MAP_SET.extras!.maps.map((m) => m.id)).toEqual(['fe2-3c-5'])
+    expect(FE2_BLOCK.maps.some((m) => m.id === 'fe2-3c-5')).toBe(false)
+    // Under the spoiler block it opens with the story's next battle, Fort Geeth's.
+    expect(FE2_BLOCK.opensAt!('fe2-3c-5')).toBe(FE2_BLOCK.maps.findIndex((m) => m.id === 'fe2-3c-6'))
   })
 
   it("places Sofia Gate's two armies as Fire Emblem Wiki lists them, and says who leaves when the other falls", () => {

@@ -28,10 +28,11 @@ FORT, CASTLE, THRONE, CHEST, VILLAGE = 0x4A, 0x4B, 0xAE, 0xAB, 0xA5
 HEALS = {FORT, CASTLE, THRONE}  # 3:$935B: 3 + a random 0-7 HP at the start of each turn
 # The foes' army names (the foe name table's generic entries); every other foe name is a person.
 GENERIC = {3, 5, 6, 31, 33, 35, 36, 43, 47, 52, 53, 55}
-# Who talks to recruit whom: the game's talk table (15:$EDB5), and each chapter's list of recruits with a condition (3:$A3DA), which
-# the routine that reads it (3:$8CE0) doesn't tie to a talker: Marth's, as Nintendo Wire's recruitment guide has them
-# (data-raw/fe1/README.md).
-LIST_TALKER = 'Marth'
+# Who recruits whom: the game's talk table (15:$EDB5), a talk on your phase started by its talker (3:$9F4E), and each chapter's list
+# of recruits with a condition (3:$A3DA), which names no talker: the routine that reads it (3:$8CE0) runs in the enemy phase's foe
+# loop (3:$8317), after each foe's action, and the foe joins when one of the four tiles round where it stopped holds a Lord's marker
+# (3:$8EC4: 0x2A, Marth's), its condition's character in your army (3:$8D6D). See data-raw/fe1/README.md.
+LIST_JOIN = 'joins on the enemy phase on ending a move next to Marth'
 GOLD = {0x78: 100, 0x79: 200, 0x7A: 500, 0x7B: 1000, 0x7C: 1500, 0x7D: 2000, 0x7E: 3000, 0x7F: 5000}  # 3:$9C6E
 # A shop entry's kind (11:$A4FF) names its command (11:$8457): ぶきや, どうぐや, とうぎじょう, あずかりじょ, ひみつのみせ. The どうぐや
 # sells items, staves and tomes, never a sword, lance, axe or bow: the vendor, as the other games' shops are named (the Switch
@@ -142,14 +143,16 @@ def foe_name(char):
 
 
 def talk_of(char, conditions, talkers):
-    """'Recruit: talk with ...' for a foe the talk table or the chapter's recruit list names, else None."""
+    """'Recruit: ...' for a foe the talk table or the chapter's recruit list names, else None: a talk with the table's talkers, and
+    for a foe on the list the enemy phase's join, which needs no talk (Minerva, Catria, Palla and Est have none)."""
     who = list(talkers.get(char, []))
-    if char in conditions and LIST_TALKER not in who:
-        who.insert(0, LIST_TALKER)
-    if not who:
-        return None
-    text = f'Recruit: talk with {joined(who)}'
     cond = conditions.get(char)
+    if not who and not cond:
+        return None
+    ways = [f'talk with {joined(who)}'] if who else []
+    if cond:
+        ways.append(f'or it {LIST_JOIN}' if who else LIST_JOIN)
+    text = 'Recruit: ' + ', '.join(ways)
     if cond and cond[3]:
         text += f' (only with {CHARS[cond[3]]} in your army)'
     return text
@@ -233,17 +236,23 @@ def main():
                 return item_name(a - 1)
             if a in GOLD:
                 return f'{GOLD[a]} gold'
-            if a == 0x80 or a in (0x81, 0x82):
-                who = recruits[0][0] if a == 0x80 else (0x27 if a == 0x81 else 0x26)
-                rec = next(x for x in recruits if x[0] == who)
+            if a in (0x80, 0x81, 0x82):
+                # 0x80 and 0x81 give the chapter's first village record, 0x82 its second (3:$9D58: 27 bytes on); 0x81 gives nothing
+                # while character 0x27 is in your army, 0x82 while 0x26 is (3:$9B51-$9BA9, through 3:$8D6D): Chapter 16's Arran at
+                # (7, 19) and Samson at (10, 19), one or the other.
+                rec = recruits[1 if a == 0x82 else 0]
+                who = rec[0]
                 note_to.append(f'{CHARS[who]} joins your army.')
+                if a in (0x81, 0x82):
+                    other = 0x27 if a == 0x81 else 0x26
+                    note_to.append(f'Not while {CHARS[other]} is in your army: {CHARS[who]} or {CHARS[other]}, not both.')
                 for i in rec[19:23]:
                     if i:
                         source(i - 1, map_id, 'kit', f'Carried by {CHARS[who]} on joining', who=who)
                 joined_chars.add(who)
                 return ''
             if a == 0x84:
-                note_to.append(f'Only for a visitor holding the {item_name(STARSPHERE)} and the {item_name(LIGHTSPHERE)}, which it takes.')
+                # The visitor's own items (3:$9BD4: $76F4 +0x13 to +0x16) must hold both; the village's note says so.
                 source(STARLIGHT, map_id, 'village', f'Given at a village for the {item_name(STARSPHERE)} and the {item_name(LIGHTSPHERE)}')
                 return item_name(STARLIGHT)
             return ''
@@ -270,9 +279,11 @@ def main():
             elif TILES[gt] == 2:
                 notes = []
                 o = {'type': 'village', 'tile': tile, 'reward': give(a, ('village', 'Given at a village'), notes)}
-                if notes:
-                    o['note'] = ' '.join(notes)
                 if o['reward'] or notes:
+                    # Only Marth visits (3:$9AEA: the acting character must be 1; a Thief, class 9, opens only chests, 3:$9B28).
+                    held = f', holding the {item_name(STARSPHERE)} and the {item_name(LIGHTSPHERE)} (it takes them)' if a == 0x84 else ''
+                    notes.append(f'Only Marth can visit it{held}.')
+                    o['note'] = ' '.join(notes)
                     m['objects'].append(o)
             else:
                 assert TILES[gt] == 15 and a == 0, (n, r, c, hex(gt), a)  # a house: it only talks

@@ -79,12 +79,16 @@ the exefs `.code`, BLZ-decompressed, loaded at 0x100000). Only data built from t
   6, 6, enemy phase; his `SID_ビグル道連れ`), so he's a named foe there; Tatarrah's death quote sets `G_水門3_デューテ撤退`, and
   `ev::EscapeDut` hands Delthea to army 2 and warps her out; the Final Battle's enemy-phase handler sets Duma's move to
   `AI_MV_NearestEnemy` once his HP is below its most; Dolth Keep's closing scene has `JoinUnit('PID_コンラート')`; the Last Bastion's
-  setting gives Slayde and four Barons a Steel Lance each (`ItemGainSilent`) when the request for five at Grieth's Citadel was
-  fulfilled (`G_SUB_13戦の準備` 2); the citadel's prison holds the desert army that withdrew (`G_ギースの砦内部3_ソニアかディーン`: 1
-  Deen, 2 Sonya). After a battle, the units who can be recruited are `Data/Event/<place>.bin`'s `仲間入り` rows at the place it
-  opens, each behind a yes or no (`はい選択`): Valbar, Kamui and Leon in the Pirate Fort, Palla and Catria at Zofia Harbor, Mathilda
-  in Desaix's Fortress, Delthea in the Sluice Gate, and Zeke in a house in Rigel Village (while `G_リゲル平野4_ジークイベント` is set
-  and `G_リゲル平野4_ジーク死亡` isn't).
+  setting gives Slayde and four Barons a Steel Lance each (`ItemGainSilent`) when the request for five made in Grieth's Citadel
+  Interior's War Room (`作戦室_SUB13`) was fulfilled (`G_SUB_13戦の準備` 2); the citadel's War Room holds the leader of the desert
+  army that withdrew, not its prison: each desert's boss dying sets `G_ギースの砦内部3_ソニアかディーン` (`Scripts/砂漠の北.cmb` 2,
+  Sonya; `砂漠の南` 1, Deen), and the War Room's setup (`作戦室_フェード前`) adds that one's portrait to talk to (Est is the one in
+  Dungeon 1). After a battle, the units who can be recruited are `Data/Event/<place>.bin`'s `仲間入り` rows at the place it opens,
+  each behind a yes or no (`はい選択`), named as the game names the place (`MID_<place>`) and the room its sheet reaches the join from
+  (back through the rows that call, jump to or, as a portrait to talk to, lead into each sequence, to a room the sheet adds with
+  `移動先追加`; `MID_拠点_<place>_<room>`): Valbar, Kamui and Leon in Pirate Throne Interior (Entrance), Palla and Catria in Zofia
+  Harbor (Entrance), Mathilda in Desaix's Fortress Interior (Dungeon), Delthea in Sluice Gate Interior (Entrance), and Zeke in
+  Rigelian Village (House 1) (while `G_リゲル平野4_ジークイベント` is set and `G_リゲル平野4_ジーク死亡` isn't).
 - **The Creation's summons** (`Scripts/戦場_テーベ_門番２.cmb`): the setting places The Creation, your army and the first group of
   each of six pairs (増援０１-０６). Each enemy phase from turn 1 its handler counts the foes, The Creation, Revenants and Witches
   (`PID_強ゾンビ`, `PID_強魔女`) aside: under 7 it summons twice, at 7 once. A summon takes, on a turn that's a multiple of 5 while The
@@ -151,10 +155,10 @@ barrels, pots, boxes and grass (`Data/Dungeon.bin`'s DG_<floor>: container -> a 
 flag; a person's random drop with its rate), what foes carry (an item or their class's own weapon), villagers' and the story's gifts
 (`Data/Event/<place>.bin`'s アイテム入手, with the act the calls leading to it need; a request's gift says its price, read from the
 request's own sequences: the marks it spends, `貨幣消費` with 引数２ 0 silver or 1 gold, the items it takes, `アイテム消費`, and a wait
-in world map turns, `GMAPターン取得`, as Rigel Village's Dracoshield has) and the scripts' ItemGain to your convoy (unit 0; the Last
+in world map turns, `GMAPターン取得`, as Rigelian Village's Dracoshield has) and the scripts' ItemGain to your convoy (unit 0; the Last
 Bastion's setting hands its foes Steel Lances, which stay theirs), who joins carrying what (the lords from their army's first map,
 the rest from the events' 仲間入り, and Conrad from Dolth Keep's closing scene, `JoinUnit`), and evolving at a blacksmith (the Forest
-Village's, the Mountain Village's, Rigel Village's, the Sage's Hamlet's and Furia Harbor's). An evolution counts from when an army
+Village's, the Mountain Village's, Rigelian Village's, the Sage's Hamlet's and Furia Harbor's). An evolution counts from when an army
 holds a copy it can use and has reached a blacksmith of its own (the armies keep their own convoys until Act 5: Alm's first is the
 Forest Village's, Celica's the Mountain Village's); a copy only foes carry is never yours, so the Rusted Axe, which Thabes' Brigand
 Risen carry without the drop flag (`戦場_汎用配置４`, `テーベの下級屍兵Ａ`), evolves for no one, and the Devil Axe is foe-only. A place's sources count from the next chapter after the battle beside it on the world map; an act's start (Ram Village,
@@ -184,6 +188,16 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - Terrain (`0x32066c`, `0x32114c`): healing and damage are HP, not a percentage (5 HP, at least 1 left).
 - Support points (`params.bin`'s tuning values, `scripts/build-fe15-supports.py`): +1 for being deployed together, +1 for fighting 1 or
   2 tiles from the partner (0 at 3 or 4), +2 for a staff used on the partner, at most 20 in a battle.
+- Support bonuses (`0x3111b0`, `scripts/build-fe15-supports.py`, which checks the instructions): run for each side of the battle
+  calculation (`0x2ee950`), so for the forecast and the fight, attacking or defending. It scans x and y ±3 round the tile the unit
+  fights from (the attacker's chosen tile, the defender's own) and keeps the tiles 1 to 3 steps away (|dx| + |dy|: `0x3112f8`-`0x311300`);
+  the unit on one counts if it isn't the unit itself and is in its own army (the army byte of each unit's +0xcc, `0x311338`: foes'
+  pairs too, as Act 5's Berkut and Rinea). Its row is the unit's support table's (Reliance.bin's 支援効果, found by `0x1f78f4`) at the
+  pair's current rank (one shared record per pair, rank at +0x18, `0x1f8820`; a support conversation adds 1), four signed bytes, hit,
+  crit, avoid and crit avoid (`0x311370`): only that rank's row is read, each already the whole bonus at its rank, so ranks don't stack.
+  Every partner in reach adds its row, with no cap (`0x311434`-`0x31147c`); the four that give the most are kept for the forecast's
+  portraits (`0x311394`-`0x311430`, `0x314bf0`), but one that misses them is still added. The reach (3) and the forecast's four are read
+  from the code.
 - No weapon triangle: no triangle table in the data, and the hit and attack routines above have no triangle step.
 - A weapon's attack (`0x452b70`, its only caller `0x2f0aa0`): its Mt, plus the wielder's Strength (stat 1) unless it has Fixed Power
   (`SID_威力固定`), plus its Mt again when it has Lethal Lady (`SID_女武器威力２倍`) and a woman wields it, plus the bonuses of the
@@ -212,7 +226,6 @@ Cipher Legends I and II replay Ram Valley and Novis Cemetery with new units).
 - How an army's records pair with a battle's Enemy records (taken in record order), what the cemeteries' and the Dragon's Maw's figures
   do (a chance or a weight), and how an encounter group's pick is made (read as weights from the table): not traced in the program.
 - What loses the Prologue (no script sets it, and its children lack the protagonist's skill).
-- Support bonuses: their 3-tile range and how ranks stack are Serenes Forest's.
 - The Sage's and Hexlock Shields' misnamed arts: what the game does with them.
 - Whether a flier gets a tile's Avoid: no read of a tile's `回避` was found in the battle's setup or strike routines (only the AI's
   tile scoring reads it), so the terrain table's Avoid is shown for every class.

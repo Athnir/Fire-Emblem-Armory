@@ -64,7 +64,7 @@ export const FE2_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sometimes dropped by a foe Brigand holding nothing"
     },
     {
-      "mapId": "fe2-2-8",
+      "mapId": "fe2-3c-1",
       "kind": "kit-later",
       "text": "Carried by Catria on joining"
     }
@@ -129,7 +129,7 @@ export const FE2_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe2-3c-5",
       "kind": "drop",
-      "text": "Dropped by Sonya"
+      "text": "Dropped by Sonya, in the south desert"
     },
     {
       "mapId": "fe2-d0",
@@ -159,7 +159,7 @@ export const FE2_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe2-3c-6",
       "kind": "kit-later",
-      "text": "Carried by Sonya on joining"
+      "text": "Carried by Sonya on joining, if Celica's army takes the north desert"
     }
   ],
   "Blessed Ring": [
@@ -183,7 +183,7 @@ export const FE2_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe2-3c-4",
       "kind": "drop",
-      "text": "Dropped by Deen"
+      "text": "Dropped by Deen, in the north desert"
     },
     {
       "mapId": "fe2-3c-5",
@@ -228,7 +228,7 @@ export const FE2_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe2-3c-6",
       "kind": "kit-later",
-      "text": "Carried by Deen on joining"
+      "text": "Carried by Deen on joining, if Celica's army takes the south desert"
     }
   ],
   "Shadow Sword": [
@@ -476,7 +476,7 @@ export const FE2_ITEM_SOURCES: Record<string, ItemSource[]> = {
   ],
   "Javelin": [
     {
-      "mapId": "fe2-2-8",
+      "mapId": "fe2-3c-1",
       "kind": "kit-later",
       "text": "Carried by Palla on joining"
     }

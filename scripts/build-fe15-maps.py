@@ -120,6 +120,10 @@ BOSS_BATTLES = {
 # dungeon's wandering-foe fields are skirmishes (the third list) wherever the dungeon is; a skippable dungeon's boss battle is optional.
 SKIPPABLE = {'盗賊のほこら', '海のほこら', '恐山', '恐山のほこら', 'ヌイババ館', '砂漠の南'}
 ALTERNATIVE = {'砂漠の北': '砂漠の南', '砂漠の南': '砂漠の北'}
+# One desert's leader falls and the other joins with the same item, so each copy says which way it comes (as Gaiden's do): the
+# fought desert's drop, and the joiner's kit if the army takes the other desert.
+DESERT_WAY = {'砂漠の北': 'north', '砂漠の南': 'south'}
+DESERT_JOINS = {'PID_ディーン': 'south', 'PID_ソニア': 'north'}
 
 # Where an army starts the game (Alm in Ram Village, Celica at the Priory): a location there counts from the act's first battle, not
 # from a battle next to it. Every other place (Zofia Castle, where Act 3 starts Alm, included) is first reached after a battle.
@@ -397,19 +401,32 @@ EVENTS = {
     ('ドーマの祭壇', 'PID_ドーマ'): ("Once he's hurt, from the next enemy phase he goes for your nearest unit", False),
     # 水門's death quote for Tatarrah sets G_水門3_デューテ撤退, and ev::EscapeDut hands Delthea to army 2, sets her class (the Mage
     # she already is) and warps her out; the Sluice Gate's interior then lets her join unless she was defeated.
-    ('水門', 'PID_敵デューテ'): ('Once Tatarrah falls, she turns green and warps out; she can then be recruited inside the Sluice Gate, '
+    ('水門', 'PID_敵デューテ'): ('Once Tatarrah falls, she turns green and warps out; she can then be recruited in {水門内部:デューテ}, '
                               'unless she was defeated', False),
 }
-# Who can be recruited after the battle (Data/Event's 仲間入り at the place the battle opens, behind a yes or no when they're talked to,
-# while they live).
+# Who can be recruited after the battle (Data/Event's 仲間入り in the place the battle opens, behind a yes or no when they're talked to,
+# while they live): (node, PID) -> (that place, the person), named with the room its sheet reaches the join from (join_room).
 JOINS = {
-    ('海賊の砦', 'PID_バルボ'): 'Can be recruited inside the Pirate Fort after the battle, if alive',
-    ('海賊の砦', 'PID_カムイ'): 'Can be recruited inside the Pirate Fort after the battle, if alive',
-    ('海賊の砦', 'PID_レオ'): 'Can be recruited inside the Pirate Fort after the battle, if alive',
-    ('ソフィアの海岸', 'PID_パオラ'): 'Can be recruited at Zofia Harbor after the battle, if alive',
-    ('ソフィアの海岸', 'PID_カチュア'): 'Can be recruited at Zofia Harbor after the battle, if alive',
-    ('ドゼーの砦', 'PID_マチルダ'): "Can be recruited inside Desaix's Fortress after the battle, if alive",
+    ('海賊の砦', 'PID_バルボ'): ('海賊の砦内部', 'バルボ'),
+    ('海賊の砦', 'PID_カムイ'): ('海賊の砦内部', 'カムイ'),
+    ('海賊の砦', 'PID_レオ'): ('海賊の砦内部', 'レオ'),
+    ('ソフィアの海岸', 'PID_パオラ'): ('ソフィアの港', 'パオラ'),
+    ('ソフィアの海岸', 'PID_カチュア'): ('ソフィアの港', 'カチュア'),
+    ('ドゼーの砦', 'PID_マチルダ'): ('ドゼーの砦内部', 'マチルダ'),
 }
+
+
+def placed_words(text):
+    """A note's '{place:person}' named as join_room() names it, the place and the room as the game shows them; '{place#sequence}'
+    the room a sequence of the place's sheet is reached from (a request's)."""
+    def one(m_):
+        loc, sep, what = m_.group(1), m_.group(2), m_.group(3)
+        if sep == ':':
+            return join_room(loc, what)
+        rooms = rooms_reaching(loc, what)
+        assert len(rooms) == 1, (loc, what, rooms)
+        return f'{place(loc)} ({room_name(loc, rooms.pop())})'
+    return re.sub(r'\{([^{}:#]+)([:#])([^{}]+)\}', one, text)
 
 
 # The Creation's battle (戦場_テーベ_門番２): its setting places The Creation, your army and the first of each of six pairs of groups
@@ -610,8 +627,8 @@ SLOT, LORDS = 0x80, 0x300
 ARMY_NOTES = {
     'ソフィアの門': ["Once Desaix falls, Slayde withdraws and walks off the map, and once Slayde falls, Desaix does: the battle is won "
                   "once no foe is left."],
-    'リゲル平野': ["If Tatiana was rescued at Nuibaba's Abode, Zeke and his company (the Paladins and Bow Knights beside him) turn green "
-                "at the start of turn 1; if Zeke lives, he can then be recruited in a house in Rigel Village."],
+    'リゲル平野': ["If Tatiana was rescued in {ヌイババ館内部:ティータ}, Zeke and his company (the Paladins and Bow Knights beside him) "
+                "turn green at the start of turn 1; if Zeke lives, he can then be recruited in {リゲルの村:ジーク}."],
     # リゲル城's condition handler (ev::NeedActivateAll: on Hard, once PID_ルドルフＨ's AI is active) wakes every foe (AiSetActive).
     'リゲル城': ["On Hard, Rudolf and the six Bow Knights don't act until woken, and once Rudolf is, every foe is."],
     # ドルクの砦's closing scene: JoinUnit('PID_コンラート').
@@ -685,7 +702,9 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
             units += slot_fill(groups.get(gname, []), slots, win)
     for e in units:
         said, passes = EVENTS.get((key, e.get('_pid')), (None, False))
+        said = said and placed_words(said)
         joins = JOINS.get((key, e.get('_pid')))
+        joins = joins and f'Can be recruited in {join_room(*joins)} after the battle, if alive'
         for words in (said, joins):
             if words:
                 e['note'] = e['note'].rstrip('.') + '. ' + words + '.'
@@ -720,7 +739,7 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
                                          win.app(*u['end'])} for u in foes]})
     if reinf:
         m['reinforcements'] = reinf
-    m['objectives'], m['objects'], m['changes'], m['notes'] = [], [], [], list(ARMY_NOTES.get(key, []))
+    m['objectives'], m['objects'], m['changes'], m['notes'] = [], [], [], [placed_words(n) for n in ARMY_NOTES.get(key, [])]
     for x, y in doors:
         # Shut as the battle starts; the Door command turns it into its tile's 変化 (TID_扉 a castle floor, TID_扉_草原 a plain).
         X, Y = win.app(x, y)
@@ -738,8 +757,8 @@ def battle_map(mid, key, title, heading, chapter, route, location, facts, terrai
         m['unconfirmed'] = m.get('unconfirmed', []) + ['Whether foes open the doors.']
     if key in LANCES:
         at = ', '.join(f'({x}, {y})' for x, y in (win.app(*t) for t in LANCES[key]))
-        m['notes'].append(f'If the request for five Steel Lances made at Grieth\'s Citadel was fulfilled, Slayde and the Barons at {at} '
-                          'each get a Steel Lance.')
+        m['notes'].append(placed_words('If the request for five Steel Lances made in {ギースの砦内部#SUB13_通常} was fulfilled, Slayde '
+                                       f'and the Barons at {at} each get a Steel Lance.'))
     if any(gname in armies and gname != 'Enemy' for gname in at_start) and slots:
         m['unconfirmed'] = m.get('unconfirmed', []) + [SLOT_ORDER]
     if key in MAP_UNCONFIRMED:
@@ -1183,22 +1202,75 @@ def drop_lists():
 CONTAINER = {'樽': 'barrel', '壺': 'pot', '木箱': 'box', '草': 'patch of grass'}
 
 
+def event_rows(location):
+    """Data/Event/<location>.bin's rows, each with the sequence it's in: [(sequence, row)]."""
+    b = load(os.path.join('Data', 'Event', location + '.bin.lz'))
+    rows = []
+    for o, n in b.labels:
+        if n.startswith('MOD_'):
+            t = Table(b, n[4:], every=True)
+            cur = None
+            for r in t.rows:
+                if r['_id']:
+                    cur = r['_id']
+                rows.append((cur, r))
+    return rows
+
+
+# The commands that lead into a sequence (its name the row's 引数１): a call, a jump, a yes or no, and a portrait to talk to.
+ENTER = {'サブルーチン呼び出し', 'ジャンプ', 'はい選択', 'いいえ選択', 'イベントジャンプ', '立ち絵追加'}
+_ROOMS = {}
+
+
+def rooms_reaching(location, seq):
+    """The rooms of a place a sequence of its event sheet is reached from (back through the rows that lead into each sequence, to a
+    sequence the sheet adds as a place to go, 移動先追加), by key."""
+    if location not in _ROOMS:
+        rows = event_rows(location)
+        into = defaultdict(set)
+        for s_, r in rows:
+            if r['コマンド'] in ENTER and isinstance(r['引数１（ジャンプ先）'], str):
+                into[r['引数１（ジャンプ先）']].add(s_)
+        _ROOMS[location] = ({r['引数１（ジャンプ先）'] for _, r in rows if r['コマンド'] == '移動先追加'}, into, rows)
+    rooms, into, _ = _ROOMS[location]
+    found, todo, seen = set(), [seq], {seq}
+    while todo:
+        cur = todo.pop()
+        if cur in rooms:
+            found.add(cur)
+            continue
+        for parent in into.get(cur, ()):
+            if parent and parent not in seen:
+                seen.add(parent)
+                todo.append(parent)
+    return found
+
+
+def room_name(location, key):
+    """A room's name as the game shows it (MID_拠点_<location>_<room>)."""
+    name = D.say(f'MID_拠点_{location}_{key}', 'Name')
+    assert name, (location, key)
+    return name
+
+
+def join_room(location, who):
+    """'<place> (<room>)': where a person's join (仲間入り) happens, the place's and the room's names as the game shows them."""
+    rooms_reaching(location, '')   # reads the sheet once
+    rows = _ROOMS[location][2]
+    seqs =[s_ for s_, r in rows if r['コマンド'] == '仲間入り' and who in (r.get('引数１（ジャンプ先）'), r.get('引数４'), r.get('引数５'))
+            and not (s_ or '').startswith('アドベンチャーをスキップ')]
+    rooms = set().union(*(rooms_reaching(location, s_) for s_ in seqs)) if seqs else set()
+    assert len(rooms) == 1, (location, who, rooms)
+    return f'{place(location)} ({room_name(location, rooms.pop())})'
+
+
 def event_gifts():
     """Every item an exploration event hands over (Data/Event/<location>.bin's アイテム入手 rows), with the location, the sequence and
     the act it needs at the least (a '*章' condition on the row or on the calls that lead to it)."""
     out = []
     for path in sorted(os.listdir(os.path.join(ROMFS, 'Data', 'Event'))):
         loc = path[:-7]
-        b = load(os.path.join('Data', 'Event', path))
-        rows = []
-        for o, n in b.labels:
-            if n.startswith('MOD_'):
-                t = Table(b, n[4:], every=True)
-                cur = None
-                for r in t.rows:
-                    if r['_id']:
-                        cur = r['_id']
-                    rows.append((cur, r))
+        rows = event_rows(loc)
         # Who calls each sequence, and under what act condition.
         callers = defaultdict(list)
         for seq, r in rows:
@@ -1347,9 +1419,12 @@ def main():
             if route == 'Extra' and m.get('_list') != 'skirmishes':
                 m['_list'] = 'optional'
             if key in ALTERNATIVE:
+                # Each desert's boss dying sets G_ギースの砦内部3_ソニアかディーン (Scripts/砂漠の北.cmb: 2, Sonya; 砂漠の南: 1, Deen),
+                # and Grieth's Citadel's War Room then shows that one's portrait to talk to (作戦室_フェード前).
                 m['notes'].insert(0, f"You fight this battle or the {battle_title(ALTERNATIVE[key])}, not both: once one army falls, the "
-                                     "other withdraws to Grieth's Citadel, whose prison then holds its leader (Deen, from the north; "
-                                     "Sonya, from the south), who can be recruited there by a talk.")
+                                     f"other withdraws to {place('ギースの砦')}, and its leader (Deen, from the north; Sonya, from the "
+                                     f"south) can then be recruited by a talk in {join_room('ギースの砦内部', 'ディーン')}. Only one of "
+                                     "them joins.")
             maps.append({k: v for k, v in m.items() if v is not None})
             pending.append((m['id'], act, route, facts_by[m['id']]))
         mid0 = ms[0]['id']
@@ -1365,11 +1440,15 @@ def main():
             if a > own:
                 on['from'] = first_of_act.get((a, m['route'])) or first_of_act[a]
             m.setdefault('notesOn', []).append(on)
+    desert_of = {node_map[k]: w for k, w in DESERT_WAY.items()}
+    desert_leaders = {unit_name(pid) for pid in DESERT_JOINS}
     for mid0, act, route, facts in pending:
         def at(needed):
             return mid0 if not needed or needed <= act else first_of_act.get((needed, route)) or first_of_act.get(needed) or mid0
         for who, carries, drops, later, generic, ds, *needed in facts['carries']:
             whom = (f'a foe {who}' if generic else who) + (f' in {needed[1]}' if len(needed) > 1 else '')
+            if mid0 in desert_of and not generic and who in desert_leaders:
+                whom += f', in the {desert_of[mid0]} desert'
             mid = at(needed[0] if needed else 0)
             for name in drops:
                 add(name_iid.get(name), mid, 'drop-later' if later else 'drop', f'Dropped by {whom}', ds)
@@ -1452,7 +1531,8 @@ def main():
             joined.add(pid)
             it = p['所持アイテム（IID_*)']
             if it:
-                add(it, mid, 'kit' + ('-later' if later else ''), f'Carried by {unit_name(pid)} when they join')
+                way = f", if Celica's army takes the {DESERT_JOINS[pid]} desert" if pid in DESERT_JOINS else ''
+                add(it, mid, 'kit' + ('-later' if later else ''), f'Carried by {unit_name(pid)} when they join{way}')
     # Scripts' ItemGain: the story's rewards in battles and dungeons.
     for path in sorted(os.listdir(os.path.join(ROMFS, 'Scripts'))):
         key = path[:-4]
