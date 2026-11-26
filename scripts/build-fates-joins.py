@@ -17,6 +17,11 @@ record's +0x08) and a fixed parent (+0x10, a person's index, the person record's
 married to someone of the other gender. Every paralogue names Chapter 7 on every route but Midori's, which names Birthright 15;
 Mozu's names no parent. The chapters a route goes on from with no My Castle visit are those whose script calls
 ev::ChapterSetSkipChapterSaveCastle(1) (Revelation 16, every route's 27), so nothing opens in the castle before the next one.
+My Castle itself comes first before Chapter 7: entering a chapter ORs its record's +0x18 bits into the game state's feature word
+(0x1b68d8), and only once bit 0 is in it (0x1000 there) does the game go to My Castle's sequence before the chapter (0x1b6ae0 ->
+0x49146c, castle::CastleSeq). The first story chapter whose record has bit 0 is Chapter 7 on every route (0x7f from there; the
+shared Chapters 1-5 have 0x80, the routes' Chapter 6 none). Scouting a challenge is a menu of the castle's (CastleSpotSelectMenu's
+MI_Encount), so no challenge opens before the castle does.
 
 Needs the dumped game files in data-raw/fates/romfs/ (git-ignored). Run:
     python scripts/build-fates-joins.py
@@ -44,8 +49,9 @@ CHAPTER, PERSON = 0x1c, 0x98  # record sizes, counted from each record's ID poin
 NOT_READ = ('Corrin', 'Jakob')
 
 
-def paralogue_records(text):
-    """{paralogue: (the chapter to clear first on each route, the fixed parent's name or None)} from the CID_X records."""
+def chapter_records(text):
+    """From GameData.bin's chapter records: {paralogue: (the chapter to clear first on each route, the fixed parent's name or None)}
+    from the CID_X records, and {route: the first story chapter My Castle comes before} (its record's +0x18 bit 0)."""
     d = decompress(open(os.path.join(RAW, 'GameData.bin.lz'), 'rb').read())
     u32 = lambda o: struct.unpack_from('<I', d, o)[0]  # noqa: E731
 
@@ -86,7 +92,13 @@ def paralogue_records(text):
             after[route] = int(first[1:])
         parent = struct.unpack_from('<H', d, o + 0x10)[0]
         out[int(m.group(1))] = (after, person(parent) if parent else None)
-    return dict(sorted(out.items()))
+    # The story chapters each route plays in order (the shared A001-A005, then its own from 6), and the first whose +0x18 has bit 0.
+    flags = {code: u32(o + 0x18) for o, code in chapters.items()}
+    castle = {}
+    for i, route in enumerate(ROUTES):
+        story = [f'A{n:03}' for n in range(1, 6)] + [f'{"ABC"[i]}{n:03}' for n in range(6, 29)]
+        castle[route] = next(int(code[1:]) for code in story if flags[code] & 1)
+    return dict(sorted(out.items())), castle
 
 
 def no_castle_after():
@@ -121,7 +133,7 @@ def chapters(route):
 
 def main():
     text = text_for()
-    paralogues = paralogue_records(text)
+    paralogues, castle_from = chapter_records(text)
     # The fixed parents of the children's paralogues, in the paralogues' order.
     PARENTS = []
     for _, parent in paralogues.values():
@@ -207,9 +219,14 @@ def main():
         '/** The story chapters each route goes on from with no My Castle visit (their script calls',
         ' * ev::ChapterSetSkipChapterSaveCastle), so nothing that opens in the castle opens before the next one. */',
         'export const NO_CASTLE_AFTER: Record<string, number[]> = ' + json.dumps(skipped, ensure_ascii=False),
+        '',
+        '/** The first story chapter each route visits My Castle before (its chapter record\'s +0x18 bit 0, which sends the game to',
+        ' * castle::CastleSeq: 0x1b6ae0): before it no castle, so nothing scouted or opened there. */',
+        'export const CASTLE_FROM: Record<string, number> = ' + json.dumps(castle_from, ensure_ascii=False),
     ]
     open(OUT, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
-    print('wrote', OUT, {r: len(v) for r, v in result.items()}, len(paralogues), 'paralogues; no castle after', skipped)
+    print('wrote', OUT, {r: len(v) for r, v in result.items()}, len(paralogues), 'paralogues; no castle after', skipped,
+          '; castle from', castle_from)
 
 
 if __name__ == '__main__':

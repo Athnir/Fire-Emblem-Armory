@@ -275,8 +275,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Fates' challenge battles are a third dropdown ("Challenges"), a list of their own:** a rerun of every chapter's or
   paralogue's map the game lets you scout (its chapter record's flag and route mask, not just an encounter file: Chapter 2
   has one but can't be scouted), on Birthright and Revelation (Conquest has none). A chapter's
-  challenge opens at the next My Castle visit after that chapter is cleared (Revelation 16's from 18); a paralogue's opens with the
-  paralogue (the app can't know it was cleared).
+  challenge opens at the next My Castle visit after that chapter is cleared: scouting is a menu of the castle's world map
+  (`CastleSpotSelectMenu`'s `MI_Encount`), and the castle first comes before Chapter 7 (the first chapter records with its bit,
+  `CASTLE_FROM`), so Chapters 3 to 5's challenges open with Chapter 6's, and Revelation 16's after 17 (the look-over, 2026-11-26);
+  a paralogue's opens with the paralogue (the app can't know it was cleared).
   Each goes by its scout name, the chapter's location ("Cemetery in a Deeprealm" for Rhajat's), never the chapter's title.
   It isn't a rerun but a map of its own on the chapter's, with everything spent: every tile in its second state at once (every
   bridge down, every vein's and the chapter's changes made, every breakable broken, every door, chest and village used up,

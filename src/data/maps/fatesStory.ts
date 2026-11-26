@@ -1,6 +1,6 @@
 import { storyOrder } from '../../logic/spoiler'
 import { ALL_MAPS } from './index'
-import { FATES_JOINS, NO_CASTLE_AFTER, PARALOGUE_AFTER, PARALOGUE_PARENT } from './fatesJoins'
+import { CASTLE_FROM, FATES_JOINS, NO_CASTLE_AFTER, PARALOGUE_AFTER, PARALOGUE_PARENT } from './fatesJoins'
 import type { StoryFork, StoryOrder } from './mapSet'
 import type { ChapterMap } from './types'
 
@@ -21,10 +21,11 @@ export const DLC_OPENS_AFTER = 6
  */
 const JOINS_LATE: Record<string, number> = { Jakob: 15 }
 
-/** The first chapter from `chapter` with a My Castle visit after it: Revelation 16 goes straight on into 17 (its ending skips
- * the castle), so what opens there opens after 17. */
+/** The first chapter from `chapter` with a My Castle visit after it: the castle first comes before Chapter 7 (`CASTLE_FROM`), so
+ * nothing opens there before Chapter 6 is cleared, and Revelation 16 goes straight on into 17 (its ending skips the castle), so what
+ * opens there opens after 17. */
 function castleAfter(chapter: number, route: string): number {
-  let n = chapter
+  let n = Math.max(chapter, (CASTLE_FROM[route] ?? 1) - 1)
   while (NO_CASTLE_AFTER[route]?.includes(n)) n++
   return n
 }
@@ -62,8 +63,8 @@ function storyFor(route: (typeof ROUTES)[number]): StoryOrder {
       const m = byId.get(id)
       if (m?.route === 'DLC') return after(maps, DLC_OPENS_AFTER)
       if (m?.route === 'Paralogue' && m.availableIn?.some((r) => r === route)) return after(maps, paralogueOpensAfter(m.chapter, route))
-      // A chapter's challenge can be scouted at the castle visit after that chapter (Revelation 16's after 17); a paralogue's as
-      // soon as the paralogue opens.
+      // A chapter's challenge can be scouted at the castle visit after that chapter (the castle's world map: the first visit comes
+      // before Chapter 7, so the shared chapters' open there; Revelation 16's after 17); a paralogue's as soon as the paralogue opens.
       if (m?.route === 'Challenge' && m.availableIn?.some((r) => r === route)) {
         const base = byId.get(m.challengeOf!)!
         return after(maps, base.route === 'Paralogue' ? paralogueOpensAfter(base.chapter, route) : castleAfter(base.chapter, route))

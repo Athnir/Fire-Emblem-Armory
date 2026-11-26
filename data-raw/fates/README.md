@@ -433,6 +433,14 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   B027 and C027 before the Endgame; C016's ending, handler 45, runs Chapter 17's opening at once). So what would open after
   Revelation 16 opens after 17: Shiro's and Mitama's paralogues (Ryoma and Azama join in 16) and Revelation 16's challenge
   (`NO_CASTLE_AFTER`).
+- My Castle first comes before Chapter 7 (`CASTLE_FROM`). Entering a chapter ORs its record's +0x18 bits into the game state's
+  feature word (+0x28, `0x1b68d8`: bit 0 → 0x1000, 1 → 0x2000, 3-6 → 0x4000-0x20000), and only once 0x1000 is in it does the game
+  go to My Castle's sequence before the chapter (`0x1b6ae0` → `0x49146c`, castle::CastleSeq). The first story chapter whose record has
+  bit 0 is Chapter 7 on every route (0x7f from there; the shared Chapters 1-5 have 0x80, the shared look of their title card,
+  `0x2175dc`; the routes' Chapter 6 none). The other bits unlock the battle preparations' menus as the early chapters hide them
+  (bit 3: the Property item, `0x4b3720`) and the offer to buy another path (bit 0 also, `0x1b6834`). Scouting a challenge is a menu of
+  the castle's world map (CastleSpotSelectMenu's MI_Encount, beside MI_SpotDLC and MI_NextChapterYes), so the shared chapters'
+  challenges open at that first visit, with Chapter 6's.
 - A recruit counts as joined even with nothing in their slots (Kagero, at the end of Revelation 11: C011's end handler places
   Support01, her slot empty), so a later Player group's preset (her Steel Shuriken in Revelation 13) isn't hers to list.
 - Each story chapter's `kit` (`gameUnits.ts`) is what your own units start it holding: the items of the units in the Player /

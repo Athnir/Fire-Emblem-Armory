@@ -16,3 +16,7 @@ export const PARALOGUE_PARENT: Record<number, string> = {"2": "Corrin", "3": "Az
 /** The story chapters each route goes on from with no My Castle visit (their script calls
  * ev::ChapterSetSkipChapterSaveCastle), so nothing that opens in the castle opens before the next one. */
 export const NO_CASTLE_AFTER: Record<string, number[]> = {"Birthright": [27], "Conquest": [27], "Revelation": [16, 27]}
+
+/** The first story chapter each route visits My Castle before (its chapter record's +0x18 bit 0, which sends the game to
+ * castle::CastleSeq: 0x1b6ae0): before it no castle, so nothing scouted or opened there. */
+export const CASTLE_FROM: Record<string, number> = {"Birthright": 7, "Conquest": 7, "Revelation": 7}

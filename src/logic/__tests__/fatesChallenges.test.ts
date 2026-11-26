@@ -3,6 +3,7 @@ import { ALL_MAPS, FATES_MAP_SET } from '../../data/maps'
 import { FATES_CHALLENGES } from '../../data/maps/fatesChallenges'
 import { GAME_CHAPTERS } from '../../data/maps/gameChapters'
 import { FATES_FORK } from '../../data/maps/fatesStory'
+import { CASTLE_FROM } from '../../data/maps/fatesJoins'
 import { reachOf } from '../spoiler'
 import { terrainAt, terrainInfo } from '../maps'
 import type { Tile } from '../../data/maps/types'
@@ -128,8 +129,18 @@ describe("Fates' challenge battles", () => {
     // until 17 is cleared.
     expect(reached('Revelation', 17).has('fe14r-16-challenge')).toBe(false)
     expect(reached('Revelation', 18).has('fe14r-16-challenge')).toBe(true)
-    // The shared chapters' challenges, on both routes that have challenges.
-    expect(reached('Revelation', 6).has('fe14-5-challenge')).toBe(true)
+    // The shared chapters' challenges, on both routes that have challenges, open at the first castle visit: scouting is a menu of
+    // My Castle's world map (CastleSpotSelectMenu's MI_Encount), and the game first goes to the castle before Chapter 7, the first
+    // chapter whose record has the castle's bit (+0x18 bit 0: 0x1b6ae0 starts castle::CastleSeq only once it's on).
+    expect(CASTLE_FROM).toEqual({ Birthright: 7, Conquest: 7, Revelation: 7 })
+    for (const route of ['Birthright', 'Revelation'] as const) {
+      for (const id of ['fe14-3-challenge', 'fe14-4-challenge', 'fe14-5-challenge']) {
+        expect(reached(route, 6).has(id), `${route} ${id}`).toBe(false)
+        expect(reached(route, 7).has(id), `${route} ${id}`).toBe(true)
+      }
+    }
+    expect(reached('Revelation', 6).has('fe14r-6-challenge')).toBe(false)
+    expect(reached('Revelation', 7).has('fe14r-6-challenge')).toBe(true)
     expect(reached('Conquest', 27).has('fe14-5-challenge')).toBe(false)
     for (const chapter of [10, 20, 26]) {
       const r = reached('Revelation', chapter)
