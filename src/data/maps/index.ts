@@ -375,12 +375,13 @@ export function mapLabel(map: ChapterMap): string {
 }
 
 /** The route buttons on the map page: the chapters before the split, each route, and the DLC. */
-export const MAP_ROUTES = ['Prologue', 'Birthright', 'Conquest', 'Revelation', 'DLC'] as const
+// The chapters every route shares are "Common" (the user's call, 2026-11-26: not "Prologue", which the game's own scripted battle is).
+export const MAP_ROUTES = ['Common', 'Birthright', 'Conquest', 'Revelation', 'DLC'] as const
 export type MapRoute = (typeof MAP_ROUTES)[number]
 
 /** A route's own maps (not its paralogues), in order. */
 export function routeMaps(route: MapRoute): ChapterMap[] {
-  return ALL_MAPS.filter((m) => m.route === (route === 'Prologue' ? 'Shared' : route))
+  return ALL_MAPS.filter((m) => m.route === (route === 'Common' ? 'Shared' : route))
 }
 
 /** The paralogues a route can reach. */
@@ -404,12 +405,12 @@ export function chapterLabel(map: ChapterMap): string {
 
 /** The route a map is listed under (a paralogue: the first route that can reach it). */
 export function mapRoute(map: ChapterMap): MapRoute {
-  if (map.route === 'Shared' || map.route === 'Story' || map.route === 'Trial') return 'Prologue'
+  if (map.route === 'Shared' || map.route === 'Story' || map.route === 'Trial') return 'Common'
   // Fates' own: The Sacred Stones' skirmishes name their routes too, but never come here.
   if (map.route === 'Paralogue' || map.route === 'Challenge') return (map.availableIn?.[0] as MapRoute | undefined) ?? 'Revelation'
   if (map.route === 'Birthright' || map.route === 'Conquest' || map.route === 'Revelation' || map.route === 'DLC') return map.route
   // Another game's routes (The Blazing Blade's stories) aren't Fates' to list.
-  return 'Prologue'
+  return 'Common'
 }
 
 /** Fates on the map page: its routes, three difficulties and the Fire Emblem Wiki's movement classes. */
@@ -418,9 +419,9 @@ export const FATES_MAP_SET: MapSet = {
   routes: {
     list: MAP_ROUTES,
     maps: (route) => routeMaps(route as MapRoute),
-    side: (route) => (route === 'Prologue' || route === 'DLC' ? [] : routeParalogues(route as MapRoute)),
+    side: (route) => (route === 'Common' || route === 'DLC' ? [] : routeParalogues(route as MapRoute)),
     of: mapRoute,
-    third: { label: 'Challenges', maps: (route) => (route === 'Prologue' || route === 'DLC' ? [] : routeChallenges(route as MapRoute)) },
+    third: { label: 'Challenges', maps: (route) => (route === 'Common' || route === 'DLC' ? [] : routeChallenges(route as MapRoute)) },
   },
   difficulties: DIFFICULTIES.map((d) => ({ value: d, label: d })),
   moveClasses: MOVE_CLASSES,

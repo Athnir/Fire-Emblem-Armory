@@ -12,10 +12,12 @@ import { rangeText } from '../logic/rangeText'
 
 const STAT_NAME: Record<string, string> = { hp: 'HP', str: 'Str', mag: 'Mag', skl: 'Skl', spd: 'Spd', lck: 'Lck', def: 'Def', res: 'Res' }
 
+// The Roster's route colours (the user's call, 2026-11-26, fates-route-colours): its backdrop's sage green, lavender and gold, deepened
+// for a badge on the dark page.
 const ROUTE_COLORS: Record<string, string> = {
-  Birthright: 'bg-sky-900 text-sky-200',
-  Conquest: 'bg-rose-900 text-rose-200',
-  Revelation: 'bg-violet-900 text-violet-200',
+  Birthright: 'bg-[#3f5a43] text-[#d8ecd9]',
+  Conquest: 'bg-[#4a3b5c] text-[#e6dcf2]',
+  Revelation: 'bg-[#5c4a1f] text-[#f5e3b3]',
   all: 'bg-neutral-700 text-neutral-200',
 }
 
@@ -201,7 +203,7 @@ export function WeaponDetailPanel({
           </span>
         ))}
         {weapon.isDlc && <span className="rounded bg-amber-900 px-2 py-0.5 text-xs text-amber-200">DLC</span>}
-        {weapon.isAmiibo && <span className="rounded bg-amber-900 px-2 py-0.5 text-xs text-amber-200">Amiibo</span>}
+        {weapon.isAmiibo && <span className="rounded bg-amber-900 px-2 py-0.5 text-xs text-amber-200">amiibo</span>}
         {weapon.isMyCastle && (
           <span className="rounded bg-cyan-900 px-2 py-0.5 text-xs text-cyan-200">My Castle</span>
         )}

@@ -35,7 +35,8 @@ const WEAPONS: ChapterWeaponsConfig = {
   statNames: {},
   /** Against a unit it's effective on, the weapon's Mt is multiplied by 3 (the damage routine's effectiveness, 0xd99a0 and 0xc404c). */
   effectiveMultiplier: 3,
-  rankLabel: (w) => (w.rank ? `${w.category === 'Gauntlets' ? 'Brawling' : `${w.category}s`} ${w.rank}` : ''),
+  // The rank by its skill, as the Roster writes it ("Sword D", "Brawling C": the user's call, 2026-11-26).
+  rankLabel: (w) => (w.rank ? `${w.category === 'Gauntlets' ? 'Brawling' : w.category} ${w.rank}` : ''),
   shopName: 'armory',
   routeName,
   // Cindered Shadows, the DLC's side story: off until ticked (the user's call, 2026-11-26), the map page's switch the same.

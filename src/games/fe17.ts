@@ -19,11 +19,12 @@ const engageWeapon = (w: ChapterWeapon) => {
   return !!(x.engage || x.emblem)
 }
 const engageSource = (s: ItemSource) => s.kind.startsWith('engage')
-/** Fell Xenologue's maps, its skirmishes too: every list of its route on the map page. */
+/** The Expansion Pass's maps: Fell Xenologue's (its skirmishes too: every list of its route on the map page) and the Divine Paralogues. */
 const XENOLOGUE_MAPS = new Set(
   (['maps', 'side'] as const)
     .flatMap((k) => FE17_MAP_SET.routes![k]('Fell Xenologue'))
     .concat(FE17_MAP_SET.routes!.third?.maps('Fell Xenologue') ?? [], FE17_MAP_SET.routes!.fourth?.maps('Fell Xenologue') ?? [])
+    .concat(FE17_MAP_SET.routes!.side('Main story').filter((m) => FE17_MAP_SET.sideStory!.also?.(m)))
     .map((m) => m.id),
 )
 const signed = (v: number) => (v < 0 ? `${v}` : `+${v}`)
@@ -45,7 +46,8 @@ const WEAPONS: ChapterWeaponsConfig = {
   optional: [
     { label: 'Show emblem weapons', covers: engageSource, weapons: engageWeapon },
     // Fell Xenologue, the DLC's side story: off until ticked (the user's call, 2026-11-26), the map page's switch the same.
-    { label: 'Show Fell Xenologue', covers: (s) => XENOLOGUE_MAPS.has(s.mapId), sideStory: 'fe17' },
+    // The Expansion Pass (Fell Xenologue and the Divine Paralogues): off until ticked, the map page's switch the same.
+    { label: 'Show the Expansion Pass', covers: (s) => XENOLOGUE_MAPS.has(s.mapId), sideStory: 'fe17' },
   ],
   /** Engravings (src/data/fe17/fe17Engrave.ts): any weapon but a staff or a blast takes one at the smithy, from an emblem of yours. */
   modifiers: {

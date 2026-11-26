@@ -264,7 +264,9 @@ def main():
                 if reward:
                     m['notes'].append(f'Seizing the {what} gives {reward}.')
                 for t in notes:
-                    m['notes'].append(f'When Marth seizes the {what}: {t[0].lower() + t[1:]}')
+                    # A name keeps its capital ("Elice joins your army"; the look-over's fe1-elice-case).
+                    first = t.split(' ', 1)[0]
+                    m['notes'].append(f'When Marth seizes the {what}: {t if first in CHARS.values() else t[0].lower() + t[1:]}')
             elif TILES[gt] == 2:
                 notes = []
                 o = {'type': 'village', 'tile': tile, 'reward': give(a, ('village', 'Given at a village'), notes)}

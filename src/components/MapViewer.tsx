@@ -2427,9 +2427,10 @@ export function MapViewer({ set }: { set: MapSet }) {
   const hiddenSide = (m: ChapterMap) =>
     !!sideRoute &&
     !sideShown &&
-    [set.routes!.maps(sideRoute), set.routes!.side(sideRoute), set.routes!.third?.maps(sideRoute) ?? [], set.routes!.fourth?.maps(sideRoute) ?? []].some(
-      (list) => list.some((x) => x.id === m.id),
-    )
+    (!!set.sideStory!.also?.(m) ||
+      [set.routes!.maps(sideRoute), set.routes!.side(sideRoute), set.routes!.third?.maps(sideRoute) ?? [], set.routes!.fourth?.maps(sideRoute) ?? []].some(
+        (list) => list.some((x) => x.id === m.id),
+      ))
   const picked = all.find((m) => m.id === mapId && reach.has(m.id) && !hiddenSide(m)) ?? newest ?? all[0]
   // The difficulty picked in the bar; changing it keeps this map and redraws it as that difficulty lays it out. A map played on
   // fewer difficulties than the game has (The Blazing Blade's Lyn's story: Normal only) shows its own.
@@ -2462,7 +2463,7 @@ export function MapViewer({ set }: { set: MapSet }) {
   const [routePick, setRoute] = useState(set.routes ? set.routes.of(map) : '')
   const route = set.routes ? (routeList.includes(routePick) ? routePick : routeFor(map)) : ''
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
-  const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))
+  const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id) && !hiddenSide(m))
   const offMain = [...(set.extras?.maps ?? []), ...(set.third?.maps ?? [])]
   const mainMaps = (set.routes ? set.routes.maps(route) : all.filter((m) => !offMain.includes(m))).filter((m) => reach.has(m.id))
   const sideLabel = set.extras?.label ?? set.routes?.sideLabel ?? 'Paralogues'

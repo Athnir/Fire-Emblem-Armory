@@ -326,18 +326,18 @@ describe("Engage's weapons", () => {
   it("gives each emblem's engage weapons from the chapter it joins, those past its bond cap once its paralogue lifts it", () => {
     const at = (name: string) => FE17_ITEM_SOURCES[name].map((x) => [x.mapId, x.kind, x.text])
     // Marth joins in Chapter 1's battle: his Rapier from Chapter 2; his Falchion (bond 15, past the cap of 11) with The Hero-King.
-    expect(at('Rapier (Emblem Marth)')).toEqual([['fe17-m001', 'engage-later', 'Engage weapon of Emblem Marth at bond level 1']])
-    expect(at('Falchion (Emblem Marth)')[0][0]).toBe('fe17-s014')
+    expect(at('Rapier (Marth)')).toEqual([['fe17-m001', 'engage-later', 'Engage weapon of Marth at bond level 1']])
+    expect(at('Falchion (Marth)')[0][0]).toBe('fe17-s014')
     // Roy comes with Diamant in Chapter 8 (the Ally group's emblem); Tiki after her Divine Paralogue, a breath for each unit type.
-    expect(at('Lancereaver (Emblem Roy)')[0].slice(0, 2)).toEqual(['fe17-m008', 'engage-later'])
-    expect(at('Fire Breath (Emblem Tiki)')[0][2]).toBe('Engage weapon of Emblem Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units')
+    expect(at('Lancereaver (Roy)')[0].slice(0, 2)).toEqual(['fe17-m008', 'engage-later'])
+    expect(at('Fire Breath (Tiki)')[0][2]).toBe('Engage weapon of Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units')
     // Every emblem's weapon is marked for the "Show emblem weapons" switch: the engage weapons, and the copies foes' emblems carry.
     const flagged = (name: string) => FE17_LISTED.find((w) => w.name === name) as (typeof FE17_LISTED)[number] & { emblem?: true }
-    expect(flagged('Rapier (Emblem Marth)').emblem).toBe(true)
-    expect(flagged('Mercurius (Emblem Marth, foes)').emblem).toBe(true)
+    expect(flagged('Rapier (Marth)').emblem).toBe(true)
+    expect(flagged('Mercurius (Marth, foes)').emblem).toBe(true)
     expect(flagged('Iron Sword').emblem).toBeUndefined()
     // An engage weapon is wielded only while engaged, and never sold.
-    const rapier = FE17_LISTED.find((w) => w.name === 'Rapier (Emblem Marth)')!
+    const rapier = FE17_LISTED.find((w) => w.name === 'Rapier (Marth)')!
     expect(rapier.rules?.[0]).toBe('An engage weapon: wielded only while engaged with its emblem')
     expect(rapier.worth).toBeNull()
   })

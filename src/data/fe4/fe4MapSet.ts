@@ -3,11 +3,11 @@ import type { MapSet } from '../maps/mapSet'
 import { FE4_MAPS } from './fe4Maps'
 import { FE4_MOVE_CLASSES, FE4_MOVE_CLASS_EXAMPLES } from './fe4Terrain'
 
-const label = (m: { heading?: string; title: string }) => `${(m.heading ?? '').replace(/^Ch\./, 'Chapter ')}: ${m.title}`
+const label = (m: { heading?: string; title: string }) => `${(m.heading ?? '').replace(/^Ch\./, 'Chapter ').replace(/^Final$/, 'Final Chapter')}: ${m.title}`
 
 /** The story as the spoiler block opens it: the twelve chapters in order (the game has no side maps). */
 export const FE4_STORY = storyOrder(FE4_MAPS, {
-  name: (m) => (m.heading === 'Prologue' || m.heading === 'Endgame' ? m.heading : `Chapter ${m.chapter}`),
+  name: (m) => (m.heading === 'Prologue' ? m.heading : m.heading === 'Final' ? 'Final Chapter' : `Chapter ${m.chapter}`),
   short: (m) => m.heading ?? `Ch.${m.chapter}`,
 })
 

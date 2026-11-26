@@ -1,12 +1,12 @@
 """
 Builds src/data/fe4/fe4Bonuses.ts: Genealogy of the Holy War's weapon triangle and leadership, read from the battle code in the
-user's ROM (scripts/fe4_rom.py), for the weapon triangle tab. The game has no support levels; the Charisma and lover bonuses the same
+user's ROM (scripts/fe4_rom.py), for the weapon triangle tab. The game has no support levels; the Charm and lover bonuses the same
 routine adds are a unit's own, so they're left to the Unit Planner (they're described below and in data-raw/fe4/README.md). Run:
     python scripts/build-fe4-bonuses.py
 
 The code (65816, bank $84; disassemble with scripts/fe4_asm.py):
   - $84:DB52 sums the bonus a unit gets from the units around it. It walks every unit on the map; one of the same army at a
-    distance of 1 to 3 tiles (|dx| + |dy|, the CMP #$04 at $84:DB92) adds: +10 if it has Charisma (skill 0x0C, $84:DBDC); +10 if it
+    distance of 1 to 3 tiles (|dx| + |dy|, the CMP #$04 at $84:DB92) adds: +10 if it has Charm (skill 0x0C, $84:DBDC); +10 if it
     is the unit's lover ($84:DBEF); its leadership bonus if it is the unit's commander ($84:DC00: a table by stars at $84:DC0D).
   - $84:D97B adds the lord's own leadership (Sigurd and Seliph, by character id 1 and 0x19, or a unit with leader bit 0x100), from the
     same table at $84:D9B0.

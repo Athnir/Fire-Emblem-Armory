@@ -47,8 +47,8 @@ CHURCH_HEAL = 22          # $84:B094: a unit on a Church is healed to full as th
 CHAPTER_DATA = 0x86C760   # 3-byte pointers to each chapter's data: [u16 locations][u16 map changes]...
 GATE_BELOW = 2            # a castle is entered from its gate, two rows below its tile (the castle kind's record at $87:F453 + 6)
 VILLAGE_STAGES = 0x7F0A4  # $87:F0A4: per village variant (its id & 3), a raided village's patch at each stage of its gold
-# The chapters: id, number, heading. Their titles are the patch's (fe4_names.chapter_titles(), its turn record), the last chapter's
-# heading too (Endgame, as the patch calls it).
+# The chapters: id, number, heading. Their titles are the patch's (fe4_names.chapter_titles(), its turn record); the last chapter is
+# the game's own Final Chapter (終章; the patch says Endgame), as the Roster names it (the user's call, 2026-11-26).
 CHAPTERS = [
     ('fe4-prologue', 0, 'Prologue', ''),
     ('fe4-1', 1, 'Ch.1', ''),
@@ -61,7 +61,7 @@ CHAPTERS = [
     ('fe4-8', 8, 'Ch.8', ''),
     ('fe4-9', 9, 'Ch.9', 'For Whose Sake'),
     ('fe4-10', 10, 'Ch.10', 'Light and Dark'),
-    ('fe4-final', 11, 'Endgame', ''),
+    ('fe4-final', 11, 'Final', ''),
 ]
 
 # Terrain id -> (the builder's letter, the name Serenes Forest gives it). Ids the maps never use (10, 11, 16, 17, 19-21, 23) are

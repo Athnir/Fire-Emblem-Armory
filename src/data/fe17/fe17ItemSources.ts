@@ -3798,140 +3798,140 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Parthia (Emblem Lucina, foes)": [
+  "Parthia (Lucina, foes)": [
     {
       "mapId": "fe17-s003",
       "kind": "foe",
       "text": "Carried by Lucina"
     }
   ],
-  "Noble Rapier (Emblem Lucina, foes)": [
+  "Noble Rapier (Lucina, foes)": [
     {
       "mapId": "fe17-s003",
       "kind": "foe",
       "text": "Carried by Lucina"
     }
   ],
-  "Parallel Falchion (Emblem Lucina, foes)": [
+  "Parallel Falchion (Lucina, foes)": [
     {
       "mapId": "fe17-s003",
       "kind": "foe",
       "text": "Carried by Lucina"
     }
   ],
-  "Mani Katti (Emblem Lyn, foes)": [
+  "Mani Katti (Lyn, foes)": [
     {
       "mapId": "fe17-s004",
       "kind": "foe",
       "text": "Carried by Lyn"
     }
   ],
-  "Killer Bow (Emblem Lyn, foes)": [
+  "Killer Bow (Lyn, foes)": [
     {
       "mapId": "fe17-s004",
       "kind": "foe",
       "text": "Carried by Lyn"
     }
   ],
-  "Hammer (Emblem Ike, foes)": [
+  "Hammer (Ike, foes)": [
     {
       "mapId": "fe17-s005",
       "kind": "foe",
       "text": "Carried by Ike"
     }
   ],
-  "Urvan (Emblem Ike, foes)": [
+  "Urvan (Ike, foes)": [
     {
       "mapId": "fe17-s005",
       "kind": "foe",
       "text": "Carried by Ike"
     }
   ],
-  "Ragnell (Emblem Ike, foes)": [
+  "Ragnell (Ike, foes)": [
     {
       "mapId": "fe17-s005",
       "kind": "foe",
       "text": "Carried by Ike"
     }
   ],
-  "Sword of the Creator (Emblem Byleth, foes)": [
+  "Sword of the Creator (Byleth, foes)": [
     {
       "mapId": "fe17-s006",
       "kind": "foe",
       "text": "Carried by Byleth"
     }
   ],
-  "Vajra-Mushti (Emblem Byleth, foes)": [
+  "Vajra-Mushti (Byleth, foes)": [
     {
       "mapId": "fe17-s006",
       "kind": "foe",
       "text": "Carried by Byleth"
     }
   ],
-  "Blutgang (Emblem Byleth, foes)": [
+  "Blutgang (Byleth, foes)": [
     {
       "mapId": "fe17-s006",
       "kind": "foe",
       "text": "Carried by Byleth"
     }
   ],
-  "Wakizashi (Emblem Corrin, foes)": [
+  "Wakizashi (Corrin, foes)": [
     {
       "mapId": "fe17-s007",
       "kind": "foe",
       "text": "Carried by Corrin"
     }
   ],
-  "Dual Katana (Emblem Corrin, foes)": [
+  "Dual Katana (Corrin, foes)": [
     {
       "mapId": "fe17-s007",
       "kind": "foe",
       "text": "Carried by Corrin"
     }
   ],
-  "Yato (Emblem Corrin, foes)": [
+  "Yato (Corrin, foes)": [
     {
       "mapId": "fe17-s007",
       "kind": "foe",
       "text": "Carried by Corrin"
     }
   ],
-  "Rapier (Emblem Eirika, foes)": [
+  "Rapier (Eirika, foes)": [
     {
       "mapId": "fe17-s008",
       "kind": "foe",
       "text": "Carried by Eirika"
     }
   ],
-  "Wind Sword (Emblem Eirika, foes)": [
+  "Wind Sword (Eirika, foes)": [
     {
       "mapId": "fe17-s008",
       "kind": "foe",
       "text": "Carried by Eirika"
     }
   ],
-  "Sieglinde (Emblem Eirika, foes)": [
+  "Sieglinde (Eirika, foes)": [
     {
       "mapId": "fe17-s008",
       "kind": "foe",
       "text": "Carried by Eirika"
     }
   ],
-  "Tyrfing (Emblem Sigurd, foes)": [
+  "Tyrfing (Sigurd, foes)": [
     {
       "mapId": "fe17-s009",
       "kind": "foe",
       "text": "Carried by Sigurd"
     }
   ],
-  "Brave Lance (Emblem Sigurd, foes)": [
+  "Brave Lance (Sigurd, foes)": [
     {
       "mapId": "fe17-s009",
       "kind": "foe",
       "text": "Carried by Sigurd"
     }
   ],
-  "Light Brand (Emblem Leif, foes)": [
+  "Light Brand (Leif, foes)": [
     {
       "mapId": "fe17-s010",
       "kind": "foe",
@@ -3950,7 +3950,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Master Lance (Emblem Leif, foes)": [
+  "Master Lance (Leif, foes)": [
     {
       "mapId": "fe17-s010",
       "kind": "foe",
@@ -4059,7 +4059,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Killer Axe (Emblem Leif, foes)": [
+  "Killer Axe (Leif, foes)": [
     {
       "mapId": "fe17-s010",
       "kind": "foe",
@@ -4070,63 +4070,63 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Shine (Emblem Micaiah, foes)": [
+  "Shine (Micaiah, foes)": [
     {
       "mapId": "fe17-s011",
       "kind": "foe",
       "text": "Carried by Micaiah"
     }
   ],
-  "Nosferatu (Emblem Micaiah, foes)": [
+  "Nosferatu (Micaiah, foes)": [
     {
       "mapId": "fe17-s011",
       "kind": "foe",
       "text": "Carried by Micaiah"
     }
   ],
-  "Thani (Emblem Micaiah, foes)": [
+  "Thani (Micaiah, foes)": [
     {
       "mapId": "fe17-s011",
       "kind": "foe",
       "text": "Carried by Micaiah"
     }
   ],
-  "Binding Blade (Emblem Roy, foes)": [
+  "Binding Blade (Roy, foes)": [
     {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Roy"
     }
   ],
-  "Lancereaver (Emblem Roy, foes)": [
+  "Lancereaver (Roy, foes)": [
     {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Roy"
     }
   ],
-  "Wyrmslayer (Emblem Roy, foes)": [
+  "Wyrmslayer (Roy, foes)": [
     {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Roy"
     }
   ],
-  "Seraphim (Emblem Celica, foes)": [
+  "Seraphim (Celica, foes)": [
     {
       "mapId": "fe17-s013",
       "kind": "foe",
       "text": "Carried by Celica"
     }
   ],
-  "Ragnarok (Emblem Celica, foes)": [
+  "Ragnarok (Celica, foes)": [
     {
       "mapId": "fe17-s013",
       "kind": "foe",
       "text": "Carried by Celica"
     }
   ],
-  "Recover (Emblem Celica, foes)": [
+  "Recover (Celica, foes)": [
     {
       "mapId": "fe17-s013",
       "kind": "foe",
@@ -4151,7 +4151,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Mercurius (Emblem Marth, foes)": [
+  "Mercurius (Marth, foes)": [
     {
       "mapId": "fe17-s014",
       "kind": "foe",
@@ -4170,7 +4170,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Falchion (Emblem Marth, foes)": [
+  "Falchion (Marth, foes)": [
     {
       "mapId": "fe17-s014",
       "kind": "foe",
@@ -4180,7 +4180,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Rapier (Emblem Marth, foes)": [
+  "Rapier (Marth, foes)": [
     {
       "mapId": "fe17-s014",
       "kind": "foe",
@@ -4364,7 +4364,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Eternal Claw (Emblem Tiki, Divine Paralogue, foes, weaker)": [
+  "Eternal Claw (Tiki, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
@@ -4382,7 +4382,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Tail Smash (Emblem Tiki, Divine Paralogue, foes, weaker)": [
+  "Tail Smash (Tiki, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
@@ -4400,7 +4400,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Fog Breath (Emblem Tiki, Divine Paralogue, foes, weakest)": [
+  "Fog Breath (Tiki, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
@@ -4418,7 +4418,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Fog Breath (Emblem Tiki, Divine Paralogue, foes, weaker)": [
+  "Fog Breath (Tiki, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
@@ -4428,7 +4428,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Eternal Claw (Emblem Tiki, Divine Paralogue, foes, weakest)": [
+  "Eternal Claw (Tiki, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
@@ -4438,7 +4438,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Tail Smash (Emblem Tiki, Divine Paralogue, foes, weakest)": [
+  "Tail Smash (Tiki, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g001",
       "kind": "foe-later",
@@ -4448,7 +4448,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Wolf Beil (Emblem Hector, Divine Paralogue, foes, weakest, lower Hit)": [
+  "Wolf Beil (Hector, Divine Paralogue, foes, weakest, lower Hit)": [
     {
       "mapId": "fe17-g002",
       "kind": "foe",
@@ -4458,7 +4458,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Runesword (Emblem Hector, Divine Paralogue, foes, weakest)": [
+  "Runesword (Hector, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g002",
       "kind": "foe",
@@ -4468,7 +4468,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Armads (Emblem Hector, Divine Paralogue, foes, weakest, lower Hit)": [
+  "Armads (Hector, Divine Paralogue, foes, weakest, lower Hit)": [
     {
       "mapId": "fe17-g002",
       "kind": "foe",
@@ -4478,7 +4478,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Wolf Beil (Emblem Hector, Divine Paralogue, foes, weaker)": [
+  "Wolf Beil (Hector, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g002",
       "kind": "foe",
@@ -4496,7 +4496,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Runesword (Emblem Hector, Divine Paralogue, foes, weaker)": [
+  "Runesword (Hector, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g002",
       "kind": "foe",
@@ -4514,7 +4514,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Armads (Emblem Hector, Divine Paralogue, foes, weaker)": [
+  "Armads (Hector, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g002",
       "kind": "foe",
@@ -4532,7 +4532,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Hliðskjálf  (Emblem Veronica, Divine Paralogue, foes, a little weaker)": [
+  "Hliðskjálf  (Veronica, Divine Paralogue, foes, a little weaker)": [
     {
       "mapId": "fe17-g003",
       "kind": "foe",
@@ -4542,7 +4542,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Fortify+ (Emblem Veronica, foes, +)": [
+  "Fortify+ (Veronica, foes, +)": [
     {
       "mapId": "fe17-g003",
       "kind": "foe",
@@ -4568,7 +4568,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Élivágar (Emblem Veronica, Divine Paralogue, foes, a little weaker)": [
+  "Élivágar (Veronica, Divine Paralogue, foes, a little weaker)": [
     {
       "mapId": "fe17-g003",
       "kind": "foe",
@@ -4585,7 +4585,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the armory in the Somniel (once the Mage Cannoneer class is unlocked)"
     }
   ],
-  "Hliðskjálf  (Emblem Veronica, Divine Paralogue, foes, weaker)": [
+  "Hliðskjálf  (Veronica, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g003",
       "kind": "foe",
@@ -4595,7 +4595,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Élivágar (Emblem Veronica, Divine Paralogue, foes, weaker)": [
+  "Élivágar (Veronica, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g003",
       "kind": "foe",
@@ -4605,7 +4605,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Hliðskjálf  (Emblem Veronica, Divine Paralogue, foes, weakest)": [
+  "Hliðskjálf  (Veronica, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g003",
       "kind": "foe",
@@ -4615,7 +4615,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Élivágar (Emblem Veronica, Divine Paralogue, foes, weakest)": [
+  "Élivágar (Veronica, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g003",
       "kind": "foe",
@@ -4625,7 +4625,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Bolting (Emblem Soren, Divine Paralogue, foes, weaker)": [
+  "Bolting (Soren, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g004",
       "kind": "foe",
@@ -4636,7 +4636,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Reflect (Emblem Soren, foes)": [
+  "Reflect (Soren, foes)": [
     {
       "mapId": "fe17-g004",
       "kind": "foe",
@@ -4655,7 +4655,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Rexcalibur (Emblem Soren, Divine Paralogue, foes, weaker)": [
+  "Rexcalibur (Soren, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g004",
       "kind": "foe",
@@ -4698,7 +4698,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Martial Monk (arrives later)"
     }
   ],
-  "Bolting (Emblem Soren, Divine Paralogue, foes, weakest)": [
+  "Bolting (Soren, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g004",
       "kind": "foe",
@@ -4708,7 +4708,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Rexcalibur (Emblem Soren, Divine Paralogue, foes, weakest)": [
+  "Rexcalibur (Soren, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g004",
       "kind": "foe",
@@ -4744,7 +4744,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Bolt Axe (Emblem Camilla, Divine Paralogue, foes)": [
+  "Bolt Axe (Camilla, Divine Paralogue, foes)": [
     {
       "mapId": "fe17-g005",
       "kind": "foe",
@@ -4762,7 +4762,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Lightning (Emblem Camilla, foes)": [
+  "Lightning (Camilla, foes)": [
     {
       "mapId": "fe17-g005",
       "kind": "foe",
@@ -4780,7 +4780,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Camilla's Axe (Emblem Camilla, Divine Paralogue, foes, weaker)": [
+  "Camilla's Axe (Camilla, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g005",
       "kind": "foe",
@@ -4798,7 +4798,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Bolt Axe (Emblem Camilla, Divine Paralogue, foes, weaker)": [
+  "Bolt Axe (Camilla, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g005",
       "kind": "foe",
@@ -4808,7 +4808,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Lightning (Emblem Camilla, Divine Paralogue, foes, weaker)": [
+  "Lightning (Camilla, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g005",
       "kind": "foe",
@@ -4818,7 +4818,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Camilla's Axe (Emblem Camilla, Divine Paralogue, foes, weakest)": [
+  "Camilla's Axe (Camilla, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g005",
       "kind": "foe",
@@ -4828,7 +4828,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Falchion (Emblem Chrom, Divine Paralogue, foes, weaker)": [
+  "Falchion (Chrom, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g006",
       "kind": "foe",
@@ -4846,7 +4846,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Levin Sword (Emblem Chrom, Divine Paralogue, foes, weaker)": [
+  "Levin Sword (Chrom, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g006",
       "kind": "foe",
@@ -4872,7 +4872,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Thoron (Emblem Chrom, Divine Paralogue, foes, weaker)": [
+  "Thoron (Chrom, Divine Paralogue, foes, weaker)": [
     {
       "mapId": "fe17-g006",
       "kind": "foe",
@@ -4890,7 +4890,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Levin Sword (Emblem Chrom, foes)": [
+  "Levin Sword (Chrom, foes)": [
     {
       "mapId": "fe17-g006",
       "kind": "foe",
@@ -4908,7 +4908,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Falchion (Emblem Chrom, Divine Paralogue, foes, weakest)": [
+  "Falchion (Chrom, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g006",
       "kind": "foe",
@@ -4918,7 +4918,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Levin Sword (Emblem Chrom, Divine Paralogue, foes, weakest)": [
+  "Levin Sword (Chrom, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g006",
       "kind": "foe",
@@ -4928,7 +4928,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
-  "Thoron (Emblem Chrom, Divine Paralogue, foes, weakest)": [
+  "Thoron (Chrom, Divine Paralogue, foes, weakest)": [
     {
       "mapId": "fe17-g006",
       "kind": "foe",
@@ -5495,539 +5495,539 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Sold at the item shop in the Somniel"
     }
   ],
-  "Rapier (Emblem Marth)": [
+  "Rapier (Marth)": [
     {
       "mapId": "fe17-m001",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Marth at bond level 1"
+      "text": "Engage weapon of Marth at bond level 1"
     }
   ],
-  "Mercurius (Emblem Marth)": [
+  "Mercurius (Marth)": [
     {
       "mapId": "fe17-m001",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Marth at bond level 10"
+      "text": "Engage weapon of Marth at bond level 10"
     }
   ],
-  "Falchion (Emblem Marth)": [
+  "Falchion (Marth)": [
     {
       "mapId": "fe17-s014",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Marth at bond level 15 (above its bond cap of 11, which The Hero-King lifts)"
+      "text": "Engage weapon of Marth at bond level 15 (above its bond cap of 11, which The Hero-King lifts)"
     }
   ],
-  "Ridersbane (Emblem Sigurd)": [
+  "Ridersbane (Sigurd)": [
     {
       "mapId": "fe17-m003",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Sigurd at bond level 1"
+      "text": "Engage weapon of Sigurd at bond level 1"
     }
   ],
-  "Brave Lance (Emblem Sigurd)": [
+  "Brave Lance (Sigurd)": [
     {
       "mapId": "fe17-m003",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Sigurd at bond level 10"
+      "text": "Engage weapon of Sigurd at bond level 10"
     }
   ],
-  "Tyrfing (Emblem Sigurd)": [
+  "Tyrfing (Sigurd)": [
     {
       "mapId": "fe17-s009",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Sigurd at bond level 15 (above its bond cap of 11, which The Holy Knight lifts)"
+      "text": "Engage weapon of Sigurd at bond level 15 (above its bond cap of 11, which The Holy Knight lifts)"
     }
   ],
-  "Seraphim (Emblem Celica)": [
+  "Seraphim (Celica)": [
     {
       "mapId": "fe17-m004",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Celica at bond level 1"
+      "text": "Engage weapon of Celica at bond level 1"
     }
   ],
-  "Recover (Emblem Celica)": [
+  "Recover (Celica)": [
     {
       "mapId": "fe17-m004",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Celica at bond level 10"
+      "text": "Engage weapon of Celica at bond level 10"
     }
   ],
-  "Ragnarok (Emblem Celica)": [
+  "Ragnarok (Celica)": [
     {
       "mapId": "fe17-s013",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Celica at bond level 15 (above its bond cap of 11, which The Caring Princess lifts)"
+      "text": "Engage weapon of Celica at bond level 15 (above its bond cap of 11, which The Caring Princess lifts)"
     }
   ],
-  "Eternal Claw (Emblem Tiki)": [
+  "Eternal Claw (Tiki)": [
     {
       "mapId": "fe17-g001",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Tiki at bond level 1"
+      "text": "Engage weapon of Tiki at bond level 1"
     }
   ],
-  "Tail Smash (Emblem Tiki)": [
+  "Tail Smash (Tiki)": [
     {
       "mapId": "fe17-g001",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Tiki at bond level 1"
+      "text": "Engage weapon of Tiki at bond level 1"
     }
   ],
-  "Fire Breath (Emblem Tiki)": [
+  "Fire Breath (Tiki)": [
     {
       "mapId": "fe17-g001",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units"
+      "text": "Engage weapon of Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units"
     }
   ],
   "Ice Breath": [
     {
       "mapId": "fe17-g001",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Tiki at bond level 1, for Armored units"
+      "text": "Engage weapon of Tiki at bond level 1, for Armored units"
     }
   ],
   "Flame Breath": [
     {
       "mapId": "fe17-g001",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Tiki at bond level 1, for Flying units"
+      "text": "Engage weapon of Tiki at bond level 1, for Flying units"
     }
   ],
   "Dark Breath": [
     {
       "mapId": "fe17-g001",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Tiki at bond level 1, for Mystical units"
+      "text": "Engage weapon of Tiki at bond level 1, for Mystical units"
     }
   ],
-  "Fog Breath (Emblem Tiki, dragons)": [
+  "Fog Breath (Tiki, dragons)": [
     {
       "mapId": "fe17-g001",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Tiki at bond level 1, for Dragon units"
+      "text": "Engage weapon of Tiki at bond level 1, for Dragon units"
     }
   ],
-  "Wolf Beil (Emblem Hector)": [
+  "Wolf Beil (Hector)": [
     {
       "mapId": "fe17-g002",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Hector at bond level 1"
+      "text": "Engage weapon of Hector at bond level 1"
     }
   ],
-  "Runesword (Emblem Hector)": [
+  "Runesword (Hector)": [
     {
       "mapId": "fe17-g002",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Hector at bond level 10"
+      "text": "Engage weapon of Hector at bond level 10"
     }
   ],
-  "Armads (Emblem Hector)": [
+  "Armads (Hector)": [
     {
       "mapId": "fe17-g002",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Hector at bond level 15"
+      "text": "Engage weapon of Hector at bond level 15"
     }
   ],
-  "Hliðskjálf  (Emblem Veronica)": [
+  "Hliðskjálf  (Veronica)": [
     {
       "mapId": "fe17-g003",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Veronica at bond level 1"
+      "text": "Engage weapon of Veronica at bond level 1"
     }
   ],
-  "Fortify+ (Emblem Veronica, +)": [
+  "Fortify+ (Veronica, +)": [
     {
       "mapId": "fe17-g003",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Veronica at bond level 10"
+      "text": "Engage weapon of Veronica at bond level 10"
     }
   ],
-  "Élivágar (Emblem Veronica)": [
+  "Élivágar (Veronica)": [
     {
       "mapId": "fe17-g003",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Veronica at bond level 15"
+      "text": "Engage weapon of Veronica at bond level 15"
     }
   ],
-  "Bolting (Emblem Soren)": [
+  "Bolting (Soren)": [
     {
       "mapId": "fe17-g004",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Soren at bond level 1"
+      "text": "Engage weapon of Soren at bond level 1"
     }
   ],
-  "Reflect (Emblem Soren)": [
+  "Reflect (Soren)": [
     {
       "mapId": "fe17-g004",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Soren at bond level 10"
+      "text": "Engage weapon of Soren at bond level 10"
     }
   ],
-  "Rexcalibur (Emblem Soren)": [
+  "Rexcalibur (Soren)": [
     {
       "mapId": "fe17-g004",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Soren at bond level 15"
+      "text": "Engage weapon of Soren at bond level 15"
     }
   ],
-  "Bolt Axe (Emblem Camilla)": [
+  "Bolt Axe (Camilla)": [
     {
       "mapId": "fe17-g005",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Camilla at bond level 1"
+      "text": "Engage weapon of Camilla at bond level 1"
     }
   ],
-  "Lightning (Emblem Camilla)": [
+  "Lightning (Camilla)": [
     {
       "mapId": "fe17-g005",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Camilla at bond level 10"
+      "text": "Engage weapon of Camilla at bond level 10"
     }
   ],
-  "Camilla's Axe (Emblem Camilla)": [
+  "Camilla's Axe (Camilla)": [
     {
       "mapId": "fe17-g005",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Camilla at bond level 15"
+      "text": "Engage weapon of Camilla at bond level 15"
     }
   ],
-  "Levin Sword (Emblem Chrom)": [
+  "Levin Sword (Chrom)": [
     {
       "mapId": "fe17-g006",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Chrom at bond level 1"
+      "text": "Engage weapon of Chrom at bond level 1"
     }
   ],
-  "Thoron (Emblem Chrom)": [
+  "Thoron (Chrom)": [
     {
       "mapId": "fe17-g006",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Chrom at bond level 10"
+      "text": "Engage weapon of Chrom at bond level 10"
     }
   ],
-  "Falchion (Emblem Chrom)": [
+  "Falchion (Chrom)": [
     {
       "mapId": "fe17-g006",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Chrom at bond level 15"
+      "text": "Engage weapon of Chrom at bond level 15"
     }
   ],
-  "Aymr (Emblem Edelgard, Dimitri and Claude)": [
+  "Aymr (Edelgard, Dimitri and Claude)": [
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Edelgard at bond level 1"
+      "text": "Engage weapon of Edelgard at bond level 1"
     },
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Dimitri at bond level 1"
+      "text": "Engage weapon of Dimitri at bond level 1"
     },
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Claude at bond level 1"
+      "text": "Engage weapon of Claude at bond level 1"
     }
   ],
-  "Areadbhar (Emblem Edelgard, Dimitri and Claude)": [
+  "Areadbhar (Edelgard, Dimitri and Claude)": [
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Edelgard at bond level 10"
+      "text": "Engage weapon of Edelgard at bond level 10"
     },
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Dimitri at bond level 10"
+      "text": "Engage weapon of Dimitri at bond level 10"
     },
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Claude at bond level 10"
+      "text": "Engage weapon of Claude at bond level 10"
     }
   ],
-  "Failnaught (Emblem Edelgard, Dimitri and Claude)": [
+  "Failnaught (Edelgard, Dimitri and Claude)": [
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Edelgard at bond level 15"
+      "text": "Engage weapon of Edelgard at bond level 15"
     },
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Dimitri at bond level 15"
+      "text": "Engage weapon of Dimitri at bond level 15"
     },
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Claude at bond level 15"
+      "text": "Engage weapon of Claude at bond level 15"
     }
   ],
-  "Shine (Emblem Micaiah)": [
+  "Shine (Micaiah)": [
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Micaiah at bond level 1"
+      "text": "Engage weapon of Micaiah at bond level 1"
     }
   ],
-  "Nosferatu (Emblem Micaiah)": [
+  "Nosferatu (Micaiah)": [
     {
       "mapId": "fe17-m006",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Micaiah at bond level 10"
+      "text": "Engage weapon of Micaiah at bond level 10"
     }
   ],
-  "Thani (Emblem Micaiah)": [
+  "Thani (Micaiah)": [
     {
       "mapId": "fe17-s011",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Micaiah at bond level 15 (above its bond cap of 11, which The Dawn Maiden lifts)"
+      "text": "Engage weapon of Micaiah at bond level 15 (above its bond cap of 11, which The Dawn Maiden lifts)"
     }
   ],
-  "Killer Axe (Emblem Leif)": [
+  "Killer Axe (Leif)": [
     {
       "mapId": "fe17-m008",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Leif at bond level 1"
+      "text": "Engage weapon of Leif at bond level 1"
     }
   ],
-  "Master Lance (Emblem Leif)": [
+  "Master Lance (Leif)": [
     {
       "mapId": "fe17-m008",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Leif at bond level 10"
+      "text": "Engage weapon of Leif at bond level 10"
     }
   ],
-  "Light Brand (Emblem Leif)": [
+  "Light Brand (Leif)": [
     {
       "mapId": "fe17-s010",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Leif at bond level 15 (above its bond cap of 11, which The Sage Lord lifts)"
+      "text": "Engage weapon of Leif at bond level 15 (above its bond cap of 11, which The Sage Lord lifts)"
     }
   ],
-  "Lancereaver (Emblem Roy)": [
+  "Lancereaver (Roy)": [
     {
       "mapId": "fe17-m008",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Roy at bond level 1"
+      "text": "Engage weapon of Roy at bond level 1"
     }
   ],
-  "Wyrmslayer (Emblem Roy)": [
+  "Wyrmslayer (Roy)": [
     {
       "mapId": "fe17-m008",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Roy at bond level 10"
+      "text": "Engage weapon of Roy at bond level 10"
     }
   ],
-  "Binding Blade (Emblem Roy)": [
+  "Binding Blade (Roy)": [
     {
       "mapId": "fe17-s012",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Roy at bond level 15 (above its bond cap of 11, which The Young Lion lifts)"
+      "text": "Engage weapon of Roy at bond level 15 (above its bond cap of 11, which The Young Lion lifts)"
     }
   ],
-  "Killer Bow (Emblem Lyn)": [
+  "Killer Bow (Lyn)": [
     {
       "mapId": "fe17-m011",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Lyn at bond level 1"
+      "text": "Engage weapon of Lyn at bond level 1"
     }
   ],
-  "Mani Katti (Emblem Lyn)": [
+  "Mani Katti (Lyn)": [
     {
       "mapId": "fe17-m011",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Lyn at bond level 10"
+      "text": "Engage weapon of Lyn at bond level 10"
     }
   ],
-  "Mulagir (Emblem Lyn)": [
+  "Mulagir (Lyn)": [
     {
       "mapId": "fe17-s004",
       "kind": "engage",
-      "text": "Engage weapon of Emblem Lyn at bond level 15 (above its bond cap of 11, which The Lady of the Plains lifts)"
+      "text": "Engage weapon of Lyn at bond level 15 (above its bond cap of 11, which The Lady of the Plains lifts)"
     }
   ],
-  "Noble Rapier (Emblem Lucina)": [
+  "Noble Rapier (Lucina)": [
     {
       "mapId": "fe17-m011",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Lucina at bond level 1"
+      "text": "Engage weapon of Lucina at bond level 1"
     }
   ],
-  "Parthia (Emblem Lucina)": [
+  "Parthia (Lucina)": [
     {
       "mapId": "fe17-m011",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Lucina at bond level 10"
+      "text": "Engage weapon of Lucina at bond level 10"
     }
   ],
-  "Parallel Falchion (Emblem Lucina)": [
+  "Parallel Falchion (Lucina)": [
     {
       "mapId": "fe17-m011",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Lucina at bond level 15 (above its bond cap of 11, which The Exalt lifts)"
+      "text": "Engage weapon of Lucina at bond level 15 (above its bond cap of 11, which The Exalt lifts)"
     }
   ],
-  "Hammer (Emblem Ike)": [
+  "Hammer (Ike)": [
     {
       "mapId": "fe17-m013",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Ike at bond level 1"
+      "text": "Engage weapon of Ike at bond level 1"
     }
   ],
-  "Urvan (Emblem Ike)": [
+  "Urvan (Ike)": [
     {
       "mapId": "fe17-m013",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Ike at bond level 10"
+      "text": "Engage weapon of Ike at bond level 10"
     }
   ],
-  "Ragnell (Emblem Ike)": [
+  "Ragnell (Ike)": [
     {
       "mapId": "fe17-m013",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Ike at bond level 15 (above its bond cap of 11, which The Radiant Hero lifts)"
+      "text": "Engage weapon of Ike at bond level 15 (above its bond cap of 11, which The Radiant Hero lifts)"
     }
   ],
-  "Blutgang (Emblem Byleth)": [
+  "Blutgang (Byleth)": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Backup units"
+      "text": "Engage weapon of Byleth at bond level 1, for Backup units"
     }
   ],
-  "Areadbhar (Emblem Byleth)": [
+  "Areadbhar (Byleth)": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Cavalry units"
+      "text": "Engage weapon of Byleth at bond level 1, for Cavalry units"
     }
   ],
-  "Failnaught (Emblem Byleth)": [
+  "Failnaught (Byleth)": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Covert units"
+      "text": "Engage weapon of Byleth at bond level 1, for Covert units"
     }
   ],
   "Aegis Shield": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Armored units"
+      "text": "Engage weapon of Byleth at bond level 1, for Armored units"
     }
   ],
-  "Lúin (Emblem Byleth)": [
+  "Lúin (Byleth)": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Flying units"
+      "text": "Engage weapon of Byleth at bond level 1, for Flying units"
     }
   ],
   "Thyrsus": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Mystical units"
+      "text": "Engage weapon of Byleth at bond level 1, for Mystical units"
     }
   ],
   "Rafail Gem": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Qi Adept units"
+      "text": "Engage weapon of Byleth at bond level 1, for Qi Adept units"
     }
   ],
-  "Aymr (Emblem Byleth)": [
+  "Aymr (Byleth)": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 1, for Dragon units"
+      "text": "Engage weapon of Byleth at bond level 1, for Dragon units"
     }
   ],
-  "Vajra-Mushti (Emblem Byleth)": [
+  "Vajra-Mushti (Byleth)": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 10"
+      "text": "Engage weapon of Byleth at bond level 10"
     }
   ],
-  "Sword of the Creator (Emblem Byleth)": [
+  "Sword of the Creator (Byleth)": [
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Byleth at bond level 15 (above its bond cap of 11, which The Instructor lifts)"
+      "text": "Engage weapon of Byleth at bond level 15 (above its bond cap of 11, which The Instructor lifts)"
     }
   ],
-  "Dual Katana (Emblem Corrin)": [
+  "Dual Katana (Corrin)": [
     {
       "mapId": "fe17-m015",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Corrin at bond level 1"
+      "text": "Engage weapon of Corrin at bond level 1"
     }
   ],
-  "Wakizashi (Emblem Corrin)": [
+  "Wakizashi (Corrin)": [
     {
       "mapId": "fe17-m015",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Corrin at bond level 10"
+      "text": "Engage weapon of Corrin at bond level 10"
     }
   ],
-  "Yato (Emblem Corrin)": [
+  "Yato (Corrin)": [
     {
       "mapId": "fe17-m015",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Corrin at bond level 15 (above its bond cap of 11, which The Crux of Fate lifts)"
+      "text": "Engage weapon of Corrin at bond level 15 (above its bond cap of 11, which The Crux of Fate lifts)"
     }
   ],
-  "Rapier (Emblem Eirika)": [
+  "Rapier (Eirika)": [
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Eirika at bond level 1"
+      "text": "Engage weapon of Eirika at bond level 1"
     },
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Ephraim at bond level 1"
+      "text": "Engage weapon of Ephraim at bond level 1"
     }
   ],
-  "Wind Sword (Emblem Eirika)": [
+  "Wind Sword (Eirika)": [
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Eirika at bond level 10"
+      "text": "Engage weapon of Eirika at bond level 10"
     },
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Ephraim at bond level 10"
+      "text": "Engage weapon of Ephraim at bond level 10"
     }
   ],
-  "Sieglinde (Emblem Eirika)": [
+  "Sieglinde (Eirika)": [
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Eirika at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
+      "text": "Engage weapon of Eirika at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
     },
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Ephraim at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
+      "text": "Engage weapon of Ephraim at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
     }
   ],
-  "Lyrátion (Emblem Alear)": [
+  "Lyrátion (Alear)": [
     {
       "mapId": "fe17-m022",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Alear at bond level 1"
+      "text": "Engage weapon of Alear at bond level 1"
     }
   ],
-  "Dragon's Fist (Emblem Alear)": [
+  "Dragon's Fist (Alear)": [
     {
       "mapId": "fe17-m022",
       "kind": "engage-later",
-      "text": "Engage weapon of Emblem Alear at bond level 10"
+      "text": "Engage weapon of Alear at bond level 10"
     }
   ]
 }

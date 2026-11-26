@@ -10,7 +10,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`../Fates App`), not here. Units on a map are fine: they're chapter data.
 - **One game picker; every tool for that game sits in the same tabs** (Weapons & forging, True hit, Weapon triangle,
   Maps, Supports; Battalions for Three Houses alone). No extra menus or tool-picker steps. A game with nothing like supports has no Supports tab
-  (`supports: null`); FE4's lover, Charisma and the like are a unit's own, so they're the Unit Planner's. The picker lists every mainline
+  (`supports: null`); FE4's lover, Charm and the like are a unit's own, so they're the Unit Planner's. The picker lists every mainline
   game in the series' order, numbered, by its name without "Fire Emblem" ("14. Fates", "15. Shadows of Valentia", never "Echoes";
   "The" kept where the title has it: the user's call, 2026-11-26), the ones not in the app greyed out in their place (Fortune's
   Weave). The Roster lists them the same way, with the same short names. With no game picked the app shows its home screen, as the Roster's does:
@@ -272,7 +272,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   out saying so, with the share of them the opening places. Echoes' dungeons' skirmishes (the battles their wandering foes start)
   are a list of their own too (the user's call), each opening with the first story battle after its dungeon.
 - **A story that splits into routes lists the chapters everyone plays under a button of their own, leading into a button per route
-  with that route's own chapters** (Fates: Prologue, Birthright, Conquest, Revelation; The Sacred Stones: Prologue to Chapter 8 with 5x,
+  with that route's own chapters** (Fates: Common, Birthright, Conquest, Revelation, its shared Chapters 1 to 5 never called "Prologue",
+  the game's scripted battle: the user's call, 2026-11-26; The Sacred Stones: Prologue to Chapter 8 with 5x,
   then Eirika's and Ephraim's from Chapter 9: the user's call). Side maps fought on a shared chapter's map (its skirmishes) go with the
   shared chapters too.
 - **Three Houses' routes are the route select** (Crimson Flower, Silver Snow, Azure Moon, Verdant Wind), each listing its house's
@@ -954,7 +955,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   in its own info ("If you recruited Felix into your house before this battle, a Mercenary stands here instead"). A student Three
   Houses swaps for another foe later or elsewhere once you've recruited them (no stand-in on their tile at the start) keeps their
   place on the map, and their note says what comes instead (the user's call: note that the battle may differ, don't swap them). Genealogy of the Holy War's
-  Generation 2 substitutes (Creidne for Larcei...) are their children's stand-ins; a child and its substitute share one item, so it's
+  Second generation substitutes (Creidne for Larcei...) are their children's stand-ins; a child and its substitute share one item, so it's
   one line ("Carried by Larcei or Creidne on joining"), and the weapon page groups its rows by generation (the user's call).
 - **Neutral armies** (Genealogy of the Holy War's third relation: an army neither hostile nor friendly to yours) get a marker colour
   of their own, matched to the game's, and turn red or green when a script turns them; each unit's note says when (the user's call).
@@ -1133,8 +1134,10 @@ A global switch (header, any game) that lets someone play along without being to
   condition naming someone still to come (Radiant Dawn's "after arriving"), no map change an arrival makes, no pot's effect (its kind
   only) and no boulder's path. Taps still preview a door, a vein or a wall; chests', villages' and talks' notes stay. A note keeps
   who a unit is and what it holds, clause by clause, so a talk riding on an arrival's sentence stays.
-- **A DLC side story is off until its switch is ticked** (the user's call, 2026-11-26): Engage's Fell Xenologue and Three Houses'
-  Cindered Shadows, one switch per game for the weapon page, the map page and the battalions (`src/logic/sideStories.ts`). Shown,
+- **A DLC side story is off until its switch is ticked** (the user's call, 2026-11-26: any paid DLC is off by default, what's free on):
+  Engage's Expansion Pass (Fell Xenologue and the Divine Paralogues: "Show the Expansion Pass") and Three Houses' Cindered Shadows, one
+  switch per game for the weapon page, the map page and the battalions (`src/logic/sideStories.ts`, a map set's `sideStory.also` for
+  maps outside the side story's own route). Shown,
   each opens as the game opens it, all at once: Fell Xenologue with the Somniel's Ancient Well once Chapter 6 is cleared, Cindered
   Shadows from the main menu's Side Story at any time (its own save). Nothing it gives counts toward the bar's new weapons.
 - **Under the block the map page's route buttons follow the bar** (the user's calls, 2026-11-26): only the route the bar is on,
@@ -1227,7 +1230,10 @@ A global switch (header, any game) that lets someone play along without being to
   other "the Roster" and "the Armory". The apps' own prose is American English (color, gray, armored, traveling; game terms as the
   game spells them: Fates' own "Defense Tonic"); a weapon's range has a hyphen in every game ("1-2", `src/logic/rangeText.ts`); "vs."
   with its period; each game's avatar goes by its default name (Corrin, Robin, Kris), never "Avatar"; the triangle tab names no weapon
-  or unit (a weapon's datasheet marks its magic and effectiveness).
+  or unit (a weapon's datasheet marks its magic and effectiveness). Game by game (the look-over's marks): Fates' routes in the Roster's
+  colours (sage green, lavender, gold), "amiibo" as Nintendo writes it; Genealogy's First and Second generation, its Charm and its Final
+  Chapter (the game's 終章, never the patch's Endgame); Engage's Emblems by name alone ("Rapier (Marth)", "Edelgard, Dimitri and
+  Claude"); Three Houses' ranks by skill ("Sword D"); Radiant Dawn's supports between any two units but the Black Knight and Lehran.
 - **The map page has a colorblind-friendly switch** (the user's call, 2026-11-26), beside "Info beside the map", remembered on the
   device and off by default, so the watched maps keep their look. When it's on, nothing is told apart by colour alone, and the colours
   are Okabe and Ito's, which stay apart for red-green and blue-yellow colour blindness alike (`COLOUR_BLIND` in `src/icons/sprites.ts`,

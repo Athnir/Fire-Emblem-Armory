@@ -1842,7 +1842,7 @@ def engage_sources(sources, story_ids, opens):
                     found.setdefault((name, who, level, at, later, cap_words), []).append(text('MBSID_' + kind) if kind else None)
     for (name, who, level, at, later, cap_words), kinds in found.items():
         types = [k for k in kinds if k]
-        words = (f"Engage weapon of Emblem {who} at bond level {level}" + (f", for {joined(types, 'or')} units" if types and None not in kinds
+        words = (f"Engage weapon of {who} at bond level {level}" + (f", for {joined(types, 'or')} units" if types and None not in kinds
                                                                             else '') + cap_words)
         add_source(sources, name, at, 'engage-later' if later else 'engage', words)
     if skipped:

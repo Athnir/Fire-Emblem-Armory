@@ -269,7 +269,7 @@ and a Luna or Sol activation skips the roll and hits ($84:E564).
 
 The game has no support levels, so it has no Supports tab (the user's call: what stands in for them belongs to a unit, so the Unit
 Planner). The weapon triangle tab shows the triangle and leadership. All of it is read from the battle code (addresses in the script):
-units of the same army within 3 tiles give +10 hit and avoid for each one with Charisma (skill 0x0C: Lachesis, its only holder in
+units of the same army within 3 tiles give +10 hit and avoid for each one with Charm (skill 0x0C: Lachesis, its only holder in
 Serenes' base-stats page, has that bit alone at +0x1C of her record), +10 for a lover, and the commander's leadership by stars
 (0, 0, 10, 20, 30, 40). The bonus loop skips only units of an army hostile to the commander's ($84:DB9F, through $84:C15F), so
 allied and neutral armies' units in reach count, and every army's commander (unit flag 0x100, $84:D990) gets their own. The weapon triangle gives the advantaged side +20 hit and avoid. Accuracy itself is
@@ -284,7 +284,7 @@ Each item's sources by chapter, for the weapon page and the spoiler block (a wea
   with how many copies the chapter's list holds (`limited`): the game sells copies, one each. The second generation's lists offer
   first-generation copies too, some a unit may still hold (IN-GAME CHECK: whether a held copy is for sale).
 - **Generations:** the weapon page groups its rows by generation (Chapter 6 starts the second afresh), so a line reads "Sold at the
-  home castle (Generation 1): ..." and a child's own copy, shared with their substitute, is one line ("Carried by Larcei or Creidne
+  home castle (First generation): ..." and a child's own copy, shared with their substitute, is one line ("Carried by Larcei or Creidne
   on joining"). Inheritance and the pawn shop only move copies that already exist, so they add no sources.
 - **Drops and what foes carry:** a foe's record holds two carried item *types* and one dropped item *instance*: at +10 in a
   generic record (kind 3), at +0x23 in a named one (kind 2). Every drop matches Serenes' list (Philip's Return Ring, Jacoban's

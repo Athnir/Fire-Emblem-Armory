@@ -170,7 +170,8 @@ def _item_names():
 
 def item_label(iid):
     """An item's name, unique among the weapons: the game's English name, with what its id says added where another weapon has the
-    same name ('Rapier (Emblem Marth)', 'Libération (upgraded)', 'Levin Sword (Emblem Chrom, foes)')."""
+    same name ('Rapier (Marth)', 'Libération (upgraded)', 'Levin Sword (Chrom, foes)'): an Emblem by its name alone, as the Roster
+    names it (the user's call, 2026-11-26)."""
     r = next((x for x in rows('item') if x['Iid'] == iid), None)
     if r is None or not r['Name']:
         return None
@@ -182,7 +183,7 @@ def item_label(iid):
     tags = []
     for jp, en in _emblems().items():
         if rest.startswith(jp + '_'):
-            tags.append(f'Emblem {en}')
+            tags.append(en)
             rest = rest[len(jp) + 1:]
             break
     else:

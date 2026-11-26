@@ -70,7 +70,7 @@ export interface MapSet {
   }
   /** A DLC side story the game keeps apart (Engage's Fell Xenologue, Three Houses' Cindered Shadows): its route is off until its
    * switch is ticked, the weapon page's switch and this one the same (`src/logic/sideStories.ts`; the user's call, 2026-11-26). */
-  sideStory?: { game: string; route: string; label: string }
+  sideStory?: { game: string; route: string; label: string; also?: (map: ChapterMap) => boolean }
   /** A game without routes can still list side maps in a second dropdown (Path of Radiance's trial maps).
    * They're left out of the chapter dropdown. */
   extras?: { label: string; maps: ChapterMap[] }

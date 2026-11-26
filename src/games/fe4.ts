@@ -11,7 +11,7 @@ import { turnsUpAt } from '../logic/spoiler'
 const parts: GameParts = {
   weapons: Fe4Weapons,
   maps: Fe4Maps,
-  // No support levels; the Charisma and lover bonuses that stand in for them are a unit's own (the Roster's).
+  // No support levels; the Charm and lover bonuses that stand in for them are a unit's own (the Roster's).
   supports: null,
   triangle: {
     beats: FE4_BONUSES.beats,

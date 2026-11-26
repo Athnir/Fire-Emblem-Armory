@@ -53,7 +53,9 @@ export const FE17_MAP_SET: MapSet = {
     },
   },
   // Off until its switch is ticked (the user's call, 2026-11-26); shown, it opens all at once with the Ancient Well after Chapter 6.
-  sideStory: { game: 'fe17', route: 'Fell Xenologue', label: 'Show Fell Xenologue' },
+  // The Expansion Pass (paid DLC), off until ticked (the user's call, 2026-11-26: any DLC is): Fell Xenologue and the Divine
+  // Paralogues.
+  sideStory: { game: 'fe17', route: 'Fell Xenologue', label: 'Show the Expansion Pass', also: (m) => m.heading === 'Divine Paralogue' },
   difficulties: (['Normal', 'Hard', 'Maddening'] as const).map((value) => ({ value, label: value })),
   moveClasses: FE17_MOVE_CLASSES,
   moveClassExamples: FE17_MOVE_CLASS_EXAMPLES,

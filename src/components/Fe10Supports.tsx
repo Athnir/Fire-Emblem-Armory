@@ -14,8 +14,9 @@ export function Fe10Supports() {
       rules={
         <>
           <li>
-            Each unit can have <span className="text-neutral-100">one support partner at a time</span>, and any two units can
-            support. Ending a support at the base frees both units, but loses all the points the pair had built up.
+            Each unit can have <span className="text-neutral-100">one support partner at a time</span>, and any two units but the
+            Black Knight and Lehran can support (neither is in the support table). Ending a support at the base frees both units, but
+            loses all the points the pair had built up.
           </li>
           <li>
             Support levels are C, B and A, each unlocked at the base once the pair has {FE10_SUPPORT_TOTALS.join(', ')} support
