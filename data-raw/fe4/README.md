@@ -46,8 +46,22 @@ clean ROM.
   build checks each spelling is in the patch.
 - Bosses and other foes have no name table in either version. They're named from Serenes' boss and NPC tables (see Units), then
   spelt as the patch's dialogue spells them: the official name or Serenes' own where the dialogue uses it (in the patch's
-  capitalisation: DiMaggio), or `BOSS_SPELLINGS` in the maps generator, each read in context ("You and Gerald are in charge") and
-  checked to be in the patch. Names the dialogue never uses stay Serenes'.
+  capitalisation: DiMaggio), or `BOSS_SPELLINGS` in the maps generator, each read in context ("You and Gerald are in charge",
+  "Banba! Fódla! Ériu!", "My apologies, Canut, but I'd like you to take charge of defending the castle") and checked to be in the
+  text the game shows. Names the dialogue never uses stay Serenes'.
+- **Only the text the game shows counts** (`fe4_names.shown`): the patch keeps older drafts of much of its script beside the text it
+  uses, and no pointer leads to them: Chapter 7's scene reads "Aed's fallen... Fort Mergen... Javarro" ($62:6E45, pointed to by the
+  scene's `14` command at file 0x328B8F), its draft "Yied's fallen... Fort Melgen... Jabarro" ($63:FA54, nothing points there). So
+  the page has Javarro, Raisa, Eliot, Pisear, Canut, Mousa, Díthorba, Fódla and Ériu, not the drafts' Jabarro, Liza, Elliot, Pizare,
+  Kanatz, Musar, Dithorba, Fotla and Eriu (and Serenes' Vampa and Juda are the shown Banba and "Bishop Judas"). A string is shown
+  when one of the patch's own pointers leads to its first byte: a 3-byte value into its banks in bytes it changed in the original
+  4 MB (the scenes' text commands 0x0C and 0x14, the death quotes' table at $8E:F67A) or in its code bank $50 (the epilogue's
+  pointers at $50:9010); values in bytes it left alone are the clean ROM's code and art and match only by chance. A string runs from
+  a 0x01 that ends the one before (after `[08]`, `[02]`, `00 1D xx` and the like); a 0x01 is no end as a control code's operand:
+  `00 3F` takes two (a portrait, 0x1B8 in Fisher's scene), `00 82` three (the map tour's camera on a unit: Sigurd's `01 00`), `00 12`
+  and `00 86` one. What's left unshown is drafts of shown lines, some reworded since (the drafts' "Alster", "Blume", "Johan").
+- Accented letters keep ISO-8859-1's order: capitals 0x56 below it (0x6B Á, 0x73 É), small letters 0x58 below (0x89 á, 0x95 í,
+  0x97 ï, 0x9B ó, 0x9E ö), ü at 0xA3 (÷ left out).
 
 ## `scripts/build-fe4-items.py` -> `src/data/fe4/fe4Weapons.ts`
 
@@ -165,7 +179,7 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
     leader 0x5C);
   - its class and level matching a row, when it's a leader (flag 1, 254 or 255), a named record (kind 2), a castle's holder, a unit
     with its own battle quote (trigger 0x0D [0][talker][FFFF][unit]) or one a scripted talk names;
-  - where more units fit than names: the flagged leaders, then the one with its own battle quote (Chapter 2's Elliot, 0x66; the
+  - where more units fit than names: the flagged leaders, then the one with its own battle quote (Chapter 2's Eliot, 0x66; the
     other Level 15 Duke Knight has none), then the one holding a castle;
   - a named record or talk partner whose level isn't Serenes' takes the chapter's one row of its class left (Eldigan: a Level 25
     Paladin in Chapter 3, 23 on Serenes; Chapter 10's Polemarch).
@@ -189,14 +203,20 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
   each `STA $0EBC`): 0x02 an army seizes a castle (army, location), 0x04 / 0x15 / 0x16 a talk (from, to; 0xFFFF anyone), 0x07 a unit
   enters a castle (unit, location), 0x0A a unit visits a village or castle, 0x0B a unit reaches an area (unit, x1 y1 x2 y2), 0x0C a
   unit stops within n tiles of another (unit, unit, n; both answer the raised kind 3, its check at $86:8A2F), 0x0D a battle between
-  two units, 0x0F a unit is defeated. The flag byte: 0xFF none; below 0x80 the entry fires once and sets that flag;
+  two units, 0x0F a unit is defeated, 0x1E a unit wins an arena match (fighter, castle, opponent: kind 0x1C, raised at $84:B5C3 after
+  a win; its handler $86:8BEF). The flag byte: 0xFF none; below 0x80 the entry fires once and sets that flag;
   0x80 + n needs flag n. Once one entry fires the rest are skipped.
 - **Blocks** after `20 66 66`: `21 turn phase a b` (0xFF any; the phase is an army's number) opens a block closed by `25 66 66`;
-  `29 n` (flag set), `2A n` (clear), `2C ... FF` (all set), `2D ... FF` (any set) open one closed by `2E 66 66`; `27 n` sets a flag.
+  `29 n` (flag set), `2A n` (clear), `2C ... FF` (all set), `2D ... FF` (any set) open one closed by `2E 66 66`; `27 n` sets a flag
+  and `28 n` clears one ($86:99D6, $86:9A13). In an opening, `46 [unit u16]` opens a block (closed by `2E 66 66`) it leaves unless
+  the unit is in play (found in the unit table, $84:84B4) with its status bit 0x200 clear ($86:909B): Chapter 9's `46 1D00 46 2200`
+  (Leif and Finn).
 - **Actions:** `30 [flag] [u16 n]` runs scene n (3-byte pointers at $8F:E8BF, 562 scenes); `31` / `32` show text.
 - **Scenes** run on their own interpreter ($91:A5E2, handlers at $91:A50A). `FD` ends a step, `FFFF` the scene; 0x01 ends, 0x02
-  jumps, 0x03-0x06 jump conditionally, 0x4B sets a flag of the chapter (`4B [chapter] [flag]`: `4B 00 16` in the Prologue). Scene opcodes 0x4A and 0x4D run one event command inline:
+  jumps, 0x03-0x06 jump conditionally, 0x4B sets a flag of the chapter (`4B [chapter] [flag]`: `4B 00 16` in the Prologue) and 0x4C
+  clears one ($91:CBA2: Chapter 9's `4C 09 2A`). Scene opcodes 0x4A and 0x4D run one event command inline:
   `4A nn` loads unit list nn, `49 id` puts a unit on the map, `53 id army` moves a unit to an army (army 0: it joins you),
+  `61 id location` puts a unit inside a castle ($86:9559 -> $84:CCB4: Chapter 9's Altena withdraws into Thracia),
   `57` / `58 [unit] [instance]` hands over an item. Command lengths come from running each handler on `scripts/fe4_cpu.py`
   (calls into other banks stepped over, the four move slots at $7E:17C4 read as free); the walk follows jumps. Every scene the
   tables use walks to its end. Two event commands step past fewer bytes in their skip entry than when run (0x34; 0x5F when its
@@ -204,9 +224,35 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
 - **Item instances:** the game tracks every physical item; scripts hand out instance numbers, counted from 1, whose item type is
   the byte at 0x3F489 + n - 1 (140 of them). Checked against Serenes' item-locations page: the Prologue's village gives the Speed
   Ring, Chapter 2's the Bargain Ring and Armour Cutter (the patch's Bargain Bracelet and Ironbane Sword).
-- **Locations:** each chapter's data (3-byte pointers at $86:C760) leads to its castles and villages: `[id][name][kind][x][y]`, kind
+- **Chapter data** (3-byte pointers at $86:C760, `fe4_events.chapter_data`): u16 offsets in its bank to the locations (+0), the
+  map changes (+2), the arena's opponents (+4, read by $81:B4C5) and the talk table (+6, $81:B4E4); 0 where a chapter has none.
+- **Locations:** each chapter's data leads to its castles and villages: `[id][name][kind][x][y]`, kind
   0 a castle (on the castle tile; location 0 is your home castle), 2 a village. A village holds 5000 gold (the per-kind record at
   $87:F453, which also gives the village's footprint, x - 1 to x + 1 and the row above, and the entrance: its own tile).
+- **The talk table** (`fe4_events.talk_table`): 8-byte entries `[u16 chapter][flag][u16 talker][u16 target][type]` up to 0xFFFF,
+  which $87:9E42 checks when a unit stands beside another: Talk is offered while the entry's flag (the chapter's) is clear
+  ($86:8294), talker 0xFFFF being anyone; type 1 also needs the talker to hold 10,000 gold ($87:9EDC: Beowolf). Each entry shares its
+  flag with the event trigger that answers the talk, which sets it as it fires, so the talk closes once held (checked for every
+  chapter: the build asserts it). Chapter 4 has no table. A talk with no entry (its trigger's flag 0xFF) is offered only through a
+  one-off link the scripts set with event commands 0x68-0x6A ($87:9EE7: Julia and Seliph in Chapter 6). So:
+  - **a talk the opening closes** (`27 f`) opens with whatever clears f again: the opening itself under `46` checks (Chapter 9:
+    Leif's talk with Altena only if Leif and Finn are both in your army as the chapter starts), or an event later (`4C` in a scene,
+    `28` in a block: Chapter 1's Ayra once Genoa is seized, scene 0x23; Chapter 9's Seliph and Altena once Travant is defeated after
+    Leif's talk, scene 0x14D at the start of Thracia's phase; the Final Chapter's Julia once Manfroy is defeated). The page says it
+    after the talker ("Recruit: talk with Sigurd, once you seize Genoa").
+  - **talks that share a flag close together**: Chapter 6's four (Larcei or Creidne, with Iuchar or Iucharba) all wait on flag 0x1D,
+    which either brother's talk sets (`16 [1D] 2900 3100`, `16 [1D] 2900 1E00`), so only one brother joins; the other's talk is never
+    offered again. His join scene (0xDE, 0xDF) makes his army your ally and the other brother's army, and Danann's, hostile to it
+    (`4D 01 03 02` / `4D 01 02 03`); nothing else brings either brother in, in any chapter. The page says so on each, and each
+    one's items count as either-or ("Carried by Iuchar or Iucharba on joining, whichever joins").
+- **The arena** (`fe4_events.arena`): two lists of opponents' unit ids up to 0xFFFF, the first for a unit fighting with a weapon whose
+  minimum range is under 2, the second for 2 or more ($87:A082, the range from the item's +0x0E through $87:E543): of the copies a unit
+  of yours can own, only bows. A unit's n-th match is entry n (its count at $84:96A0, 0-6: seven matches), and an opponent already in
+  play gives way to the entry after it ($84:84B4). Chapter 2's first list ends with Chulainn, seventh, then the Forester who takes his
+  place once he's in play; the second has a Sniper there. A win raises trigger kind 0x1C: Chapter 2's `1E [1A] FFFF FFFF 0900` sets
+  flag 0x1A, whose block's once-only castle triggers (`07 [17] FFFF castle`) put him in your army in whichever castle the winner
+  enters (scenes 0x4F, 0x5D-0x60): "Chulainn joins your army once one of your units beats him in the arena: he's the seventh and
+  last match for a unit fighting with anything but a bow." No other chapter's lists hold a recruit. Not read: the arena's prizes.
 - **What the page says:** each later group's arrival (the block or trigger whose scene loads it, its flags traced back to what sets
   them: a seize, a talk, a defeat, another group's arrival, a unit reaching an area, whose rectangle is drawn), a phase named by how
   its army stands at that point; the castle whose seizing runs the chapter's ending scene (event command 0x78) as the win, and any
@@ -217,10 +263,11 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
 - **A scene that ends the chapter** (0x78) only stages its scene: the units it loads or places are its cast, no group on the map,
   and the flags it sets cause nothing on the battle map. A unit a scene places and removes again (0x65) is a cast too (Chapter 8's
   Julius).
-- **Talks:** a talk that does something is on the unit talked to (and on the talker when it's someone else's unit): who joins, for
-  how much gold (Beowolf's scene takes 10,000 from the talker with `55 FFFF 2710`), what's handed over, an army that turns (`4D`),
-  who leaves the map, the chapter ending. 0x15 takes the talker's child or substitute as one ($86:8828), 0x16 both sides
-  ($86:8876). A talk between two of your own units stays a note.
+- **Talks:** a talk that does something is on the unit talked to (and on the talker when it's someone else's unit): when it opens
+  (the talk table, above), who joins, for how much gold (Beowolf's scene takes 10,000 from the talker with `55 FFFF 2710`), what's
+  handed over, an army that turns (`4D`), who withdraws into a castle (`61`), who leaves the map, the chapter ending. 0x15 takes the
+  talker's child or substitute as one ($86:8828), 0x16 both sides ($86:8876), so a talk's words name both ("when Larcei or Creidne
+  talks to Iuchar"). A talk between two of your own units stays a note.
 - **Departures:** event commands 0x65 and 0x66 take a unit off the map (its own defeat, a scene's cast and an ending aside: a
   block's reaches only the units on the map by then, a trigger's any); trigger 0x1A (A fights B: kind 0x18, raised as a battle
   starts at $84:B981) running command 0x74 withdraws A ("Withdraws after a battle").
@@ -238,8 +285,8 @@ Unconfirmed: what the map's high bits mean beyond the AI's lock regions (bits 10
   starts them; the starting units are those the opening places (the rest start in the home castle). A child and the substitute the
   game places when the child wasn't born share a tile: the child is drawn, the substitute is their stand-in (the map's stand-in
   toggle), and their items are one line ("Carried by Larcei or Creidne on joining"). The second generation's openings also move
-  Sigurd's id, which is left out from Chapter 6 on.
-- **Not read yet:** the arena.
+  Sigurd's id, which is left out from Chapter 6 on. A unit one event places more than once (alternative scenes: Chulainn out of
+  whichever castle) has no one tile, so it isn't drawn.
 
 ## Looters and the AI (traced so far; not on the maps yet)
 

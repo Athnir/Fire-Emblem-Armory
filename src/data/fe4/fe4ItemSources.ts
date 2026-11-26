@@ -48,7 +48,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Iuchar on joining"
+      "text": "Carried by Iuchar on joining, if Iuchar joins rather than Iucharba"
     },
     {
       "mapId": "fe4-7",
@@ -362,12 +362,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Iucharba on joining"
-    },
-    {
-      "mapId": "fe4-6",
-      "kind": "kit-later",
-      "text": "Carried by Iuchar on joining"
+      "text": "Carried by Iuchar or Iucharba on joining, whichever joins"
     },
     {
       "mapId": "fe4-7",
@@ -542,14 +537,14 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "drop-later",
-      "text": "Dropped by Jabarro, arriving mid-chapter"
+      "text": "Dropped by Javarro, arriving mid-chapter"
     }
   ],
   "Silver Lance": [
     {
       "mapId": "fe4-2",
       "kind": "drop",
-      "text": "Dropped by Elliot"
+      "text": "Dropped by Eliot"
     },
     {
       "mapId": "fe4-3",
@@ -573,7 +568,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-7",
       "kind": "drop-later",
-      "text": "Dropped by Liza, arriving mid-chapter"
+      "text": "Dropped by Raisa, arriving mid-chapter"
     },
     {
       "mapId": "fe4-10",
@@ -590,7 +585,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "foe-later",
-      "text": "Carried by Juda, a foe, arriving mid-chapter"
+      "text": "Carried by Judas, a foe, arriving mid-chapter"
     },
     {
       "mapId": "fe4-10",
@@ -652,7 +647,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "foe-later",
-      "text": "Carried by Juda, a foe, arriving mid-chapter"
+      "text": "Carried by Judas, a foe, arriving mid-chapter"
     },
     {
       "mapId": "fe4-10",
@@ -1001,7 +996,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-6",
       "kind": "kit-later",
-      "text": "Carried by Iucharba on joining"
+      "text": "Carried by Iucharba on joining, if Iucharba joins rather than Iuchar"
     }
   ],
   "Sleep Staff": [
@@ -1313,7 +1308,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-3",
       "kind": "drop-later",
-      "text": "Dropped by Pizare, arriving mid-chapter"
+      "text": "Dropped by Pisear, arriving mid-chapter"
     },
     {
       "mapId": "fe4-10",
@@ -1399,7 +1394,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "drop-later",
-      "text": "Dropped by Musar, arriving mid-chapter"
+      "text": "Dropped by Mousa, arriving mid-chapter"
     }
   ],
   "Blizzard": [
@@ -1619,7 +1614,7 @@ export const FE4_ITEM_SOURCES: Record<string, Fe4ItemSource[]> = {
     {
       "mapId": "fe4-9",
       "kind": "event-later",
-      "text": "Given to Charlot after you seize Galatia and Charlot talks to Hannibal and Charlot stops next to Hannibal"
+      "text": "Given to Charlot after you seize Galatia and Coirpre or Charlot talks to Hannibal and Charlot stops next to Hannibal"
     }
   ],
   "Killer Ballista": [

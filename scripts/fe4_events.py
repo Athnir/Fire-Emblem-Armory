@@ -333,13 +333,107 @@ def shop_stock(chapter):
 # Kinds read from where the game raises them (STA $0EBC): 1 an army seizes a castle (army, castle); 3 a unit enters an area
 # (unit, x1 y1, x2 y2 as bytes); 9 a unit visits a location (unit, location); 0x0A one unit talks to another (from, to, -);
 # 0x17 a unit dies (unit); 0x14 a battle between two units (both orders); 6 a unit enters a castle (unit, location: Levin into
-# Silesia, Yuria into Velthomer); the rest aren't needed for the page yet. Opcodes 0x15 and 0x16 are talks too (kind 0x0A, two units).
+# Silesia, Yuria into Velthomer); 0x1C a unit wins an arena match (fighter, castle, opponent: raised at $84:B5C3 after a win,
+# $8A:E5A1; opcode 0x1E's handler, $86:8BEF, checks it); the rest aren't needed for the page yet. Opcodes 0x15 and 0x16 are talks too
+# (kind 0x0A, two units).
 TRIGGERS = {
     0x01: (0x20, 1), 0x02: (0x01, 2), 0x03: (0x02, 2), 0x04: (0x0A, 3), 0x05: (0x04, 2), 0x06: (0x05, 2), 0x07: (0x06, 2),
     0x08: (0x07, 2), 0x09: (0x08, 2), 0x0A: (0x09, 2), 0x0B: (0x03, None), 0x0D: (0x14, 4), 0x0F: (0x17, 2), 0x10: (0x11, 2),
     0x15: (0x0A, 2), 0x16: (0x0A, 2),
-    0x1A: (0x18, 2), 0x1C: (0x1A, 2), 0x1D: (0x1B, 1), 0x1F: (0x1D, 2),
+    0x1A: (0x18, 2), 0x1C: (0x1A, 2), 0x1D: (0x1B, 1), 0x1E: (0x1C, 3), 0x1F: (0x1D, 2),
 }
+
+
+def chapter_data(chapter):
+    """(bank, file offset) of the chapter's data (3-byte pointers at $86:C760): u16 offsets, in its bank, to the map's locations (+0),
+    its map changes (+2), the arena's opponents (+4, read by $81:B4C5) and the talk table (+6, $81:B4E4); 0 where it has none."""
+    o = rom_offset(CHAPTER_DATA) + 3 * chapter
+    p = int.from_bytes(R[o:o + 3], 'little')
+    return p & 0xFF0000, rom_offset(p)
+
+
+def talk_table(chapter):
+    """The talks the game offers in a chapter: [{'flag', 'from', 'to', 'type'}] from the chapter data's +6, 8-byte entries `[u16
+    chapter][flag][u16 talker][u16 target][type]` up to 0xFFFF ($87:9E42 checks each). Talk is offered while the entry's flag is
+    clear ($86:8294), talker 0xFFFF being anyone; type 1 also needs the talker to hold 10,000 gold ($87:9EDC: Beowolf). A talk with
+    no entry is offered only through a one-off link the scripts set with event commands 0x68-0x6A ($87:9EE7). Chapter 4 has none."""
+    bank, base = chapter_data(chapter)
+    if not u16(base + 6):
+        return []
+    o, out = rom_offset(bank | u16(base + 6)), []
+    while u16(o) != 0xFFFF:
+        assert u16(o) == chapter, (chapter, hex(o))
+        out.append({'flag': R[o + 2], 'from': u16(o + 3), 'to': u16(o + 5), 'type': R[o + 7]})
+        o += 8
+    return out
+
+
+ARENA_MATCHES = 7   # a unit's match number runs 0-6: from 7 the arena has no one for it ($87:A08F)
+
+
+def arena(chapter):
+    """The arena's opponents: two lists of unit ids up to 0xFFFF behind the chapter data's +4, the first for a unit fighting with a
+    weapon whose minimum range is under 2, the second for 2 or more ($87:A082, the range from the item's +0x0E through $87:E543). A
+    unit's n-th match is entry n ($84:96A0 keeps its count); an opponent already in play gives way to the entry after it ($84:84B4:
+    Chapter 2's Chulainn, the first list's seventh, to a Forester). ([], []) where there's no arena (the Prologue, Chapter 6)."""
+    bank, base = chapter_data(chapter)
+    if not u16(base + 4):
+        return [], []
+    table = rom_offset(bank | u16(base + 4))
+    out = []
+    for k in range(2):
+        o, ids = rom_offset(bank | u16(table + 2 * k)), []
+        while u16(o) != 0xFFFF:
+            ids.append(u16(o))
+            o += 2
+        out.append(ids)
+    return tuple(out)
+
+
+def opening_flags(chapter):
+    """What the opening does to the chapter's flags, in order: [(op, flag, units)], op 0x27 setting one and 0x28 clearing it, units
+    the `46 [unit]` checks it sits under: a block, closed by `2E 66 66`, that the opening leaves unless each unit is in play (found
+    in the unit table, $84:84B4) with its status bit 0x200 clear ($86:909B). Chapter 9 closes Leif's talk with Altena (27 28) and
+    opens it again only under 46 1D00 and 46 2200: Leif and Finn."""
+    bank, opening, _ = chapter_headers()[chapter]
+    out, units = [], []
+    for _, op, a in script(bank, opening):
+        if op == 0x46:
+            units.append(a[0] | a[1] << 8)
+        elif op == 0x2E:
+            units = []
+        elif op in (0x27, 0x28):
+            out.append((op, a[0], tuple(units)))
+    return out
+
+
+def flag_clearers(chapter):
+    """{flag: [what clears it]}: ('trigger', t) or ('block', b) for an event whose action, or the scene it runs, clears one of the
+    chapter's flags: event command 0x28 [flag] ($86:8D08), itself or run inline, or scene op 0x4C [chapter][flag] ($91:CBA2; both
+    through $86:9A13). Chapter 9's scene 0x14D, run as Thracia's phase starts once Travant is defeated and Leif has talked to
+    Altena, clears the flag that keeps Seliph's talk with her closed."""
+    triggers, blocks = event_table(chapter)
+
+    def cleared(action):
+        if not action:
+            return []
+        op, a = action
+        out = [a[0]] if op == 0x28 else []
+        for o, x in action_scene(action):
+            if o == 0x4C and len(x) >= 2 and x[0] == chapter:
+                out.append(x[1])
+            elif o in INLINE_OPS and x[:1] == b'\x28' and len(x) >= 2:
+                out.append(x[1])
+        return out
+
+    out = {}
+    for t in triggers:
+        for f in cleared(t['action']):
+            out.setdefault(f, []).append(('trigger', t))
+    for b in blocks:
+        for f in cleared((b['op'], b['args'])):
+            out.setdefault(f, []).append(('block', b))
+    return out
 
 
 def event_table(chapter):
@@ -419,15 +513,17 @@ def ending(action):
 
 class Describer:
     """Puts a chapter's event conditions into words. `unit(id)` names a unit, `place(location id)` names a castle or village, and
-    `army(n)` names an army ('your army', 'the enemy', ...)."""
+    `army(n)` names an army ('your army', 'the enemy', ...); `pair(id)` names a talk's side that a child and the substitute standing
+    in for them both answer ('Larcei or Creidne'), `unit` by default."""
 
-    def __init__(self, chapter, unit, place, army, group=lambda lists: None, tile=lambda x, y: (x, y), phase=None):
+    def __init__(self, chapter, unit, place, army, group=lambda lists: None, tile=lambda x, y: (x, y), phase=None, pair=None):
         self.triggers, self.blocks = event_table(chapter)
         self.setters = flag_setters(self.triggers, self.blocks, chapter)
         # The conditions under which a block's commands end the chapter (one of them runs a scene with 0x78): a flag set there is
         # nothing to the battle map.
         self.endings = {(b['turn'], repr(b['flags'])) for b in self.blocks if ending((b['op'], b['args']))}
         self.unit, self.place, self.army, self.group, self.tile = unit, place, army, group, tile
+        self.pair = pair or unit
         self.phase = phase or (lambda n: 'your phase' if n == 0 else f'the phase of {army(n)}')
 
     def trigger(self, t):
@@ -438,8 +534,12 @@ class Describer:
         if op == 0x02:
             return f'you seize {self.place(w[1])}' if w[0] == 0 else f'{self.army(w[0])} seizes {self.place(w[1])}'
         if op in (0x04, 0x15, 0x16):
-            who = 'anyone' if w[0] == 0xFFFF else self.unit(w[0])
-            return f'{who} talks to {self.unit(w[1])}'
+            # 0x15 takes the talker's child or substitute as one ($86:8828), 0x16 both sides ($86:8876).
+            who = 'anyone' if w[0] == 0xFFFF else (self.pair if op in (0x15, 0x16) else self.unit)(w[0])
+            return f'{who} talks to {(self.pair if op == 0x16 else self.unit)(w[1])}'
+        if op == 0x1E:
+            who = 'one of your units' if w[0] == 0xFFFF else self.unit(w[0])
+            return f'{who} beats {self.unit(w[2])} in the arena'
         if op == 0x0F:
             return f'{self.unit(w[0])} is defeated' if w[0] != 0xFFFF else None
         if op == 0x0A:

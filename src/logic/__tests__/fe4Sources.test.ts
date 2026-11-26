@@ -19,7 +19,8 @@ describe("Genealogy of the Holy War's item sources, from its scripts, shop lists
     expect(at('Return Ring', 'drop')).toContain('Ch.2 Dropped by Philip')
     expect(at('Levin Sword', 'drop')).toContain('Ch.3 Dropped by Jacobi')
     expect(at('Bolganone', 'drop')).toContain('Ch.10 Dropped by Hilda')
-    expect(at('Tornado', 'drop-later')).toContain('Ch.9 Dropped by Musar, arriving mid-chapter')
+    // Serenes' Musar is Mousa in the text the game shows ("Sounds like Sir Mousa's leading the charge"; Musar is an unused draft's).
+    expect(at('Tornado', 'drop-later')).toContain('Ch.9 Dropped by Mousa, arriving mid-chapter')
   })
 
   it('gives the talks, visits and hidden finds Serenes lists (Silver Sword: Alvis; Holsety: Silesia; Hero Axe: Lex)', () => {
@@ -38,6 +39,14 @@ describe("Genealogy of the Holy War's item sources, from its scripts, shop lists
     // A child and the substitute standing in for them carry the same copies: one line for the pair.
     expect(at('Silver Bow', 'kit-later')).toEqual(['Ch.8 Carried by Febail or Asaello on joining'])
     expect(at('Iron Blade', 'kit')).toContain('Ch.6 Carried by Larcei or Creidne on joining')
+    // Only one of Iuchar and Iucharba joins (their talks share flag 0x1D): what each carries is had only if he does, and the Steel
+    // Axe both carry is one copy either way.
+    expect(at('Speed Ring', 'kit-later')).toEqual(['Ch.6 Carried by Iuchar on joining, if Iuchar joins rather than Iucharba'])
+    expect(at('Paragon Ring', 'kit-later')).toEqual(['Ch.6 Carried by Iucharba on joining, if Iucharba joins rather than Iuchar'])
+    expect(at('Steel Axe', 'kit-later')).toContain('Ch.6 Carried by Iuchar or Iucharba on joining, whichever joins')
+    expect(Object.values(FE4_ITEM_SOURCES).flat().filter((s) => /^Carried by Iuchar(ba)? on joining$/.test(s.text))).toEqual([])
+    // Chulainn joins from Chapter 2's arena: his own items count from the next chapter.
+    expect(at('Iron Blade', 'kit-later')).toContain('Ch.2 Carried by Chulainn on joining')
   })
 
   it("counts a recruit's own items and a talk's or an event's gift from the next chapter", () => {
@@ -49,7 +58,8 @@ describe("Genealogy of the Holy War's item sources, from its scripts, shop lists
       (x) => x.kind === 'kit' || x.mapId === 'fe4-final')).toBe(true)
     // A block's gift: Chapter 9's Berserk Staff, once Galatia is seized and Charlot has spoken to Hannibal (trigger 0x0C: Charlot stops
     // next to him), and a gift that depends on a flag says which (Chapter 6's scene 0x1EA: Julia's Aura before Isaach falls, Nosferatu after).
-    expect(at('Berserk Staff', 'event-later')).toEqual(['Ch.9 Given to Charlot after you seize Galatia and Charlot talks to Hannibal and Charlot stops next to Hannibal'])
+    // The talk is trigger 0x16, which Coirpre or his substitute Charlot answers.
+    expect(at('Berserk Staff', 'event-later')).toEqual(['Ch.9 Given to Charlot after you seize Galatia and Coirpre or Charlot talks to Hannibal and Charlot stops next to Hannibal'])
     expect(at('Aura', 'talk-later')).toEqual(['Ch.6 Julia talks to Seliph, before you seize Isaach'])
     expect(at('Nosferatu', 'talk-later')).toEqual(['Ch.6 Julia talks to Seliph, after you seize Isaach'])
   })
@@ -59,7 +69,7 @@ describe("Genealogy of the Holy War's item sources, from its scripts, shop lists
     expect(at('Silver Blade', 'drop-later')).toEqual(['Ch.3 Dropped by Chagall, arriving mid-chapter'])
     expect(at('Ridersbane', 'drop-later')).toContain('Ch.7 Dropped by Bramsel, arriving mid-chapter')
     // The Prologue's Gandolf leaves on turn 1's enemy phase, some 40 tiles from your army: his Skill Ring is his Chapter 1 drop.
-    expect([...at('Skill Ring', 'drop'), ...at('Skill Ring', 'drop-later')]).toEqual(['Ch.1 Dropped by Munnir, arriving mid-chapter', 'Ch.7 Dropped by Jabarro, arriving mid-chapter'])
+    expect([...at('Skill Ring', 'drop'), ...at('Skill Ring', 'drop-later')]).toEqual(['Ch.1 Dropped by Munnir, arriving mid-chapter', 'Ch.7 Dropped by Javarro, arriving mid-chapter'])
   })
 
   it("marks the weapons no copy exists of as foe-only, with every foe carrying them, and says a foe's weapon nowhere else", () => {

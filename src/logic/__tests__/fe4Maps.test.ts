@@ -121,8 +121,8 @@ describe("Genealogy of the Holy War's maps", () => {
 
   it("draws each army as it stands toward yours when it comes, and says when that changes (event commands 4B and 4D)", () => {
     const joiners = (heading: string, when: string) => map(heading).joiners!.filter((j) => j.when === when)
-    // Chapter 1: Elliot's army, made when Genoa or Marpha falls (4B 05 09), comes hostile; Eldigan's comes as your ally.
-    expect(map('Ch.1').reinforcements!.find((g) => g.units.some((u) => u.name === 'Elliot'))).toMatchObject({
+    // Chapter 1: Eliot's army, made when Genoa or Marpha falls (4B 05 09), comes hostile; Eldigan's comes as your ally.
+    expect(map('Ch.1').reinforcements!.find((g) => g.units.some((u) => u.name === 'Eliot'))).toMatchObject({
       label: 'Group 2', when: 'At the start of the enemy phase after you seize Genoa or you seize Marpha.',
     })
     const eldigan = joiners('Ch.1', 'At the start of the allied phase after Group 2 arrives.')
@@ -162,8 +162,10 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(unit('Ch.2', 'Erinys').talk).toBe('Recruit: talk with Lewyn; the 4 Pegasus Riders leave the map')
     expect(unit('Ch.3', 'Eldigan').talk).toBe('Talk with Lachesis: Lachesis receives a Lands Sword; Eldigan leaves the map')
     expect(unit('Ch.5', 'Byron').talk).toBe('Talk with Sigurd: Sigurd receives Tyrfing; Byron leaves the map')
-    // 0x15 and 0x16 take a child and the substitute the game's table pairs them with ($86:9CA5) as one.
-    expect(unit('Ch.6', 'Iuchar').talk).toBe('Recruit: talk with Larcei or Creidne; their army turns friendly')
+    // 0x15 and 0x16 take a child and the substitute the game's table pairs them with ($86:9CA5) as one. Chapter 6's talks with the
+    // two brothers share one flag (0x1D), so only one of them joins.
+    expect(unit('Ch.6', 'Iuchar').talk).toBe(
+      "Recruit: talk with Larcei or Creidne; their army turns friendly. Only one of Iuchar and Iucharba joins: talking to either closes the other's talk")
     expect(unit('Ch.7', 'Tine').talk).toBe('Recruit: talk with Arthur or Amid')
     expect(unit('Final', 'Arion').talk).toBe('Talk with Altena: their army turns friendly')
     // A talk said on a unit isn't a note as well; one between two of your own units stays one.
@@ -180,9 +182,9 @@ describe("Genealogy of the Holy War's maps", () => {
     }
     // Recruits are never skulls.
     for (const name of ['Jamke', 'Erinys', 'Altena', 'Hannibal', 'Julia']) expect(everyone.filter(({ u }) => u.name === name).every(({ u }) => u.type === 'named'), name).toBe(true)
-    // The narration points at Kinbois (82 06 48 00); Elliot has his own battle quote; Eldigan's level isn't Serenes'.
+    // The narration points at Kinbois (82 06 48 00); Eliot has his own battle quote; Eldigan's level isn't Serenes'.
     expect(map('Ch.1').units.find((u) => u.name === 'Cimbaeth')!.tile).toEqual([54, 25])
-    expect(everyone.some(({ m, u }) => m.heading === 'Ch.2' && u.name === 'Elliot')).toBe(true)
+    expect(everyone.some(({ m, u }) => m.heading === 'Ch.2' && u.name === 'Eliot')).toBe(true)
     expect(everyone.find(({ m, u }) => m.heading === 'Ch.10' && u.name === 'Zaggam')!.u).toMatchObject({ type: 'boss', note: 'Dark Bishop, Lv 27. Holds Miletos.' })
     expect(map('Ch.10').joiners!.some((j) => j.name === 'Polemarch')).toBe(true)
     // Departures: the Prologue's Gandolf on turn 1; Chapter 8's Ishtar on turn 12, or after a battle (trigger 0x1A runs 0x74).
@@ -278,7 +280,39 @@ describe("Genealogy of the Holy War's maps", () => {
     expect(febail.standIn).toMatchObject({ name: 'Asaello', note: 'Bow Fighter, Lv 9', talk: 'Recruit: talk with Patty or Daisy' })
     const notes = map('Prologue').notes
     expect(notes).toContain('Sigurd talks to Arvis (once Arvis appears on the map): Sigurd receives a Silver Sword; Arvis leaves the map.')
-    expect(map('Ch.1').units.find((u) => u.name === 'Ayra')!.talk).toBe('Recruit: talk with Sigurd')
+    // The opening closes Ayra's talk (27 04) and seizing Genoa opens it (scene 0x23: 4C 01 04).
+    expect(map('Ch.1').units.find((u) => u.name === 'Ayra')!.talk).toBe('Recruit: talk with Sigurd, once you seize Genoa')
+  })
+
+  it("opens each talk as its talk-table entry's flag says (chapter data +6: Talk is offered while the flag is clear, $86:8294)", () => {
+    const unit = (heading: string, name: string) =>
+      [...map(heading).units, ...(map(heading).reinforcements ?? []).flatMap((g) => g.units)].find((u) => u.name === name)!
+    // Chapter 9's opening closes both of Altena's talks (27 28, 27 2A) and opens Leif's again only under 46 1D00 46 2200 (Leif and
+    // Finn); his talk puts her inside Thracia (61 2C00 04), and scene 0x14D opens Seliph's (4C 09 2A) once Travant is defeated and
+    // Leif has talked to her. The group the talk brings is said on the group, not in the talk (kept under the spoiler block).
+    expect(unit('Ch.9', 'Altena').talk).toBe(
+      'Talk with Leif (only if Leif and Finn are both in your army as the chapter starts): Altena withdraws into Thracia. ' +
+        "Recruit: talk with Seliph, once Travant is defeated after Leif's talk")
+    expect(map('Ch.9').reinforcements![0].when).toBe('When Leif talks to Altena or at the start of the enemy phase after Altena is defeated.')
+    // The Final Chapter's Julia: the opening closes Seliph's talk (27 3C), Manfroy's defeat opens it (28 3C).
+    expect(unit('Final', 'Julia').talk).toBe('Recruit: talk with Seliph, once Manfroy is defeated')
+    // Both brothers' talks share flag 0x1D: whichever is held first closes the other's.
+    expect(unit('Ch.6', 'Iucharba').talk).toMatch(/Only one of Iuchar and Iucharba joins: talking to either closes the other's talk$/)
+    // A turn that names a talk names a child and the substitute both (0x16): "Larcei or Creidne", never Creidne alone.
+    expect(FE4_MAPS.flatMap((m) => m.units.map((u) => u.note ?? '')).filter((n) => /\bCreidne talks/.test(n) && !/Larcei or Creidne talks/.test(n))).toEqual([])
+  })
+
+  it("adds Chulainn from Chapter 2's arena lists (chapter data +4), with no one tile: he walks out of whichever castle", () => {
+    // The first list (a weapon with a minimum range under 2) ends with Chulainn, seventh of seven; the bows' list has a Sniper there.
+    expect(map('Ch.2').notes).toContain(
+      "Chulainn joins your army once one of your units beats him in the arena: he's the seventh and last match for a unit fighting with anything but a bow.")
+    expect((map('Ch.2').joiners ?? []).some((j) => j.name === 'Chulainn')).toBe(false)
+  })
+
+  it("spells the bosses as the text the game shows does, not the patch's unused older drafts", () => {
+    const names = new Set(FE4_MAPS.flatMap((m) => [...m.units, ...(m.reinforcements ?? []).flatMap((g) => g.units)].flatMap((u) => u.name.split(' / '))))
+    for (const n of ['Javarro', 'Raisa', 'Eliot', 'Pisear', 'Canut', 'Mousa', 'Judas', 'Díthorba', 'Banba', 'Fódla', 'Ériu', 'Fisher']) expect(names.has(n), n).toBe(true)
+    for (const n of ['Jabarro', 'Liza', 'Elliot', 'Pizare', 'Kanatz', 'Musar', 'Juda', 'Dithorba', 'Vampa', 'Fotla', 'Eriu']) expect(names.has(n), n).toBe(false)
   })
 })
 

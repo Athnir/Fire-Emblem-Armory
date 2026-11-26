@@ -44,7 +44,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   community translation patch Serenes Forest hosts (Lil' Nordion for FE4, Lil' Manster for FE5, the FE6 Localization patch's
   `.ups` for FE6; they sit next to the ROMs in `Documents\FE Games`): the patch is applied in memory and only its name tables
   (FE6: its text, by the ROM's text ids) are read, by the ROM's own ids. Nothing patched
-  is written or committed. Where the patch has no table (FE4's bosses), its dialogue's spelling is used; Serenes Forest, then
+  is written or committed. Where the patch has no table (FE4's bosses), its dialogue's spelling is used, only what the game shows (a
+  string one of the patch's own pointers leads to, `fe4_names.shown`: its unused older drafts' Jabarro, Liza and Elliot are the shown
+  Javarro, Raisa and Eliot; the look-over, 2026-11-26); Serenes Forest, then
   fireemblemwod.com, then the wikis fill what the patch lacks. New Mystery of the Emblem (FE12): the clean dump
   `FIREEMBLEM12_VI2J01_01.nds` and the Heroes of Shadow patch (`FE12_v3.01.zip`, an xdelta file: `scripts/vcdiff.py`).
 - **Gaiden (FE2) is the exception (the user's call):** `scripts/fe2_rom.py` (the Unit Planner's reader), `fe2_data.py`,
@@ -1014,6 +1016,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   'Renais Cit.' units survive"). A gift is under only the checks whose branch holds it: one that guards a scene or a join before the
   gifts doesn't make them conditional (Awakening's Paralogue 22), and stacked thresholds each say their own ("if Inigo defeats 3 or
   more foes and survives"). Who a gift goes to is said where the script hands it to a unit ("to Tiki").
+- **A talk says when it opens**, from the game's talk table where it has one (Genealogy's chapter data +6: "Recruit: talk with
+  Sigurd, once you seize Genoa"; Altena's talk with Leif "only if Leif and Finn are both in your army as the chapter starts"), and
+  talks the game closes together say only one can be held ("Only one of Iuchar and Iucharba joins: talking to either closes the
+  other's talk"), what each would bring an either-or ("Carried by Iuchar or Iucharba on joining, whichever joins") (the look-over,
+  2026-11-26).
 - **A talk that swaps in another record** (Mystery of the Emblem's $87:87A9, keeping only the tile and HP) names the unit by who joins,
   its note saying how the game shows it until the talk ("Shown as Navarre, with Navarre's portrait, until the talk"; under the spoiler
   block the map shows it by that name, `shownAs`), and the level it joins at where the record's differs ("Joins at Lv 3": Nyna and

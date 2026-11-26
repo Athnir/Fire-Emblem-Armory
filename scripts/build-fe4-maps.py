@@ -10,7 +10,8 @@ How the ROM keeps a chapter (found by tracing a chapter load in Mesen; details i
   - the terrain id indexes the movement cost table (15 movement types x 26 ids, $83:987D) and the avoid table ($83:9A25).
 
 The English names (chapters, classes, characters, castles, items, terrain) are Lil' Nordion's (scripts/fe4_names.py); bosses are named
-from Serenes Forest's boss and NPC tables, as the patch's dialogue spells them, which needs a network connection. Run:
+from Serenes Forest's boss and NPC tables, as the dialogue the patch shows spells them (not its unused older drafts), which needs a
+network connection. Run:
     python scripts/build-fe4-maps.py
 """
 import html
@@ -361,13 +362,16 @@ def ring_names():
 
 
 NAME_CHART = 'https://serenesforest.net/genealogy-of-the-holy-war/general/name-chart/'
-# Bosses whose name the patch's dialogue spells differently from Serenes (each read in context there: "You and Gerald are in charge",
-# "Banba! Fotla! Eriu!"); the build checks that the patch uses each spelling.
+# Bosses whose name the patch's dialogue spells differently from Serenes (each read in context in the text the game shows: "You and
+# Gerald are in charge", "Banba! Fódla! Ériu!", "Pisear, yer in charge o' the boys", "My apologies, Canut, but I'd like you to take
+# charge of defending the castle", "Sounds like Sir Mousa's leading the charge", "Bishop Judas" at Galatia); the build checks that the
+# patch shows each spelling (fe4_names.shown: its older drafts' Jabarro, Liza, Elliot, Pizare, Kanatz, Musar, Fotla and Eriu don't count).
 BOSS_SPELLINGS = {
     'Gerrard': 'Gerald', 'Jacoban': 'Jacobi', 'Disler': 'Distler', 'Dobarl': 'Dobar', 'Maikov': 'Maykov', 'Morigan': 'Morrigan',
-    'Muhammed': 'Muhammad', 'Papilion': 'Papilio', 'Pizarl': 'Pizare', 'Voltz': 'Völtz', 'Maybell': 'Meabel', 'Bleg': 'Breg',
-    'Palmark': 'Polemarch', 'Rodan': 'Rodin', 'Vaha': 'Vaja', 'Coruta': 'Gortach', 'Eliu': 'Eriu', 'Fetra': 'Fotla',
-    'Deetäver': 'Dithorba', 'Maios': 'Myos', 'Magorn': 'Magon',
+    'Muhammed': 'Muhammad', 'Papilion': 'Papilio', 'Pizarl': 'Pisear', 'Voltz': 'Völtz', 'Maybell': 'Meabel', 'Bleg': 'Breg',
+    'Palmark': 'Polemarch', 'Rodan': 'Rodin', 'Vaha': 'Vaja', 'Coruta': 'Gortach', 'Vampa': 'Banba', 'Eliu': 'Ériu', 'Fetra': 'Fódla',
+    'Deetäver': 'Díthorba', 'Maios': 'Myos', 'Magorn': 'Magon', 'Jabarro': 'Javarro', 'Liza': 'Raisa', 'Elliot': 'Eliot',
+    'Kanatz': 'Canut', 'Musar': 'Mousa', 'Juda': 'Judas',
 }
 LORDS = {c: 'Sigurd' if c <= 5 else 'Seliph' for c in range(12)}   # the first generation's lord, then the second's (Lil' Nordion's names)
 VILLAGE_GOLD = 0x7F453     # u16 offsets per location kind (0 castle, 2 village) to [gold u16][footprint]: what a village holds
@@ -532,7 +536,7 @@ def build_units(heights, classes, tables, grids):
         # boss table: the game keeps no name for them (its name table, $8D:920D, covers the 63 playable characters: $91:8D56 holds the
         # index under 0x3F). The opening narration's pointer at a unit names it first (Chapter 1's Kinbois is 0x48, not Genoa's
         # leader 0x5C). When more units fit a row than the table has names, only the flagged leaders take the name, else the one
-        # given a battle quote of its own (trigger 0x0D [0][talker][FFFF][unit] showing text when anyone fights it: Chapter 2's Elliot,
+        # given a battle quote of its own (trigger 0x0D [0][talker][FFFF][unit] showing text when anyone fights it: Chapter 2's Eliot,
         # 0x66, has one, the other Level 15 Duke Knight none), else the one holding a castle; a named record whose level isn't Serenes'
         # takes the chapter's one row of its class left (Eldigan: a Level 25 Paladin in Chapter 3's ROM, 23 on Serenes).
         castle_tiles = {(l[3], l[4]) for l in locs.values() if l[1] == 0}
@@ -738,7 +742,17 @@ def build_units(heights, classes, tables, grids):
             """A tile moved onto the grid: a joiner walks in from the border (the Prologue's Quan from the east edge)."""
             return [min(max(t_[0], 1), width), min(max(t_[1], 1), height)]
 
-        d = ev.Describer(chapter, unit_name, place, army, group, tile, phase)
+        def either(ident, paired):
+            """The ids a talk's id stands for: a child and its substitute both, when the trigger takes the pair as one (0x16 maps its
+            own ids too, so either can be written)."""
+            if not paired:
+                return [ident]
+            return [ident, subs[ident]] if ident in subs else [ident, child_of[ident]] if ident in child_of else [ident]
+
+        def who_words(ids):
+            return ' or '.join(playable(i) or unit_name(i) for i in sorted(ids, key=lambda i: i not in subs))   # the child first
+
+        d = ev.Describer(chapter, unit_name, place, army, group, tile, phase, pair=lambda i: who_words(either(i, True)))
 
         def sentence(clause):
             return clause[0].upper() + clause[1:] + '.'
@@ -935,15 +949,89 @@ def build_units(heights, classes, tables, grids):
         endings_on = {f_ for b_ in d.blocks if (b_['turn'], repr(b_['flags'])) in d.endings for test, fl in b_['flags'] if test != 'clear'
                       for f_ in fl}
 
-        def either(ident, paired):
-            """The ids a talk's id stands for: a child and its substitute both, when the trigger takes the pair as one (0x16 maps its
-            own ids too, so either can be written)."""
-            if not paired:
-                return [ident]
-            return [ident, subs[ident]] if ident in subs else [ident, child_of[ident]] if ident in child_of else [ident]
+        # When a talk is offered: while its talk-table entry's flag is clear (fe4_events.talk_table), the flag the trigger answering
+        # the talk sets when it fires. An opening that sets the flag (event command 0x27) closes the talk at the start, and what clears
+        # it again opens it: the opening itself under `46` checks (Chapter 9: Leif's talk with Altena only if Leif and Finn are in
+        # your army), or an event later (fe4_events.flag_clearers: Chapter 1's Ayra once Genoa is seized).
+        start_ops, clearers = ev.opening_flags(chapter), ev.flag_clearers(chapter)
+        in_table = {e_['flag'] for e_ in ev.talk_table(chapter)}
+        # Each entry and the trigger answering it share their flag, in every chapter (a talk on flag 0xFF has no entry: a link offers it).
+        assert {t['flag'] for t in d.triggers if t['op'] in (0x04, 0x15, 0x16) and t['flag'] < 0x80} == in_table, chapter
 
-        def who_words(ids):
-            return ' or '.join(playable(i) or unit_name(i) for i in sorted(ids, key=lambda i: i not in subs))   # the child first
+        def in_army(ids_):
+            names_ = [playable(i) or unit_name(i) for i in ids_]
+            if len(names_) == 1:
+                return f'{names_[0]} is in your army'
+            return f"{', '.join(names_[:-1])} and {names_[-1]} are {'both' if len(names_) == 2 else 'all'} in your army"
+
+        def cause(f_):
+            """What sets flag f_, as a clause: a trigger by its own condition (Leif's talk with Altena, not the group its scene
+            brings), anything else as the Describer puts it."""
+            setters_ = d.setters.get(f_, [])
+            if setters_ and all(k_ == 'trigger' for k_, _ in setters_):
+                words_ = [d.trigger(t_) for _, t_ in setters_]
+                if all(words_):
+                    return ' or '.join(dict.fromkeys(words_))
+            return d.flag(f_, 0)
+
+        def talk_opens(flag, on):
+            """When a talk opens, as words to follow its talker: '' for one open from the start, ' (only if ...)' for one the
+            opening opens on `46` checks, ', once ...' for one an event opens. `on` is the unit the words are on, so a talk with it
+            that the opening waits on is 'after Leif's talk'."""
+            if flag not in in_table:
+                return ''
+            closed, checks = False, []
+            for op_, f_, units_ in start_ops:
+                if f_ == flag and not units_:
+                    closed = op_ == 0x27
+                elif f_ == flag and op_ == 0x28:
+                    checks.append(units_)
+            if not closed:
+                return ''
+            ways = [f'only if {in_army(u_)} as the chapter starts' for u_ in checks]
+            for kind_, x_ in clearers.get(flag, []):
+                if kind_ == 'trigger':
+                    c_ = d.trigger(x_)
+                    ways.append(f'once {c_}' if c_ else 'after an event in the chapter')
+                    continue
+                # A block's flags, its "not yet" tests aside (the block runs once); a phase start that waits on them follows them.
+                parts_ = [] if x_['turn'] is None or x_['flags'] else None
+                for test_, fl_ in x_['flags']:
+                    if test_ != 'clear' and parts_ is not None:
+                        words_ = [cause(f2) for f2 in fl_]
+                        parts_ = None if None in words_ else parts_ + ([' or '.join(words_)] if test_ == 'any set' else words_)
+                if not parts_:
+                    c_ = d.when(x_)
+                    ways.append(f'from {c_}' if c_ else 'after an event in the chapter')
+                    continue
+                talked_ = [p_[:-len(f' talks to {on}')] for p_ in parts_ if p_.endswith(f' talks to {on}')]
+                rest_ = [p_ for p_ in parts_ if not p_.endswith(f' talks to {on}')]
+                after_ = ' and '.join(f"{w_}'s talk" for w_ in talked_)
+                ways.append(f"once {' and '.join(rest_)}" + (f' after {after_}' if after_ else '') if rest_ else f'after {after_}')
+            if not ways:
+                return ''
+            text_ = ', or '.join(dict.fromkeys(ways))
+            return f' ({text_})' if text_.startswith('only if') else f', {text_}'
+
+        # Talks that share one flag close together: whichever is answered first sets it, and the game offers none of them again (their
+        # talk-table entries wait on it). Chapter 6's four talks with Iuchar and Iucharba share flag 0x1D, so only one brother joins; a
+        # child and the substitute standing in for them are one unit here (Chapter 8's Febail or Asaello).
+        joined_by = {}
+        for t in d.triggers:
+            if t['op'] in (0x04, 0x15, 0x16) and t['action'] and t['flag'] < 0x80:
+                for op_, x in ev.action_scene(t['action']):
+                    if op_ in ev.INLINE_OPS and x[:1] == b'\x53' and len(x) >= 4 and x[3] == 0:
+                        joined_by.setdefault(t['flag'], []).append(x[1] | x[2] << 8)
+        rivals = {}
+        for ids_ in joined_by.values():
+            ids_ = sorted(i for i in set(ids_) if i not in child_of)
+            for i in ids_ if len(ids_) > 1 else []:
+                rivals[i] = ids_
+
+        def only_one(ident):
+            names_ = [unit_name(i) for i in rivals[ident]]
+            why = "either closes the other's talk" if len(names_) == 2 else "any closes the others' talks"
+            return f"Only one of {', '.join(names_[:-1])} and {names_[-1]} joins: talking to {why}"
 
         talks, talked, unsure = {}, {}, []
         for t in d.triggers:
@@ -983,6 +1071,12 @@ def build_units(heights, classes, tables, grids):
                     results.append(f'{name.replace("the ", f"the {n} ", 1) + "s" if n > 1 else name} leave{"" if n > 1 else "s"} the map')
                 else:
                     results.append(f'{name} leaves the map')
+            # Event command 0x61 [unit u16][location] puts a unit inside a castle ($86:9559 -> $84:CCB4): Chapter 9's Altena, talked to
+            # by Leif, withdraws into Thracia.
+            for x in cmds:
+                if x[0] == 0x61 and len(x) >= 4 and x[3] in locs and locs[x[3]][1] == 0:
+                    i = x[1] | x[2] << 8
+                    results.append(f"{target if i in to_ids else speaker if i in frm_ids else unit_name(i)} withdraws into {place(x[3])}")
             sets = {t['flag']} if t['flag'] < 0x80 else set()
             if t['action'][0] == 0x27:
                 sets.add(t['action'][1][0])
@@ -1003,13 +1097,17 @@ def build_units(heights, classes, tables, grids):
 
             for ids, other in ((to_ids, speaker), (frm_ids, target)):
                 said = joined_words(ids) + results + (['the chapter ends'] if ends_here else [])
+                opens = talk_opens(t['flag'], target if ids is to_ids else speaker)
                 for i in ids:
                     for u_ in drawn.get(i, []):
                         if any(j in ids for j in joins):
-                            text = f"Recruit: talk with {other}" + (f' for {cost:,} gold' if cost else '') + ''.join(f'; {r}' for r in said)
+                            text = (f"Recruit: talk with {other}" + (f' for {cost:,} gold' if cost else '') + opens +
+                                    ''.join(f'; {r}' for r in said))
                         else:
-                            text = f"Talk with {other}: {'; '.join(said)}"
+                            text = f"Talk with {other}{opens}: {'; '.join(said)}"
                         talked.setdefault(id(u_), (u_, []))[1].append(text)
+                        if i in rivals:
+                            talked[id(u_)][1].append(only_one(i))
             if any(drawn.get(i) for i in to_ids + frm_ids):
                 continue
             results = joined_words([]) + results
@@ -1026,6 +1124,36 @@ def build_units(heights, classes, tables, grids):
                 u_['standIn']['talk'] = u_['talk']
         for opener, results in talks.values():
             notes.append(f"{opener}: {'; '.join(results)}.")
+
+        def arena_win(e):
+            """The unit an event waits on someone beating in the arena (a block on flags only arena wins set: trigger 0x1E), or None.
+            Chapter 2's: beating Chulainn sets flag 0x1A, and its block's once-only triggers place him in whichever castle the unit
+            that beat him enters (Evans, Nordion, Hochrhein, Infini, Makariy: scenes 0x4F and 0x5D-0x60)."""
+            fl = [f_ for test, fl_ in (e[1][0]['flags'] if e[0] == 'block' else []) if test != 'clear' for f_ in fl_]
+            setters_ = [x for f_ in fl for x in d.setters.get(f_, [])]
+            if not setters_ or not all(k_ == 'trigger' and t_['op'] == 0x1E for k_, t_ in setters_):
+                return None
+            beaten = {t_['args'][4] | t_['args'][5] << 8 for _, t_ in setters_}
+            return beaten.pop() if len(beaten) == 1 else None
+
+        def arena_note(ident):
+            """'Chulainn joins your army once one of your units beats him in the arena: he's the seventh and last match for a unit
+            fighting with anything but a bow': his place in the arena's lists (fe4_events.arena), the first for a weapon whose
+            minimum range is under 2, the second for 2 or more, which among the copies a unit of yours can own is only a bow's."""
+            first, second = ev.arena(chapter)
+            at = [lst.index(ident) for lst in (first, second) if ident in lst[:ev.ARENA_MATCHES]]
+            assert len(set(at)) == 1, (chapter, ident, first, second)
+            far = {rom_item(ev.instance_type(n_))['type'] for n_ in range(1, ev.INSTANCE_COUNT + 1)
+                   if rom_item(ev.instance_type(n_))['kind'] == 'weapon' and rom_item(ev.instance_type(n_))['range'][0] >= 2}
+            assert far == {'Bow'}, far
+            which = '' if ident in first and ident in second else (' for a unit fighting with anything but a bow' if ident in first
+                                                                    else ' for a unit fighting with a bow')
+            nth = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'][at[0]]
+            last = ' and last' if at[0] == ev.ARENA_MATCHES - 1 else ''
+            t = character(ident)
+            him, he = ('her', "she's") if t[0x12 if t[0] == 0 else 8] else ('him', "he's")   # its sex: +0x12, a child's +8
+            return f"{unit_name(ident)} joins your army once one of your units beats {him} in the arena: {he} the {nth}{last} match{which}."
+
         for e in events[1:]:
             # Event command 0x49 puts a unit on the map: a playable character joins you; anyone else (Alvis, Julius) appears. One the
             # same scene takes off again (0x65) is its cast, and a scene that ends the chapter puts no one on the battle map.
@@ -1047,7 +1175,10 @@ def build_units(heights, classes, tables, grids):
             if not (e[0] == 'trigger' and e[1]['op'] in (0x04, 0x15, 0x16)):
                 joining += [unit_name(x[0] | x[1] << 8) for o, x in e[2] if o == 0x53 and len(x) > 2 and x[2] == 0]
                 joining = list(dict.fromkeys(joining))
-            if joining:
+            won = arena_win(e)
+            if won is not None and joining == [unit_name(won)]:
+                notes.append(arena_note(won))
+            elif joining:
                 text, n = names_list(joining, pairs, children)
                 notes.append(f"{text} join{'s' if n == 1 else ''} your army: {c}.")
             if others:
@@ -1128,7 +1259,10 @@ def build_units(heights, classes, tables, grids):
             placed = [x[0] | x[1] << 8 for o, x in e[2] if o == 0x49 and len(x) >= 2]
             moves = placements(e[3], [x[0] for o, x in e[2] if o in (0x4A, 0x4F) and x])
             c = event_when(e)
-            here = [(playable(i), tuple(moves[i][1]), tuple(moves[i][0])) for i in placed if playable(i) and i in moves and i not in gone]
+            # A unit the event places more than once is placed by alternatives, no one tile (Chapter 2's Chulainn walks out of
+            # whichever castle the unit that beat him enters).
+            here = [(playable(i), tuple(moves[i][1]), tuple(moves[i][0])) for i in placed if playable(i) and i in moves and i not in gone
+                    and placed.count(i) == 1]
             for name, to, frm, sub in merge(here):
                 if c:
                     joiners.append({'name': name, 'tile': list(to), 'from': inside(frm), 'group': f'event{n_}', 'when': sentence(c)})
@@ -1242,6 +1376,24 @@ def build_units(heights, classes, tables, grids):
                 else:
                     continue
                 for ident in idents:
+                    if ident and playable(ident) and ident not in joined and ident in rivals:
+                        # Only one of rivals joins (their talks share one flag): a copy is had only if its carrier joins, and an
+                        # item each carries is one copy either way ("Carried by Iuchar or Iucharba on joining, whichever joins").
+                        joined.update(rivals[ident])
+                        carriers = {}
+                        for m_ in rivals[ident]:
+                            t = character(m_)
+                            for i in (t[0x23:0x26] if t[0] == 0 else t[9:11]):
+                                if i not in (0, 0xFF):
+                                    carriers.setdefault(ev.instance_type(i), []).append(m_)
+                        names_ = [playable(m_) for m_ in rivals[ident]]
+                        for type_, ms in carriers.items():
+                            if set(ms) == set(rivals[ident]):
+                                text = f"Carried by {' or '.join(names_)} on joining, whichever joins"
+                            else:
+                                text = (f"Carried by {playable(ms[0])} on joining, if {playable(ms[0])} joins rather than "
+                                        f"{' or '.join(n_ for n_ in names_ if n_ != playable(ms[0]))}")
+                            found.append((type_, kind, text))
                     if ident and playable(ident) and ident not in joined:
                         joined.add(ident)
                         t = character(ident)
@@ -1439,7 +1591,8 @@ def chapter_records():
 def main():
     TERRAIN.update({i: (letter, ln.terrain_names()[i]) for i, (letter, _) in TERRAIN.items()})
     titles = ln.chapter_titles()
-    assert [h.replace('Ch. ', 'Ch.') for h, _ in titles] == [c[2] for c in CHAPTERS], titles
+    # The patch heads the last chapter Endgame; the page calls it the game's Final Chapter (CHAPTERS above).
+    assert [h.replace('Ch. ', 'Ch.').replace('Endgame', 'Final') for h, _ in titles] == [c[2] for c in CHAPTERS], titles
     CHAPTERS[:] = [(i, n, h, titles[n][1]) for i, n, h, _ in CHAPTERS]
     steps = [u16(STEPS + 2 * i) for i in range(8)]
     assert steps[:3] == [7, 10, 20], steps
