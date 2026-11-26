@@ -78,8 +78,10 @@ FILLS = {'fe14b-19': {'wa': '#0b0b0e'},
          # Birthright 9's floor a step lighter and its walls darker, so they part (the user: they blended at (17, 5) and (19, 5)), and
          # Conquest 18's, the same map.
          'fe14b-9': {'t1': '#6a4a33', 'wa': '#3d2c1f'}, 'fe14c-18': {'t1': '#6a4a33', 'wa': '#3d2c1f'},
-         # Ghostly Gold's stone partitions (STONE_FENCES), in their render's grey.
-         'fe14-dlc-6a': {'wg': '#6a604e'},
+         # Ghostly Gold's stone partitions (STONE_FENCES), the grey stone its photos show (the user: (17, 10) wrong colour, it was tan).
+         'fe14-dlc-6a': {'wg': '#57535c'},
+         # Museum Melee's Exit (DRAWN_AS), the purple pad its photos show.
+         'fe14-dlc-6b': {'ge': '#733f90'},
          # Revelation 13's docks (DOCKS), weathered timber.
          'fe14r-13': {'gi': '#6b5238'}}
 # Ships whose floor is their deck (the user: wood, not flagstones; Revelation 14's two ships, Paralogue 3's, Birthright 11's, Revelation
@@ -132,6 +134,26 @@ RUBBLE_MAPS = {'fe14-5'}
 CLIFF_PARTITIONS = {'fe14c-21'}
 # Partitions that are low stone walls (Ghostly Gold's two at (16, 10) and (17, 10): the user, stone), in their render's colour (FILLS).
 STONE_FENCES = {'fe14-dlc-6a'}
+# The user's notes of 2026-11-26. Tiles drawn as another code, their numbers kept (`looksAs`): Boo Camp's partitions (低壁) the walls
+# they are in its photos (the user: all of this type of tile is a wall on this map), Museum Melee's Exit (出口) a purple pad on the
+# floor (the user: not a wall; its photos' purple, FILLS), by the game's name for the tile.
+DRAWN_AS = {'fe14-dlc-67': {'低壁': 'wa'}, 'fe14-dlc-6b': {'出口': 'ge'}}
+# Tiles named apart from the code they share, so the tile panel and the legend say what the game says (Museum Melee's Exit, among its
+# walls).
+OWN_NAMES = {'fe14-dlc-6b': ('出口',)}
+# What's drawn over a tile by the game's name for it (`decor`): Conquest 26's torches (篝火) candlesticks (the user: candlesticks, (9, 7)
+# and those like it in its rooms).
+NAMED_DECOR = {'fe14c-26': {'篝火': 'candle'}}
+# What's drawn over a tile, by tile: Conquest 23's three partitions braziers (the user: braziers, Radiant Dawn's Part 2 Ch.2 lit torch,
+# not candlesticks).
+TILE_DECOR = {'fe14c-23': {(14, 21): 'brazier', (22, 19): 'brazier', (29, 21): 'brazier'}}
+# The ground an icon stands on, by tile (`standOn`): Ghostly Gold's rubble on its grass (the user: the backdrop of these on grass),
+# Revelation 13's obstacles on the stone or the dock's wood under each in its photos (the user: some on the wrong ground).
+STAND_ON = {'fe14-dlc-6a': {(19, 8): 'ta', (22, 11): 'ta', (22, 12): 'ta'},
+            'fe14r-13': {(2, 3): 't1', (15, 3): 't1', (18, 4): 't1', (9, 5): 't1', (4, 6): 't1', (4, 10): 't1', (11, 10): 'gi',
+                         (19, 11): 't1', (19, 15): 't1', (4, 17): 't1'}}
+# Its sky (空) the void, a drop into the dark (the user, Museum Melee: sky void tiles, not cliffs, as Engage's).
+SKY_VOID = {'fe14-dlc-6b'}
 # Wooden docks and piers its art lays where the game says floor (Revelation 13's: the user, wood instead of stone, (3, 4), (11, 11) and
 # the tiles like them; each found by its planks' stripes in the render, checked by eye): boards (`gi`), the floor's numbers kept.
 DOCKS = {'fe14r-13': [(17, 25), (17, 24), (17, 23), (5, 22), (4, 18), (11, 13), (11, 12), (12, 12), (5, 11), (11, 11), (5, 10), (6, 10), (10, 10), (16, 8), (17, 8), (17, 7), (3, 6), (17, 6), (3, 5), (16, 5), (17, 5), (1, 4), (2, 4), (3, 4), (6, 2), (7, 2), (8, 2), (6, 1), (8, 1), (13, 1)]}
@@ -197,7 +219,9 @@ STEPS = {
     'fe14-x22': [(9, 3, 9, 4), (19, 3, 19, 4), (2, 24, 3, 24), (22, 24, 23, 24)],
     'fe14b-11': [(11, 6, 11, 7), (5, 10, 5, 11), (16, 11, 17, 13), (5, 13, 5, 14), (11, 17, 11, 18)],
     'fe14b-24': [(12, 5, 13, 5), (13, 6, 13, 6), (24, 15, 24, 16), (2, 16, 3, 16), (23, 16, 23, 16), (2, 17, 2, 17), (13, 26, 13, 27), (14, 27, 14, 27)],
-    'fe14b-27': [(6, 6, 6, 7), (12, 6, 14, 6), (20, 6, 20, 7), (6, 14, 6, 15), (20, 14, 20, 15), (7, 19, 9, 19), (17, 19, 19, 19), (12, 21, 14, 22)],
+    # (and the two flights either side of its carpet at the bottom: the user, 2026-11-26)
+    'fe14b-27': [(6, 6, 6, 7), (12, 6, 14, 6), (20, 6, 20, 7), (6, 14, 6, 15), (20, 14, 20, 15), (7, 19, 9, 19), (17, 19, 19, 19), (12, 21, 14, 22),
+                 (11, 1, 11, 5), (15, 1, 15, 5)],
     'fe14b-7': [(12, 2, 14, 3)],
     'fe14b-9': [(12, 1, 14, 2)],
     'fe14c-16': [(11, 6, 11, 7), (5, 10, 5, 11), (16, 11, 17, 13), (5, 13, 5, 14), (11, 17, 11, 18)],
@@ -435,6 +459,7 @@ def main():
             return AFTER.get(state)
 
         rows = []
+        tile_names = {}
         buildings = set()
         walls = set()
         firsts = {}
@@ -516,6 +541,7 @@ def main():
                 prev['names'][en] = prev['names'].get(en, 0) + 1
                 prev['where'].setdefault(en, []).append((c, H + 1 - r))
                 firsts[(c, H + 1 - r)] = L
+                tile_names[(c, H + 1 - r)] = (name, en)
                 if name in BUILDINGS and L in ('#', 'B'):
                     buildings.add((c, H + 1 - r))
                 if name == '壁' and L == '#':
@@ -828,7 +854,7 @@ def main():
         decor |= pillars(walls, firsts) if map_id in PILLAR_MAPS else {}
         out[map_id] = {'statues': decor, 'houses': house_blocks(buildings, set(breaks) | set(afters)), 'code': code, 'dark': dark, 'breakables': breakables, 'veins': veins, 'traps': traps, 'width': W, 'height': H,
                        'grid': rows, 'terrain': kinds, 'spent': sorted(spent.items(), key=lambda kv: (-kv[0][1], kv[0][0])),
-                       'switch': switch, 'pots': pots, 'warps': warps, 'blocks': blocks}
+                       'switch': switch, 'pots': pots, 'warps': warps, 'blocks': blocks, 'names': tile_names}
 
     # Out in the app's two-character terrain codes (scripts/terrain_codes.py).
     ground = json.load(open(GROUND, encoding='utf-8')) if os.path.exists(GROUND) else {}
@@ -944,6 +970,23 @@ def main():
         every = lambda *codes: {(x, y) for y in range(1, H + 1) for x in range(1, W + 1) if at(x, y) in codes}
         looks = m.setdefault('wallLooks', {})
         decor = m['statues']
+        # The user's notes of 2026-11-26: tiles drawn as the game names them.
+        names = m.pop('names')
+        for (x, y), (jp, en) in names.items():
+            k = f'{x},{y}'
+            if jp in DRAWN_AS.get(map_id, {}):
+                m.setdefault('looksAs', {})[k] = DRAWN_AS[map_id][jp]
+            if jp in NAMED_DECOR.get(map_id, {}):
+                decor[k] = NAMED_DECOR[map_id][jp]
+            if map_id in SKY_VOID and jp == '空' and at(x, y) == 'wd':
+                looks[k] = 'void'
+            if jp in OWN_NAMES.get(map_id, ()):
+                info = m['terrain'][at(x, y)]
+                info.setdefault('tileNames', {}).setdefault(en, []).append((x, y))
+        for (x, y), kind in TILE_DECOR.get(map_id, {}).items():
+            decor[f'{x},{y}'] = kind
+        if map_id in STAND_ON:
+            m['standOn'] = {f'{x},{y}': code for (x, y), code in STAND_ON[map_id].items()}
         # Pots stand on the floor round them where it's floor, not the plain the game leaves under an object (Conquest 12's: the user).
         if 't1' in m['terrain']:
             for x, y in m.pop('pots'):
@@ -1212,8 +1255,12 @@ def main():
         "  decor?: Record<string, NonNullable<ChapterMap['decor']>[string]>",
         "  /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */",
         '  ruins?: string[]',
-        "  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user). */",
-        "  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky'>",
+        "  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user), or the void (Museum Melee's sky). */",
+        "  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void'>",
+        "  /** Tiles drawn as another code, their numbers kept (Boo Camp's partitions as its walls, Museum Melee's Exit as a purple pad). */",
+        '  looksAs?: Record<string, TerrainCode>',
+        "  /** The ground an icon stands on, by tile (Ghostly Gold's rubble on grass, Revelation 13's obstacles on stone or wood). */",
+        '  standOn?: Record<string, TerrainCode>',
         "  /** Its houses' roofs grey, as its art paints them (Paralogue 20's: the user). */",
         "  greyRoofs?: true",
         "  /** Its muck drawn as a bog, no icon (Boo Camp's: the user). */",
@@ -1252,6 +1299,10 @@ def main():
             lines.append('    bridgeSpans: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['bridgeSpans'].items())) + ' },')
         if m.get('boatEnds'):
             lines.append('    boatEnds: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['boatEnds'].items())) + ' },')
+        if m.get('looksAs'):
+            lines.append('    looksAs: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['looksAs'].items())) + ' },')
+        if m.get('standOn'):
+            lines.append('    standOn: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['standOn'].items())) + ' },')
         if m.get('greyRoofs'):
             lines.append('    greyRoofs: true,')
         if m.get('muckAsBog'):

@@ -35,8 +35,12 @@ export interface GameTerrain {
   decor?: Record<string, NonNullable<ChapterMap['decor']>[string]>
   /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */
   ruins?: string[]
-  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user). */
-  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky'>
+  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user), or the void (Museum Melee's sky). */
+  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void'>
+  /** Tiles drawn as another code, their numbers kept (Boo Camp's partitions as its walls, Museum Melee's Exit as a purple pad). */
+  looksAs?: Record<string, TerrainCode>
+  /** The ground an icon stands on, by tile (Ghostly Gold's rubble on grass, Revelation 13's obstacles on stone or wood). */
+  standOn?: Record<string, TerrainCode>
   /** Its houses' roofs grey, as its art paints them (Paralogue 20's: the user). */
   greyRoofs?: true
   /** Its muck drawn as a bog, no icon (Boo Camp's: the user). */
@@ -1234,7 +1238,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14b-27': {
     code: 'A027',
     fills: { t1: '#674437', wa: '#7f8680' },
-    decor: { '12,21': 'stairs', '12,22': 'stairs', '12,6': 'stairs', '13,21': 'stairs', '13,22': 'stairs', '13,6': 'stairs', '14,21': 'stairs', '14,22': 'stairs', '14,6': 'stairs', '17,19': 'stairs', '18,19': 'stairs', '19,19': 'stairs', '20,14': 'stairs', '20,15': 'stairs', '20,6': 'stairs', '20,7': 'stairs', '6,14': 'stairs', '6,15': 'stairs', '6,6': 'stairs', '6,7': 'stairs', '7,19': 'stairs', '8,19': 'stairs', '9,19': 'stairs' },
+    decor: { '11,1': 'stairs', '11,2': 'stairs', '11,3': 'stairs', '11,4': 'stairs', '11,5': 'stairs', '12,21': 'stairs', '12,22': 'stairs', '12,6': 'stairs', '13,21': 'stairs', '13,22': 'stairs', '13,6': 'stairs', '14,21': 'stairs', '14,22': 'stairs', '14,6': 'stairs', '15,1': 'stairs', '15,2': 'stairs', '15,3': 'stairs', '15,4': 'stairs', '15,5': 'stairs', '17,19': 'stairs', '18,19': 'stairs', '19,19': 'stairs', '20,14': 'stairs', '20,15': 'stairs', '20,6': 'stairs', '20,7': 'stairs', '6,14': 'stairs', '6,15': 'stairs', '6,6': 'stairs', '6,7': 'stairs', '7,19': 'stairs', '8,19': 'stairs', '9,19': 'stairs' },
     width: 25,
     height: 30,
     grid: [
@@ -2153,6 +2157,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14c-23': {
     code: 'B023',
     fills: { ga: '#a6a077', t1: '#473b35', ta: '#717438', wa: '#949488', wb: '#44402e' },
+    decor: { '14,21': 'brazier', '22,19': 'brazier', '29,21': 'brazier' },
     links: [[[8, 23], [10, 23]], [[14, 16], [16, 18]], [[17, 15], [19, 17]], [[23, 17], [25, 15]], [[26, 18], [28, 16]]],
     width: 29,
     height: 23,
@@ -2323,7 +2328,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14c-26': {
     code: 'B026',
     fills: { t1: '#0a0202', wa: '#291a08' },
-    decor: { '20,14': 'stairs', '20,15': 'stairs', '20,16': 'stairs', '21,14': 'stairs', '21,15': 'stairs', '21,16': 'stairs', '6,14': 'stairs', '6,15': 'stairs', '6,16': 'stairs', '7,14': 'stairs', '7,15': 'stairs', '7,16': 'stairs' },
+    decor: { '10,24': 'candle', '10,28': 'candle', '11,12': 'candle', '11,16': 'candle', '11,18': 'candle', '11,20': 'candle', '11,23': 'candle', '11,29': 'candle', '12,4': 'candle', '12,9': 'candle', '15,4': 'candle', '15,9': 'candle', '16,12': 'candle', '16,16': 'candle', '16,18': 'candle', '16,20': 'candle', '16,23': 'candle', '16,29': 'candle', '17,24': 'candle', '17,28': 'candle', '18,4': 'candle', '18,7': 'candle', '2,10': 'candle', '2,12': 'candle', '2,15': 'candle', '20,14': 'stairs', '20,15': 'stairs', '20,16': 'stairs', '21,14': 'stairs', '21,15': 'stairs', '21,16': 'stairs', '23,15': 'candle', '25,10': 'candle', '25,12': 'candle', '25,15': 'candle', '4,15': 'candle', '6,14': 'stairs', '6,15': 'stairs', '6,16': 'stairs', '7,14': 'stairs', '7,15': 'stairs', '7,16': 'stairs', '9,4': 'candle', '9,7': 'candle' },
     width: 26,
     height: 30,
     grid: [
@@ -2812,6 +2817,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     code: 'C013',
     fills: { gi: '#6b5238', t1: '#6f6559', wa: '#8e6f4f' },
     decor: { '10,15': 'stairs', '11,15': 'stairs', '12,15': 'stairs' },
+    standOn: { '11,10': 'gi', '15,3': 't1', '18,4': 't1', '19,11': 't1', '19,15': 't1', '2,3': 't1', '4,10': 't1', '4,17': 't1', '4,6': 't1', '9,5': 't1' },
     bridgeFloors: ['14,9', '15,22', '15,9', '16,22', '18,13', '18,14', '2,15', '2,16', '5,21', '6,21'],
     wholeBridges: [[2, 2, 15, 16], [5, 6, 21, 21], [15, 16, 22, 22], [14, 15, 9, 9], [18, 18, 13, 14]],
     width: 20,
@@ -4752,6 +4758,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14-dlc-67': {
     code: 'E000',
     fills: { ta: '#4e524d', wa: '#313330', wm: '#25243a' },
+    looksAs: { '1,8': 'wa', '1,9': 'wa', '10,11': 'wa', '10,12': 'wa', '15,13': 'wa', '15,14': 'wa', '16,13': 'wa', '16,14': 'wa', '17,14': 'wa', '17,15': 'wa', '17,20': 'wa', '17,21': 'wa', '18,14': 'wa', '18,15': 'wa', '18,21': 'wa', '19,14': 'wa', '19,15': 'wa', '25,17': 'wa', '26,17': 'wa', '7,11': 'wa', '8,11': 'wa', '8,12': 'wa', '8,21': 'wa', '9,11': 'wa', '9,12': 'wa', '9,20': 'wa', '9,21': 'wa' },
     muckAsBog: true,
     width: 26,
     height: 26,
@@ -4878,8 +4885,9 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-6a': {
     code: 'E000',
-    fills: { t1: '#4b4542', ta: '#4f5842', wa: '#383931', wg: '#6a604e' },
+    fills: { t1: '#4b4542', ta: '#4f5842', wa: '#383931', wg: '#57535c' },
     wallLooks: { '16,10': 'stone', '17,10': 'stone' },
+    standOn: { '19,8': 'ta', '22,11': 'ta', '22,12': 'ta' },
     width: 28,
     height: 23,
     grid: [
@@ -4928,8 +4936,10 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-6b': {
     code: 'E000',
-    fills: { t1: '#938e7b', ta: '#8a4550', wa: '#6a6b5e' },
+    fills: { ge: '#733f90', t1: '#938e7b', ta: '#8a4550', wa: '#6a6b5e' },
     decor: { '10,9': 'crates', '12,13': 'pillar', '14,9': 'crates', '15,10': 'crates', '15,11': 'crates', '15,15': 'crates', '15,16': 'crates', '15,5': 'crates', '16,5': 'crates', '8,5': 'crates', '9,10': 'crates', '9,11': 'crates', '9,15': 'crates', '9,16': 'crates', '9,5': 'crates' },
+    wallLooks: { '1,1': 'void', '1,18': 'void', '1,19': 'void', '1,2': 'void', '1,26': 'void', '1,27': 'void', '1,28': 'void', '1,29': 'void', '1,3': 'void', '1,4': 'void', '1,5': 'void', '1,6': 'void', '1,7': 'void', '16,28': 'void', '16,29': 'void', '17,26': 'void', '17,27': 'void', '17,28': 'void', '17,29': 'void', '18,20': 'void', '18,21': 'void', '18,24': 'void', '18,25': 'void', '18,26': 'void', '18,27': 'void', '18,28': 'void', '18,29': 'void', '19,10': 'void', '19,11': 'void', '19,15': 'void', '19,16': 'void', '19,17': 'void', '19,18': 'void', '19,19': 'void', '19,20': 'void', '19,28': 'void', '19,29': 'void', '19,9': 'void', '2,1': 'void', '2,2': 'void', '2,28': 'void', '2,29': 'void', '2,3': 'void', '2,4': 'void', '2,5': 'void', '2,6': 'void', '2,7': 'void', '20,1': 'void', '20,18': 'void', '20,19': 'void', '20,4': 'void', '20,5': 'void', '20,6': 'void', '21,19': 'void', '21,5': 'void', '22,5': 'void', '23,19': 'void', '23,20': 'void', '23,28': 'void', '23,29': 'void', '23,5': 'void', '3,1': 'void', '3,2': 'void', '3,29': 'void', '3,3': 'void', '3,4': 'void', '3,5': 'void', '3,6': 'void', '3,7': 'void', '4,1': 'void', '4,17': 'void', '4,18': 'void', '4,2': 'void', '4,28': 'void', '4,29': 'void', '4,3': 'void', '4,4': 'void', '4,5': 'void', '4,6': 'void', '4,7': 'void', '4,8': 'void', '5,10': 'void', '5,11': 'void', '5,15': 'void', '5,16': 'void', '5,17': 'void', '5,18': 'void', '5,19': 'void', '5,26': 'void', '5,27': 'void', '5,28': 'void', '5,29': 'void', '5,9': 'void', '6,20': 'void', '6,23': 'void', '6,24': 'void', '6,25': 'void', '6,26': 'void', '6,27': 'void', '6,28': 'void', '6,29': 'void', '7,26': 'void', '7,27': 'void', '7,28': 'void', '7,29': 'void', '8,28': 'void', '8,29': 'void' },
+    looksAs: { '19,2': 'ge', '19,3': 'ge' },
     width: 23,
     height: 29,
     grid: [
@@ -4978,7 +4988,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tc: { name: "Stairs", def: 0, avo: 10, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tf: { name: "Spring", def: 0, avo: -10, heal: 0, move: { "Infantry A": null, "Infantry B": 5, "Infantry C": 5, "Infantry D": 4, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: "4/3", Fliers: 1 } },
-      wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      wa: { name: "Wall", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null }, tileNames: { "Exit": [[19, 3], [19, 2]] } },
       wd: { name: "Emptiness", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
       wg: { name: "Partition", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: 1 } },
     },

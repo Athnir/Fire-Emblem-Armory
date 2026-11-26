@@ -77,19 +77,21 @@ const BRIDGES_NOTE =
 
 /**
  * Revelation 21's rooms, from its chapter script (handlers 19 to 35: an enemy acting in one is promoted or demoted by the vein
- * flag). Which nine are blue is from the user's screenshots of its scouting battle; either vein swaps the colours, and the
- * effects with them.
+ * flag). Which are blue and which red as the battle starts is from the game's own photos of it (the emulator's, 2026-11-25: the
+ * user, the colours were the other way round, as the user's screenshots of its scouting battle had them); either vein swaps the
+ * colours, and the effects with them. The bottom-left room's carpet doesn't show in the photos; its area is the script's, swapped
+ * with the rest.
  */
 const GOING_FORWARD_ROOMS: ChapterMap['rooms'] = [
   {
     color: 'blue',
     effect: 'an enemy that acts in it is promoted (Archer to Sniper, Knight to General...)',
-    rects: [[6, 23, 9, 26], [1, 18, 4, 21], [11, 18, 16, 21], [22, 17, 26, 20], [6, 12, 9, 16], [18, 12, 20, 16], [8, 6, 13, 9], [21, 1, 26, 10], [1, 1, 8, 3]],
+    rects: [[1, 23, 4, 26], [11, 23, 16, 26], [6, 18, 9, 21], [18, 18, 20, 20], [1, 12, 4, 16], [11, 12, 16, 16], [22, 12, 26, 15], [9, 1, 13, 4]],
   },
   {
     color: 'red',
     effect: 'an enemy that acts in it is demoted back to its base class',
-    rects: [[1, 23, 4, 26], [11, 23, 16, 26], [6, 18, 9, 21], [18, 18, 20, 20], [1, 12, 4, 16], [11, 12, 16, 16], [22, 12, 26, 15], [9, 1, 13, 4]],
+    rects: [[6, 23, 9, 26], [1, 18, 4, 21], [11, 18, 16, 21], [22, 17, 26, 20], [6, 12, 9, 16], [18, 12, 20, 16], [8, 6, 13, 9], [21, 1, 26, 10], [1, 1, 8, 3]],
   },
 ]
 

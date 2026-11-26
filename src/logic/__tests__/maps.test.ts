@@ -534,9 +534,12 @@ describe('what the chapter scripts do to the map, checked live in the game', () 
     for (const v of byId('fe14r-11').changes.filter((c) => c.trigger === 'dragonVein')) expect(v.patch, v.id).toBeUndefined()
   })
 
-  it("colour Revelation 21's rooms, nine blue and eight red, and its veins swap them", () => {
+  it("colour Revelation 21's rooms as its photos show the battle starting, eight blue and nine red, and its veins swap them", () => {
     const rooms = byId('fe14r-21').rooms!
-    expect(rooms.map((r) => [r.color, r.rects.length])).toEqual([['blue', 9], ['red', 8]])
+    expect(rooms.map((r) => [r.color, r.rects.length])).toEqual([['blue', 8], ['red', 9]])
+    // the top left room red, the one beside it blue (the user, 2026-11-26: the colours were the other way round)
+    expect(rooms.find((r) => r.color === 'red')!.rects).toContainEqual([6, 23, 9, 26])
+    expect(rooms.find((r) => r.color === 'blue')!.rects).toContainEqual([1, 23, 4, 26])
     expect(byId('fe14r-21').changes.filter((c) => c.trigger === 'dragonVein').every((c) => c.swapsRooms)).toBe(true)
   })
 

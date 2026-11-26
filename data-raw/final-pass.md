@@ -11,14 +11,9 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Awakening | Lost Bloodlines 1, 2 and 3 (`fe13-dlc7` to `fe13-dlc9`) | The same: the villages' look | "I'm not sure if it's the zoomed in or out type village" |
 | Awakening | Rogues & Redeemers 1 and 2 (`fe13-dlc13`, `fe13-dlc14`) | The same: the villages' look | "same note as 3" |
 | Fates | Paralogue 16, Abducted (`fe14-x16`) | The whole map against the game: the render's overgrown halls are hard to read | "Map image issues" |
-| Fates | Conquest 23, Possessed (`fe14c-23`) | What the partition at (22, 19) beside the throne is; the render doesn't show | "can't tell what these tiles are" |
-| Fates | Boo Camp (`fe14-dlc-67`) | Its muck (the bog texture now) and its mist (a dark fog now) against the game | the user's note kept for the manual check: "lets use the bog texture for these (11, 5)... (7, 7)... more like dark fog" |
-| Fates | Museum Melee (`fe14-dlc-6b`) | The tiles at (22, 6) | "will have to verify these tiles in-game" |
+| Fates | Museum Melee (`fe14-dlc-6b`) | The rest of the map against the game (its Exit tiles a purple pad and its sky the void since 2026-11-26) | "will wan to look at manually for this map for the rest" |
 | Fates | Paralogue 16's challenge (`fe14-x16-challenge`) | Its stairs, with Paralogue 16 above | "Check" |
 | Fates | Paralogue 22 and its challenge (`fe14-x22`, `fe14-x22-challenge`) | Its stairs: (9, 3) to (9, 4), (19, 3) to (19, 4), (2, 24) to (3, 24), (22, 24) to (23, 24) and its openings | kept for the manual check; "Check" |
-| Fates | Birthright 27 (`fe14b-27`) | Its stairs | kept for the manual check: "Stairs" |
-| Fates | Revelation 21 (`fe14r-21`) | (8, 1) to (8, 3): the chapter script's area for its bottom-left room runs from x 1 to 8 (C021.cmb), its carpet only to x 7 | kept for the manual check: "(8, 3) to (8, 1) should not be blue" |
-| Fates | Ghostly Gold (`fe14-dlc-6a`) | (16, 10) and (17, 10), drawn as low stone walls since the tenth look | kept for the manual check: "(16, 10) and (17, 10) are stone" |
 | Three Houses | Silver Snow 26 (`fe16-26-ss`; Verdant Wind 26 the same stage) | The whole map against the game: its neon lights make the photos too odd to grade by | "will have to manually load the map" |
 | Three Houses | Crimson Flower 37 (`fe16-37-cf`) | Which of its houses stand and which are in ruins (all in ruins now) | "Can load manually if needed" |
 | Gaiden | Its forts, every map (the fort tile, $DA: 103 tiles on 40 maps) | Draw them as the supply tile (`nd`: a fort's numbers, a grain sack before a crate), as Echoes' supplies, which remake them, are drawn since its review of 2026-11-25; Gaiden is frozen, so it waits for this pass | "lets make a supply tile variant for the fort that we can use for 2 and 15, will replace them in 2 in the final run but they are not really fort tiles" |

@@ -42,7 +42,8 @@ function WoodBridge({ map, t: [x, y], fill, railed }: { map: ChapterMap; t: Tile
   const Y = (map.height - y) * CELL
   const open = (dx: number, dy: number) => {
     const c = x + dx >= 1 && y + dy >= 1 && x + dx <= map.width && y + dy <= map.height ? terrainAt(map, [x + dx, y + dy]) : undefined
-    return !!c && (WATER_CODES.has(c) || c[0] === 'w')
+    // Over a bog too where its muck is drawn as one (Fates' Boo Camp: the user, its bridge over the hot spring railed as the game has it).
+    return !!c && (WATER_CODES.has(c) || c[0] === 'w' || (c === 'db' && !!map.muckAsBog))
   }
   const [n, s, w, e] = [open(0, 1), open(0, -1), open(-1, 0), open(1, 0)]
   // The span runs the way its bridge tiles run (its end tile, water only at its sides, turned the wrong way: Radiant Dawn's Part 4

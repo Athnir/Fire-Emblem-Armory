@@ -396,7 +396,14 @@ new game, so the same fixes don't have to be caught again. When the user settles
   crossings wooden bridges read off their boxes (`FLOOR_BRIDGES`: `bridgeFloors` and `wholeBridges`, the floor's numbers kept: the user), Ghostly Gold's partitions low stone
   walls (`STONE_FENCES`), Birthright 22's walkway along its top wall cobbles, Birthright 9's floor a step lighter than its walls; a
   challenge's spent village with no house over it drawn as the ground round it, its numbers kept (`bareTiles`: Revelation 14's), and a
-  warp's sigil drawn where the chapter's walls are spent (Revelation 18's middle sigil). The chapters written by hand take the builder's looks too
+  warp's sigil drawn where the chapter's walls are spent (Revelation 18's middle sigil). Their notes of 2026-11-26 (Fates frozen
+  again after, the user's OK): Boo Camp's partitions (低壁) drawn as its walls and its bridge railed over the hot spring's muck
+  (`looksAs`, `DRAWN_AS`); Ghostly Gold's partitions its photos' grey stone and its rubble on its grass (`standOn`, `STAND_ON`);
+  Museum Melee's Exit (出口) a purple pad on the floor, named Exit, and its sky (空) the void (`SKY_VOID`); Birthright 27's two
+  flights either side of its carpet stairs (`STEPS`); Conquest 23's three partitions braziers, Radiant Dawn's lit torch
+  (`TILE_DECOR`), Conquest 26's torches (篝火) candlesticks (`NAMED_DECOR`); Revelation 13's obstacles on the stone or the dock's wood
+  under each in its photos; Revelation 21's rooms red and blue as its photos show the battle starting (the other way round from the
+  user's scouting screenshots). The chapters written by hand take the builder's looks too
   (`index.ts`'s `withGameLooks`); a hall's few plain tiles its floor (`PLAIN_AS_FLOOR`: Revelation 25's); a pot on its round stone base; Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
   same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, Birthright 25's walls
   standing alone in its halls its pillars (`decor`: the user's calls); where its buildings join into blocks the house rule can't part
