@@ -46,8 +46,8 @@ export function firstChapter(
   story: StoryOrder,
   difficulty: Difficulty = 'Normal',
 ): number {
-  const order = new Map(story.maps.map((m, i) => [m.id, i]))
-  return Math.min(Infinity, ...[...chaptersFor(w, sources, story, difficulty)].map((id) => order.get(id) ?? Infinity))
+  // A side map counts from the chapter that opens it (turnsUpAt), so "Proceed" counts the trial maps' weapons too.
+  return Math.min(Infinity, ...[...chaptersFor(w, sources, story, difficulty)].map((id) => turnsUpAt(story, id)))
 }
 
 /**

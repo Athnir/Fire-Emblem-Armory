@@ -62,7 +62,15 @@ export interface MapSet {
     third?: { label: string; maps: (route: string) => ChapterMap[] }
     /** And a fourth (Engage: the Tempest Trials are its third, the skirmishes its fourth). */
     fourth?: { label: string; maps: (route: string) => ChapterMap[] }
+    /** Under the spoiler block, the routes the bar's path can be on (Three Houses: the house's first route until the Black Eagles part at
+     * Chapter 12, the Prologue's before a house is picked). Without it, every route with a chapter reached. */
+    walked?: (path: string | undefined) => string[]
+    /** Under the spoiler block, what a route's button says (Three Houses: the house until Chapter 12, then the route). */
+    label?: (route: string, reach: { route?: string; has: (id: string) => boolean }) => string
   }
+  /** A DLC side story the game keeps apart (Engage's Fell Xenologue, Three Houses' Cindered Shadows): its route is off until its
+   * switch is ticked, the weapon page's switch and this one the same (`src/logic/sideStories.ts`; the user's call, 2026-11-26). */
+  sideStory?: { game: string; route: string; label: string }
   /** A game without routes can still list side maps in a second dropdown (Path of Radiance's trial maps).
    * They're left out of the chapter dropdown. */
   extras?: { label: string; maps: ChapterMap[] }

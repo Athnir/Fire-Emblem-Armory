@@ -5,6 +5,7 @@ import { FE4_ITEM_SOURCES } from '../data/fe4/fe4ItemSources'
 import { FE4_LISTED } from '../data/fe4/fe4Listed'
 import { FE4_STORY } from '../data/fe4/fe4MapSet'
 import type { GameParts } from '.'
+import { turnsUpAt } from '../logic/spoiler'
 
 /** Genealogy of the Holy War's screens and data: loaded on their own the first time the game is picked. */
 const parts: GameParts = {
@@ -39,7 +40,7 @@ const parts: GameParts = {
     const index = new Map(FE4_STORY.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE4_LISTED.filter((w) => {
-      const first = Math.min(Infinity, ...(FE4_ITEM_SOURCES[w.name] ?? []).map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...(FE4_ITEM_SOURCES[w.name] ?? []).map((s) => turnsUpAt(FE4_STORY, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

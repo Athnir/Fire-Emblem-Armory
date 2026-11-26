@@ -17,6 +17,8 @@ const ROUTE_NAMES: Record<string, string> = {
   be: 'Black Eagles', bl: 'Blue Lions', gd: 'Golden Deer', cf: 'Crimson Flower', ss: 'Silver Snow', am: 'Azure Moon',
   vw: 'Verdant Wind', cs: 'Cindered Shadows',
 }
+/** A Cindered Shadows map (its id's suffix). */
+const CINDERED = (mapId: string) => mapId.endsWith('-cs')
 const routeName = (m: ChapterMap) =>
   m.route === 'Paralogue'
     ? 'Paralogues'
@@ -36,6 +38,8 @@ const WEAPONS: ChapterWeaponsConfig = {
   rankLabel: (w) => (w.rank ? `${w.category === 'Gauntlets' ? 'Brawling' : `${w.category}s`} ${w.rank}` : ''),
   shopName: 'armory',
   routeName,
+  // Cindered Shadows, the DLC's side story: off until ticked (the user's call, 2026-11-26), the map page's switch the same.
+  optional: [{ label: 'Show Cindered Shadows', covers: (s) => CINDERED(s.mapId), sideStory: 'fe16' }],
 }
 
 /** Fire Emblem: Three Houses' screens and data: loaded on their own the first time the game is picked. */
@@ -51,7 +55,8 @@ const parts: GameParts = {
     const story = walkFork(FE16_FORK, route).story
     const at = story.maps.findIndex((m) => m.id === mapId)
     return FE16_LISTED.filter((w) => {
-      const sources = (FE16_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
+      // What the list shows by default: no Cindered Shadows.
+      const sources = (FE16_ITEM_SOURCES[w.name] ?? []).filter((s) => !CINDERED(s.mapId) && onDifficulty(difficulty, s.difficulties))
       const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length

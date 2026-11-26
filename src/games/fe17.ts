@@ -19,6 +19,13 @@ const engageWeapon = (w: ChapterWeapon) => {
   return !!(x.engage || x.emblem)
 }
 const engageSource = (s: ItemSource) => s.kind.startsWith('engage')
+/** Fell Xenologue's maps, its skirmishes too: every list of its route on the map page. */
+const XENOLOGUE_MAPS = new Set(
+  (['maps', 'side'] as const)
+    .flatMap((k) => FE17_MAP_SET.routes![k]('Fell Xenologue'))
+    .concat(FE17_MAP_SET.routes!.third?.maps('Fell Xenologue') ?? [], FE17_MAP_SET.routes!.fourth?.maps('Fell Xenologue') ?? [])
+    .map((m) => m.id),
+)
 const signed = (v: number) => (v < 0 ? `${v}` : `+${v}`)
 
 const WEAPONS: ChapterWeaponsConfig = {
@@ -35,7 +42,11 @@ const WEAPONS: ChapterWeaponsConfig = {
   shopName: 'the Somniel',
   routeName: (m) => (m.route === 'Fell Xenologue' ? 'Fell Xenologue' : m.route === 'Paralogue' ? 'Paralogues' : undefined),
   // The emblems' own weapons (every emblem's, and the copies the foes' emblems carry) are many: off until ticked.
-  optional: [{ label: 'Show emblem weapons', covers: engageSource, weapons: engageWeapon }],
+  optional: [
+    { label: 'Show emblem weapons', covers: engageSource, weapons: engageWeapon },
+    // Fell Xenologue, the DLC's side story: off until ticked (the user's call, 2026-11-26), the map page's switch the same.
+    { label: 'Show Fell Xenologue', covers: (s) => XENOLOGUE_MAPS.has(s.mapId), sideStory: 'fe17' },
+  ],
   /** Engravings (src/data/fe17/fe17Engrave.ts): any weapon but a staff or a blast takes one at the smithy, from an emblem of yours. */
   modifiers: {
     label: 'Engraving',
@@ -81,7 +92,9 @@ const parts: GameParts = {
     const at = FE17_STORY.maps.findIndex((m) => m.id === mapId)
     return FE17_LISTED.filter((w) => {
       if (engageWeapon(w)) return false
-      const sources = (FE17_ITEM_SOURCES[w.name] ?? []).filter((s) => !engageSource(s) && onDifficulty(difficulty, s.difficulties))
+      const sources = (FE17_ITEM_SOURCES[w.name] ?? []).filter(
+        (s) => !engageSource(s) && !XENOLOGUE_MAPS.has(s.mapId) && onDifficulty(difficulty, s.difficulties),
+      )
       const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(FE17_STORY, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length

@@ -163,7 +163,24 @@ export const FE16_MAP_SET: MapSet = {
     of: routeOf,
     sideLabel: 'Paralogues',
     third: { label: 'Auxiliary battles', maps: (route) => (route === CINDERED ? [] : AUXILIARY) },
+    // Under the block: the Prologue's alone before a house is picked, then the house's first route (the Black Eagles' two share their
+    // chapters to 11), then the route the Black Eagles part into at 12.
+    walked: (path) => {
+      if (!path) return [ROUTE_LIST[0]]
+      const [house, key] = path.split('/')
+      const own = ROUTES.filter((r) => r.house === house)
+      return [(own.find((r) => r.key === key) ?? own[0] ?? ROUTES[0]).route]
+    },
+    // The house until its route's own chapters are reached (Chapter 12), then the route (the user's call, 2026-11-26).
+    label: (route, reach) => {
+      if (route === CINDERED) return route
+      if (!reach.route) return 'Prologue'
+      const r = ROUTES.find((x) => x.route === route)
+      if (!r || routeMaps(route).some((m) => m.route === route && reach.has(m.id))) return route
+      return HOUSES.find((h) => h.id === r.house)!.label
+    },
   },
+  sideStory: { game: 'fe16', route: CINDERED, label: 'Show Cindered Shadows' },
   difficulties: [
     { value: 'Normal', label: 'Normal' },
     { value: 'Hard', label: 'Hard' },

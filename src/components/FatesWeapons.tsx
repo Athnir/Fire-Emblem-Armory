@@ -98,7 +98,30 @@ export function FatesWeapons() {
     return rows
   }, [chapter, showRewards, difficulty])
 
+  // Under the block a category with nothing turned up yet isn't offered, as the other games hide theirs, the cross-route exceptions
+  // too; a category picked earlier that has gone falls back to all of them.
+  const shownOptions = useMemo(() => {
+    if (!open) return categoryOptions
+    const listed = ALL_WEAPONS.filter(
+      (w) =>
+        open.has(w.id) &&
+        !(hideFoeOnly && w.foeOnly) &&
+        (showRewards || !isRewardItem(w)) &&
+        (showDlc || !isDlcItem(w)) &&
+        !offDifficulty(w, difficulty),
+    )
+    return categoryOptions.filter((c) =>
+      c === 'all'
+        ? true
+        : c === 'Cross'
+          ? (route === 'Birthright' || route === 'Conquest') && listed.some((w) => isCrossException(w, route))
+          : listed.some((w) => w.category === c && !(route !== 'any' && isCrossException(w, route))),
+    )
+  }, [open, categoryOptions, hideFoeOnly, showRewards, showDlc, difficulty, route])
+  const cat: CategoryFilter = shownOptions.includes(category) ? category : 'all'
+
   const filtered = useMemo(() => {
+    const category = cat
     return ALL_WEAPONS.filter((w) => {
       if (open && !open.has(w.id)) return false
       if (hideFoeOnly && w.foeOnly) return false
@@ -127,7 +150,7 @@ export function FatesWeapons() {
       if (search && !w.name.toLowerCase().includes(search.toLowerCase())) return false
       return true
     })
-  }, [category, route, search, open, stock, hideFoeOnly, showRewards, showDlc, difficulty])
+  }, [cat, route, search, open, stock, hideFoeOnly, showRewards, showDlc, difficulty])
 
   const selected = (open ? ALL_WEAPONS.find((w) => w.id === selectedId && open.has(w.id)) ?? ALL_WEAPONS.find((w) => open.has(w.id)) : ALL_WEAPONS.find((w) => w.id === selectedId)) ?? null
   const detailRef = useRef<HTMLDivElement>(null)
@@ -157,11 +180,11 @@ export function FatesWeapons() {
 <>
       <div className="flex flex-wrap gap-3">
         <select
-          value={category}
+          value={cat}
           onChange={(e) => setCategory(e.target.value as CategoryFilter)}
           className="rounded border border-neutral-700 bg-neutral-900 px-2 py-1"
         >
-          {categoryOptions.map((c) => (
+          {shownOptions.map((c) => (
             <option key={c} value={c}>
               {c === 'all' ? 'All categories' : c === 'Cross' ? 'Cross-route exceptions' : c}
             </option>

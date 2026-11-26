@@ -8,6 +8,7 @@ import { FE3_LISTED } from '../data/fe3/fe3Listed'
 import { FE3_MAP_SET, FE3_STORY } from '../data/fe3/fe3MapSet'
 import type { ChapterMap } from '../data/maps/types'
 import type { GameParts } from '.'
+import { turnsUpAt } from '../logic/spoiler'
 
 /** The book a chapter is in: Book 2 starts the army afresh, so its sources are listed apart. */
 const routeName = (m: ChapterMap) => (m.id.startsWith('fe3-1-') ? 'Book 1' : 'Book 2')
@@ -37,7 +38,7 @@ const parts: GameParts = {
     const index = new Map(FE3_STORY.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE3_LISTED.filter((w) => {
-      const first = Math.min(Infinity, ...(FE3_ITEM_SOURCES[w.name] ?? []).map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...(FE3_ITEM_SOURCES[w.name] ?? []).map((s) => turnsUpAt(FE3_STORY, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

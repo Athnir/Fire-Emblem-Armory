@@ -9,6 +9,7 @@ import { FE11_MAP_SET, FE11_STORY } from '../data/fe11/fe11MapSet'
 import { FE11_TRIANGLE } from '../data/fe11/fe11Triangle'
 import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
+import { turnsUpAt } from '../logic/spoiler'
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE11_LISTED,
@@ -54,7 +55,7 @@ const parts: GameParts = {
     const at = index.get(mapId)
     return FE11_LISTED.filter((w) => {
       const sources = (FE11_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
-      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(FE11_STORY, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

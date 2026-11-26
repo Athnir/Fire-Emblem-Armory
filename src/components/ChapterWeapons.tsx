@@ -11,6 +11,7 @@ import { turnsUpAt } from '../logic/spoiler'
 import { useReach } from './Reach'
 import { onDifficulty, useDifficulty } from './Difficulty'
 import { rangeText } from '../logic/rangeText'
+import { setSideStoryShown, useSideStories } from '../logic/sideStories'
 
 /** A weapon of a game whose items turn up chapter by chapter (FE4, FE6): read from the game's own item table. */
 export interface ChapterWeapon {
@@ -82,7 +83,8 @@ export interface ChapterWeaponsConfig {
    * A weapon with no other source is listed only once its switch is on; one `weapons` names (Engage's engage weapons, the foes' too)
    * isn't listed at all until then.
    */
-  optional?: { label: string; covers?: (s: ItemSource) => boolean; weapons?: (w: ChapterWeapon) => boolean }[]
+  /** Sources and weapons off until a switch is ticked. A side story's (`sideStory`: its game) shares its switch with the map page. */
+  optional?: { label: string; covers?: (s: ItemSource) => boolean; weapons?: (w: ChapterWeapon) => boolean; sideStory?: string }[]
   /**
    * Something the player adds to a weapon that changes its numbers (Engage's engravings): a picker on the datasheet, its pick added to
    * the stats shown and handed to `extra` (a refine table adds it too). `options` are what this weapon can take by this chapter.
@@ -191,8 +193,10 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
   const sourceAt = (s: ItemSource) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))
   const optional = config.optional ?? []
   const [shownOptional, setShownOptional] = useState<string[]>([])
-  const hidden = (s: ItemSource) => optional.some((o) => o.covers?.(s) && !shownOptional.includes(o.label))
-  const hiddenWeapon = (w: ChapterWeapon) => optional.some((o) => o.weapons?.(w) && !shownOptional.includes(o.label))
+  const sides = useSideStories()
+  const isShown = (o: (typeof optional)[number]) => (o.sideStory ? !!sides[o.sideStory] : shownOptional.includes(o.label))
+  const hidden = (s: ItemSource) => optional.some((o) => o.covers?.(s) && !isShown(o))
+  const hiddenWeapon = (w: ChapterWeapon) => optional.some((o) => o.weapons?.(w) && !isShown(o))
   // The modifier picked on the datasheet (an engraving), kept while you look from weapon to weapon.
   const [modifierId, setModifierId] = useState('')
   // Only the difficulty picked in the bar: a weapon none of whose sources hold on it isn't listed, like one behind a switch.
@@ -221,7 +225,7 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
     const shown = listed.filter((w) => firstAt(w) <= reach.at)
     return { weapons: shown, fresh: new Set(shown.filter((w) => reach.at > 0 && firstAt(w) === reach.at).map((w) => w.id)) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [all, reach, shownOptional, difficulty])
+  }, [all, reach, shownOptional, sides, difficulty])
   const hasFoeOnly = weapons.some((w) => w.foeOnly)
   const hasCrit = all.some((w) => w.crit !== undefined)
   const hasWt = all.some((w) => w.wt !== undefined)
@@ -305,8 +309,12 @@ export function ChapterWeapons({ config }: { config: ChapterWeaponsConfig }) {
           <label key={o.label} className="flex items-center gap-1 text-sm text-neutral-300">
             <input
               type="checkbox"
-              checked={shownOptional.includes(o.label)}
-              onChange={(e) => setShownOptional(e.target.checked ? [...shownOptional, o.label] : shownOptional.filter((x) => x !== o.label))}
+              checked={isShown(o)}
+              onChange={(e) =>
+                o.sideStory
+                  ? setSideStoryShown(o.sideStory, e.target.checked)
+                  : setShownOptional(e.target.checked ? [...shownOptional, o.label] : shownOptional.filter((x) => x !== o.label))
+              }
             />
             {o.label}
           </label>

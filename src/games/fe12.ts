@@ -8,7 +8,7 @@ import { FE12_ITEM_SOURCES } from '../data/fe12/fe12ItemSources'
 import { FE12_LISTED } from '../data/fe12/fe12Listed'
 import { FE12_FORK, FE12_MAP_SET, FE12_STORY } from '../data/fe12/fe12MapSet'
 import { FE12_TRIANGLE } from '../data/fe12/fe12Triangle'
-import { walkFork } from '../logic/spoiler'
+import { turnsUpAt, walkFork } from '../logic/spoiler'
 import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
@@ -70,7 +70,7 @@ const parts: GameParts = {
     const at = index.get(mapId)
     return FE12_LISTED.filter((w) => {
       const sources = (FE12_ITEM_SOURCES[w.name] ?? []).filter((s) => !dlc(s) && onDifficulty(difficulty, s.difficulties))
-      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

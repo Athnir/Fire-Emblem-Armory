@@ -1127,6 +1127,20 @@ A global switch (header, any game) that lets someone play along without being to
 - **A map shows only how it starts:** no reinforcement groups and no joiners, friend or foe, and none of the notes or
   weapon sources that give them away (a foe that arrives later, "arrives with Group 3"). Units placed on the map,
   forced deployments and objects stay.
+- **A map under the block is the map and nothing the game doesn't show at the start** (the user's calls, 2026-11-26, `atStart`): no
+  foe's behavior (who it goes for, where it heads, a looter's badge and targets, "X can raze it", the tapped unit's path), no reward a
+  chapter's end, a win or a boss's fall gives ("Clearing it adds Roy", Three Houses' battalions, the GBA games' end gifts), no loss
+  condition naming someone still to come (Radiant Dawn's "after arriving"), no map change an arrival makes, no pot's effect (its kind
+  only) and no boulder's path. Taps still preview a door, a vein or a wall; chests', villages' and talks' notes stay. A note keeps
+  who a unit is and what it holds, clause by clause, so a talk riding on an arrival's sentence stays.
+- **A DLC side story is off until its switch is ticked** (the user's call, 2026-11-26): Engage's Fell Xenologue and Three Houses'
+  Cindered Shadows, one switch per game for the weapon page, the map page and the battalions (`src/logic/sideStories.ts`). Shown,
+  each opens as the game opens it, all at once: Fell Xenologue with the Somniel's Ancient Well once Chapter 6 is cleared, Cindered
+  Shadows from the main menu's Side Story at any time (its own save). Nothing it gives counts toward the bar's new weapons.
+- **Under the block the map page's route buttons follow the bar** (the user's calls, 2026-11-26): only the route the bar is on,
+  moving with each Proceed; Three Houses' the Prologue alone before a house is picked, then the house (named by the house until
+  Chapter 12, then by its route; the Black Eagles' choice only at the split). "Proceed" counts what a side map brings too (a side map
+  counts from the chapter that opens it), and Fates' weapon page offers no category with nothing in it yet.
 - **Side maps** (trial maps and the like) open once the story is cleared: with its last chapter. Echoes' Act 6 opens with the Final
   Battle, the amiibo dungeons with Act 3, every other map outside its story with the first story battle after it. Its Acts 3 and 4
   run both armies at once; the list puts Alm's battles first where the game allows it: in Act 4, Alm reaching the Dragon's Maw before

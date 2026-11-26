@@ -206,8 +206,25 @@ describe('a map under the block', () => {
       expect(start.reinforcements, m.id).toBeUndefined()
       expect(start.joiners, m.id).toBeUndefined()
       expect(start.notes.some((n) => /arrives with Group/.test(n)), m.id).toBe(false)
-      expect(start.units, m.id).toBe(m.units)
+      // The same units on the same tiles: only what they'll do goes (below).
+      expect(start.units.map((u) => [u.name, u.type, u.tile.join()]), m.id).toEqual(m.units.map((u) => [u.name, u.type, u.tile.join()]))
       expect(start.starts, m.id).toBe(m.starts)
+    }
+  })
+
+  // The user's calls on the look-over, 2026-11-26: under the block a map is the map and nothing the game doesn't show at the start.
+  it("says nothing of a foe's behavior, a chapter's rewards, a pot's effect or a boulder's path", () => {
+    const bandit = maps.find((m) => m.id === 'fe9-1')!.units.find((u) => u.looter)!
+    expect(bandit.note).toMatch(/Goes for the villages/)
+    const start = atStart(maps.find((m) => m.id === 'fe9-1')!).units.find((u) => u.name === bandit.name && u.tile.join() === bandit.tile.join())!
+    // Who it is and what it holds stay; where it goes, its looter's badge and its tapped path don't.
+    expect(start.note).toBe('Lv 1 (Easy 3, Hard 3) Bandit: Iron Axe.')
+    expect(start.looter).toBeUndefined()
+    expect(start.goesTo).toBeUndefined()
+    // Radiant Dawn's loss condition names nobody still to come; its boulders keep their paths to themselves.
+    for (const m of FE10_MAP_SET.maps.map(atStart)) {
+      expect(m.defeat ?? '', m.id).not.toMatch(/after arriving/)
+      expect(m.changes.filter((c) => c.trigger === 'boulder').every((c) => c.noPreview), m.id).toBe(true)
     }
   })
 })

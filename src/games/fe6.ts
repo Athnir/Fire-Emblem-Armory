@@ -7,7 +7,7 @@ import { FE6_LISTED } from '../data/fe6/fe6Listed'
 import { FE6_SUPPORTS } from '../data/fe6/fe6Supports'
 import { FE6_FORK, FE6_MAP_SET } from '../data/fe6/fe6MapSet'
 import { FE6_TRIANGLE } from '../data/fe6/fe6Triangle'
-import { walkFork } from '../logic/spoiler'
+import { turnsUpAt, walkFork } from '../logic/spoiler'
 import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
@@ -38,7 +38,7 @@ const parts: GameParts = {
     const at = index.get(mapId)
     return FE6_LISTED.filter((w) => {
       const sources = (FE6_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
-      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

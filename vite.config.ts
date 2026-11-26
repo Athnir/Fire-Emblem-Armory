@@ -37,7 +37,7 @@ export default defineConfig(() => ({
       registerType: 'prompt',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
-        // The app is one bundle with every game's data in it, past the 2 MiB default; a file over the limit fails the build.
+        // Each game is its own file (src/games/<id>.ts), but a big game's passes the 2 MiB default; a file over the limit fails the build.
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
       manifest: {

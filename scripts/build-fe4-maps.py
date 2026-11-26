@@ -1304,7 +1304,7 @@ def build_units(heights, classes, tables, grids):
                 cur = r_
             if runs:
                 text = '; '.join(f"turns {stance[r_]} {', or '.join(cs)}" for r_, cs in runs)
-                u['note'] = ' '.join(x for x in (u.get('note'), text[0].upper() + text[1:] + '.') if x)
+                u['note'] = ' '.join(x for x in (u.get('note') and u['note'].rstrip('.') + '.', text[0].upper() + text[1:] + '.') if x)
             u['_hostile'] = cur == 1 or any(r_ == 1 for r_, _ in runs)
 
         # What foes carry and drop, from the units of every army hostile to yours when it comes or once it turns: one standing on the
@@ -1338,7 +1338,7 @@ def build_units(heights, classes, tables, grids):
         for j in arrivals_:
             if j.pop('_hostile'):
                 if j.get('_drops'):
-                    j['note'] = ' '.join(x for x in (j.get('note'), f"Drops {' and '.join(article(i) for i in j['_drops'])}.") if x)
+                    j['note'] = ' '.join(x for x in (j.get('note') and j['note'].rstrip('.') + '.', f"Drops {' and '.join(article(i) for i in j['_drops'])}.") if x)
                 foe_lines(j, ', arriving mid-chapter', '-later')
         # Who leaves the map during the chapter (event commands 0x65 and 0x66, not the unit's own defeat, a scene's cast or the end),
         # and who withdraws after a battle (trigger 0x1A, "A fights B": kind 0x18, raised as a battle starts at $84:B981, runs 0x74).

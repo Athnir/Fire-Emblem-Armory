@@ -10,6 +10,7 @@ import { turnsUpAt } from '../logic/spoiler'
 import { onDifficulty, useDifficulty } from './Difficulty'
 import { GambitArea, GambitAreaLegend } from './GambitArea'
 import { useReach } from './Reach'
+import { useSideStories } from '../logic/sideStories'
 
 const KIND_ICON: Record<Fe16Battalion['kind'], Sprite> = { Infantry: SWORD_ICON, Armored: ARMOR_HELM, Cavalry: HORSE_HEAD, Flying: WING }
 const STATS: Fe16BattalionStat[] = ['Phys', 'Mag', 'Hit', 'Crit', 'Avo', 'Prot', 'Res', 'Cha']
@@ -33,9 +34,15 @@ export function Fe16Battalions({ routeName }: { routeName: (m: ChapterMap) => st
   const story = reach.story ?? FE16_STORY
   const open = reach.on && reach.route ? OPEN_ROUTES[reach.route] : undefined
   const sourceAt = (s: Fe16BattalionSource) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))
+  // Cindered Shadows' battalions only with its switch ticked (the weapon page's and the map page's switch).
+  const sides = useSideStories()
+  const cindered = !!sides.fe16
   const sourcesOf = (b: Fe16Battalion) =>
     (FE16_BATTALION_SOURCES[b.name] ?? []).filter(
-      (s) => onDifficulty(difficulty, s.difficulties) && (!open || !s.routes || s.routes.some((r) => open.includes(r))),
+      (s) =>
+        onDifficulty(difficulty, s.difficulties) &&
+        (cindered || !s.mapId.endsWith('-cs')) &&
+        (!open || !s.routes || s.routes.some((r) => open.includes(r))),
     )
   /** The first chapter a battalion turns up in (its story index); a guild line that stops offering it doesn't count. */
   const firstAt = (b: Fe16Battalion) => Math.min(Infinity, ...sourcesOf(b).filter((s) => s.kind !== 'guild-gone').map(sourceAt))
@@ -47,7 +54,7 @@ export function Fe16Battalions({ routeName }: { routeName: (m: ChapterMap) => st
     const shown = listed.filter((b) => firstAt(b) <= reach.at)
     return { battalions: shown, fresh: new Set(shown.filter((b) => reach.at > 0 && firstAt(b) === reach.at).map((b) => b.id)) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reach, difficulty])
+  }, [reach, difficulty, cindered])
   const [kind, setKind] = useState('all')
   const [rank, setRank] = useState('all')
   const [search, setSearch] = useState('')

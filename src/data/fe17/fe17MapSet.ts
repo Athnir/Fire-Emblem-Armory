@@ -52,6 +52,8 @@ export const FE17_MAP_SET: MapSet = {
       maps: (r) => SKIRMISHES.filter((m) => xenologueSkirmish(m) === (r === 'Fell Xenologue')),
     },
   },
+  // Off until its switch is ticked (the user's call, 2026-11-26); shown, it opens all at once with the Ancient Well after Chapter 6.
+  sideStory: { game: 'fe17', route: 'Fell Xenologue', label: 'Show Fell Xenologue' },
   difficulties: (['Normal', 'Hard', 'Maddening'] as const).map((value) => ({ value, label: value })),
   moveClasses: FE17_MOVE_CLASSES,
   moveClassExamples: FE17_MOVE_CLASS_EXAMPLES,

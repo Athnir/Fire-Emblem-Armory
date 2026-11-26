@@ -6,6 +6,7 @@ import { FE1_ITEM_SOURCES } from '../data/fe1/fe1ItemSources'
 import { FE1_LISTED } from '../data/fe1/fe1Listed'
 import { FE1_MAP_SET, FE1_STORY } from '../data/fe1/fe1MapSet'
 import type { GameParts } from '.'
+import { turnsUpAt } from '../logic/spoiler'
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE1_LISTED,
@@ -32,7 +33,7 @@ const parts: GameParts = {
     const index = new Map(FE1_STORY.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE1_LISTED.filter((w) => {
-      const first = Math.min(Infinity, ...(FE1_ITEM_SOURCES[w.name] ?? []).map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...(FE1_ITEM_SOURCES[w.name] ?? []).map((s) => turnsUpAt(FE1_STORY, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

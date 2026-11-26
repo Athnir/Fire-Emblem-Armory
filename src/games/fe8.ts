@@ -8,7 +8,7 @@ import { FE8_LISTED } from '../data/fe8/fe8Listed'
 import { FE8_FORK, FE8_MAP_SET, FE8_ROUTE_NAME, FE8_STORY } from '../data/fe8/fe8MapSet'
 import { FE8_SUPPORTS } from '../data/fe8/fe8Supports'
 import { FE8_TRIANGLE } from '../data/fe8/fe8Triangle'
-import { walkFork } from '../logic/spoiler'
+import { turnsUpAt, walkFork } from '../logic/spoiler'
 import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
 
@@ -53,7 +53,7 @@ const parts: GameParts = {
     const at = index.get(mapId)
     return FE8_LISTED.filter((w) => {
       const sources = (FE8_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
-      const first = Math.min(Infinity, ...sources.map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

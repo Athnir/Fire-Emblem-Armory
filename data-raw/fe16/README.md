@@ -709,3 +709,7 @@ clear colour), Silver Snow 20's light stone paths, a64's lawns and a62's dirt fr
   are; Fire Emblem Wiki gives only the full reward and, for at least half kept, an Advanced Seal.
 - Chapter 8 on Hard: the script places a second Armored Knight (record 60) on (12, 15) of the grid, where record 53 already stands;
   the app shows both there, as where the game puts the second isn't traced.
+
+**When Cindered Shadows opens.** It's started from the main menu's Side Story, with its own save, at any time once the DLC is in
+(Twinfinite's and HyperX's guides): no story chapter opens it, so the spoiler block opens it all at once, behind its switch (off by
+default: the user's call, 2026-11-26).

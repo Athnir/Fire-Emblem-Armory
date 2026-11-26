@@ -24,6 +24,7 @@ import {
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wholeBridgeBoxes, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
+import { setSideStoryShown, useSideStories } from '../logic/sideStories'
 
 const CELL = 10
 const GUTTER = 7 // room for the axis numbers
@@ -2419,7 +2420,17 @@ export function MapViewer({ set }: { set: MapSet }) {
   const reach = useReach()
   const newest = reach.now ? all.find((m) => m.id === reach.now) : undefined
   const [mapId, setMapId] = useState((newest ?? all[0]).id)
-  const picked = all.find((m) => m.id === mapId && reach.has(m.id)) ?? newest ?? all[0]
+  // A side story (Engage's Fell Xenologue, Three Houses' Cindered Shadows) stays off the page until its switch is ticked.
+  const sides = useSideStories()
+  const sideShown = set.sideStory ? !!sides[set.sideStory.game] : false
+  const sideRoute = set.sideStory && set.routes ? set.sideStory.route : undefined
+  const hiddenSide = (m: ChapterMap) =>
+    !!sideRoute &&
+    !sideShown &&
+    [set.routes!.maps(sideRoute), set.routes!.side(sideRoute), set.routes!.third?.maps(sideRoute) ?? [], set.routes!.fourth?.maps(sideRoute) ?? []].some(
+      (list) => list.some((x) => x.id === m.id),
+    )
+  const picked = all.find((m) => m.id === mapId && reach.has(m.id) && !hiddenSide(m)) ?? newest ?? all[0]
   // The difficulty picked in the bar; changing it keeps this map and redraws it as that difficulty lays it out. A map played on
   // fewer difficulties than the game has (The Blazing Blade's Lyn's story: Normal only) shows its own.
   const pickedDifficulty = useDifficulty()
@@ -2433,7 +2444,23 @@ export function MapViewer({ set }: { set: MapSet }) {
       ? { ...m, changes: m.changes.filter((c) => !c.difficulties || c.difficulties.includes(difficulty)) }
       : m
   }, [picked, reach.on, difficulty])
-  const [route, setRoute] = useState(set.routes ? set.routes.of(map) : '')
+  // The routes the page offers: a side story only with its switch ticked; under the block, the bar's own (a game's `walked`: Three
+  // Houses' house, then its route) or every route with a chapter reached.
+  const routeList = set.routes
+    ? set.routes.list.filter((r) => {
+        if (r === sideRoute) return sideShown && (!reach.on || set.routes!.maps(r).some((m) => reach.has(m.id)))
+        if (!reach.on) return true
+        if (set.routes!.walked) return set.routes!.walked(reach.route).includes(r)
+        return set.routes!.maps(r).some((m) => reach.has(m.id))
+      })
+    : []
+  /** The route a map goes with: its own where the page offers it, else an offered route that lists it. */
+  const routeFor = (m: ChapterMap) => {
+    const own = set.routes!.of(m)
+    return routeList.includes(own) ? own : (routeList.find((r) => set.routes!.maps(r).some((x) => x.id === m.id)) ?? routeList[0] ?? own)
+  }
+  const [routePick, setRoute] = useState(set.routes ? set.routes.of(map) : '')
+  const route = set.routes ? (routeList.includes(routePick) ? routePick : routeFor(map)) : ''
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
   const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id))
   const offMain = [...(set.extras?.maps ?? []), ...(set.third?.maps ?? [])]
@@ -2596,6 +2623,8 @@ export function MapViewer({ set }: { set: MapSet }) {
   if (newest && openedTo !== reach.at) {
     setOpenedTo(reach.at)
     choose(newest.id)
+    // The route buttons follow the bar too (Fates' route after its split, Three Houses' house and then its route).
+    if (set.routes) setRoute(routeFor(newest))
   }
 
   // Showing who arrives on a turn shows the map as it stands by then (the Phantom Ship's joiners come on the ship of turn 5).
@@ -2643,7 +2672,7 @@ export function MapViewer({ set }: { set: MapSet }) {
     <div className="flex flex-col gap-4">
       {set.routes && (
       <div className="flex flex-wrap gap-1" role="group" aria-label="Route">
-        {set.routes.list.filter((r) => !reach.on || set.routes!.maps(r).some((m) => reach.has(m.id))).map((r) => (
+        {routeList.map((r) => (
           <button
             key={r}
             onClick={() => chooseRoute(r)}
@@ -2652,9 +2681,15 @@ export function MapViewer({ set }: { set: MapSet }) {
               route === r ? 'border-violet-500 bg-violet-950/60 text-violet-100' : 'border-neutral-700 text-neutral-300 hover:bg-neutral-800'
             }`}
           >
-            {r}
+            {reach.on && set.routes!.label ? set.routes!.label(r, reach) : r}
           </button>
         ))}
+        {set.sideStory && (
+          <label className="ml-1 flex items-center gap-1 text-sm text-neutral-300">
+            <input type="checkbox" checked={sideShown} onChange={(e) => setSideStoryShown(set.sideStory!.game, e.target.checked)} />
+            {set.sideStory.label}
+          </label>
+        )}
       </div>
       )}
       <div className="flex flex-wrap items-center gap-3">
@@ -3755,7 +3790,8 @@ function Legend({
   if (events.some((c) => !shutsDoor(c, changeTile(c)))) items.push({ label: 'Changes during the chapter (tap it)', sprite: MAP_EVENT })
   if (map.changes.some((c) => c.trigger === 'eruption'))
     items.push({ label: 'Lava floor that turns to hazard, cracked magma, on its turn (tap it)', sprite: MAP_EVENT })
-  if (map.changes.some((c) => c.trigger === 'boulder')) items.push({ label: 'Boulder (tap to see its path)', sprite: BOULDER })
+  if (map.changes.some((c) => c.trigger === 'boulder'))
+    items.push({ label: map.changes.some((c) => c.trigger === 'boulder' && !c.noPreview) ? 'Boulder (tap to see its path)' : 'Boulder', sprite: BOULDER })
   const sides = shownWalls(map)
   if (sides.some((w) => !w.all && !w.step)) items.push({ label: "Blocked side: ground units can't cross (fliers can)", swatch: FENCE })
   if (sides.some((w) => w.step)) items.push({ label: "Step between levels: ground units can't cross (fliers can)", swatch: RAIL })
@@ -4129,6 +4165,7 @@ function TileInfo({
   onToggleBurn: () => void
 }) {
   const cb = useColourBlind()
+  const reach = useReach()
   if (!tile) {
     return (
       <section className="rounded border border-neutral-800 p-4 text-sm text-neutral-500">
@@ -4310,7 +4347,7 @@ function TileInfo({
             {pot.pot === 'medicine' ? 'Medicine pot' : 'Poison pot'}
             {potsBroken && ' (broken by the vein preview)'}
           </p>
-          <p className="text-neutral-200">{describePotEffect(pot.effect)}</p>
+          {!reach.on && <p className="text-neutral-200">{describePotEffect(pot.effect)}</p>}
           <p className="text-neutral-400">
             Hits every unit, yours and the enemy's, within {pot.radius} tiles when broken.
           </p>
@@ -4759,6 +4796,8 @@ function ChapterInfo({ map, label, difficulty }: { map: ChapterMap; label: strin
 }
 
 function PotList({ map, selected, broken, onSelect }: { map: ChapterMap; selected: Tile | null; broken: boolean; onSelect: (t: Tile) => void }) {
+  // Under the spoiler block a pot is only its kind, as the game names it: what it does shows once it's broken in the game.
+  const reach = useReach()
   const pots = map.objects.filter((o): o is Pot => o.type === 'pot')
   if (pots.length === 0) return null
   // Top of the map first, like reading the grid.
@@ -4782,7 +4821,7 @@ function PotList({ map, selected, broken, onSelect }: { map: ChapterMap; selecte
                     <span className="inline-block w-16 text-neutral-500">
                       ({p.tile[0]}, {p.tile[1]})
                     </span>
-                    {describePotEffect(p.effect)}
+                    {!reach.on && describePotEffect(p.effect)}
                   </button>
                 </li>
               ))}

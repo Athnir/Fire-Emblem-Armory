@@ -3,61 +3,78 @@
 A Fire Emblem companion, game by game: pick a game and get its weapons and forging, true hit
 calculator, weapon triangle and maps together. Everything runs client-side and works offline once installed.
 
-- **Fire Emblem: Mystery of the Emblem** (from the Japanese cartridge, with the English names of its translation patch: RPGuy96's and
+- **Shadow Dragon & the Blade of Light** (from the Switch release's Famicom cartridge, named from the Switch program's own English):
+  weapons and where each turns up (shops, villages, recruits' items, the second item a foe drops), true hit (its own scaled roll),
+  and every chapter's map with its units, recruits, reinforcements, villages, shops and arenas. It has no weapon triangle and no
+  supports, so it has neither tab.
+- **Gaiden** (from a translated copy of the cartridge, named as Shadows of Valentia names its units, classes and items): weapons and
+  where each turns up (chests, what recruits carry, drops, a foe's random drop), true hit, and every battle's and dungeon's map with its
+  units and the monsters that gather. It has no shops, no weapon triangle and no supports.
+- **Mystery of the Emblem** (from the Japanese cartridge, with the English names of its translation patch: RPGuy96's and
   VincentASM's translation, Quirino's update and Robert of Normandy's current project, [fe3-translation](https://github.com/RobertTheSable/fe3-translation)):
   weapons and where each turns up in both books (drops and what foes carry included), true hit (its own scaled roll), supports, and
   every map of Book 1, Book 2 and the Endgame with its units, reinforcements and spawn points, recruits, chests, villages, houses,
   doors, shops, secret shops and hidden items. The game has no weapon triangle, so it has no triangle tab. Every table and event command
   was traced in the clean cartridge (Mesen and the game's own code); the patch's build files gave its text tables' addresses.
-- **Fire Emblem: Genealogy of the Holy War** (from the Japanese cartridge, with Lil' Nordion's English names): weapons and
+- **Genealogy of the Holy War** (from the Japanese cartridge, with Lil' Nordion's English names): weapons and
   where each turns up, true hit, the weapon triangle and leadership, and every chapter's map with its castles, villages and
   reinforcements.
-- **Fire Emblem: Thracia 776** (from the Japanese cartridge, with Lil' Manster's English names): weapons and where each turns up
+- **Thracia 776** (from the Japanese cartridge, with Lil' Manster's English names): weapons and where each turns up
   (what foes carry included, since any foe can be captured), true hit, the weapon triangle, leadership and Charm, supports, and every
   chapter's and gaiden chapter's map with its units, reinforcements, recruits, chests, villages, doors, shops, escape points and when
   each gaiden chapter opens. The Lil' Manster team's public build files ([fe776br](https://github.com/famitino/fe776br), with Zane
   Avernathy's disassembly) and his [VoltEdge](https://github.com/ZaneAvernathy/VoltEdge) library named the tables, the event commands
   and the game's routines; each one used was checked in the clean cartridge. Lil' Manster's menu names are drawn from its own letter
   tiles, matched against the shapes of its team's font.
-- **Fire Emblem: The Binding Blade** (from the Japanese cartridge, with the FE6 Localization patch's English names): weapons and
+- **The Binding Blade** (from the Japanese cartridge, with the FE6 Localization patch's English names): weapons and
   where each turns up on both routes, true hit, the weapon triangle, supports, and every chapter's, gaiden chapter's and trial
   map's map with its units on Normal and Hard, reinforcements, recruits, chests, villages, shops and the desert's buried items.
-- **Fire Emblem: The Blazing Blade** (from the North American cartridge): weapons and where each turns up in Lyn's, Eliwood's and
+- **The Blazing Blade** (from the North American cartridge): weapons and where each turns up in Lyn's, Eliwood's and
   Hector's stories, true hit, the weapon triangle, supports, and every chapter's map in each story with its units on Normal and Hard,
   reinforcements, recruits, chests, villages, shops and the gaiden chapters' conditions.
-- **Fire Emblem: The Sacred Stones** (from the North American cartridge): weapons and where each turns up on Eirika's and Ephraim's
+- **The Sacred Stones** (from the North American cartridge): weapons and where each turns up on Eirika's and Ephraim's
   routes (the world map towns' shops included), true hit, the weapon triangle, supports, and every chapter's, the Tower of Valni's and
   the Lagdou Ruins' maps with their units on Easy, Normal and Hard (each generic foe's level per difficulty), reinforcements, recruits,
   chests, villages, shops, the desert's buried items and the rewards an end scene gives on a condition. The FE8 decompilation project
   ([fireemblem8u](https://github.com/FireEmblemUniverse/fireemblem8u)) named the event commands; each one used was checked in the game's
   code.
-- **Fire Emblem: Shadow Dragon** (from the North American cartridge): weapons, tomes, staves and dragonstones and where each turns up
+- **Path of Radiance** (from the North American disc): every weapon's stats and rules (laguz strikes included), the forge (costs
+  worked out the way the game does, and which chapters offer each base weapon), true hit, the weapon triangle, supports, and every
+  chapter's and trial map's map with its units on Easy, Normal and Hard (Easy has its own placements), reinforcements and when they
+  come, chests, villages, doors, traps and goals.
+- **Radiant Dawn** (from the North American disc): every weapon's stats and rules (laguz strikes and cards included), shops and
+  bargains, the forge (costs the way the game works them out, and the Coin cards), true hit (checked in the game's code), the weapon
+  triangle and leadership, supports, and every chapter's map with its units on Easy, Normal and Hard.
+- **Shadow Dragon** (from the North American cartridge): weapons, tomes, staves and dragonstones and where each turns up
   (armories, vendors and the secret shop, chests, villages, recruits' items, drops), the weapon triangle and weapon rank bonuses (read
   in the game's code), and every chapter's map (the Prologue, Chapters 1-24, the five gaiden chapters with what opens them, and the
   Endgame) with its units, recruits, reinforcements and the areas that bring them, shops, chests and villages, true hit (two random
   numbers averaged) and the forge's limits and prices (both read in the game's code), and the five Hard modes (each foe's weapons per mode, and what each mode adds to their stats). It has
   no supports.
-- **Fire Emblem Awakening** (from the North American cartridge and its DLC): weapons with their forge, shops by location, travelling
+- **New Mystery of the Emblem** (from the Japanese cartridge, with the Heroes of Shadow patch's English names): weapons and where
+  each turns up, the forge, true hit, the weapon triangle, supports, and every chapter's map (the Prologue's answers, the gaiden
+  chapters and what opens them, the Archanean Chronicles and the downloadable chapters) with its units in each of the five modes.
+- **Awakening** (from the North American cartridge and its DLC): weapons with their forge, shops by location, traveling
   merchants, event tiles, renown rewards and where each turns up (story, paralogues and the 25 DLC maps the user owns), true hit (two
   numbers, checked in the game's code), the weapon triangle and weapon rank bonuses, dual support, and every chapter's, paralogue's and
   DLC map's map with its units on Normal, Hard and Lunatic, reinforcements and when they come, recruits, chests, villages, event tiles,
   Chapter 18's lava and Chapter 23's barrier, and when each side map opens.
-- **Fire Emblem Echoes: Shadows of Valentia** (from the North American cartridge): weapons, shields and rings with their combat
+- **Fates**: every weapon's stats, effects, route availability and prices, forge ranks to +7, My Castle's shops by level, and every
+  chapter's, paralogue's, challenge battle's and DLC map's map (from the game's own files), and what each support partner gives.
+- **Shadows of Valentia** (from the North American cartridge): weapons, shields and rings with their combat
   arts, forge stars and evolutions, and where each turns up (dungeon chests and finds, the random pools of barrels, pots and boxes,
   villagers' gifts, what recruits carry, drops, Rusted items and the weapons they evolve into), true hit (Fates' curve, checked in the
   game's code), support points, and every battle's map with its units on Normal and Hard (Rigel Castle's Hard layout included), each
   dungeon's skirmishes (its formations and fixed encounters) and boss battles, the cemeteries' layouts, Act 6 and the amiibo dungeons.
   The DLC (not in the user's files) adds its eight weapons and where they come from, from Fire Emblem Wiki; its maps wait for the DLC's
   own files. The game has no weapon triangle, so it has no triangle tab.
-- **Fire Emblem Fates** (done): every weapon's stats, effects, route availability and prices, forge
-  ranks to +7, maps of every chapter, paralogue and DLC map, and what each support partner gives.
-- **Fire Emblem: Path of Radiance** (in progress): every weapon's stats and rules, the forge (costs
-  worked out the way the game does, and which chapters offer each base weapon), every chapter's map
-  (units on Easy/Normal and Hard, reinforcements and when they come, chests, villages, doors and goals),
-  true hit and supports.
-- **Fire Emblem: Radiant Dawn** (in progress): every weapon's stats and rules, shops and bargains, the
-  forge (costs the way the game works them out, and the Coin cards), true hit (checked in the game's
-  code), supports and every chapter's map.
+- **Three Houses** (from the Switch cartridge, its update and its DLC): weapons and where each turns up, the battalions (a tab of
+  their own, with each gambit's area), true hit (two numbers averaged, read in the game's code), supports, and every battle's map by
+  route (the White Clouds by house, then Crimson Flower, Silver Snow, Azure Moon and Verdant Wind), the paralogues, the auxiliary
+  battles and Cindered Shadows. It has no weapon triangle.
+- **Engage** (from the Switch release and its Expansion Pass): weapons and where each turns up (engravings and refines included,
+  the emblems' own weapons behind a switch), true hit, the weapon triangle (its Break), supports, and every chapter's, paralogue's,
+  Divine Paralogue's and Fell Xenologue's map, the skirmishes and the Tempest Trials.
 
 **Live app:** https://athnir.github.io/Fire-Emblem-Armory/
 
@@ -66,8 +83,8 @@ calculator, weapon triangle and maps together. Everything runs client-side and w
 - **The game's own files**, dumped from a copy of the game and its downloads (never shipped or
   committed; only data derived from them is). Every map's terrain, units, item drops, reinforcement
   timing, objectives, chests, villages and Dragon Veins, every terrain's costs, and every weapon's
-  stats, ranks, prices and effectiveness. The generators are in `scripts/` and the formats in `data-raw/fates/README.md`,
-  `data-raw/fe3/README.md`, `data-raw/fe4/README.md`, `data-raw/fe5/README.md`, `data-raw/fe6/README.md`, `data-raw/fe7/README.md`, `data-raw/fe9/README.md`, `data-raw/fe10/README.md`, `data-raw/fe11/README.md`, `data-raw/fe13/README.md` and `data-raw/fe15/README.md`. Path of Radiance's forge prices follow the game's own price routine.
+  stats, ranks, prices and effectiveness. The generators are in `scripts/` and each game's formats in its own
+  `data-raw/<game>/README.md`. Path of Radiance's forge prices follow the game's own price routine.
 - **[Fire Emblem Wiki](https://fireemblemwiki.org/)**: chapter pages and minimaps, used to check
   enemy counts and for notes the files don't spell out, plus the Tellius games' affinity tables. Awakening's map sizes and every map's
   enemy counts are checked against its pages, and its articles on reinforcement timing and event tiles explained what the scripts do.

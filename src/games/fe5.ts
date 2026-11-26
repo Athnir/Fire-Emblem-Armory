@@ -8,7 +8,7 @@ import { FE5_LISTED } from '../data/fe5/fe5Listed'
 import { FE5_FORK, FE5_MAP_SET, FE5_STORY } from '../data/fe5/fe5MapSet'
 import { FE5_TRIANGLE } from '../data/fe5/fe5Triangle'
 import type { ChapterMap } from '../data/maps/types'
-import { walkFork } from '../logic/spoiler'
+import { turnsUpAt, walkFork } from '../logic/spoiler'
 import type { GameParts } from '.'
 
 /** The two routes after Chapter 15, as the weapon page names them; the rest of the story has none. */
@@ -63,7 +63,7 @@ const parts: GameParts = {
     const index = new Map(story.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE5_LISTED.filter((w) => {
-      const first = Math.min(Infinity, ...(FE5_ITEM_SOURCES[w.name] ?? []).map((s) => (index.get(s.mapId) ?? Infinity) + (s.kind.endsWith('-later') ? 1 : 0)))
+      const first = Math.min(Infinity, ...(FE5_ITEM_SOURCES[w.name] ?? []).map((s) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length
   },

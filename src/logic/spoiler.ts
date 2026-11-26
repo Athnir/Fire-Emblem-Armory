@@ -48,7 +48,8 @@ export function reachOf(story: StoryOrder, at: number, route?: string): Reach {
  */
 export function turnsUpAt(story: StoryOrder, mapId: string, arrives?: boolean): number {
   const own = story.maps.findIndex((m) => m.id === mapId)
-  if (own < 0) return story.opensAt?.(mapId) ?? Infinity
+  // Outside the story: the chapter that opens it, or, with no `opensAt`, the story's last chapter (as `reachOf` opens it).
+  if (own < 0) return story.opensAt ? story.opensAt(mapId) : story.maps.length - 1
   return arrives ? own + 1 : own
 }
 

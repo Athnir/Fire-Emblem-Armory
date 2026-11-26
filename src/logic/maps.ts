@@ -279,24 +279,68 @@ export function describePotEffect(effect: PotEffect): string {
  * War's "Azelle and Lex join your army: turn 2", "Arvis appears on the map", and talks with someone who appears later; Anankos's
  * summons, and the groups the Heirs of Fate finale brings once his claws fall; Awakening's Endgame sigils' foes; Shadow Dragon's map
  * changes that wait on someone who comes later). */
-const ARRIVAL_NOTE = /(?:is|are)n't on the map at the start|arrives with Group|joins? your army:|appears on the map|keeps summoning|arrive on the next|foes come on/
+const ARRIVAL_NOTE = /(?:is|are)n't on the map at the start|arrives with Group|joins? your army:|appears on the map|keeps summoning|arrive on the next|foes come on|\bjoins? on turn\b|^Reinforcements\b|only the one you pick comes|brings enemy reinforcements/
+
+/** A chapter note on what winning, a chapter's end or a boss's fall gives, and on what condition (Shadow Dragon and the Blade of
+ * Light's seized castles, Awakening's "Clearing it adds Roy to your army", Three Houses' battalions, the GBA games' and Thracia's end
+ * gifts, Fates' joins at a chapter's end and its Yato's forms). */
+const REWARD_NOTE = /^(?:Seizing the (?:castle|throne) gives|Clearing it (?:gives|adds)|Routing two groups of Risen gets a reward|Winning it recruits|Battalions? given when the battle is won|When the battle is won:|Corrin's Yato becomes|Once [^,]+ is defeated, if your army holds)|: given to .+ at the end of the chapter|\bjoins? at the end of the chapter/
+
+/** What a foe (or a green unit) will do: who it goes for, where it heads, what it waits for, what it loots and where it leaves. */
+const BEHAVIOR = /\b(?:goes for|heads for|holds its ground|moves with|leaves the map|makes for|takes the Crest|never moves|never attacks|never attacking|advances on|waits until|targets the|raises the alarm|doesn't move|razing what)\b/i
 
 /**
  * The map as it stands when the chapter starts, for the spoiler block: no reinforcement groups, no joiners, and no
  * note about either, the unconfirmed ones included. Who is placed on the map, the forced deployments and the objects stay.
+ * Beyond that it's the map and nothing the game doesn't show at the start (the user's calls, 2026-11-26): no reward a chapter's end
+ * or a boss's fall gives, no foe's behavior (who it goes for, where it heads, a looter's badge and targets), no loss condition naming
+ * someone who comes later, no map change an arrival makes, no pot's effect and no boulder's path. Taps still preview a door, a vein
+ * or a wall, and chests', villages' and talks' notes stay.
  */
 export function atStart(map: ChapterMap): ChapterMap {
-  // A unit's or an object's own note loses the sentences that give an arrival away (Genealogy of the Holy War's "Turns hostile when
-  // Group 1 arrives.", "Visited by Laylea (once Laylea appears on the map)").
-  const told = (note: string | undefined) => {
+  // A unit's note keeps who it is and what it holds, losing the sentences, and the clauses after a semicolon, that give an arrival or
+  // its behavior away (Genealogy of the Holy War's "Turns hostile when Group 1 arrives."; "Lv 2 Brigand; goes for the villages").
+  const told = (note: string | undefined, behavior = false) => {
     if (!note) return note
-    const kept = note.split(/(?<=\.)\s+/).filter((x) => !ARRIVAL_NOTE.test(x) && !/\bGroups? \d/.test(x))
+    // Clause by clause, so a talk riding on an arrival's sentence stays ("Turns hostile when Group 1 arrives; turns friendly when
+    // Creidne talks to Iucharba.").
+    const kept = note
+      .split(/(?<=\.)\s+/)
+      .map((x) => {
+        const clauses = x
+          .split('; ')
+          .filter((c) => !ARRIVAL_NOTE.test(c) && !/\bGroups? \d/.test(c) && !(behavior && BEHAVIOR.test(c)))
+        const out = clauses.join('; ')
+        // A sentence keeps its full stop, and a clause left first its capital.
+        const whole = out && /\.$/.test(x) && !/[.!?)]$/.test(out) ? `${out}.` : out
+        return whole && whole !== x ? whole[0].toUpperCase() + whole.slice(1) : whole
+      })
+      .filter(Boolean)
+    return kept.length ? kept.join(' ') : undefined
+  }
+  // A village's note loses who can raze it (a looter's target); Thracia's rule that any foe standing on it can stays.
+  const village = (note: string | undefined) => {
+    const t = told(note)
+    if (!t) return t
+    const kept = t.split(/(?<=\.)\s+/).filter((x) => !/\bcan (?:raze|destroy) it\b/.test(x) || /\bA foe standing\b/.test(x))
     return kept.length ? kept.join(' ') : undefined
   }
   // Foes hidden under the snow (Revelation 10) aren't seen at the start either.
   const units = map.units.some((u) => u.buried) ? map.units.filter((u) => !u.buried) : map.units
-  const trimmed = units.map((u) => (u.note && told(u.note) !== u.note ? { ...u, note: told(u.note) } : u))
-  const objects = map.objects.map((o) => ('note' in o && o.note && told(o.note) !== o.note ? { ...o, note: told(o.note) } : o))
+  const trimmed = units.map((u) => {
+    const note = told(u.note, true)
+    if (note === u.note && !u.goesTo && !u.looter) return u
+    return { ...u, note, goesTo: undefined, looter: undefined }
+  })
+  const objects = map.objects.map((o) => {
+    if (!('note' in o) || !o.note) return o
+    const note = o.type === 'village' ? village(o.note) : told(o.note)
+    return note === o.note ? o : { ...o, note }
+  })
+  // Who's on the map at the start: a loss condition or an escape naming anyone else waits for them.
+  const here = new Set([...units.map((u) => u.name), ...(map.forced ?? []).map((f) => f.name)])
+  const heard = (n: string) => !ARRIVAL_NOTE.test(n) && !REWARD_NOTE.test(n)
+  const said = (n: string) => n.replace(/: winning it gives [^.]+\./, '.')
   return {
     ...map,
     units: trimmed.every((u, i) => u === units[i]) ? units : trimmed,
@@ -305,8 +349,21 @@ export function atStart(map: ChapterMap): ChapterMap {
     // the battle starts, so they stay.
     reinforcements: map.groupsNote ? map.reinforcements : undefined,
     joiners: undefined,
-    notes: map.notes.filter((n) => !ARRIVAL_NOTE.test(n)),
+    notes: map.notes.filter(heard).map(said),
+    notesOn: map.notesOn?.filter((n) => heard(n.note)),
     unconfirmed: map.unconfirmed?.filter((n) => !ARRIVAL_NOTE.test(n)),
+    // Radiant Dawn's "or Fiona dies (after arriving)".
+    defeat: map.defeat && map.defeat.split(', or ').filter((p) => !/\(after arriving\)/.test(p)).join(', or '),
+    // Radiant Dawn's "Where Heather escapes", while Heather has yet to come.
+    objectives: map.objectives.filter((o) => {
+      const who = o.label?.match(/^Where (.+?) escapes$/)?.[1]
+      return !who || here.has(who)
+    }),
+    // A map change an arrival makes (Genealogy's "When Group 3 arrives: thicket becomes forest") waits for it; a boulder keeps its
+    // path to itself.
+    changes: map.changes
+      .filter((c) => !/\bGroups? \d+ arrives?\b/.test(c.effect ?? ''))
+      .map((c) => (c.trigger === 'boulder' && !c.noPreview ? { ...c, noPreview: true as const } : c)),
   }
 }
 
