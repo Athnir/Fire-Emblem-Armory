@@ -328,9 +328,12 @@ export function atStart(map: ChapterMap): ChapterMap {
   // Foes hidden under the snow (Revelation 10) aren't seen at the start either.
   const units = map.units.some((u) => u.buried) ? map.units.filter((u) => !u.buried) : map.units
   const trimmed = units.map((u) => {
-    const note = told(u.note, true)
-    if (note === u.note && !u.goesTo && !u.looter) return u
-    return { ...u, note, goesTo: undefined, looter: undefined }
+    // One the game shows by another name until a talk (Mystery of the Emblem's Samuel as Navarre) goes by that name, and its note
+    // loses the sentence that gives him away.
+    const told2 = told(u.note, true)
+    const note = u.shownAs && told2 ? told2.split(/(?<=\.)\s+/).filter((x) => !/^Shown as /.test(x)).join(' ') || undefined : told2
+    if (note === u.note && !u.goesTo && !u.looter && !u.shownAs) return u
+    return { ...u, name: u.shownAs ?? u.name, shownAs: undefined, note, goesTo: undefined, looter: undefined }
   })
   const objects = map.objects.map((o) => {
     if (!('note' in o) || !o.note) return o

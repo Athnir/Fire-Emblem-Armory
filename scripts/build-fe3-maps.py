@@ -22,7 +22,7 @@ import fe3_ai as ai  # noqa: E402
 import fe3_events as fe  # noqa: E402
 import fe3_rom as r  # noqa: E402
 import gba_maps as gm  # noqa: E402
-from fe3_names import chapter_titles, character_names, class_names, item_names, menu_text, objectives  # noqa: E402
+from fe3_names import chapter_titles, character_names, class_names, item_help, item_names, menu_text, objectives  # noqa: E402
 from terrain_codes import encode  # noqa: E402
 import fe3_art  # noqa: E402
 
@@ -89,11 +89,12 @@ ARMY = set()
 LORD = {}  # Marth's record, from the book's first chapter
 
 
-def world():
-    return fe.World(army=set(ARMY))
+def world(flags=()):
+    return fe.World(army=set(ARMY), flags=set(flags))
 
 
-NUMBER = {2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten'}
+NUMBER = {2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven',
+          12: 'twelve'}
 
 
 def chapters():
@@ -189,6 +190,7 @@ class Chapter:
         self.tile_infos = []
         self.slots = []
         self.patched = {}  # (row, column) -> the terrain ids the chapter's changes can put there
+        self.flags = set()  # the flags its opening leaves set (Book 2's Chapter 14: 0 and 2), which its later events start from
 
     def app(self, row, col):
         """A game tile (row, column from 0 at the top left) -> the app's [x, y] (from (1, 1) at the bottom left)."""
@@ -441,8 +443,20 @@ def book_joiners():
     return out
 
 
+def own_portraits():
+    """{name id: the portrait most of its units wear}: each person's own face (Navarre's 0x12, which Book 2's Chapter 6's Samuel
+    wears until his talk)."""
+    from collections import Counter
+    seen = {}
+    for n in range(1, r.MAX_CHAPTER + 1):
+        for u in placed_units(r.chapter_map(n))[0]:
+            seen.setdefault(u['name'], Counter())[u['portrait']] += 1
+    return {k: c.most_common(1)[0][0] for k, c in seen.items()}
+
+
 GENERIC = generic_names()
 JOINERS = book_joiners()
+PORTRAITS = own_portraits()
 
 
 def unit_entry(ch, u, kind, talk=None):
@@ -618,18 +632,77 @@ def script_sources(n):
     return out
 
 
+DEATHS = 0x83BFD0  # what $83:BEDB runs once a battle's unit has fallen, while $0ACC is clear (a battle clears it first, $83:ACC5)
+SET_FLAG_CALL = bytes.fromhex('2234aa87')  # JSL $87:AA34, the flag setter
+
+
+def death_flags():
+    """{(book, name id): flag} for the people whose fall the program marks with a flag of its own, no script's ($83:BFD0): the
+    chapter ($07DF) below 0x15 is Book 1 (CMP / BCS), then a CMP #name / BEQ per person on the fallen unit's name id ($0763,X), each
+    branch LDA #flag / JSL $87:AA34. Book 1: Caeda 20, Minerva 19; Book 2: Caeda 21, Tiki 22, Marisha 23, Astram 17, Roshea 24,
+    Rickard 6."""
+    a = DEATHS
+    assert bytes(r.R[r.lo(a):r.lo(a) + 9]) == bytes.fromhex('c220addf0729ff00c9'), 'not the death flags routine'
+    split = r.u16(a + 9)
+    assert r.u8(a + 11) == 0xB0, 'no book split'
+    book2 = a + 13 + (r.u8(a + 12) ^ 0x80) - 0x80
+
+    def chain(p, book):
+        out = {}
+        assert bytes(r.R[r.lo(p):r.lo(p) + 6]) == bytes.fromhex('bd630729ff00'), hex(p)  # LDA $0763,X; AND #$FF
+        p += 6
+        while r.u8(p) == 0xC9:  # CMP #name, BEQ branch
+            assert r.u8(p + 3) == 0xF0, hex(p)
+            to = p + 5 + (r.u8(p + 4) ^ 0x80) - 0x80
+            assert r.u8(to) == 0xA9 and bytes(r.R[r.lo(to) + 3:r.lo(to) + 7]) == SET_FLAG_CALL, hex(to)
+            out[(book, r.u16(p + 1))] = r.u16(to + 1)
+            p += 5
+        assert r.u8(p) in (0x80, 0x60), hex(p)  # BRA to the RTS, or the RTS
+        return out
+    assert split == 21, split
+    return {**chain(a + 13, 1), **chain(book2, 2)}
+
+
+DEATH_FLAGS = death_flags()
+DEATH_OWNERS = {(book, f): name for (book, name), f in DEATH_FLAGS.items()}
+
+
+def book_of(n):
+    return 1 if n <= 20 else 2
+
+
+def standing_names(m):
+    """The name ids of everyone who can stand on a map: its units (placed_units) and its spawn slots' units."""
+    out = {u['name'] for u in placed_units(m)[0]}
+    for ptr in script_entries(m):
+        out |= {r.reinforcement_unit(ops[5])['name'] for _, c, ops in fe.reachable(ptr) if c == 0x1C}
+    return out
+
+
+RECRUITING = set()  # (chapter, (talker, target)) for the talks that recruit (their script swaps a unit in)
+
+
 def flag_setters():
-    """{flag: [(chapter, kind, words)]} for every script that sets it (SET_FLAG, 0x11), and {(chapter, flag): [...]} for those that
-    clear it."""
+    """{flag: [(chapter, kind, words)]} for every script that sets it (SET_FLAG, 0x11), and the program's death flags in every chapter
+    of the person's book they can stand on the map in (death_flags: Book 2's Rickard sets 6 in Chapters 5 and 6); and {(chapter,
+    flag): [(kind, words, script)]} for the scripts that clear it."""
     sets, clears = {}, {}
     for n in range(1, r.MAX_CHAPTER + 1):
         for kind, words, ptr, _ in script_sources(n):
-            for _, c, ops in fe.reachable(ptr):
+            cmds = fe.reachable(ptr)
+            if kind == 'talk' and any(c == 0x0D for _, c, _ in cmds):
+                RECRUITING.add((n, words))
+            for _, c, ops in cmds:
                 f = ops[0] | ops[1] << 8 if c in (0x11, 0x12) else None
                 if c == 0x11:
                     sets.setdefault(f, []).append((n, kind, words))
-                elif c == 0x12:
-                    clears.setdefault((n, f), []).append((kind, words))
+                elif c == 0x12 and (kind, words, ptr) not in clears.get((n, f), []):
+                    clears.setdefault((n, f), []).append((kind, words, ptr))
+    for n in range(1, r.MAX_CHAPTER + 1):
+        here = standing_names(r.chapter_map(n))
+        for (book, name), f in DEATH_FLAGS.items():
+            if book == book_of(n) and name in here:
+                sets.setdefault(f, []).append((n, 'death', (name_of(name), False)))
     return sets, clears
 
 
@@ -657,13 +730,69 @@ def flag_words(f, n, own=None):
         return f'until {deaths_words(deaths)} is defeated'
     if any(kind == 'turn' and words['turn'] in (0, 1) for kind, words in sets_here):
         cleared = FLAG_CLEARS.get((n, f), [])
-        talks = [words for kind, words in cleared if kind == 'talk']
+        talks = [words for kind, words, _ in cleared if kind == 'talk']
         if talks:
             return 'once ' + ' or '.join(f'{a} has talked to {b}' for a, b in dict.fromkeys(talks))
-        deaths = [words for kind, words in cleared if kind == 'death' and words]
+        deaths = [words for kind, words, _ in cleared if kind == 'death' and words]
         if deaths:
             return f'once {deaths_words(deaths)} is defeated'
     return None
+
+
+def or_list(words):
+    words = list(dict.fromkeys(words))
+    return words[0] if len(words) == 1 else ', '.join(words[:-1]) + ' or ' + words[-1]
+
+
+def chapters_words(ns):
+    """'Chapter 5', 'Chapter 7, 8 or 9'."""
+    labels = [chapter_label(n) for n in ns]
+    if len(labels) > 1 and all(x.startswith('Chapter ') for x in labels):
+        return 'Chapter ' + or_list([x[8:] for x in labels])
+    return or_list(labels)
+
+
+def opens(n, f):
+    """Whether chapter n's opening clears flag f (a flag kept from before stops counting there: Book 2's Chapter 7 clears 6)."""
+    return any(kind == 'turn' and words['turn'] in (0, 1) and words['phase'] == 0 for kind, words, _ in FLAG_CLEARS.get((n, f), []))
+
+
+def carried_setters(f, n):
+    """The setters of flag f in the chapters of chapter n's book before it, since the last opening that cleared it: what a flag kept
+    from earlier chapters says there."""
+    since = max([k for k in range(1, n) if book_of(k) == book_of(n) and opens(k, f)], default=0)
+    return sorted([s for s in FLAG_SETS.get(f, []) if since <= s[0] < n and book_of(s[0]) == book_of(n)], key=lambda s: s[0])
+
+
+def setter_words(setters, me=None, positive=False):
+    """What a kept flag's setters mean, in words: 'Julian didn't recruit him in Chapter 5 and he wasn't defeated there' (the flag
+    clear), or with `positive` 'Roshea was defeated in Chapter 18' (the flag set); `me` the name of the unit it's said of ('him').
+    One person's falls in several chapters are one clause ('Astram wasn't defeated in Chapter 7, 8 or 9'). None where a setter is
+    neither a talk nor a death."""
+    groups = []
+    for n, kind, wd in setters:
+        if kind == 'death' and groups and groups[-1][:2] == (kind, wd):
+            groups[-1][2].append(n)
+        else:
+            groups.append((kind, wd, [n]))
+    out, named, prev = [], False, None
+    for kind, wd, ns in groups:
+        where = 'there' if ns == [prev] else 'in ' + chapters_words(ns)
+        if kind == 'death':
+            who = 'he' if wd[0] == me and named else wd[0]
+            verb = 'was' if positive else "wasn't"
+            out.append(f'{who} {verb} defeated {where}')
+            named = named or wd[0] == me
+        elif kind == 'talk':
+            talker, target = wd
+            recruits = (ns[0], wd) in RECRUITING
+            verb = ('recruited' if positive else "didn't recruit") if recruits else ('talked to' if positive else "didn't talk to")
+            out.append(f"{talker} {verb} {'him' if target == me else target} {where}")
+            named = named or target == me
+        else:
+            return None
+        prev = ns[0] if len(ns) == 1 else None
+    return (' or ' if positive else ' and ').join(out)
 
 
 def condition_words(n, cond, own=None):
@@ -711,6 +840,120 @@ def phase_words(phase):
     return {0: 'your phase', 1: 'enemy phase'}.get(phase, f'phase {phase}')
 
 
+EVERY_ITEM = frozenset(range(r.ITEM_COUNT))
+
+
+def tested_flags(ptr):
+    return {ops[0] | ops[1] << 8 for _, c, ops in fe.reachable(ptr) if c == 0x13}
+
+
+def play(ch, ptr, flags, items=(), carried=()):
+    return fe.Run(ch.m, fe.World(army=set(ARMY), flags=set(flags), items=set(items)), units=[dict(u) for u in carried]).run(ptr)
+
+
+def effects(run):
+    return len(run.loads) + len(run.tiles) + len(run.slots) + len(run.items) + len(run.recruits)
+
+
+def group_words(items):
+    """('all twelve shards', 'shards') for items that share one help text in the patch, named by its last word (each of the twelve star
+    shards is a "Starsphere shard"); else (their names, None)."""
+    helps = {item_help()[i] for i in items}
+    one = next(iter(helps))
+    if len(items) > 1 and len(helps) == 1 and one.replace(' ', '').isalpha():
+        noun = plural(one.split(' ')[-1])
+        return f"all {NUMBER.get(len(items), str(len(items)))} {noun}", noun
+    return f'the {or_words([item_name(i) for i in items])}', None
+
+
+def clear_clauses(ch, f, carried=(), depth=0):
+    """[(who, words, the same as a gerund)] for what clears flag f in chapter n after its opening set it: the area events that clear
+    it, each read by playing it with every item and with none (IF_NO_ITEM), and one that waits on another of the opening's flags read
+    through what clears that (Book 2's Chapter 14: its event at (19, 24) clears flag 2 when it makes the Starsphere from all twelve
+    shards, and flag 0 when your army lacks one; Tiki's room clears 0 once 2 is)."""
+    out = []
+    for kind, words, ptr in FLAG_CLEARS.get((ch.n, f), []):
+        if kind != 'area':
+            continue
+        who, where = whose(ch, words['who'], carried), area_where(ch, words)
+        at = 'at ' + where[3:] if where.startswith('on ') else where
+        rich, poor = play(ch, ptr, ch.flags, EVERY_ITEM, carried), play(ch, ptr, ch.flags, (), carried)
+        by_rich, by_poor = f not in rich.world.flags, f not in poor.world.flags
+        needs = [ops[0] for _, c, ops in fe.reachable(ptr) if c == 0x29]
+        held = group_words(needs)[0] if needs else ''
+        if by_rich and by_poor:
+            out.append((who, f'stopped {where}', f'stopping {where}'))
+        elif by_rich:
+            made = [i for i, _ in rich.items if i not in [j for j, _ in poor.items]]
+            if made and set(needs) <= set(rich.taken):
+                thing = or_words([item_name(i) for i in made])
+                out.append((who, f'made the {thing} {at} ({held} in your army)', f'making the {thing} {at}'))
+            else:
+                out.append((who, f'stopped {where} with {held} in your army', f'stopping {where} with {held} in your army'))
+        elif by_poor:
+            out.append((who, f'stopped {where} without {held} in your army', f'stopping {where} without {held} in your army'))
+        elif depth == 0:
+            for g in sorted((tested_flags(ptr) & ch.flags) - {f}):
+                if f not in play(ch, ptr, ch.flags - {g}, EVERY_ITEM, carried).world.flags:
+                    inner = clear_clauses(ch, g, carried, depth + 1)
+                    if inner:
+                        after = ' or '.join(gerund for _, _, gerund in inner)
+                        out.append((who, f'stopped {where} after {after}', f'stopping {where} after {after}'))
+    return out
+
+
+def once_words(clauses, subject=None):
+    """', once he has made the Starsphere at (19, 24) (all twelve shards in your army)': the clauses, said of the event's own subject
+    ('he' for Marth), their verb said once ('stopped on (19, 24) ..., or on (28, 22) ...')."""
+    if not clauses:
+        return ''
+    actors = list(dict.fromkeys(a for a, _, _ in clauses))
+    perfect = [p for _, p, _ in clauses]
+    if len(actors) > 1:
+        return ', once ' + ', or '.join(f'{a} has {p}' for a, p, _ in clauses)
+    who = 'he' if actors[0] == subject == name_of(MARTH) else actors[0]
+    verbs = {p.split(' ')[0] for p in perfect}
+    if len(perfect) > 1 and len(verbs) == 1:
+        verb = verbs.pop()
+        return f", once {who} has {verb} " + ', or '.join(p[len(verb) + 1:] for p in perfect)
+    return f", once {who} has " + ', or '.join(perfect)
+
+
+def gated(ch, ptr, carried=(), subject=None):
+    """An event played as the chapter stands after its opening (the flags it leaves set), and where one of those flags holds it back,
+    as it plays once that flag is cleared, with what clears it: (run, ', once ...' or ''). Book 2's Chapter 14's opening sets flags 0
+    and 2: Tiki's room waits for 2, which only the (19, 24) event's twelve-shard branch clears ($8B:850B), its throne room for 0."""
+    run = play(ch, ptr, ch.flags, carried=carried)
+    for f in sorted(tested_flags(ptr) & ch.flags):
+        alt = play(ch, ptr, ch.flags - {f}, carried=carried)
+        if effects(alt) > effects(run):
+            words = once_words(clear_clauses(ch, f, carried), subject)
+            if words:
+                return alt, words
+    return run, ''
+
+
+def death_gates(ch, ptr, carried=()):
+    """{('slot', slot) or ('load', character): words} for what an event brings only while a fallen person's flag is clear (the death
+    flags, $83:BFD0), found by playing it again with the flag set: Book 2's Chapter 9 brings Astram on turn 7 only if he wasn't
+    defeated in Chapter 7 or 8."""
+    out = {}
+    base = play(ch, ptr, ch.flags, carried=carried)
+    for f in sorted(tested_flags(ptr) & {g for (b, _), g in DEATH_FLAGS.items() if b == book_of(ch.n)}):
+        setters = carried_setters(f, ch.n)
+        said = setter_words(setters) if setters else None
+        if not said:
+            continue
+        alt = play(ch, ptr, ch.flags | {f}, carried=carried)
+        for k, s in base.slots.items():
+            if alt.slots.get(k) != s:
+                out[('slot', k)] = said
+        for u in base.loads:
+            if all(x['char'] != u['char'] for x in alt.loads):
+                out[('load', u['char'])] = said
+    return out
+
+
 def arrivals(ch, m, source, talks, carried):
     """The turn events after the opening, the area events and the character events: who they bring in, and when; and the spawn
     slots they fill (the slots spawn a unit at the start of each enemy phase while their count lasts, $87:9DB2). What one event brings
@@ -724,23 +967,32 @@ def arrivals(ch, m, source, talks, carried):
             continue
         phase = phase_words(e['phase'])
         events.append({'when': f"Turn {e['turn']}, {phase}", 'since': f"From turn {e['turn']}'s {phase}",
-                       'stop': f"at the {phase} on turn {e['turn']}", 'area': None, 'ptr': e['ptr']})
+                       'stop': f"at the {phase} on turn {e['turn']}", 'area': None, 'ptr': e['ptr'], 'who': None})
     for e in r.area_events(ch.m):
         # FC any of your units (slots below 0x20), FD any enemy, FE anyone, else that character.
         who = 'enemy' if e['who'] == 0xFD else 'player'
-        trigger = f"{whose(ch, e['who'], carried)} stops in the marked area"
+        actor = whose(ch, e['who'], carried)
+        trigger = f'{actor} stops in the marked area'
         events.append({'when': f'As soon as {trigger}', 'since': f'Once {trigger}', 'stop': f'once {trigger}',
-                       'area': {'who': who, 'rect': ch.rect(e['rows'], e['cols'])}, 'ptr': e['ptr']})
+                       'area': {'who': who, 'rect': ch.rect(e['rows'], e['cols'])}, 'ptr': e['ptr'], 'who': actor})
     for e in r.char_events(ch.m):
         trigger = f"{whose(ch, e['char'], carried)} is defeated"
-        events.append({'when': f'Once {trigger}', 'since': f'Once {trigger}', 'stop': f'once {trigger}', 'area': None, 'ptr': e['ptr']})
-    slots = {}
+        events.append({'when': f'Once {trigger}', 'since': f'Once {trigger}', 'stop': f'once {trigger}', 'area': None, 'ptr': e['ptr'],
+                       'who': None})
+    slots, dead = {}, {}
     for ev in events:
-        when, area, ptr = ev['when'], ev['area'], ev['ptr']
-        run = fe.Run(ch.m, world(), units=[dict(u) for u in carried]).run(ptr)
+        area, ptr = ev['area'], ev['ptr']
+        # As the chapter stands after its opening; an event one of the opening's flags holds back says what clears it (Tiki's).
+        run, gate = gated(ch, ptr, carried, ev['who'])
+        when = ev['when'] + gate
+        ev['since'] += gate
+        # What it brings only while a fallen person's flag is clear (Book 2's Chapter 9: Astram).
+        gates = death_gates(ch, ptr, carried)
         for k, s in run.slots.items():
             slots.setdefault(k, []).append((ev, s))
             ch.slots.append(s)
+            if ('slot', k) in gates:
+                dead[id(s)] = gates[('slot', k)]
         # A scene's cast (Book 2's Chapter 1 brings Ogma and Catria on for a talk; Chapter 14's "Lena" records are Gotoh's scene): what
         # the event loads and takes off again never stands on the map.
         gone = {id(u) for u in run.removed}
@@ -757,6 +1009,8 @@ def arrivals(ch, m, source, talks, carried):
             for u, entry in zip(foes, g['units']):
                 foe_sources(source, m['id'], u, entry, later=True)
                 entry['_ai']['placed_by'] = ptr  # the event that brings it: its AI is already that event's
+                if ('load', u['char']) in gates:
+                    entry['note'] += f". Comes only if {gates[('load', u['char'])]}."
         for u in friends:
             j = {'name': name_of(u['name']), 'tile': ch.app(u['row'], u['col']), 'from': ch.app(*u['start']), 'group': f'e{ptr:x}',
                  'when': when}
@@ -792,6 +1046,8 @@ def arrivals(ch, m, source, talks, carried):
             u = r.reinforcement_unit(s['unit'])
             entry = {**unit_entry(ch, {**u, 'row': s['row'], 'col': s['col']}, 'enemy' if u['name'] in GENERIC else 'named'),
                      'from': ch.app(s['row'], s['col'])}
+            if id(s) in dead:
+                entry['note'] += f'. Comes only if {dead[id(s)]}.'
             g['units'].append(entry)
             foe_sources(source, m['id'], u, entry, later=True)
         if ev['area']:
@@ -916,7 +1172,8 @@ def changes_of(ch, m, carried):
     for e in r.turn_events(ch.m):
         if e in first:
             continue
-        run = fe.Run(ch.m, world()).run(e['ptr'])
+        # As the chapter stands after its opening (the flags it leaves set).
+        run, gate = gated(ch, e['ptr'])
         patch = after(run.tiles)
         if not patch:
             continue
@@ -924,14 +1181,16 @@ def changes_of(ch, m, carried):
         if all(TERRAIN[t][0] == 'd' for t in patch.values()):
             # Doors a turn shuts (the Book 1 Endgame's): one change per door, with every turn that shuts it.
             for k, t in patch.items():
-                turned.setdefault(((k, t),), {'phase': e['phase'], 'unless': unless, 'turns': []})['turns'].append(e['turn'])
+                turned.setdefault((((k, t),), gate), {'phase': e['phase'], 'unless': unless, 'turns': []})['turns'].append(e['turn'])
         else:
-            turned.setdefault(tuple(sorted(patch.items())), {'phase': e['phase'], 'unless': unless, 'turns': []})['turns'].append(e['turn'])
-    for items, v in turned.items():
+            turned.setdefault((tuple(sorted(patch.items())), gate), {'phase': e['phase'], 'unless': unless, 'turns': []})['turns'].append(
+                e['turn'])
+    for (items, gate), v in turned.items():
         patch = dict(items)
         opened |= set(patch)
         ts = sorted(set(v['turns']))
-        when = f"At the start of the {phase_words(v['phase'])} on turn{'s' if len(ts) > 1 else ''} {or_words([str(t) for t in ts])}"
+        when = (f"At the start of the {phase_words(v['phase'])} on turn{'s' if len(ts) > 1 else ''} {or_words([str(t) for t in ts])}" +
+                gate)
         tile = sorted(patch)[0]
         X, Y = ch.app(*tile)
         if len(patch) == 1 and TERRAIN[patch[tile]][0] == 'd':
@@ -942,21 +1201,23 @@ def changes_of(ch, m, carried):
         changes.append(entry(f'turn-{X}-{Y}', tile, effect, patch, wide=len(patch) > 1))
     events = []
     for e in r.area_events(ch.m):
-        events.append((f"When {whose(ch, e['who'], carried)} stops {area_where(ch, e)}", e['ptr']))
+        who = whose(ch, e['who'], carried)
+        events.append((f"When {who} stops {area_where(ch, e)}", e['ptr'], who))
     for e in r.char_events(ch.m):
-        events.append((f"Once {whose(ch, e['char'], carried)} is defeated", e['ptr']))
+        events.append((f"Once {whose(ch, e['char'], carried)} is defeated", e['ptr'], None))
     for t in r.talks():
         if t['map'] == ch.m:
-            events.append((f"When {name_of(t['talker'])} talks to {name_of(t['target'])}", t['ptr']))
-    for when, ptr in events:
-        run = fe.Run(ch.m, world(), units=[dict(u) for u in carried]).run(ptr)
+            events.append((f"When {name_of(t['talker'])} talks to {name_of(t['target'])}", t['ptr'], name_of(t['talker'])))
+    for when, ptr, who in events:
+        # An event one of the opening's flags holds back says what clears it (Book 2's Chapter 14: its throne room, Tiki's room).
+        run, gate = gated(ch, ptr, carried, who)
         patch = after(run.tiles)
         if not patch:
             continue
         opened |= set(patch)
         tile = sorted(patch)[0]
         X, Y = ch.app(*tile)
-        changes.append(entry(f'event-{ptr:x}', tile, f'{when}, {what(patch)}.', patch, wide=len(patch) > 1))
+        changes.append(entry(f'event-{ptr:x}', tile, f'{when}{gate}, {what(patch)}.', patch, wide=len(patch) > 1))
     return changes, {k for k in opened if k in roofed}
 
 
@@ -1220,6 +1481,41 @@ def words_of(run):
     return ', '.join([item_name(i) for i, _ in run.items] + [f'{g} gold' for g in run.gold])
 
 
+def joiners_of(run):
+    return [u for u in run.loads if u['side'] == fe.PLAYER]
+
+
+def visit_conditions(ch, ptr, joins):
+    """What a village's join waits on, found by playing its script again with each of its checks turned the other way, as the
+    openings' are (opening_conditions): an IF_PRESENT's character out of your army, an IF_FLAG's flag set. Est's village (Book 1's
+    Chapter 16, $8C:851C) asks for Minerva in your army (its check of her fall's flag, 19, adds nothing to that)."""
+    checks = []
+    for _, c, ops in fe.reachable(ptr):
+        if c == 0x1F and ops[1] == 0:
+            checks.append(('present', ops[0]))
+        elif c == 0x13:
+            checks.append(('flag', ops[0] | ops[1] << 8))
+    lost_by = {}
+    for kind, v in dict.fromkeys(checks):
+        w = world({v} if kind == 'flag' else ())
+        if kind == 'present':
+            w.army.discard(v)
+        kept = {u['char'] for u in joiners_of(fe.Run(ch.m, w).run(ptr))}
+        lost_by[(kind, v)] = [u['char'] for u in joins if u['char'] not in kept]
+    out = []
+    for (kind, v), lost in lost_by.items():
+        if not lost:
+            continue
+        if kind == 'present':
+            out.append(f'if {name_of(present_name(ch, v))} is in it')
+        elif not subsumed(ch, v, lost, lost_by):
+            setters = carried_setters(v, ch.n)
+            said = setter_words(setters) if setters else None
+            if said:
+                out.append(f'if {said}')
+    return ' and '.join(out)
+
+
 def locations(ch, m, source):
     """Houses, villages, shops, secret shops and the seize tile ($8C:917C), chests and doors ($8C:9AD3), hidden items ($8C:9FDE)."""
     seize = None
@@ -1246,16 +1542,41 @@ def locations(ch, m, source):
                 source(i, m['id'], 'shop', f'Sold at the {kind.lower()}' + (', with a Member Card' if kind == 'Secret shop' else ''))
             continue
         reward = words_of(run)
-        joins = [name_of(u['name']) for u in run.loads if u['side'] == fe.PLAYER]
+        joins = [name_of(u['name']) for u in joiners_of(run)]
         if t['kind'] in (VILLAGE, HOUSE):
             sends = sent_off(ch, ai.rewrites(r.tile_script(t['id'])))
             if not reward and not joins and not sends:
                 continue
             # The record's who byte is a name id ($83:E519): a village is Marth's to visit, a house (FF) anyone's.
             o = {'type': 'village', 'tile': tile, 'reward': reward}
-            notes = [f"{' and '.join(dict.fromkeys(joins))} {'joins' if len(set(joins)) == 1 else 'join'} your army."] if joins else []
+            cond = visit_conditions(ch, r.tile_script(t['id']), joiners_of(run)) if joins else ''
+            notes = ([f"{' and '.join(dict.fromkeys(joins))} {'joins' if len(set(joins)) == 1 else 'join'} your army"
+                      f"{' ' + cond if cond else ''}."] if joins else [])
             if sends:
                 notes.append(sends)
+            # A visit that walls off another village (SET_TILE onto its tile: Book 1's Chapter 13's two, $8C:84B0 and $8C:84C8, each
+            # writing metatile 8, Blocked, onto the other; Book 2's Chapter 15's on a copy of that map): what that one gives can't be
+            # had too. The pair goes by character id, else by the villages' order.
+            for w in run.tiles:
+                other = next((x for x in tile_events(ch) if x is not t and x['kind'] in (VILLAGE, HOUSE) and
+                              (x['row'], x['col']) == (w['row'], w['col'])), None)
+                if other is None or walkable(ch.table[w['tile'] & 0x3FF]):
+                    continue
+                there = fe.Run(ch.m, world()).run(r.tile_script(other['id']))
+                theirs = joiners_of(there)
+                at = '({}, {})'.format(*ch.app(other['row'], other['col']))
+                if theirs and joins:
+                    pair = [name_of(u['name']) for u in sorted({u['char']: u for u in joiners_of(run) + theirs}.values(),
+                                                                key=lambda u: u['char'])]
+                    their = ' and '.join(dict.fromkeys(name_of(u['name']) for u in theirs))
+                    notes.append(f"Visiting it closes {their}'s village at {at}: {or_list(pair)}, not both.")
+                elif reward and words_of(there) and not theirs and not joins:
+                    gifts = [reward, words_of(there)] if tile_events(ch).index(t) < tile_events(ch).index(other) else [
+                        words_of(there), reward]
+                    notes.append(f'Visiting it closes the village at {at}, which gives the {words_of(there)}: the {gifts[0]} or the '
+                                 f'{gifts[1]}, not both.')
+                else:
+                    notes.append(f'Visiting it closes the village at {at}.')
             cond = condition(t['flag']) if conditional(t['flag']) else []
             held = [item_name(v) for k, v in cond if k == 0]
             needs = (f", holding the {or_words(held)}" + (' (it takes them)' if run.taken else '')) if held else ''
@@ -1298,10 +1619,26 @@ def locations(ch, m, source):
     return seize
 
 
+def present_name(ch, char):
+    """The name id of the character an IF_PRESENT asks for (in your army it's on no list of the map's: its character id is its name's)."""
+    return next((x['name'] for x in placed_units(ch.m)[0] if x['char'] == char), char)
+
+
+def subsumed(ch, f, lost, lost_by):
+    """A fallen person's flag ($83:BFD0) where the same script's check for that person in your army holds back what the flag does
+    (`lost`, by check in `lost_by`): being in your army, they haven't fallen, so the flag adds nothing (Book 1's Chapters 11 and 16 ask
+    for Minerva both ways; not Book 2's Chapter 6, whose check for Rickard is on the other branch)."""
+    owner = DEATH_OWNERS.get((book_of(ch.n), f))
+    return owner is not None and any(kind == 'present' and present_name(ch, v) == owner and set(x) >= set(lost)
+                                     for (kind, v), x in lost_by.items())
+
+
 def opening_conditions(ch, units):
     """{id(unit): words} for the units the opening places only on a condition, found by playing it again with each of its checks
     turned the other way (IF_FLAG, IF_PRESENT): Book 1's Chapter 11 brings Catria and Palla only with Minerva in your army, Book 2's
-    Chapter 8 Jeorge only if he lived through Chapter 5. And the flags it waits on that no script sets: [(flag, [unit])]."""
+    Chapter 6 Rickard only if Julian didn't recruit him in Chapter 5 and he wasn't defeated there (his fall sets the flag too,
+    $83:BFD0); the tiles it changes on a kept flag, in words ([(game tiles, words)]: Book 2's Chapter 19 closes Roshea's village if he
+    was defeated in Chapter 18); and the flags it waits on that nothing sets: [(flag, [unit])]."""
     checks = []
     for e in opening_events(ch):
         for _, c, ops in fe.reachable(e['ptr']):
@@ -1311,7 +1648,7 @@ def opening_conditions(ch, units):
                 checks.append(('present', ops[0]))
     key = lambda u: (u['char'], u['start'])  # noqa: E731
     base = {key(u): u for u in units}
-    words, unset = {}, []
+    words, unset, closes, lost_by = {}, [], [], {}
     for kind, v in dict.fromkeys(checks):
         w = world()
         if kind == 'flag':
@@ -1319,36 +1656,39 @@ def opening_conditions(ch, units):
         else:
             w.army.discard(v)
         alt = {key(u) for u in opening(ch, w, dry=True).units}
-        gone = [u for k, u in base.items() if k not in alt]
-        if not gone:
+        lost_by[(kind, v)] = [k for k in base if k not in alt]
+    for (kind, v), lost in lost_by.items():
+        gone = [base[k] for k in lost]
+        if not gone or (kind == 'flag' and subsumed(ch, v, lost, lost_by)):
             continue
-        if kind == 'present':
-            text = f"Placed only with {name_of(next((x['name'] for x in placed_units(ch.m)[0] if x['char'] == v), v))} in your army."
-        else:
-            setters = [(n, k_, wd) for n, k_, wd in FLAG_SETS.get(v, []) if n < ch.n and (n <= 20) == (ch.n <= 20)]
-            if not setters:
-                unset.append((v, gone))
-                continue
-            n, k_, wd = setters[-1]
-            if k_ == 'death':
-                text = f"Placed only if {wd[0]} wasn't defeated in {chapter_label(n)}."
-            elif k_ == 'talk':
-                text = f"Placed only if {wd[0]} didn't talk to {wd[1]} in {chapter_label(n)}."
-            else:
-                text = f'Placed only on a condition from {chapter_label(n)}.'
+        setters = carried_setters(v, ch.n) if kind == 'flag' else []
+        if kind == 'flag' and not setters:
+            unset.append((v, gone))
+            continue
         for u in gone:
-            words.setdefault(id(u), []).append(text.replace(f" to {name_of(u['name'])} in ", ' to him in '))
+            if kind == 'present':
+                text = f'Placed only with {name_of(present_name(ch, v))} in your army.'
+            else:
+                said = setter_words(setters, name_of(u['name']))
+                text = f'Placed only if {said}.' if said else f'Placed only on a condition from {chapter_label(setters[-1][0])}.'
+            words.setdefault(id(u), []).append(text)
     for kind, v in dict.fromkeys(checks):
-        if kind != 'flag' or any(n < ch.n for n, _, _ in FLAG_SETS.get(v, [])):
+        if kind != 'flag':
             continue
         w = world()
         w.flags.add(v)
         base_tiles = {(t['row'], t['col']): t['tile'] for t in opening(ch, dry=True).tiles}
         alt_tiles = {(t['row'], t['col']): t['tile'] for t in opening(ch, w, dry=True).tiles}
-        changed = [k for k in set(base_tiles) | set(alt_tiles) if base_tiles.get(k) != alt_tiles.get(k) and ch.inside(*k)]
-        if changed:
-            unset.append((v, [{'tile': ch.app(*k)} for k in sorted(changed)]))
-    return words, unset
+        changed = sorted(k for k in set(base_tiles) | set(alt_tiles) if base_tiles.get(k) != alt_tiles.get(k) and ch.inside(*k))
+        if not changed:
+            continue
+        setters = carried_setters(v, ch.n)
+        said = setter_words(setters, positive=True) if setters else None
+        if said:
+            closes.append((changed, said))
+        else:
+            unset.append((v, [{'tile': ch.app(*k)} for k in changed]))
+    return words, unset, closes
 
 
 def leavers(ch):
@@ -1413,7 +1753,11 @@ def gift_notes(ch, carried=()):
             text += f"if your army holds the {or_words([item_name(i) for i in needs])}, {to_words} gets the " + \
                     or_words([item_name(i) for i in extra_items])
         taken = [item_name(i) for i in rich.taken]
-        if taken and set(rich.taken) == set(needs):
+        if taken and set(rich.taken) == set(needs) == set(poor.taken):
+            # Taken whether or not the army holds them all (Book 2's Chapter 14: the shards it holds go for the Lightsphere alone).
+            noun = group_words(needs)[1]
+            text += f' (the {noun} are taken either way)' if noun else " (they're taken either way)"
+        elif taken and set(rich.taken) == set(needs):
             text += " (they're taken)" if len(taken) > 1 else ' (it is taken)'
         elif taken:
             text += f" (the {or_words(taken)} {'are' if len(taken) > 1 else 'is'} taken)"
@@ -1472,6 +1816,7 @@ def main():
         state['joining'] = {}
         ch = Chapter(n, mi)
         run = opening(ch)
+        ch.flags = set(run.world.flags)
         talks, gifts = talks_of(ch)
         recruits = recruit_items(ch)
         rows = [[ch.ids[y][x] for x in range(1, ch.cols - 1)] for y in range(1, ch.rows - 1)]
@@ -1489,7 +1834,7 @@ def main():
         foes = [u for u in run.units if u['side'] == fe.ENEMY]
         # The game's boss list is by name, for both books: a talk recruit on it is this chapter's boss only when no one else on the list
         # is (Sheena in Book 2's Chapter 17 is; Lorenz, Book 2's first boss, isn't in Book 1's Chapter 16, where Camus is).
-        placed_if, unset = opening_conditions(ch, run.units)
+        placed_if, unset, closes = opening_conditions(ch, run.units)
         leaving = leavers(ch)
         # A boss a turn's script always takes off the map only passes through (Gharnef in Book 1's Chapter 12): a named foe.
         passing = {u['name'] for u in foes if leaving.get(u['char'], (None, False))[1]}
@@ -1511,16 +1856,29 @@ def main():
                 continue
             kind = 'boss' if u['name'] in bosses else 'enemy' if u['name'] in GENERIC else 'named'
             e = unit_entry(ch, u, kind, talks.get(u['name']))
-            extra = placed_if.get(id(u), []) + ([leaving[u['char']][0] + '.'] if u['char'] in leaving else [])
+            recruit = (e.get('talk') or '').startswith('Recruit')
+            # The record the talk swaps in ($87:87A9 keeps only the unit's tile and HP): the map names the unit by who joins, where that's
+            # another person (Book 2's Chapter 6: the game shows Samuel as Navarre, by Navarre's name and portrait, until the talk), and
+            # says the level it joins at where that's another (the Final Chapter's Nyna and Lena).
+            joiner = recruits.get(u['name'], u) if recruit else u
+            joining = []
+            if joiner['name'] != u['name']:
+                shown = name_of(u['name'])
+                e['name'] = name_of(joiner['name'])
+                # The spoiler block's map shows him as the game does at the start (src/logic/maps.ts `atStart`).
+                e['shownAs'] = shown
+                looks = f", with {shown}'s portrait," if u['portrait'] == PORTRAITS.get(u['name']) != joiner['portrait'] else ''
+                joining.append(f'Shown as {shown}{looks} until the talk.')
+            if joiner['level'] != u['level']:
+                joining.append(f"Joins at Lv {joiner['level']}.")
+            extra = joining + placed_if.get(id(u), []) + ([leaving[u['char']][0] + '.'] if u['char'] in leaving else [])
             if extra:
                 e['note'] = e['note'] + '. ' + ' '.join(extra)
             m['units'].append(e)
             # One who leaves on a turn and can't be harmed before (Imhullu without a Starlight, Book 1's Chapter 6 four) gives nothing.
             if leaving.get(u['char'], (None, False))[1] and (n == 6 or any(item_name(i) == 'Imhullu' for i in u['weapons'])):
                 continue
-            if (e.get('talk') or '').startswith('Recruit'):
-                # The record the talk swaps in, by its own name (Book 2's Chapter 6: the foe called Navarre joins as Samuel).
-                joiner = recruits.get(u['name'], u)
+            if recruit:
                 for i in joiner['items']:
                     source(i, map_id, later('kit', n), f"Carried by {name_of(joiner['name'])} on joining", who=joiner['char'])
             else:
@@ -1530,6 +1888,15 @@ def main():
         if m.get('corrinStart') and m['starts'] and m['corrinStart'] not in m['starts']:
             # The opening walks Marth off his starting tile (Chapter 1 of each book): he starts where it leaves him.
             m['starts'][0] = m['corrinStart']
+        # What the opening changes on a kept flag, on the village it closes (Book 2's Chapter 19: Roshea's, if he fell in Chapter 18).
+        for tiles, said in closes:
+            shut = [o for o in m['objects'] if o['type'] == 'village' and (ch.h + 1 - o['tile'][1], o['tile'][0]) in tiles]
+            for o in shut:
+                text = f"The chapter's opening closes it if {said}."
+                o['note'] = f"{o['note']} {text}" if o.get('note') else text
+            if not shut:
+                where = or_words(['({}, {})'.format(*ch.app(*k)) for k in tiles])
+                m['notes'].append(f"The chapter's opening changes the tiles at {where} if {said}.")
         arrivals(ch, m, source, talks, run.units)
         m['changes'], closed = changes_of(ch, m, run.units)
         settle_ai(ch, m, run.units)

@@ -11,6 +11,8 @@ The patch's text tables (addresses from its public build files, FE3_buildfiles_v
                          patch's full item names (its menu shows 7 letters, "Iron" with a sword icon)
   status       $F0:A352  "Book 1 Chapter 1" and the chapter's title, by chapter number
   objectives   $F0:AFA6  by chapter number ("Seize castle")
+  item help    $F0:93AE  the same, by item id (found by its strings, checked by id: item_help): the twelve star shards' "Starsphere
+                         shard"
 """
 import functools
 import os
@@ -134,6 +136,20 @@ def item_names():
         out[i] = {'SwordSlayer': 'Swordslayer'}.get(n, n)
     assert out[0x50] == 'Aum' and list(out.values()).count('Aum') == 2, out[0x50]
     out[0x50] = 'Aum (5 uses)'
+    return out
+
+
+ITEM_HELP = 0xF093AE
+
+
+@functools.lru_cache(maxsize=None)
+def item_help():
+    """By item id: the patch's help text for each item (menu text, u16 pointers in bank $F0; not in its build files' list, found by
+    its strings and checked by id: Iote's Shield "Negates weapon bonuses for bearer", the Silver Card "Bearer can buy items at half
+    price", the Mbr Card "Bearer can enter secret shops", each of the twelve star shards "Starsphere shard"). A weapon's is the stat
+    line its window fills in; the spheres' are "?????"."""
+    out = {i: menu_text(ITEM_HELP, i) for i in range(0x7F)}
+    assert out[0x6D] == 'Negates weapon bonuses for bearer' and out[0x7C] == 'Bearer can enter secret shops', out[0x6D]
     return out
 
 

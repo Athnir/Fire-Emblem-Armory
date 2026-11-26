@@ -1014,6 +1014,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   'Renais Cit.' units survive"). A gift is under only the checks whose branch holds it: one that guards a scene or a join before the
   gifts doesn't make them conditional (Awakening's Paralogue 22), and stacked thresholds each say their own ("if Inigo defeats 3 or
   more foes and survives"). Who a gift goes to is said where the script hands it to a unit ("to Tiki").
+- **A talk that swaps in another record** (Mystery of the Emblem's $87:87A9, keeping only the tile and HP) names the unit by who joins,
+  its note saying how the game shows it until the talk ("Shown as Navarre, with Navarre's portrait, until the talk"; under the spoiler
+  block the map shows it by that name, `shownAs`), and the level it joins at where the record's differs ("Joins at Lv 3": Nyna and
+  Lena). A visit that walls off another village says so on both ("Arran or Samson, not both"); a flag the program sets when a person
+  falls ($83:BFD0) counts as a script's does ("...and he wasn't defeated there"); and an event a flag its chapter's opening sets holds
+  back says what clears it ("once he has made the Starsphere at (19, 24)") (the look-over, 2026-11-26).
 - **A choice the chapter asks** (Awakening's Paralogue 13: whose offer you take) says what each answer does, read from its branches:
   the armies it turns (on the map and on each unit), the groups it brings ("if you accept Gyral's offer or turn both offers down"),
   the drops it clears and the reward it sets.

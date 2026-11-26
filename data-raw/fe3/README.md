@@ -21,7 +21,9 @@ ids; nothing patched is written.
   class roll and descriptions spell them ("Armor Knight"), and the women's classes of a pair (Knight 6, Mage 0x17, Bishop 0x18) get
   "(F)": their weapons differ.
 - Items: the storage messages at `$8E:8C4A` (u16 pointers, bank `$E7`; "Iron Sword was sent to the storage."), one per item id, give
-  the patch's full names (its menu shows "Iron" with a sword icon). "Staff" is dropped from the staves' ("Heal Staff").
+  the patch's full names (its menu shows "Iron" with a sword icon). "Staff" is dropped from the staves' ("Heal Staff"). Their help
+  text, a menu table at `$F0:93AE` by item id (not in the build files' list: found by its strings, checked by id, `item_help`), names
+  what the twelve star shards are ("Starsphere shard"), so the maps call them shards.
 - Chapter headings and titles: the status screen's at `$F0:A352` ("Book 1 Chapter 1" / "Marth Embarks"; the user's call over the save
   list's "Endgame" names); objectives at `$F0:AFA6`. Book 1's last is its Chapter 20, and Book 2's last four maps (chapters 41-44)
   are all its "Final Chapter", so the app numbers them part 1 to part 4. The map ids keep the old names (`fe3-1-endgame`,
@@ -157,7 +159,14 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
 - **Tile events** (`$8C:917C`, 10 bytes: [map][who: 0 your army, FF anyone][column][row][condition][kind][event id u16][u16]): kind 0
   a house, 1 a shop (its SHOP command: [shop][type: 0 armory, 1 vendor, 2 secret shop]), 2 the arena, 3 a village, 4 the seize tile,
   8 a secret shop (on an ordinary tile). Their scripts: u16 pointers at `$8C:8004` by event id (bank `$8C`). A record whose condition
-  isn't met is skipped; of the seize records, the last one met wins.
+  isn't met is skipped; of the seize records, the last one met wins. A village's join is played again with each of its script's checks
+  turned the other way, as the openings' are (`visit_conditions`): Est's (Book 1's Chapter 16, `$8C:850C`) gives the Hammerne on
+  every visit but loads Est only with Minerva in your army (`$8C:851C`; its check of her fall's flag, 19, adds nothing to that), and
+  the village closes after any visit. A visit that writes a wall onto another village's tile closes that one for good, and its note
+  names whom each gives: Book 1's Chapter 13's two (`$8C:849F` Samson's, `$8C:84B7` Arran's) write metatile 8 (Blocked, no class
+  enters) onto each other (`$8C:84B0`, `$8C:84C8`): Arran or Samson, not both. Their flag 5, which the Thief's area events set
+  (`$8B:8484`), only spares a village the Thief has already reached. Book 2's Chapter 15, on a copy of that map, does the same with
+  its two gifts (`$8C:888B`, `$8C:88A5`): the Power Ring or the Dragon Shield.
 - **Chests, doors and drawbridges** (`$8C:9AD3`, the same format): kind 7 a chest (its script gives the item or gold), 5 a door, 6 a
   drawbridge. The record's last u16 is the metatile written onto its tile once it's opened (FFFF: none; `$83:C8C5`), before its script
   runs. A door opens for a Thief (class 0x13) of either army (`$83:E776`; the AI uses the same check, `$82:8DE4`) or a unit holding a
@@ -176,7 +185,12 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
 - **Talks** (`$8B:89C6`, 6 bytes: [map][talker name][target name][condition][event id u16]): scripts at `$8B:8A93` by event id. A
   talk whose script swaps a unit for a record of the chapter's list (command 0x0D: [?][the record's character][the unit's character])
   recruits the unit it takes off: the target, or the talker where a foe starts the talk (Book 1's Chapter 11: Catria and Palla talk to
-  Marth). What joins is the record swapped in, by its own name (Book 2's Chapter 6: the foe called Navarre joins as Samuel).
+  Marth). What joins is the record swapped in (`$87:87A9` keeps only the unit's tile and its HP and max HP, then loads the record,
+  level and all, `$83:DCC1`). Where it's another person, the map names the unit by it and says how the game shows it until then:
+  Book 2's Chapter 6's foe (`$89:A38D`) has Navarre's name and portrait (0x12, 0x12), and his talks swap in Samuel (`$88:8B28`, name
+  0x70, portrait 0x82). Where its level is another, the unit says the level it joins at: the Final Chapter's Nyna, Lv 7 on the map
+  (`$89:C3AF`), joins at Lv 3 (`$88:8DCE`), Lena, Lv 3 (`$89:C3E8`), at Lv 7 (`$88:8E07`); neither is on the auto-level list
+  (`$93:FE95`), so the level moves no stat. No other talk's record differs in name or level.
 - **A scene's cast**: what an event loads (command 0x0C) and takes off again (0x0B) never stands on the map (Book 2's Chapter 1:
   Ogma and Catria; Chapter 3: two Pallas; Chapter 14: Gotoh's scene records). What joins, or is given, during or after a battle counts
   from the next chapter (the last chapter's from itself); ITEM with unit FF gives it to the unit acting (`$87:9AF5`): Marth, who
@@ -188,15 +202,35 @@ Scripts are byte commands dispatched by `$87:81C9` through the table at `$87:81E
   opening sets Book 1's Chapter 8 flag 4 and Marth's talk with Maria clears it (so Minerva's talk waits for Maria to join); deaths set
   Book 2's Chapter 17 flag 18 (Sheena's talk lasts until Samson or any Soldier or Archer falls); a flag only the talk itself sets is
   its once-only flag. What an opening places on a condition (IF_FLAG, IF_PRESENT) is found by playing it again with the check turned
-  the other way: Catria and Palla only with Minerva in your army (Book 1's Chapter 11), Rickard only if Julian didn't talk to him in
-  Chapter 5, Jeorge only if he wasn't defeated there (Book 2's Chapters 6 and 8: flags carried from Chapter 5).
+  the other way, a kept flag named by every setter in the book's earlier chapters since the last opening that cleared it: Catria and
+  Palla only with Minerva in your army (Book 1's Chapter 11; its check of her fall's flag adds nothing to that), Rickard only if
+  Julian didn't recruit him in Chapter 5 and he wasn't defeated there, Jeorge only if he wasn't defeated there (Book 2's Chapters 6
+  and 8: flags kept from Chapter 5), Astram only if he wasn't defeated in Chapter 7 (Book 2's Chapter 8), or in Chapter 7, 8 or 9
+  (its Chapter 16). The tiles an opening changes on a kept flag go on the village they close: Book 2's Chapter 19 closes Roshea's
+  village (SET_TILE, `$8C:BBCA`) if he was defeated in Chapter 18.
+- **Deaths' flags** (`$83:BFD0`, run by `$83:BEDB` once a battle's unit has fallen, while `$0ACC` is clear: a battle clears it first,
+  `$83:ACC5`; the one routine that sets it, `$93:D089`, wasn't traced): the program, no script, sets a flag when certain people fall,
+  by the fallen unit's name id (`$0763,X`): in Book 1 (the chapter below 0x15) Caeda 20 and Minerva 19, in Book 2 Caeda 21, Tiki 22,
+  Marisha 23, Astram 17, Roshea 24 and Rickard 6 (read from its CMP / BEQ chain, `death_flags`; each branch calls the flag setter,
+  `$87:AA34`). They count as set in each chapter of the book where the person can stand on the map. They're the flags no chapter's
+  script sets that the openings of Book 1's Chapter 11 (19) and Book 2's Chapters 8, 16 (17) and 19 (24) wait on. Events read them
+  too: Book 2's Chapter 9 brings Astram on turn 7 (`$8C:BA7F`, slot 7) only if he wasn't defeated in Chapter 7 or 8. Caeda's, Tiki's
+  and Marisha's are read only by each book's last seize script (Book 2's Chapter 1 also sets Marisha's as it opens, and her village
+  clears it, `$8C:8678`).
+- **The opening's flags**: the events after the opening play as it leaves the flags (Book 2's Chapter 14's sets 0 and 2,
+  `$8C:B69D`), and one an opening's flag holds back says what clears it (`gated`), each clearing area event played with every item
+  and with none (IF_NO_ITEM), one that waits on another of the opening's flags read through what clears that one. Tiki's room
+  (`$8B:8585`) waits for flag 2, which only the event at (19, 24) clears, in its branch for all twelve shards (`$8B:850B`: it takes
+  them and gives the Lightsphere and the Starsphere; without them all it takes those held, gives the Lightsphere and never runs
+  again, so Tiki never joins). The throne room (`$8B:848C`) waits for flag 0, which that event clears when your army lacks a shard
+  (`$8B:8537`) and Tiki's room once 2 is (`$8B:8590`).
 - **Who leaves**: a script after the opening that takes a unit off (REMOVE) says when: on a turn (Book 1's Chapter 6 four on turn 2;
   Gharnef in Chapter 12 on turn 4, so he only passes through, a named foe, and his Falchion, which he can't be made to drop before,
   isn't a source there), in a talk (Lorenz goes with Marth's) or once someone falls (the Earth Dragons with Medeus).
 - **Events' items**: what an area, death or turn event hands out, and on what (IF_NO_ITEM, TAKE_ITEM): Hardin's death trades the five
   spheres for the Binding Shield (Book 2's Chapter 20, `$8B:8919`), and Book 2's Chapter 14 gives the Lightsphere, and the Starsphere
-  for the twelve star shards. The Endgame opens on Book 2's Chapter 20's second seize record, condition 11: your army holds the
-  Binding Shield (the first, with none, ends the game: BOOK_END).
+  for the twelve star shards (the shards are taken either way). The Endgame opens on Book 2's Chapter 20's second seize record,
+  condition 11: your army holds the Binding Shield (the first, with none, ends the game: BOOK_END).
 - **Shops** (`$8C:9044`): 8 item ids per shop, padded with FE.
 - **Paths** (command 0x09: four u16 pointers to [op][value] lists ended by FFFF): op 0 picks the unit, 2 its direction (0 left,
   1 right, 2 up, 3 down), 5 moves it by pixels (16 a tile), FF 02 sets it down where its walk ends, FF 03 leaves it walking on: a
@@ -246,5 +280,3 @@ Not confirmed:
 - Spawn slot counts: Book 1's Chapter 4 slots hold 16 each; the Fire Emblem Wiki says 17.
 - The openings' walks are played as described above; positions match the game in Chapter 1 (its work RAM at the first turn), the
   rest weren't checked in the emulator.
-- Three flags no chapter's script sets: 17 (Book 2's Astram waits on it in Chapters 8 and 16), 19 (Catria and Palla in Book 1's
-  Chapter 11) and 24 (Book 2's Chapter 19 closes its village at (26, 3) while it's set); the maps say so under unconfirmed.

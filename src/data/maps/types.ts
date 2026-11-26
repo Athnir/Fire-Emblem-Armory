@@ -96,6 +96,9 @@ export interface MapUnit {
   carries?: string[]
   /** Who can talk to them, and whether that recruits them ('Recruit: talk with Ike'). */
   talk?: string
+  /** The name the game shows until a talk reveals who they are (Mystery of the Emblem's Samuel, shown as Navarre): the spoiler block's
+   * map uses it, and drops the note's sentence that says so. */
+  shownAs?: string
   /** Set only on bosses / named foes that Niles (Conquest) or Orochi (Birthright) can capture: the ones the game keeps a
    * prisoner record for (`PID_捕獲_…`). Anyone playable on any route never can; generic foes can but aren't worth noting. */
   capturable?: true

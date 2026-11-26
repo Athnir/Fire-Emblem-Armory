@@ -266,11 +266,14 @@ describe("Mystery of the Emblem's map changes", () => {
     expect(change('fe3-1-endgame', 'turn-4-14').effect).toMatch(/^At the start of the enemy phase on turns 5, 6 and 7, this door shuts unless/)
     // Twin villages: visiting one closes the other.
     expect(change('fe3-1-13', 'visit-12-22').effect).toBe('Visiting this village closes the one at (9, 22).')
-    // Book 2's Chapter 14: Marth stopping on three tiles lifts three rooms' roofs.
+    // Book 2's Chapter 14: Marth stopping on three tiles lifts three rooms' roofs. Its opening sets flags 0 and 2 ($8C:B69D): Tiki's
+    // room waits for 2, which only the (19, 24) event's branch for all twelve shards clears ($8B:850B), the throne room for 0, which
+    // that event clears without them all ($8B:8537) and Tiki's room once 2 is ($8B:8590).
     expect(map('fe3-2-14').changes.map((c) => c.effect)).toEqual([
-      'When Marth stops on (5, 22), the closed room opens.',
+      'When Marth stops on (5, 22), once he has stopped on (19, 24) without all twelve shards in your army, or on (28, 22) after ' +
+        'making the Starsphere at (19, 24), the closed room opens.',
       'When Marth stops on (19, 24), the closed room opens.',
-      'When Marth stops on (28, 22), the closed room opens.',
+      'When Marth stops on (28, 22), once he has made the Starsphere at (19, 24) (all twelve shards in your army), the closed room opens.',
     ])
   })
 })
@@ -285,11 +288,36 @@ describe("Mystery of the Emblem's joins and gifts", () => {
     expect(FE3_ITEM_SOURCES['Bolganone']).toContainEqual({ mapId: 'fe3-2-e2-3', kind: 'kit', text: 'Carried by Lena on joining' })
   })
 
+  it("says what waits on the Starsphere in Book 2's Chapter 14, the shards' word the patch's own (their help text)", () => {
+    // Tiki's event ($8B:8585) runs only once flag 2 is clear: no Starsphere, no Tiki (she has no other Book 2 record).
+    expect(map('fe3-2-14').joiners![0].when).toBe(
+      'As soon as Marth stops in the marked area, once he has made the Starsphere at (19, 24) (all twelve shards in your army)',
+    )
+    // The (19, 24) event takes the shards whether or not the army holds them all.
+    expect(map('fe3-2-14').notes).toContain(
+      'When Marth stops on (19, 24), he gets the Lightsphere, and the Starsphere if your army holds the Aquarius, Pisces, Aries, ' +
+        'Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius and Capricorn (the shards are taken either way).',
+    )
+  })
+
   it('counts what joins or is given during or after a battle from the next chapter, the last chapter from itself', () => {
     expect(FE3_ITEM_SOURCES['Parthia']).toContainEqual({ mapId: 'fe3-1-10', kind: 'event-later', text: 'Given at the end of the chapter to Marth' })
     expect(FE3_ITEM_SOURCES['Excalibur']).toContainEqual({ mapId: 'fe3-1-4', kind: 'kit-later', text: 'Carried by Merric on joining' })
-    // A talk swaps in its own record: the foe called Navarre in Book 2's Chapter 6 joins as Samuel.
+    // A talk swaps in its own record ($87:87A9 keeps only the tile and HP): the foe the game shows as Navarre in Book 2's Chapter 6,
+    // by Navarre's name and portrait ($89:A38D: 0x12, 0x12), is Samuel ($88:8B28: 0x70, 0x82); the map names him so, and says how the
+    // game shows him.
     expect(FE3_ITEM_SOURCES['Aquarius']).toEqual([{ mapId: 'fe3-2-6', kind: 'kit-later', text: 'Carried by Samuel on joining' }])
+    expect(map('fe3-2-6').units.find((u) => u.name === 'Samuel')).toMatchObject({
+      type: 'named', note: "Lv 5 Mercenary. Shown as Navarre, with Navarre's portrait, until the talk.", talk: 'Recruit: talk with Caeda or Ogma',
+    })
+    expect(map('fe3-2-6').units.some((u) => u.name === 'Navarre')).toBe(false)
+    // Under the spoiler block the map is what the game shows at the start: Navarre, the note keeping who he looks like and his talk.
+    expect(atStart(map('fe3-2-6')).units.find((u) => u.tile.join() === '5,24')).toMatchObject({
+      name: 'Navarre', note: 'Lv 5 Mercenary.', talk: 'Recruit: talk with Caeda or Ogma',
+    })
+    // And the level it joins at, where the record's is another (the Final Chapter's two: no other talk's record differs).
+    const at = (name: string) => map('fe3-2-e2-3').units.find((u) => u.name === name)!.note
+    expect([at('Nyna'), at('Lena'), at('Maria')]).toEqual(['Lv 7 Bishop (F). Joins at Lv 3.', 'Lv 3 Bishop (F). Joins at Lv 7.', 'Lv 1 Bishop (F)'])
     // A foe who starts the talk itself (Book 1's Chapter 11: Catria and Palla talk to Marth) is the recruit, with its gear.
     expect(map('fe3-1-11').units.filter((u) => u.talk?.startsWith('Recruit: talks to Marth')).map((u) => u.name)).toEqual(['Catria', 'Palla'])
     expect(FE3_ITEM_SOURCES['Killer Sword']).toContainEqual({ mapId: 'fe3-1-11', kind: 'kit-later', text: 'Carried by Catria on joining' })
@@ -317,9 +345,43 @@ describe("Mystery of the Emblem's conditions and leavers", () => {
     expect(unit('fe3-1-8', 'Minerva').talk).toBe('Recruit: talk with Marth, once Marth has talked to Maria')
     // Sheena's lasts until a death sets flag 18 (the Soldiers' and Archers' character events, and Samson's).
     expect(unit('fe3-2-17', 'Sheena').talk).toBe('Recruit: talk with Marth, until Samson or any Soldier or Archer is defeated')
-    // Carried flags: who was recruited or fell in an earlier chapter.
-    expect(unit('fe3-2-6', 'Rickard').note).toMatch(/Placed only if Julian didn't talk to him in Chapter 5\. Doesn't move or attack\.$/)
+    // Carried flags: who was recruited or fell in an earlier chapter, every setter since the last opening that cleared the flag. Book 2's
+    // Chapter 6 places Rickard while flag 6 is clear ($8C:BBAE): Julian's talk in Chapter 5 sets it, and so does his fall (the program's
+    // death flags, $83:BFD0).
+    expect(unit('fe3-2-6', 'Rickard').note).toBe(
+      "Lv 3 Thief. Placed only if Julian didn't recruit him in Chapter 5 and he wasn't defeated there. Doesn't move or attack.",
+    )
     expect(unit('fe3-2-8', 'Jeorge').note).toMatch(/Placed only if Jeorge wasn't defeated in Chapter 5\.$/)
+    // Astram's fall sets flag 17 in Book 2: Chapters 8 and 16 place him, and Chapter 9's turn 7 brings him, only while it's clear.
+    expect(unit('fe3-2-8', 'Astram').note).toMatch(/^Lv 4 Hero\. Placed only if Astram wasn't defeated in Chapter 7\. /)
+    expect(unit('fe3-2-16', 'Astram').note).toBe("Lv 5 Hero. Placed only if Astram wasn't defeated in Chapter 7, 8 or 9.")
+    expect(map('fe3-2-9').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Astram')!.note).toBe(
+      "Lv 5 Hero. Comes only if Astram wasn't defeated in Chapter 7 or 8.",
+    )
+    // Roshea's sets 24, on which Book 2's Chapter 19's opening closes his village ($8C:BBC4).
+    expect(map('fe3-2-19').objects).toContainEqual(expect.objectContaining({
+      tile: [26, 3],
+      note: "Roshea joins your army. Only Marth can visit it. The chapter's opening closes it if Roshea was defeated in Chapter 18. Thief " +
+        'can raze it before you visit.',
+    }))
+    // Minerva's (19) adds nothing where the same check asks for her in your army (Catria and Palla above; Est's village, $8C:851C).
+    expect(map('fe3-1-16').objects).toContainEqual(expect.objectContaining({
+      tile: [13, 13], reward: 'Hammerne',
+      note: 'Est joins your army if Minerva is in it. Only Marth can visit it. Thief can raze it before you visit.',
+    }))
+    // The deaths' flags settle every flag the openings wait on that no script sets.
+    expect(FE3_MAPS.filter((m) => m.unconfirmed?.length).map((m) => m.id)).toEqual([])
+    // Twin villages: each visit walls off the other ($8C:84B0, $8C:84C8, Blocked), so one of the two (and Book 2's Chapter 15's, on a
+    // copy of the map: the Power Ring or the Dragon Shield).
+    expect(map('fe3-1-13').objects.filter((o) => o.type === 'village').map((o) => ('note' in o ? o.note : ''))).toEqual([
+      "Samson joins your army. Visiting it closes Arran's village at (9, 22): Arran or Samson, not both. Only Marth can visit it. Thief " +
+        'can raze it before you visit.',
+      "Arran joins your army. Visiting it closes Samson's village at (12, 22): Arran or Samson, not both. Only Marth can visit it. Thief " +
+        'can raze it before you visit.',
+    ])
+    expect(map('fe3-2-15').objects.filter((o) => o.type === 'village').map((o) => ('note' in o ? o.note : ''))[0]).toMatch(
+      /^Visiting it closes the village at \(9, 22\), which gives the Dragon Shield: the Power Ring or the Dragon Shield, not both\. /,
+    )
     // The Starlight village: Marth's alone (its who byte), holding both spheres (condition 1).
     expect(map('fe3-1-17').objects).toContainEqual(expect.objectContaining({
       tile: [26, 25], reward: 'Starlight',
