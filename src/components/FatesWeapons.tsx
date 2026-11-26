@@ -1,3 +1,4 @@
+import { useBackdropRoute } from './Backdrop'
 import { useMemo, useRef, useState } from 'react'
 import { useReach } from './Reach'
 import { useDifficulty } from './Difficulty'
@@ -78,6 +79,8 @@ export function FatesWeapons() {
     [reach],
   )
   const route: Route | 'any' = chapter ? (chapter.route ?? 'any') : pickedRoute
+  // The backdrop shows this route's art, as the Roster's follows its route.
+  useBackdropRoute('fates', route === 'any' ? undefined : route)
 
   const categoryOptions = useMemo(() => categoryOptionsForRoute(route), [route])
 

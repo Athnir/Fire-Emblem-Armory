@@ -1,3 +1,4 @@
+import { useBackdropRoute } from './Backdrop'
 import { useMemo, useState } from 'react'
 import { useReach } from './Reach'
 import { ColourBlindContext, useColourBlind } from './ColourBlind'
@@ -2462,6 +2463,8 @@ export function MapViewer({ set }: { set: MapSet }) {
   }
   const [routePick, setRoute] = useState(set.routes ? set.routes.of(map) : '')
   const route = set.routes ? (routeList.includes(routePick) ? routePick : routeFor(map)) : ''
+  // The backdrop follows the route picked here (Fates').
+  useBackdropRoute(set.backdropGame ?? '', set.backdropGame ? route : undefined)
   // The second dropdown: a route's paralogues (Fates), or the game's side maps (trial maps).
   const paralogues = (set.routes ? set.routes.side(route) : (set.extras?.maps ?? [])).filter((m) => reach.has(m.id) && !hiddenSide(m))
   const offMain = [...(set.extras?.maps ?? []), ...(set.third?.maps ?? [])]

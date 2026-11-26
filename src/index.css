@@ -4,6 +4,36 @@ html, body {
   background-color: #0a0a0a;
 }
 
+/* The backdrop (Backdrop.tsx, RouteBackground.tsx: the same files as the Roster's, and these rules the same as its). */
+/* Route-themed background (RouteBackground.tsx): React updates these elements' color attributes in
+   place on route change (same SVG structure every time, just different fill/stroke/stop-color), so
+   a plain CSS transition on those properties turns that into a smooth 1s cross-fade instead of an
+   instant snap. */
+.route-bg stop,
+.route-bg ellipse,
+.route-bg circle,
+.route-bg g {
+  transition: fill 1000ms ease, stroke 1000ms ease, stop-color 1000ms ease;
+}
+
+/* Covers the case a plain color transition can't: when a route change swaps the edge-strip flower
+   shape itself (e.g. Birthright's blossom to Conquest's rose), RouteBackground.tsx remounts that
+   group under a fresh key rather than reusing the old DOM nodes — there's no way to interpolate
+   between different element types/counts via CSS attribute transitions. This animation just fades
+   the freshly-mounted shape in instead of letting it pop in fully opaque immediately. */
+@keyframes route-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.route-fade-in {
+  animation: route-fade-in 700ms ease;
+}
+/* A new game's backdrop fades in over the last one's in a second (Backdrop.tsx; the user's call, 2026-11-26). */
+.backdrop-fade-in {
+  animation: route-fade-in 1000ms ease;
+}
+
+
 @layer base {
   select {
     appearance: none;

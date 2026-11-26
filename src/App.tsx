@@ -1,3 +1,4 @@
+import { Backdrop } from './components/Backdrop'
 import { useEffect, useMemo, useState } from 'react'
 import { DifficultyContext } from './components/Difficulty'
 import { Home } from './components/Home'
@@ -150,7 +151,10 @@ function App() {
   const held = block && !!parts && !story && NEEDS_STORY.includes(tool)
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 p-4 text-neutral-200">
+    <div className="isolate mx-auto flex min-h-screen max-w-6xl flex-col gap-4 p-4 text-neutral-200">
+      {/* The game's backdrop, as the Roster's: Fates' route art, the plain page for the rest until theirs is made (the user's call,
+          2026-11-26), fading over a second as the game or route changes. */}
+      <Backdrop gameId={gameId || undefined} />
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>

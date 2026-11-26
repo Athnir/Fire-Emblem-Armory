@@ -415,6 +415,7 @@ export function mapRoute(map: ChapterMap): MapRoute {
 
 /** Fates on the map page: its routes, three difficulties and the Fire Emblem Wiki's movement classes. */
 export const FATES_MAP_SET: MapSet = {
+  backdropGame: 'fates',
   maps: ALL_MAPS,
   routes: {
     list: MAP_ROUTES,

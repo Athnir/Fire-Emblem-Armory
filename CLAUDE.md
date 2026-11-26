@@ -1222,6 +1222,10 @@ A global switch (header, any game) that lets someone play along without being to
 - **Icons are the app's own 10×10 pixel sprites** (NES Zelda look) in `src/icons/sprites.ts`, never emoji.
   Each should look like the thing, be distinct from the others, and not be overdone. The legend uses the
   same icons as the map.
+- **Each game has a backdrop, the same in both apps** (the user's call, 2026-11-26): art behind every page, one per game and per route,
+  drawn in code (nothing from the games), `src/components/Backdrop.tsx` and `RouteBackground.tsx` word for word the same in the Roster
+  and the Armory (a change to one goes to both). Fates' is its chapter splash colours and flowers by route; every other game has its
+  slot, the plain page until its art is made. A game's route change fades in a second, and so does a change of game.
 - **Everything fits a phone screen.** Tapping a weapon scrolls to its datasheet. A select is never wider than the screen (the game
   picker's longest option made the whole page scroll sideways): `src/index.css`.
 - **Wording works for every game** ("Lord's start", not "Corrin's start").
