@@ -30,7 +30,7 @@ export function Fe17Supports() {
             <tbody>
               {t.levels.map((l) => (
                 <tr key={l.level} className="border-b border-neutral-800">
-                  <td className="py-1 pr-4">{l.level === 'Ring' ? 'Ring (pact ring)' : l.level}</td>
+                  <td className="py-1 pr-4">{l.level === 'Ring' ? 'Ring (Pact Ring)' : l.level}</td>
                   <td className={cell}>{sign(l.hit)}</td>
                   <td className={cell}>{sign(l.crit)}</td>
                   <td className={cell}>{sign(l.avoid)}</td>

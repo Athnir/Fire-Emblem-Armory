@@ -176,6 +176,48 @@ describe("Engage's story maps", () => {
   it('places what the openings bring: Chapter 10 opens with nineteen of its foes', () => {
     expect(totals(map('fe17-m010'))[0]).toBe(21)
   })
+
+  it('says who a talk recruits, and how else the unit joins: each talk played, its join read', () => {
+    const unit = (id: string, name: string) => map(id).units.find((u) => u.name === name)!
+    // A talk whose function has the one talked to join (UnitJoin); the bond scene's end joins Jade and Saphir anyway if they survive
+    // (m009_kizuna's and m019_kizuna's Ending), and Seadall's talk binds Emblem Corrin to him (UnitCreateGodUnit).
+    expect(unit('fe17-m009', 'Jade').talk).toBe('Recruit: talk with Alear or Diamant; she joins after the battle anyway if she survives')
+    expect(unit('fe17-m015', 'Seadall').talk).toBe('Recruit: talk with Alear; he joins with Emblem Corrin')
+    expect(unit('fe17-m018', 'Lindon').talk).toBe('Recruit: talk with Alear, Ivy or Hortensia')
+    expect(unit('fe17-m019', 'Saphir').talk).toBe(
+      'Recruit: talk with Alear, Diamant or Alcryst; she joins after the battle anyway if she survives',
+    )
+    // Paralogue 1's Jean comes on turn 1; Paralogue 2's Anna comes out of the chest, yours at once if Alear opens it (s002.lua).
+    const joiner = (id: string, name: string) => map(id).joiners!.find((j) => j.name === name)!
+    expect(joiner('fe17-s001', 'Jean').talk).toBe('Recruit: talk with Alear; he joins after the battle anyway if he survives')
+    expect(joiner('fe17-s002', 'Anna').talk).toBe(
+      'Recruit: talk with Alear; she joins at once if Alear opens the chest at (14, 4), and after the battle anyway if she survives',
+    )
+    // No one else on Engage's maps is a talk's recruit (Chapter 4's talks with Céline's retainers, Chapter 9's with Jade once she's
+    // yours and Chapter 22's emblem talks recruit no one).
+    const talked = new Set(FE17_MAPS.flatMap((m) => [...m.units, ...(m.joiners ?? [])].filter((u) => u.talk).map((u) => u.name)))
+    expect([...talked].sort()).toEqual(['Anna', 'Jade', 'Jean', 'Lindon', 'Saphir', 'Seadall'])
+  })
+
+  it("gives a unit its person's items before its placement's, as the game creates it", () => {
+    // App.Unit.CreateFromDispos: CreateImpl1 adds person.xml's Items, SetDispos the placement's (Jade's and Saphir's are empty).
+    const unit = (id: string, name: string) => map(id).units.find((u) => u.name === name)!
+    expect(unit('fe17-m009', 'Jade').carries).toEqual(['Steel Axe', 'Vulnerary'])
+    expect(unit('fe17-m019', 'Saphir').carries).toEqual(['Brave Axe', 'Tomahawk', 'Elixir'])
+    // The emblems Fell Xenologue 3's foes summon carry their own weapons.
+    const marth = map('fe17-e003').reinforcements!.flatMap((g) => g.units).find((u) => u.name === 'Marth')!
+    expect(marth.carries).toEqual(['Rapier (Marth, foes)', 'Mercurius (Marth, foes)', 'Falchion (Marth, foes)'])
+  })
+
+  it("outlines where a unit's escape wins the battle", () => {
+    // An escape event whose function sets the win variable (勝利): Chapter 11's Alear, Chapter 15's Seadall. Seadall's wins only
+    // once he has joined you (its condition holds after his talk); the escape by the way in does nothing.
+    expect(map('fe17-m011').objectives).toEqual([{ type: 'escape', tiles: [[8, 2], [9, 2]], label: 'Escape' }])
+    expect(map('fe17-m015').objectives).toEqual([
+      { type: 'escape', tiles: [[24, 2], [25, 2]], label: 'Where Seadall escapes, once he has joined you' },
+    ])
+    expect(FE17_MAPS.filter((m) => m.objectives.length).map((m) => m.id)).toEqual(['fe17-m011', 'fe17-m015'])
+  })
 })
 
 describe("Engage's maps as its battle scenes draw them", () => {
@@ -325,9 +367,15 @@ describe("Engage's weapons", () => {
 
   it("gives each emblem's engage weapons from the chapter it joins, those past its bond cap once its paralogue lifts it", () => {
     const at = (name: string) => FE17_ITEM_SOURCES[name].map((x) => [x.mapId, x.kind, x.text])
-    // Marth joins in Chapter 1's battle: his Rapier from Chapter 2; his Falchion (bond 15, past the cap of 11) with The Hero-King.
+    // Marth joins in Chapter 1's battle: his Rapier from Chapter 2; his Falchion (bond 15, past the cap at 10: LevelCap 11 is the first
+    // locked level, App.GodBond.IsLevelCapNormal) with The Hero-King.
     expect(at('Rapier (Marth)')).toEqual([['fe17-m001', 'engage-later', 'Engage weapon of Marth at bond level 1']])
-    expect(at('Falchion (Marth)')[0][0]).toBe('fe17-s014')
+    expect(at('Falchion (Marth)')).toEqual([
+      ['fe17-s014', 'engage', 'Engage weapon of Marth at bond level 15 (past bond level 10, where its bond stops until The Hero-King lifts the cap)'],
+    ])
+    // Emblem Alear has no unlock variable, so no cap (App.GodUnit.IsUnlockedLevelCap): its bond follows its wearer's support with
+    // Alear (A is bond 20), and its Oligoludia is yours from the chapter after its ring is made (m022.lua's Ending).
+    expect(at('Oligoludia (Alear)')).toEqual([['fe17-m022', 'engage-later', 'Engage weapon of Alear at bond level 20']])
     // Roy comes with Diamant in Chapter 8 (the Ally group's emblem); Tiki after her Divine Paralogue, a breath for each unit type.
     expect(at('Lancereaver (Roy)')[0].slice(0, 2)).toEqual(['fe17-m008', 'engage-later'])
     expect(at('Fire Breath (Tiki)')[0][2]).toBe('Engage weapon of Tiki at bond level 1, for Backup, Cavalry, Covert or Qi Adept units')
@@ -357,6 +405,14 @@ describe("Engage's weapons", () => {
     expect(at('Obstruct').find((x) => x[1] === 'gift-later')?.[2]).toMatch(/^Given after the battle if the Villager at \(\d+, \d+\) survives$/)
     expect(FE17_ITEM_SOURCES['Libération (upgraded, Normal)'].map((s) => [s.mapId, s.kind, s.difficulties])).toEqual([
       ['fe17-e006', 'gift', ['Normal']],
+    ])
+    // Nel and Rafal join at the Somniel once Fell Xenologue is cleared (hub_solanelcommon_p3's HubSolanelEvilEnd), Rafal by the
+    // name its battles knew him by too (Nil: the same portrait, 049Il).
+    expect(at('Fell Slaystone')).toEqual([
+      ['fe17-e006', 'kit-later', 'Carried by Rafal (Nil), who joins at the Somniel once Fell Xenologue is cleared'],
+    ])
+    expect(at('Fell Magicstone')).toEqual([
+      ['fe17-e006', 'kit-later', 'Carried by Nel, who joins at the Somniel once Fell Xenologue is cleared'],
     ])
   })
 

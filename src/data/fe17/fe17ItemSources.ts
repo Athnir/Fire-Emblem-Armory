@@ -3922,6 +3922,15 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s009",
       "kind": "foe",
       "text": "Carried by Sigurd"
+    },
+    {
+      "mapId": "fe17-e003",
+      "kind": "foe-later",
+      "text": "Carried by Sigurd (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
     }
   ],
   "Brave Lance (Sigurd, foes)": [
@@ -4096,6 +4105,15 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Roy"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Roy (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
     }
   ],
   "Lancereaver (Roy, foes)": [
@@ -4103,6 +4121,15 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Roy"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Roy (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
     }
   ],
   "Wyrmslayer (Roy, foes)": [
@@ -4110,6 +4137,15 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s012",
       "kind": "foe",
       "text": "Carried by Roy"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Roy (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
     }
   ],
   "Seraphim (Celica, foes)": [
@@ -4117,6 +4153,19 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s013",
       "kind": "foe",
       "text": "Carried by Celica"
+    },
+    {
+      "mapId": "fe17-e003",
+      "kind": "foe-later",
+      "text": "Carried by Celica (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Celica (arrives later)"
     }
   ],
   "Ragnarok (Celica, foes)": [
@@ -4124,6 +4173,19 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s013",
       "kind": "foe",
       "text": "Carried by Celica"
+    },
+    {
+      "mapId": "fe17-e003",
+      "kind": "foe-later",
+      "text": "Carried by Celica (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Celica (arrives later)"
     }
   ],
   "Recover (Celica, foes)": [
@@ -4131,6 +4193,19 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-s013",
       "kind": "foe",
       "text": "Carried by Celica"
+    },
+    {
+      "mapId": "fe17-e003",
+      "kind": "foe-later",
+      "text": "Carried by Celica (arrives later)",
+      "difficulties": [
+        "Maddening"
+      ]
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Celica (arrives later)"
     }
   ],
   "Speed Tonic": [
@@ -4168,6 +4243,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Maddening"
       ]
+    },
+    {
+      "mapId": "fe17-e003",
+      "kind": "foe-later",
+      "text": "Carried by Marth (arrives later)"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Marth (arrives later)"
     }
   ],
   "Falchion (Marth, foes)": [
@@ -4178,6 +4263,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Maddening"
       ]
+    },
+    {
+      "mapId": "fe17-e003",
+      "kind": "foe-later",
+      "text": "Carried by Marth (arrives later)"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Marth (arrives later)"
     }
   ],
   "Rapier (Marth, foes)": [
@@ -4188,6 +4283,16 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "difficulties": [
         "Maddening"
       ]
+    },
+    {
+      "mapId": "fe17-e003",
+      "kind": "foe-later",
+      "text": "Carried by Marth (arrives later)"
+    },
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Marth (arrives later)"
     }
   ],
   "Pact Ring": [
@@ -5400,30 +5505,41 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       ]
     }
   ],
+  "Light Brand (Leif, foes, ++)": [
+    {
+      "mapId": "fe17-e006",
+      "kind": "foe-later",
+      "text": "Carried by Leif (arrives later)",
+      "difficulties": [
+        "Hard",
+        "Maddening"
+      ]
+    }
+  ],
   "Fell Stone": [
     {
       "mapId": "fe17-e006",
       "kind": "kit-later",
-      "text": "Carried by Nel"
+      "text": "Carried by Nel, who joins at the Somniel once Fell Xenologue is cleared"
     },
     {
       "mapId": "fe17-e006",
       "kind": "kit-later",
-      "text": "Carried by Rafal"
+      "text": "Carried by Rafal (Nil), who joins at the Somniel once Fell Xenologue is cleared"
     }
   ],
   "Fell Magicstone": [
     {
       "mapId": "fe17-e006",
       "kind": "kit-later",
-      "text": "Carried by Nel"
+      "text": "Carried by Nel, who joins at the Somniel once Fell Xenologue is cleared"
     }
   ],
   "Fell Slaystone": [
     {
       "mapId": "fe17-e006",
       "kind": "kit-later",
-      "text": "Carried by Rafal"
+      "text": "Carried by Rafal (Nil), who joins at the Somniel once Fell Xenologue is cleared"
     }
   ],
   "Libération (upgraded, Normal)": [
@@ -5513,7 +5629,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s014",
       "kind": "engage",
-      "text": "Engage weapon of Marth at bond level 15 (above its bond cap of 11, which The Hero-King lifts)"
+      "text": "Engage weapon of Marth at bond level 15 (past bond level 10, where its bond stops until The Hero-King lifts the cap)"
     }
   ],
   "Ridersbane (Sigurd)": [
@@ -5534,7 +5650,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s009",
       "kind": "engage",
-      "text": "Engage weapon of Sigurd at bond level 15 (above its bond cap of 11, which The Holy Knight lifts)"
+      "text": "Engage weapon of Sigurd at bond level 15 (past bond level 10, where its bond stops until The Holy Knight lifts the cap)"
     }
   ],
   "Seraphim (Celica)": [
@@ -5555,7 +5671,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s013",
       "kind": "engage",
-      "text": "Engage weapon of Celica at bond level 15 (above its bond cap of 11, which The Caring Princess lifts)"
+      "text": "Engage weapon of Celica at bond level 15 (past bond level 10, where its bond stops until The Caring Princess lifts the cap)"
     }
   ],
   "Eternal Claw (Tiki)": [
@@ -5781,7 +5897,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s011",
       "kind": "engage",
-      "text": "Engage weapon of Micaiah at bond level 15 (above its bond cap of 11, which The Dawn Maiden lifts)"
+      "text": "Engage weapon of Micaiah at bond level 15 (past bond level 10, where its bond stops until The Dawn Maiden lifts the cap)"
     }
   ],
   "Killer Axe (Leif)": [
@@ -5802,7 +5918,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s010",
       "kind": "engage",
-      "text": "Engage weapon of Leif at bond level 15 (above its bond cap of 11, which The Sage Lord lifts)"
+      "text": "Engage weapon of Leif at bond level 15 (past bond level 10, where its bond stops until The Sage Lord lifts the cap)"
     }
   ],
   "Lancereaver (Roy)": [
@@ -5823,7 +5939,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s012",
       "kind": "engage",
-      "text": "Engage weapon of Roy at bond level 15 (above its bond cap of 11, which The Young Lion lifts)"
+      "text": "Engage weapon of Roy at bond level 15 (past bond level 10, where its bond stops until The Young Lion lifts the cap)"
     }
   ],
   "Killer Bow (Lyn)": [
@@ -5844,7 +5960,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-s004",
       "kind": "engage",
-      "text": "Engage weapon of Lyn at bond level 15 (above its bond cap of 11, which The Lady of the Plains lifts)"
+      "text": "Engage weapon of Lyn at bond level 15 (past bond level 10, where its bond stops until The Lady of the Plains lifts the cap)"
     }
   ],
   "Noble Rapier (Lucina)": [
@@ -5865,7 +5981,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m011",
       "kind": "engage-later",
-      "text": "Engage weapon of Lucina at bond level 15 (above its bond cap of 11, which The Exalt lifts)"
+      "text": "Engage weapon of Lucina at bond level 15 (past bond level 10, where its bond stops until The Exalt lifts the cap)"
     }
   ],
   "Hammer (Ike)": [
@@ -5886,7 +6002,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m013",
       "kind": "engage-later",
-      "text": "Engage weapon of Ike at bond level 15 (above its bond cap of 11, which The Radiant Hero lifts)"
+      "text": "Engage weapon of Ike at bond level 15 (past bond level 10, where its bond stops until The Radiant Hero lifts the cap)"
     }
   ],
   "Blutgang (Byleth)": [
@@ -5956,7 +6072,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m014",
       "kind": "engage-later",
-      "text": "Engage weapon of Byleth at bond level 15 (above its bond cap of 11, which The Instructor lifts)"
+      "text": "Engage weapon of Byleth at bond level 15 (past bond level 10, where its bond stops until The Instructor lifts the cap)"
     }
   ],
   "Dual Katana (Corrin)": [
@@ -5977,7 +6093,7 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m015",
       "kind": "engage-later",
-      "text": "Engage weapon of Corrin at bond level 15 (above its bond cap of 11, which The Crux of Fate lifts)"
+      "text": "Engage weapon of Corrin at bond level 15 (past bond level 10, where its bond stops until The Crux of Fate lifts the cap)"
     }
   ],
   "Rapier (Eirika)": [
@@ -6008,12 +6124,12 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Eirika at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
+      "text": "Engage weapon of Eirika at bond level 15 (past bond level 10, where its bond stops until The Azure Twin lifts the cap)"
     },
     {
       "mapId": "fe17-m016",
       "kind": "engage-later",
-      "text": "Engage weapon of Ephraim at bond level 15 (above its bond cap of 11, which The Azure Twin lifts)"
+      "text": "Engage weapon of Ephraim at bond level 15 (past bond level 10, where its bond stops until The Azure Twin lifts the cap)"
     }
   ],
   "Lyrátion (Alear)": [
@@ -6028,6 +6144,13 @@ export const FE17_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "mapId": "fe17-m022",
       "kind": "engage-later",
       "text": "Engage weapon of Alear at bond level 10"
+    }
+  ],
+  "Oligoludia (Alear)": [
+    {
+      "mapId": "fe17-m022",
+      "kind": "engage-later",
+      "text": "Engage weapon of Alear at bond level 20"
     }
   ]
 }

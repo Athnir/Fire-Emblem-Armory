@@ -295,7 +295,12 @@ def unit_entry(n, u, d, t):
     e = {'type': kind, 'name': n.name(row), 'tile': app_tile(t, u.x, u.z), '_pid': u.pid}
     if kind == 'ally' and generic:
         e['generic'] = True
-    items = [(row[f'Item{k}.Iid'], row[f'Item{k}.Drop']) for k in range(1, 7) if row[f'Item{k}.Iid']]
+    # A unit the battle creates holds its person's own items (person.xml Items: Jade's Steel Axe, the emblems Fell Xenologue's foes
+    # summon), then its placement's (App.Unit.CreateFromDispos: CreateImpl1 adds the person's, SetDispos the placement's, with their
+    # drop flags; a skirmish's and a Tempest Trial's foe the same, App.Unit.CreateEncountPost).
+    person = n.person.get(u.pid) or {}
+    items = [(iid, '') for iid in D.flag_list(person.get('Items', ''))] + [
+        (row[f'Item{k}.Iid'], row[f'Item{k}.Drop']) for k in range(1, 7) if row[f'Item{k}.Iid']]
     drops = [n.item_name(i) for i, dr in items if dr == '1' and n.item_name(i)]
     carries = [n.item_name(i) for i, dr in items if dr != '1' and n.item_name(i)]
     if drops:
@@ -848,7 +853,7 @@ def own_at_start(b):
 def script_joins():
     """Who each battle has join your army, by script (UnitJoin: its own arguments, or the `pid` it's handed: Chapter 6's Yunaka): a
     battle's script and its bond scene's (`m009_kizuna`) count for that battle; the Somniel's for the battle they wait for
-    (HubIsCompleteChapter: Fell Xenologue's army joins once its last chapter is cleared). {battle: [pid]}."""
+    (HubIsCompleteChapter: Fell Xenologue's army joins once its last chapter is cleared). {battle: {pid: 'battle' or 'somniel'}}."""
     out = {}
     folder = os.path.join(D.ROMFS, 'scripts')
     for f in sorted(os.listdir(folder)):
@@ -865,9 +870,19 @@ def script_joins():
             hub = re.findall(r'HubIsCompleteChapter\(\s*"([A-Z]\d{3})"\s*\)', body)
             battle = own.group(1) if own else hub[-1].lower() if hub else None
             if battle:
-                out.setdefault(battle, [])
-                out[battle] += [p for p in pids if p not in out[battle]]
+                for p in pids:
+                    out.setdefault(battle, {}).setdefault(p, 'battle' if own else 'somniel')
     return out
+
+
+def xeno_alias(n, pid):
+    """The name Fell Xenologue's own persons with this person's portrait go by, where it isn't the person's own (UnitIconID: Rafal's
+    049Il is Nil's, the name he has through Fell Xenologue until its last scene gives his own: e006 MID_ED1)."""
+    p = n.person[pid]
+    names = Counter(text(r['Name']) for r in n.person.values()
+                    if re.match(r'PID_E\d{3}_', r['Pid']) and r['Name'] and r['UnitIconID'] == p['UnitIconID'])
+    alias = names.most_common(1)[0][0] if names else None
+    return alias if alias and alias != text(p['Name']) else None
 
 
 OWN_SEEN = set()
@@ -877,9 +892,12 @@ def own_kits(name, map_id, n, starters, sources):
     """Your units' own gear, counted once, in the battle where each first becomes yours: placed on your side (Chapter 1's Alear and
     Vander) or joining by its scripts (script_joins: Chapter 3's Firenese army). It carries its placement's items there, or, with
     none, its person's (person.xml Items: Nel's after Fell Xenologue). A unit that joins after the battle's first turn counts from the
-    next chapter. Fell Xenologue's army (persons of its own, PID_E00n_...) and the Prologue's Alear stay in their battles."""
+    next chapter; one the Somniel's script has join once the battle is cleared says so, with the name Fell Xenologue knew it by where
+    that's another (xeno_alias: "Rafal (Nil)"). Fell Xenologue's army (persons of its own, PID_E00n_...) and the Prologue's Alear stay
+    in their battles."""
     pids = dict(starters or {})
-    for pid in script_joins().get(name.lower(), []):
+    joins = script_joins().get(name.lower(), {})
+    for pid in joins:
         pids.setdefault(pid, 'later')
     rows = {}
     for _, rs in D.dispos(name):
@@ -894,10 +912,15 @@ def own_kits(name, map_id, n, starters, sources):
         if not iids:
             iids = D.flag_list(n.person[pid]['Items'])
         who = n.name(r) if r else text(n.person[pid]['Name'])
+        words = f'Carried by {who}'
+        if joins.get(pid) == 'somniel':
+            alias = xeno_alias(n, pid)
+            story = ROUTE['E'] if name.upper() == XENO[-1] else text(f'MCID_{name.upper()}_PREFIX')
+            words = f"Carried by {who}{f' ({alias})' if alias else ''}, who joins at the Somniel once {story} is cleared"
         for iid in iids:
             item = n.item_name(iid)
             if item:
-                add_source(sources, item, map_id, 'kit' if when == 'start' else 'kit-later', f'Carried by {who}')
+                add_source(sources, item, map_id, 'kit' if when == 'start' else 'kit-later', words)
 
 
 def end_gifts(name, n, t):
@@ -979,6 +1002,195 @@ def end_gifts(name, n, t):
     return [(iid, pid, words, None if len(ds) == len(DIFFS) else ds) for (iid, pid, words), ds in found.items()]
 
 
+def fired(name, d, i, by_lord=True):
+    """A battle with its event i brought about: by the lord (Battle.happen), or by another of your units (a deployment slot's)."""
+    b = E.battle(name, d)
+    if by_lord:
+        b.happen(b.events[i])
+    else:
+        b.fire(b.events[i], actor=next((u for u in b._force_units(E.FORCE_PLAYER) if u.pid != LORD), None))
+    return b
+
+
+def with_unit(name, d, pid):
+    """The battle played until a unit is on the map and not yet yours: at the start, else once the turns place it (Paralogue 1's Jean,
+    on turn 1), else once the event that places it has happened, brought about by the lord or another of your units (Paralogue 2's
+    Anna, out of a chest: opened by Alear, she joins at once). None where nothing does."""
+    b = E.battle(name, d)
+    for turn in range(1, TURNS + 1):
+        if b._unit(pid) is not None:
+            return b
+        b.run_turns(turn, first=turn)
+    if b._unit(pid) is not None:
+        return b
+    for ev in E.battle(name, d).events:
+        if ev['kind'] in E.TURN_KINDS or ev['kind'] == 'EventEntryTalk':
+            continue
+        for by_lord in (True, False):
+            try:
+                pb = fired(name, d, ev['index'], by_lord)
+            except E.LuaError:
+                continue
+            u = pb._unit(pid)
+            if u is not None and u.force != E.FORCE_PLAYER:
+                return pb
+    return None
+
+
+# What the lord does to an event's tile, where the event has a recruit join at once only when it's the lord who does it.
+LORD_DOES = {'EventEntryTbox': 'opens the chest at', 'EventEntryVisit': 'visits the village at', 'EventEntryDoor': 'opens the door at'}
+
+
+def talk_recruits(name, d, t):
+    """Who the chapter's talks recruit (EventEntryTalk: its function, the talker, the talker's army, the one talked to, its army, ...,
+    its condition), each talk brought about as Battle.happen does with the one talked to on the map: {pid: (talkers, emblems, acts)},
+    the talkers in the script's order ('' for any of your units), the emblems the talk binds to the recruit (UnitSetGodUnit: Chapter
+    15's talk gives Seadall Corrin) and what else of the lord's has the recruit join at once ('opens the chest at (14, 4)': Paralogue
+    2's Anna, whose chest opened by anyone else leaves her green). A talk with someone already yours (Chapter 9's with Jade once she's
+    joined) recruits no one."""
+    out = {}
+    for ev in E.battle(name, d).registered('EventEntryTalk'):
+        talker, target = ev['args'][1], ev['args'][3]
+        b = with_unit(name, d, target) if target else None
+        if b is None:
+            continue
+        mark = len(b.log)
+        try:
+            if not b.happen(b.events[ev['index']]):
+                continue
+        except E.LuaError:
+            continue
+        log = b.log[mark:]
+        if not any(kind == 'join' and data['pid'] == target for _, kind, data in log):
+            continue
+        talkers, gods, acts = out.setdefault(target, ([], [], []))
+        if talker not in talkers:
+            talkers.append(talker)
+        for _, kind, data in log:
+            if kind == 'god' and data['pid'] == target and data['gid'] not in gods:
+                gods.append(data['gid'])
+    for target, (_, _, acts) in out.items():
+        for ev in E.battle(name, d).events:
+            if ev['kind'] not in LORD_DOES:
+                continue
+            joins = []
+            for by_lord in (True, False):
+                try:
+                    pb = fired(name, d, ev['index'], by_lord)
+                except E.LuaError:
+                    joins.append(None)
+                    continue
+                joins.append(any(kind == 'join' and data['pid'] == target for at, kind, data in pb.log if at[0] == 'event'))
+            if joins == [True, False]:
+                x, y = app_tile(t, int(ev['args'][1]), int(ev['args'][2]))
+                acts.append(f"{LORD_DOES[ev['kind']]} ({x}, {y})")
+    return out
+
+
+def end_joins(name, d):
+    """Who the battle's end has join your army when no talk has (Chapter 9's Jade: m009_kizuna's Ending joins her if she survives and
+    isn't yours yet): the end played as end_gifts plays it, its bond scene (Startup, Opening, MapOpening, MapEnding, Ending) on a map
+    that holds your army alone, as the walk about the battlefield does (a green unit left on the battlefield isn't in it: UnitIsExist
+    is false), then again after each death the script registers for one who joins. {pid: True where only a survivor joins}."""
+    kizuna = name.lower() + '_kizuna'
+    has_kizuna = os.path.exists(os.path.join(D.ROMFS, 'scripts', kizuna + '.lua'))
+
+    def ended(setup=None):
+        b = E.battle(name, d)
+        if setup:
+            setup(b)
+        b.lua.globals['HubIsEncountMap'] = lambda *a: False
+        b.at = ('end',)
+        mark = len(b.log)
+        b.call('MapEnding')
+        b.call('Ending')
+        if has_kizuna:
+            for u in b.units:
+                if u.force != E.FORCE_PLAYER:
+                    u.on_map = False
+            b._include(kizuna)
+            for f in ('Startup', 'Opening', 'MapOpening', 'MapEnding', 'Ending'):
+                b.call(f)
+        return {data['pid'] for at, kind, data in b.log[mark:] if kind == 'join' and data['pid']}
+    try:
+        first = E.battle(name, d)
+        out = {}
+        for pid in ended():
+            deaths = [ev['index'] for ev in first.registered('EventEntryDie') if ev['args'][1] == pid]
+            out[pid] = any(pid not in ended(lambda b, i=i: b.happen(b.events[i])) for i in deaths)
+        return out
+    except E.LuaError as e:
+        print(f'{name}: the end scripts stopped: {e}')
+        return {}
+
+
+def pronoun(n, pid):
+    return {'1': 'he', '2': 'she'}.get((n.person.get(pid) or {}).get('Gender'), 'it')
+
+
+def talk_words(n, pid, talkers, gods, acts, survivor):
+    """A talk recruit in words, as Awakening's maps give one: 'Recruit: talk with Alear or Diamant', then how the unit joins besides:
+    with what the talk binds to it ('he joins with Emblem Corrin'), at once where the lord does something else ('she joins at once if
+    Alear opens the chest at (14, 4)') and after the battle where its end has the unit join anyway (`survivor`: True if only alive, None
+    where it doesn't)."""
+    names = {r['Gid']: r for r in D.rows('god')}
+    words = 'Recruit: talk with ' + joined([n.name({'Pid': p, 'Jid': ''}) if p else 'any of your units' for p in talkers], 'or')
+    she = pronoun(n, pid)
+    ways = [f"with Emblem {text(names[gid]['Mid'])}" for gid in gods if gid in names]
+    if acts:
+        ways.append(f"at once if {n.name({'Pid': LORD, 'Jid': ''})} {joined(acts, 'or')}")
+    if survivor is not None:
+        ways.append('after the battle anyway' + (f' if {she} survives' if survivor else ''))
+    return words + (f"; {she} joins {', and '.join(ways)}" if ways else '')
+
+
+# The variable that wins the battle once set (App.MapSituation.IsComplete reads it, SetComplete sets it; 敗北 the same for a loss,
+# IsGameOver): Chapter 11's and 15's escapes set it.
+WIN_VAR = '勝利'
+
+
+def escape_goals(name, n, t, b, talks):
+    """The tiles a unit escapes by to win, as objectives: an escape event (EventEntryEscape: its function, the tile, the unit, its
+    condition) whose function sets the win variable (Chapter 11's Alear, Chapter 15's Seadall), the lord's 'Escape' and another's
+    'Where Seadall escapes'. One whose condition holds only once another of the chapter's events has happened says so: 'once he has
+    joined you' where that's the talk that recruits him (Chapter 15's: its escape at the start does nothing, and the doors the talk
+    closes shut it)."""
+    present = {u.pid for u in b.units}
+    clauses = Clauses(n, t, b, present)
+    goals = {}
+    for ev in b.registered('EventEntryEscape'):
+        x, z, pid = int(ev['args'][1]), int(ev['args'][2]), ev['args'][3]
+        pb = E.battle(name, 0)
+        try:
+            pb.fire(pb.events[ev['index']], actor=pb._unit(pid))
+        except E.LuaError:
+            continue
+        if pb.vars.get(WIN_VAR) != 1:
+            continue
+        once = ''
+        fresh = E.battle(name, 0)
+        if not fresh.condition(fresh.events[ev['index']]):
+            for other in b.events:
+                if other['kind'] in E.TURN_KINDS or other['kind'] == 'EventEntryEscape':
+                    continue
+                pb = E.battle(name, 0)
+                try:
+                    pb.happen(pb.events[other['index']])
+                    holds = pb.condition(pb.events[ev['index']])
+                except E.LuaError:
+                    continue
+                if holds:
+                    recruits = other['kind'] == 'EventEntryTalk' and other['args'][3] == pid and pid in talks
+                    said = clauses.cause(('event', other['index']), b)
+                    once = f', once {pronoun(n, pid)} has joined you' if recruits else f', once {said}' if said else ''
+                    break
+        who = 'Escape' if pid == LORD else f"Where {n.name({'Pid': pid, 'Jid': ''})} escapes"
+        tiles = goals.setdefault(who + once, [])
+        if app_tile(t, x, z) not in tiles:
+            tiles.append(app_tile(t, x, z))
+    return [{'type': 'escape', 'tiles': tiles, 'label': label} for label, tiles in goals.items()]
+
+
 def start_units(b):
     """What stands on the map once the opening is over: the start's groups and what the opening places (Chapter 10's army)."""
     opening = {id(u) for at, kind, data in b.log if kind == 'dispos' and at[0] in ('start', 'opening') for u in data['units']}
@@ -1027,10 +1239,21 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
     tiers = {}
     starters = None
     opening_gifts = {}
+    normal_talks = None
     for d, dname in enumerate(DIFFS):
         b = play(name, d, levels[0] if levels else None)
         if starters is None:
             starters = own_at_start(b)
+        # Who a talk recruits, said on the unit talked to, with the end's join where a survivor joins anyway (Chapter 9's Jade).
+        talks = talk_recruits(name, d, t)
+        survivors = end_joins(name, d) if talks else {}
+        if normal_talks is None:
+            normal_talks = talks
+
+        def told(e, pid):
+            if pid in talks:
+                e['talk'] = talk_words(n, pid, *talks[pid], survivors.get(pid))
+            return e
         # What the start gives (Fell Xenologue 6's opening hands Alear its Libération, one on Normal, another on Hard and Maddening).
         for at, kind, data in b.log:
             if kind == 'item' and at[0] in ('start', 'opening'):
@@ -1060,7 +1283,7 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
                     forced.append(entry)
         units = []
         for u in start:
-            e = unit_entry(n, u, d, t)
+            e = told(unit_entry(n, u, d, t), u.pid)
             if levels:
                 e['note'] = (f"{army_lv(u.row)} {brief(n, u)}; at army level {band(u.row)}"
                              + ''.join(f'. {x}' for x in notes_at.get((u.x, u.z), [])))
@@ -1113,7 +1336,7 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
             g['when'].setdefault(dname, when)
             entries = []
             for u in gunits:
-                e = unit_entry(n, u, d, t)
+                e = told(unit_entry(n, u, d, t), u.pid)
                 for line in retargets.get(u.pid, []):
                     e['note'] += f' {line}'
                 entries.append((u, e))
@@ -1188,9 +1411,12 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
         for u, e in us:
             js.append({'name': e['name'], 'tile': e['tile'], 'from': app_tile(t, *getattr(u, 'came_from', (u.x, u.z))),
                        'group': gname, **({'ally': True} if u.force == E.FORCE_ALLY else {}),
-                       'when': g['when'][dn], **({'areas': g['areas']} if g['areas'] else {})})
+                       'when': g['when'][dn], **({'areas': g['areas']} if g['areas'] else {}),
+                       **({'talk': e['talk']} if e.get('talk') else {})})
     if js:
         m['joiners'] = js
+    # Where a unit's escape wins the battle (Chapter 11's Alear, Chapter 15's Seadall): the map's objective.
+    m['objectives'] = escape_goals(name, n, t, E.battle(name, 0, levels[0] if levels else None), normal_talks or {})
     for (kind, tile), items in objects.items():
         if kind == 'EventEntryVisit':
             m['objects'].append({'type': 'village', 'tile': list(tile), 'reward': ', '.join(sorted(items))})
@@ -1793,8 +2019,11 @@ def write_engravings(story_ids, opens):
 
 def engage_sources(sources, story_ids, opens):
     """Each emblem's engage weapons (god.xml's growth table: at each bond level, for any unit or for one unit type), once the emblem is
-    yours (emblem_joins); a weapon above the emblem's bond cap (11 for the twelve of the story) once its paralogue lifts the cap
-    (紋章士外伝_レベルキャップ開放 in that paralogue's script), or never where nothing lifts it (Emblem Alear's 20)."""
+    yours (emblem_joins); a weapon at or past the emblem's bond cap once its paralogue lifts the cap (紋章士外伝_レベルキャップ開放 in
+    that paralogue's script). The cap (LevelCap, 11 for the twelve of the story) is the first bond level that's locked, so their bond
+    stops at 10 (App.GodBond.IsLevelCapNormal: the next level is LevelCap and App.GodUnit.IsUnlockedLevelCap is false); an emblem with
+    no unlock variable (UnlockLevelCapVarName empty: Emblem Alear, whose bond follows its wearer's support with Alear,
+    App.GodBond.SetLevelFromUnitReliance) has no cap, IsUnlockedLevelCap being true for it."""
     import re
     joins = emblem_joins()
     gods = {r['Gid']: r for r in D.rows('god')}
@@ -1821,7 +2050,7 @@ def engage_sources(sources, story_ids, opens):
         if g is None or not g['GrowTable']:
             continue
         who = text(g['Mid'])
-        cap = int(g['LevelCap'] or 99)
+        cap = int(g['LevelCap'] or 99) if g['UnlockLevelCapVarName'] else 99
         for r in table.get(g['GrowTable'], []):
             level = int(r['Level'] or 0)
             for col, kind in ENGAGE_COLUMNS:
@@ -1830,12 +2059,13 @@ def engage_sources(sources, story_ids, opens):
                     if not name:
                         continue
                     at, later, cap_words = map_id, after, ''
-                    if level > cap:
+                    if level >= cap:
                         lift = lifts.get(g['UnlockLevelCapVarName'])
                         if lift is None:
                             skipped.append(f'{name}: {who} at {level}')
                             continue
-                        cap_words = f' (above its bond cap of {cap}, which {text("MCID_" + lift[5:].upper())} lifts)'
+                        cap_words = (f' (past bond level {cap - 1}, where its bond stops until {text("MCID_" + lift[5:].upper())} '
+                                     'lifts the cap)')
                         if index(lift, False) > index(map_id, after):
                             at, later = lift, False
                     # One weapon for several unit types at one level (Tiki's Fire Breath) is one line.

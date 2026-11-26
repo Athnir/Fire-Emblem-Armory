@@ -127,7 +127,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   side: Lehran in Endgame (5)) or hand-over (`build-fe10-items.py`'s `kit()`), never from a scene's cast (`_op`, `_ed`).
 - **A foe's gear is on the map:** tapping a foe's tile says what it carries on the chosen difficulty (Fates, from the placement
   files: an item slot's flag word leaves it off the difficulties whose byte is 0xFF; Awakening, each slot's level per difficulty,
-  which leaves it off, steps a foe's weapon up its series or forges it, as the program's item loader does).
+  which leaves it off, steps a foe's weapon up its series or forges it, as the program's item loader does; Engage, a unit's own
+  person record's items before its placement's, as the program's `CreateFromDispos` gives them: Jade's and Saphir's, the Fell
+  Xenologue's summoned Emblems').
 - **A weapon only foes carry has no forge or refine table**, and a green unit's gear is yours only if the unit joins your army
   (Engage: `UnitJoin`; Fell Xenologue's Generals and Chapter 12's villagers give you nothing).
 - **Engage's emblem weapons** (every emblem's engage weapons, and the copies the foes' emblems carry) are off until "Show emblem

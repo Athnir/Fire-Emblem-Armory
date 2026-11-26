@@ -5,8 +5,8 @@ The game places a battle's Player, Enemy and Ally groups itself (the program's o
 registers its events: `EventEntryTurn`, `EventEntryArea`...), then MapOpening. Each event is an inspector holding its function, its
 arguments and a condition (`App.MapInspector.IsCondition`: a function's result, a boolean, or the name of a done-flag variable).
 `Battle` runs the script's Lua (fe17_lua.py) with the game's functions written here: they keep the units on the map, the script's
-variables and the terrain, and log what the script does (`Battle.log`: placements, items given, joins, terrain changes) under
-the moment it happened (`Battle.at`).
+variables and the terrain, and log what the script does (`Battle.log`: placements, items given, joins, emblems bound to units,
+terrain changes) under the moment it happened (`Battle.at`).
 
     b = Battle('M004', difficulty=0)       # 0 Normal, 1 Hard, 2 Maddening
     b.start()                              # places the start, runs Startup and MapOpening
@@ -152,6 +152,9 @@ class Battle:
             'SubPrefix': lambda s, *a: str(s).split('_', 1)[-1], 'DisposGetGroupCount': lambda g, *a: len(self.placed(g)),
             'MindGetUnit': lambda: self.actor, 'MindGetEventUnit': lambda: self.actor, 'MindGetTargetUnit': lambda: self.target,
             'UnitCreateGodUnit': None,
+            # An emblem bound to a unit (common.lua's UnitCreateGodUnit: GodUnitCreate, then this; Chapter 15's talk gives Seadall
+            # Corrin): logged ('god').
+            'UnitSetGodUnit': lambda u, gid=None, *a: self._record('god', pid=self._pid(u), gid=gid),
             # Whether a unit's AI has started (a foe waiting until your units come near): none has, unless `active` names it.
             'AiGetActive': self._ai_active,
             'AiSetSequence': self._ai_set,

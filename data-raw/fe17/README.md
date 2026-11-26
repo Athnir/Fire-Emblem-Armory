@@ -127,9 +127,13 @@ Field names are the game's own: every data table names its fields, and the progr
   an emblem's weapons at each bond level, wielded only while engaged (the item's Engage flag), never sold. An emblem is yours from the
   chapter after the battle whose script creates it (`UnitCreateGodUnit`/`GodUnitCreate`: Marth in Chapter 1, Celica with Céline in 4)
   or whose placements bring it with a unit who joins (Roy with Diamant in 8), or whose bond scene does (`m003_kizuna`: Sigurd); a Divine
-  Paralogue's after it (`神竜の章_紋章士加入`), Edelgard, Dimitri and Claude's on the Somniel once Chapter 6 is cleared. A weapon above
-  the emblem's bond cap (`LevelCap`, 11 for the story's twelve) comes once its paralogue lifts it (`紋章士外伝_レベルキャップ開放`:
-  The Hero-King for Marth); Emblem Alear's Oligoludia (bond 20, cap 11, nothing lifts it) is left out.
+  Paralogue's after it (`神竜の章_紋章士加入`), Edelgard, Dimitri and Claude's on the Somniel once Chapter 6 is cleared. The bond cap
+  (`LevelCap`, 11 for the story's twelve) is the first bond level that's locked, so their bond stops at 10 (`App.GodBond.IsLevelCapNormal`:
+  the next level is `LevelCap` and `App.GodUnit.IsUnlockedLevelCap` false; the ring list's `GetToLv` gives 10) until the emblem's
+  paralogue lifts it (`紋章士外伝_レベルキャップ開放` sets `G_<name>レベルキャップ解放`: The Hero-King for Marth), and a weapon at or
+  past it comes then. An emblem with no unlock variable (`UnlockLevelCapVarName` empty) has no cap (`IsUnlockedLevelCap` is true for it):
+  Emblem Alear, whose bond follows its wearer's support with Alear (C 5, B 10, A 20, the Pact Ring's rank 21:
+  `App.GodBond.SetLevelFromUnitReliance`, as the game's tutorial says), so its Oligoludia (bond 20) comes with it.
 - **Engravings** (`god.xml`: `EngraveWord`, `EngravePower`, `EngraveWeight`, `EngraveHit`, `EngraveCritical`, `EngraveAvoid`,
   `EngraveSecure`): an engraving adds its numbers to the weapon's own Mt, Wt, Hit, Crit, Avoid and Dodge, as its refine level's do
   (`App.UnitItem.GetPower`, `GetWeight`, `GetHit`, `GetCritical`, `GetAvoid`, `GetSecure`: the item's, the refine level's and the
@@ -148,8 +152,32 @@ Field names are the game's own: every data table names its fields, and the progr
   as the battle starts or on its first turn (Chapter 1's Alear steps in on turn 1), or joining by a script (`UnitJoin`: its own
   arguments, or the `pid` handed to it; a bond scene's, `m009_kizuna`, for its battle; the Somniel's after Fell Xenologue for that
   battle). It carries its placement's items, or with none its person's (`person.xml` `Items`: Nel's dragonstones). A join after the first
-  turn counts from the next chapter. A green unit that never joins (Fell Xenologue's Generals, Chapter 12's villagers) gives you
-  nothing. Fell Xenologue's own army (persons of its own, `PID_E00n_...`) and the Prologue's Alear stay in their battles.
+  turn counts from the next chapter. One the Somniel's script has join says so ("who joins at the Somniel once Fell Xenologue is
+  cleared"), by the name Fell Xenologue knew it by too where that's another: Fell Xenologue's own persons with its portrait
+  (`UnitIconID`: Rafal's 049Il is Nil's, the name he goes by until its last scene, e006 `MID_ED1`). A green unit that never joins (Fell
+  Xenologue's Generals, Chapter 12's villagers) gives you nothing. Fell Xenologue's own army (persons of its own, `PID_E00n_...`) and
+  the Prologue's Alear stay in their battles.
+- **What a unit on the map holds**: a unit the battle creates holds its person's own items (`person.xml` `Items`), then its
+  placement's with their drop flags (`App.Unit.CreateFromDispos`: `CreateImpl1` adds the person's, `SetDispos` the placement's through
+  `App.DisposData.AddUnitItem`; a skirmish's and a Tempest Trial's foe the same, `App.Unit.CreateEncountEnemy` and
+  `CreateChallengeEnemy` through `CreateEncountPost`, which draws a weapon only where these give none): Jade's Steel Axe and
+  Vulnerary, Saphir's Brave Axe, Tomahawk and Elixir, the emblems Fell Xenologue 3's and 6's foes summon, the skirmishes' Corrupted
+  Wyverns, the Tempest Trials' Phantom Wyrms.
+- **Talks** (`talk_recruits`): each `EventEntryTalk` (its function, the talker, its army, the one talked to, its army, ..., its
+  condition) is brought about as `Battle.happen` does, with the one talked to on the map and not yet yours (at the start, once the
+  turns place it, or once the event that does has happened: Paralogue 1's Jean on turn 1, Paralogue 2's Anna out of a chest); a talk
+  whose function has it join (`UnitJoin`) recruits it, and the unit says who can talk to it: Jade (Alear or Diamant), Seadall (Alear;
+  the talk binds Emblem Corrin to him, `UnitCreateGodUnit`), Lindon (Alear, Ivy or Hortensia), Saphir (Alear, Diamant or Alcryst),
+  Jean and Anna (Alear). It says too where the battle's end has the unit join anyway (`end_joins`: the end played as `end_gifts`
+  plays it, its bond scene's `Startup`, `Opening`, `MapOpening`, `MapEnding` and `Ending` on a map holding your army alone, where a
+  green unit left on the battlefield isn't, `UnitIsExist` false; then again after the unit's death event: "if she survives", Jade,
+  Saphir, Jean and Anna), and where something else of the lord's has it join at once (Anna, when Alear opens her chest; opened by
+  anyone else, she stays green).
+- **Escapes** (`escape_goals`): an `EventEntryEscape` (its function, the tile, the unit, its condition) whose function sets the
+  variable that wins the battle (`勝利`: `App.MapSituation.IsComplete` reads it, `SetComplete` sets it; `敗北` loses it,
+  `IsGameOver`) is the map's objective, outlined: Chapter 11's Alear ("Escape"), Chapter 15's Seadall, whose escape
+  wins only once he has joined you (its condition holds after his talk; the escape where the chapter starts does nothing, and the doors
+  the talk closes shut it).
 - **What a battle's start and end give** (`end_gifts`): an `ItemGain` in the opening (Fell Xenologue 6 hands Alear one Libération on
   Normal, another on Hard and Maddening), and the end's: the battle's `MapEnding` and `Ending`, then its bond scene's script
   (`<map>_kizuna`: its `MapOpening`, `MapEnding`, `Ending`; what its talks give, its `Ending` gives if they haven't). Alear's Libération
