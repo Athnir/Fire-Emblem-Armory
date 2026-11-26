@@ -1144,9 +1144,34 @@ def talk_words(n, pid, talkers, gods, acts, survivor):
     return words + (f"; {she} joins {', and '.join(ways)}" if ways else '')
 
 
-# The variable that wins the battle once set (App.MapSituation.IsComplete reads it, SetComplete sets it; 敗北 the same for a loss,
-# IsGameOver): Chapter 11's and 15's escapes set it.
-WIN_VAR = '勝利'
+# The variables that win and lose the battle once set (App.MapSituation.IsComplete reads 勝利, SetComplete sets it; IsGameOver reads
+# 敗北, SetGameOver sets it): Chapter 11's and 15's escapes set the first, Paralogue 15's the second.
+WIN_VAR, LOSE_VAR = '勝利', '敗北'
+
+
+def escaper(n, b, clauses, pid):
+    """Who an escape names, as the game's rule texts name units: a named unit by its name; a generic one by its class and what it alone
+    of the map's units carries off (Paralogue 15's Barbarian carrying the Pact Ring), else by its tile ('the Barbarian at (15, 12)')."""
+    if not n.generic(pid):
+        return n.name({'Pid': pid, 'Jid': ''})
+    def dropped(u):
+        return [n.item_name(u.row[f'Item{k}.Iid']) for k in range(1, 7) if u.row[f'Item{k}.Iid'] and u.row[f'Item{k}.Drop'] == '1']
+    mine = [i for u in b.units if u.pid == pid and u.on_map for i in dropped(u) if i]
+    others = {i for u in b.units if u.pid != pid and u.on_map for i in dropped(u)}
+    alone = [i for i in mine if i not in others]
+    if alone:
+        u = next(u for u in b.units if u.pid == pid and u.on_map)
+        return f'the {n.class_name(n.job_of(u.row))} carrying the {alone[0]}'
+    return clauses.who(pid)
+
+
+def lost_by(defeat, whos):
+    """The game's loss text with who loses the battle by escaping named: its own 'foe escapes' (Paralogue 15's MID_RULE_S015_LOSE)
+    made that unit, or the clause added where the text doesn't say it."""
+    clause = f"{joined(whos, 'or')} escapes"
+    if 'foe escapes' in defeat:
+        return defeat.replace('foe escapes', clause, 1)
+    return f"{defeat.rstrip('. ')}, or {clause}."
 
 
 def escape_goals(name, n, t, b, talks):
@@ -1154,16 +1179,22 @@ def escape_goals(name, n, t, b, talks):
     condition) whose function sets the win variable (Chapter 11's Alear, Chapter 15's Seadall), the lord's 'Escape' and another's
     'Where Seadall escapes'. One whose condition holds only once another of the chapter's events has happened says so: 'once he has
     joined you' where that's the talk that recruits him (Chapter 15's: its escape at the start does nothing, and the doors the talk
-    closes shut it)."""
+    closes shut it). An escape whose function sets the loss variable instead names its unit for the loss text, no tiles outlined (the
+    user's call: Paralogue 15's Barbarian carrying the Pact Ring off): (objectives, [who loses it by escaping])."""
     present = {u.pid for u in b.units}
     clauses = Clauses(n, t, b, present)
-    goals = {}
+    goals, losses = {}, []
     for ev in b.registered('EventEntryEscape'):
         x, z, pid = int(ev['args'][1]), int(ev['args'][2]), ev['args'][3]
         pb = E.battle(name, 0)
         try:
             pb.fire(pb.events[ev['index']], actor=pb._unit(pid))
         except E.LuaError:
+            continue
+        if pb.vars.get(LOSE_VAR) == 1 and pb.vars.get(WIN_VAR) != 1:
+            who = escaper(n, b, clauses, pid)
+            if who not in losses:
+                losses.append(who)
             continue
         if pb.vars.get(WIN_VAR) != 1:
             continue
@@ -1188,7 +1219,7 @@ def escape_goals(name, n, t, b, talks):
         tiles = goals.setdefault(who + once, [])
         if app_tile(t, x, z) not in tiles:
             tiles.append(app_tile(t, x, z))
-    return [{'type': 'escape', 'tiles': tiles, 'label': label} for label, tiles in goals.items()]
+    return [{'type': 'escape', 'tiles': tiles, 'label': label} for label, tiles in goals.items()], losses
 
 
 def start_units(b):
@@ -1415,8 +1446,11 @@ def battle_map(cid, chapter_row, n, sources, used_tids):
                        **({'talk': e['talk']} if e.get('talk') else {})})
     if js:
         m['joiners'] = js
-    # Where a unit's escape wins the battle (Chapter 11's Alear, Chapter 15's Seadall): the map's objective.
-    m['objectives'] = escape_goals(name, n, t, E.battle(name, 0, levels[0] if levels else None), normal_talks or {})
+    # Where a unit's escape wins the battle (Chapter 11's Alear, Chapter 15's Seadall): the map's objective. A foe's escape that loses
+    # it is named in the loss text (Paralogue 15's), its tiles not outlined.
+    m['objectives'], losses = escape_goals(name, n, t, E.battle(name, 0, levels[0] if levels else None), normal_talks or {})
+    if losses:
+        m['defeat'] = lost_by(m['defeat'], losses)
     for (kind, tile), items in objects.items():
         if kind == 'EventEntryVisit':
             m['objects'].append({'type': 'village', 'tile': list(tile), 'reward': ', '.join(sorted(items))})

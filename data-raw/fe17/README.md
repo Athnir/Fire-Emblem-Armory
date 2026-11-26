@@ -177,7 +177,9 @@ Field names are the game's own: every data table names its fields, and the progr
   variable that wins the battle (`勝利`: `App.MapSituation.IsComplete` reads it, `SetComplete` sets it; `敗北` loses it,
   `IsGameOver`) is the map's objective, outlined: Chapter 11's Alear ("Escape"), Chapter 15's Seadall, whose escape
   wins only once he has joined you (its condition holds after his talk; the escape where the chapter starts does nothing, and the doors
-  the talk closes shut it).
+  the talk closes shut it). One whose function sets the loss variable names its unit in the loss text instead, its tiles not outlined
+  (the user's call): Paralogue 15's "foe escapes" (`MID_RULE_S015_LOSE`) is the Barbarian carrying the Pact Ring (`指輪持ち逃げ`, while
+  the ring isn't taken back), a generic unit named by its class and what it alone carries off, else by its tile. No other battle has one.
 - **What a battle's start and end give** (`end_gifts`): an `ItemGain` in the opening (Fell Xenologue 6 hands Alear one Libération on
   Normal, another on Hard and Maddening), and the end's: the battle's `MapEnding` and `Ending`, then its bond scene's script
   (`<map>_kizuna`: its `MapOpening`, `MapEnding`, `Ending`; what its talks give, its `Ending` gives if they haven't). Alear's Libération

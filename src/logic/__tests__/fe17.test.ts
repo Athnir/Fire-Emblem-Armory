@@ -217,6 +217,10 @@ describe("Engage's story maps", () => {
       { type: 'escape', tiles: [[24, 2], [25, 2]], label: 'Where Seadall escapes, once he has joined you' },
     ])
     expect(FE17_MAPS.filter((m) => m.objectives.length).map((m) => m.id)).toEqual(['fe17-m011', 'fe17-m015'])
+    // An escape whose function sets the loss variable (敗北, App.MapSituation.IsGameOver) is named in the loss text, its tiles not
+    // outlined (the user's call): Paralogue 15's "foe escapes" is the Barbarian carrying off the Pact Ring (s015.lua 指輪持ち逃げ).
+    expect(map('fe17-s015').defeat).toBe('Alear is defeated or the Barbarian carrying the Pact Ring escapes.')
+    expect(FE17_MAPS.filter((m) => / escapes\b/.test(m.defeat)).map((m) => m.id)).toEqual(['fe17-s015'])
   })
 })
 
