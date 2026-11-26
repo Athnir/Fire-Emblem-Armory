@@ -4,6 +4,7 @@ import { FE16_ITEM_SOURCES } from '../../data/fe16/fe16ItemSources'
 import { FE16_SUPPORTS } from '../../data/fe16/fe16Supports'
 import { FE16_LISTED } from '../../data/fe16/fe16Listed'
 import { FE16_MAPS } from '../../data/fe16/fe16Maps'
+import { FE16_OPENS } from '../../data/fe16/fe16Opens'
 import { FE16_FORK, FE16_MAP_SET } from '../../data/fe16/fe16MapSet'
 import { FE16_MOVE_CLASSES, FE16_TERRAIN } from '../../data/fe16/fe16Terrain'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
@@ -143,12 +144,19 @@ describe("Three Houses' White Clouds maps", () => {
   it('notes a student the script swaps for a soldier later or elsewhere once recruited, and keeps the student on the map', () => {
     const unit = (id: string, name: string) =>
       [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)].find((u) => u.name === name)!
-    // Verdant Wind's To War at Gronder: a Kingdom General (a Pegasus Knight) arrives for Ingrid in the third army's phase; Dedue's
-    // record is placed only while he isn't recruited (his stand-in, a Fortress Knight of no army, never appears).
+    // Verdant Wind's To War at Gronder: a Kingdom General (a Pegasus Knight) arrives for Ingrid in the third army's phase. Its script
+    // places Dedue only while he isn't recruited, but no Golden Deer can recruit him: he has no recruit talk (the monastery's script,
+    // file 360, offers none), so only the Blue Lions ever have him, and his note doesn't say it.
     expect(unit('fe16-17-vw', 'Ingrid').note).toContain(
       "if you recruited Ingrid into your house before this battle, a Pegasus Knight comes in Ingrid's place",
     )
-    expect(unit('fe16-17-vw', 'Dedue').note).toContain("if you recruited Dedue into your house before this battle, Dedue isn't in it")
+    expect(unit('fe16-17-vw', 'Dedue').note).not.toContain('recruited Dedue')
+    // Nor a stand-in for one no house can have by then: Catherine's talk opens in Chapter 4 (The Magdred Ambush is 3), Hilda's never
+    // for the Black Eagles in White Clouds, and Crimson Flower's Catherine is never yours.
+    expect(unit('fe16-3', 'Catherine').standIn).toBeUndefined()
+    expect(unit('fe16-7-be', 'Hilda').standIn).toBeUndefined()
+    expect(unit('fe16-7-bl', 'Hilda').standIn).toMatchObject({ name: 'Brigand' })
+    expect(unit('fe16-p53-cf', 'Catherine').note).not.toContain('recruited Catherine')
     // Crimson Flower's Chapter 13: only the Alliance General on Leonie's own tile takes her place; her escort comes either way.
     expect(unit('fe16-32-cf', 'Leonie').note).toContain("a Paladin comes in Leonie's place")
   })
@@ -323,8 +331,37 @@ describe("Three Houses' Part II maps", () => {
     const later = 'At the start of your phase with one of your units in the marked area, from turn 5'
     expect(new Set(ss.map((j) => j.when))).toEqual(new Set(['Turn 3, your phase', later]))
     expect(ss.filter((j) => j.when === later).every((j) => j.areas?.length === 1)).toBe(true)
-    // Azure Moon's Gilbert comes only if he's in your army.
-    expect(map('fe16-13-am').joiners!.find((j) => j.name === 'Gilbert')?.note).toBe('If Gilbert is in your army')
+    // Azure Moon's Gilbert joins at its time skip on his own (0x3d91b0), so he always comes.
+    expect(map('fe16-13-am').joiners!.find((j) => j.name === 'Gilbert')).toBeDefined()
+    expect(map('fe16-13-am').joiners!.find((j) => j.name === 'Gilbert')?.note).toBeUndefined()
+  })
+
+  it("follows who is yours when Part II begins: Silver Snow's church knights, the students who leave at the time skip, Dedue", () => {
+    const unit = (id: string, name: string) =>
+      [...map(id).units, ...(map(id).reinforcements ?? []).flatMap((g) => g.units)].filter((u) => u.name === name)
+    // After scenario 11, Catherine, Cyril, Shamir and Seteth join Silver Snow on their own (0x3d7720): The Battle of Garreg Mach sends
+    // a Knight of Seiros for each of Shamir and Catherine (its events 67 and 77), never Shamir or Catherine as green units (72, 82).
+    expect(unit('fe16-12-ss', 'Shamir')).toEqual([])
+    expect(unit('fe16-12-ss', 'Catherine')).toEqual([])
+    expect(unit('fe16-12-am', 'Catherine')).toHaveLength(1)
+    // A recruited Ashe or Lorenz leaves at the time skip (0x3d91b0) where their house isn't the route's (Ashe on Silver Snow and
+    // Verdant Wind, Lorenz on Silver Snow and Azure Moon): the battle fights them, and defeating one offers Persuade or Kill.
+    for (const id of ['fe16-15-ss', 'fe16-15-vw']) {
+      expect(unit(id, 'Ashe')[0].standIn, id).toBeUndefined()
+      expect(unit(id, 'Ashe')[0].note, id).toContain(
+        'if you recruited Ashe before the time skip, once defeated Ashe can be persuaded to become your ally again',
+      )
+    }
+    for (const id of ['fe16-16-ss', 'fe16-16-am']) {
+      expect(unit(id, 'Lorenz')[0].note, id).toContain('if you recruited Lorenz before the time skip')
+      expect(unit(id, 'Lorenz')[0].note, id).not.toContain("in Lorenz's place")
+    }
+    // Lorenz is Verdant Wind's own: only the Alliance General's set comes there (its event 28, never 29).
+    expect(unit('fe16-16-vw', 'Lorenz')).toEqual([])
+    // Dedue leaves Azure Moon after Chapter 12, lost unless War for the Weak was cleared, and comes back on turn 2 of Chapter 16.
+    expect(map('fe16-16-am').joiners!.find((j) => j.name === 'Dedue')).toMatchObject({
+      when: 'Turn 2, your phase', note: 'If War for the Weak was cleared in Part I',
+    })
   })
 
   it("says each route's lose condition, its leader, and the locations it defends", () => {
@@ -388,9 +425,21 @@ describe("Three Houses' paralogues", () => {
       'Can be fought in the months of Chapters 16 to 18 on Silver Snow, Chapters 16 to 22 on Azure Moon and Chapters 16 to 19 on Verdant Wind.',
       'Needs Byleth and Rhea at support C or above.',
     ])
-    expect(para('fe16-p48').notes[1]).toBe('Needs Gilbert in your army; Annette and Gilbert at support C or above.')
-    // Dividing the World opens in White Clouds: for the Black Eagles only until the routes part, Crimson Flower's Hilda being a foe.
-    expect(para('fe16-p57').notes[0]).toContain('Chapters 10 to 11 on Crimson Flower')
+    // Gilbert is Azure Moon's from its time skip (0x3d91b0): only the support is asked.
+    expect(para('fe16-p48').notes[1]).toBe('Needs Annette and Gilbert at support C or above.')
+    // Dividing the World asks for Hilda in your army (DeathFlag kinds 2 and 3 read her in-army bits, 0x547d50), and Hilda's recruit
+    // talk is the Blue Lions', or Silver Snow's from Chapter 12 (file 360): never the Black Eagles' in White Clouds, never Crimson
+    // Flower's. The paralogue check (0x3f10c0) takes either of its two persons before the time skip, both after it.
+    expect(para('fe16-p57').availableIn).toEqual(['Silver Snow', 'Azure Moon', 'Verdant Wind'])
+    expect(para('fe16-p57').notes.slice(0, 2)).toEqual([
+      'Can be fought in the months of Chapters 12 to 17 on Silver Snow, Chapters 10 to 19 on Azure Moon and Chapters 10 to 18 on Verdant Wind.',
+      'Needs Hilda in your army, and Cyril too from Chapter 13.',
+    ])
+    expect(FE16_OPENS['fe16-p57']).toEqual({ 'Silver Snow': 12, 'Azure Moon': 10, 'Verdant Wind': 10 })
+    // A White Clouds paralogue about two takes either: Falling Short of Heaven, Ashe or Catherine. An Ocean View asks nothing more,
+    // Flayn joining every house after Chapter 6 (0x3d7720).
+    expect(para('fe16-p45').notes[1]).toBe('Needs Ashe or Catherine in your army.')
+    expect(para('fe16-p58').notes.some((n) => n.startsWith('Needs'))).toBe(false)
     expect(para('fe16-p52').notes[1]).toContain("unless Seteth and Flayn both fell in Protecting Garreg Mach (Crimson Flower's Chapter 15)")
   })
 
@@ -573,6 +622,19 @@ describe("Three Houses' relics and the rest: every way the files (and, where the
       { mapId: 'fe16-32-cf', kind: 'kit', text: 'Carried by Jeritza on joining' },
     ])
     expect(src('Blessed Lance').filter((s) => s.kind === 'event-later').map((s) => s.mapId)).toEqual(['fe16-7-be', 'fe16-7-bl', 'fe16-7-gd'])
+    // The faculty and knights bring their gear from the first chapter a house can recruit them (file 360's RecruitTalk checks):
+    // Catherine from Chapter 4 for the Blue Lions and the Golden Deer, on Silver Snow from 12, never the Black Eagles before it or
+    // Crimson Flower; Cyril the same from Chapter 5, which every house fights, so from each house's Chapter 4 on ('-later').
+    expect(src('Thunderbrand').filter((s) => s.kind === 'kit')).toEqual([
+      { mapId: 'fe16-4-bl', kind: 'kit', text: 'Carried by Catherine on joining' },
+      { mapId: 'fe16-4-gd', kind: 'kit', text: 'Carried by Catherine on joining' },
+      { mapId: 'fe16-12-ss', kind: 'kit', text: 'Carried by Catherine on joining' },
+    ])
+    expect(src('Iron Axe').filter((s) => s.text === 'Carried by Cyril on joining').map((s) => [s.mapId, s.kind])).toEqual([
+      ['fe16-4-bl', 'kit-later'], ['fe16-4-gd', 'kit-later'], ['fe16-12-ss', 'kit'],
+    ])
+    // Shamir from Chapter 5 in every house.
+    expect(src('Iron Bow').filter((s) => s.text === 'Carried by Shamir on joining').map((s) => s.mapId)).toEqual(['fe16-5'])
     expect(src('Sublime Creator Sword')).toEqual([
       { mapId: 'fe16-10', kind: 'event', text: "Byleth's Sword of the Creator becomes it once Kronya is defeated" },
     ])

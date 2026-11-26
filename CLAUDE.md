@@ -268,7 +268,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
 - **Fates' challenge battles are a third dropdown ("Challenges"), a list of their own:** a rerun of every chapter's or
   paralogue's map the game lets you scout (its chapter record's flag and route mask, not just an encounter file: Chapter 2
   has one but can't be scouted), on Birthright and Revelation (Conquest has none). A chapter's
-  challenge opens once that chapter is cleared; a paralogue's opens with the paralogue (the app can't know it was cleared).
+  challenge opens at the next My Castle visit after that chapter is cleared (Revelation 16's from 18); a paralogue's opens with the
+  paralogue (the app can't know it was cleared).
   Each goes by its scout name, the chapter's location ("Cemetery in a Deeprealm" for Rhajat's), never the chapter's title.
   It isn't a rerun but a map of its own on the chapter's, with everything spent: every tile in its second state at once (every
   bridge down, every vein's and the chapter's changes made, every breakable broken, every door, chest and village used up,
@@ -973,6 +974,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   place on the map, and their note says what comes instead (the user's call: note that the battle may differ, don't swap them). Genealogy of the Holy War's
   Second generation substitutes (Creidne for Larcei...) are their children's stand-ins; a child and its substitute share one item, so it's
   one line ("Carried by Larcei or Creidne on joining"), and the weapon page groups its rows by generation (the user's call).
+- **Three Houses' recruits follow the monastery's script** (the look-over, 2026-11-26: file 360's RecruitTalk checks) and the
+  program's own joins (0x3d7720; Gilbert at the time skip, 0x3d91b0): a stand-in, a "recruited" clause or a recruit's gear appears only
+  where some house or route fighting the map can have that person by then; a recruited Ashe or Lorenz who leaves at the time skip is
+  fought with Persuade or Kill, never a stand-in; a paralogue about two people needs either of them before the time skip and both
+  after (0x3f10c0), and opens only from the chapter they can be yours.
 - **Neutral armies** (Genealogy of the Holy War's third relation: an army neither hostile nor friendly to yours) get a marker colour
   of their own, matched to the game's, and turn red or green when a script turns them; each unit's note says when (the user's call).
 - **Shown on the map:** the lord's start ("Lord's start", with the lord named in the text), forced
@@ -1194,12 +1200,15 @@ A global switch (header, any game) that lets someone play along without being to
   (the castle opens), any number of times. Allies' gifts and the Lottery Shop's prizes open by chapter (below). The story's
   gifts come with a chapter (Yato's forms: Fire Emblem Wiki). DLC maps and their rewards open after Chapter 6 (the Dragon's
   Gate), paralogues by chapter.
-- **A child's paralogue opens the chapter after their fixed parent joins your army for good** (the other parent is whoever you
-  marry): Soleil follows her father Laslow (joins in Conquest 12, so Chapter 13), Shigure his mother Azura (Conquest 9, so 10).
-  Joins are read from the game's chapter files (`scripts/build-fates-joins.py`: scripts that hand a unit over, Support groups,
-  the Player groups) and checked against Serenes Forest's recruitment pages in a test; nothing opens before Chapter 7 (the
-  castle). Jakob joins in 6 or only after 15 depending on Corrin's gender, so his son Dwyer's waits for the later date.
-  Mozu's (Paralogue 1) opens after Chapter 8 (Gamer Guides), not confirmed in-game.
+- **A paralogue opens as its chapter record says** (the look-over, 2026-11-26: GameData.bin's CID_X001-X022, read by
+  `build-fates-joins.py`; the program's check at 0x3d2e6c): once the chapter the record names is cleared on the route (Chapter 7 for
+  every one, Birthright 15 for Midori's) and, for a child's, once the fixed parent it names has joined your army for good (the other
+  parent is whoever you marry), at the next My Castle visit after the later of the two. Soleil follows her father Laslow (joins in
+  Conquest 12, so Chapter 13), Shigure his mother Azura (Conquest 9, so 10), and Mozu's and Kana's open after Chapter 7, so from 8.
+  A chapter whose script skips My Castle (`ev::ChapterSetSkipChapterSaveCastle`: Revelation 16, every route's 27) opens nothing
+  before the next, so Shiro's and Mitama's, and Revelation 16's challenge, come from 18. Joins are read from the game's chapter files
+  (scripts that hand a unit over, Support groups, the Player groups) and checked against Serenes Forest's recruitment pages in a test;
+  Jakob joins in 6 or only after 15 depending on Corrin's gender, so his son Dwyer's waits for the later date.
 - **Fates' weapon page leaves three things off until a switch is ticked:** "Show visit & battle rewards" (a weapon whose only
   source is a My Castle Battle Points or Visit Points reward; one with any other way to get it, allies' gifts and the Lottery Shop included, is
   listed normally, and its reward lines only appear once the switch is ticked),
@@ -1210,7 +1219,8 @@ A global switch (header, any game) that lets someone play along without being to
   Birthright and Conquest, 13 on Revelation). It comes from each chapter's Player groups where a unit first turns up, and from
   what a recruit brings in the chapter they join (a Support group, a green unit handed over, a foe a talk recruits: Keaton's
   Beastrune in Conquest 14). Later Player groups list units with preset gear the game never hands over (Azura's Bronze Lance in
-  Birthright 6, Benny's Blessed Lance in Conquest 21): that doesn't count (`kit` on the map).
+  Birthright 6, Benny's Blessed Lance in Conquest 21): that doesn't count (`kit` on the map). A recruit with nothing in their slots
+  still joins (Kagero at the end of Revelation 11), so a later Player group's preset isn't theirs either.
 - **No filler lines for "not available":** where a shop doesn't stock something, the page says nothing at all, so a blank can't
   hint at what comes later.
 - **Allies' gifts open by their gate:** the item table puts each gift (the joke, Raider and named weapons, the Harp Yumi,

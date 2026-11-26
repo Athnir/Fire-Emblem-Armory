@@ -116,8 +116,8 @@ the weapon texts to the records.
   stocks at levels 1 to 3 (a number, or unlimited) isn't in any file we have, so it still comes from Serenes Forest's Dawn
   Armoury, Dusk Armoury, Rod Store, Staff Store and Smithy pages (needs a network connection).
 - Serenes' "Armourslayer" and "Short Bow" are the game's "Armorslayer" and "Mini Bow" (prices match); the script maps them.
-- Not in any file we have: when each paralogue opens (the children's need their parents married) and the chapters the Yato
-  evolves in (`src/data/weapons/fatesGifts.ts`, from the Fire Emblem Wiki, which agree with the chapter titles in the files).
+- Not in any file we have: the chapters the Yato evolves in (`src/data/weapons/fatesGifts.ts`, from the Fire Emblem Wiki, which
+  agree with the chapter titles in the files). When each paralogue opens is in the chapter records (below, "When characters join").
 
 ## My Castle's ally gifts and Lottery Shop (`scripts/build-fates-items.py`, `scripts/build-fates-castle.py`)
 
@@ -422,8 +422,19 @@ files say, Def 2, Avo 20, heal 20 (the game's own window), and the lava its vein
   Event groups begins in (one missing chapter allowed; a run of only one or two chapters at the end counts as the run before it);
   a recruitable green unit (Ally) just before that run is the chapter. Jakob is left out: he joins in 6 or much later depending
   on Corrin's gender. A test checks every value against Serenes Forest's recruitment pages, and they all agree.
-- A child's paralogue opens the chapter after their fixed parent's join (the table of fixed parents is in
-  `src/data/maps/fatesStory.ts`; the chapter titles on the child's own page say who to talk to, which is that parent).
+- When a paralogue opens is the program's (0x3d2e6c, run as a chapter ends), from its chapter record (GameData.bin's CID_X001-X022,
+  28 bytes): +0x0d, +0x0e and +0x0f name the chapter to clear first on Birthright, Conquest and Revelation (that chapter's index,
+  its record's +0x08): Chapter 7 for every paralogue on every route, but Birthright 15 for Paralogue 6 (Midori's). +0x10 is the
+  fixed parent (a person's index, the person record's +0x1c; Mozu's names none), who must be in your army and married to someone
+  of the other gender (0x534648, 0x53eda8); the other parent is whoever they marry. Kinds 2 and 7 (+9; the amiibo maps are 7)
+  never open this way. `fatesJoins.ts` carries both (`PARALOGUE_AFTER`, `PARALOGUE_PARENT`), and `src/data/maps/fatesStory.ts`
+  opens a paralogue after the later of the record's chapter and its parent's join, at the next My Castle visit.
+- The chapters a route goes on from with no My Castle visit: their script calls `ev::ChapterSetSkipChapterSaveCastle(1)` (A027,
+  B027 and C027 before the Endgame; C016's ending, handler 45, runs Chapter 17's opening at once). So what would open after
+  Revelation 16 opens after 17: Shiro's and Mitama's paralogues (Ryoma and Azama join in 16) and Revelation 16's challenge
+  (`NO_CASTLE_AFTER`).
+- A recruit counts as joined even with nothing in their slots (Kagero, at the end of Revelation 11: C011's end handler places
+  Support01, her slot empty), so a later Player group's preset (her Steel Shuriken in Revelation 13) isn't hers to list.
 - Each story chapter's `kit` (`gameUnits.ts`) is what your own units start it holding: the items of the units in the Player /
   PlayerM / PlayerF groups of the chapter's placement file (Corrin's Bronze Sword in Chapter 1, Gunter's lance and Felicia's /
   Jakob's dagger and Heal from Chapter 2, Corrin's Yato from 6 on Birthright and Conquest and from 13 on Revelation). Paralogue and

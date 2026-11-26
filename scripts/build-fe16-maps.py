@@ -415,11 +415,30 @@ ROUTE_LORD = {'cf': 2, 'ss': None, 'am': 3, 'vw': 4, 'cs': None}
 CINDERED = ('cs', 'Cindered Shadows', 0, (4,))
 CS_DIFFS = DIFFS[:2]
 # Who is in your army on each route from Chapter 12 (persons): the house's students, as Part II's scripts test them ('is recruited'),
-# but for Silver Snow's Edelgard and Hubert, who leave the Black Eagles. A student recruited from another house is an addition the
-# maps show as a stand-in or a joiner 'if recruited'.
-ROUTE_ARMY = {'cf': (2, 5, 6, 7, 8, 9, 10, 11), 'ss': (6, 7, 8, 9, 10, 11), 'am': (3, 12, 13, 14, 15, 16, 17, 18),
-              'vw': (4, 19, 20, 21, 22, 23, 24, 25)}
+# but for Silver Snow's Edelgard and Hubert, who leave the Black Eagles, and those who join on their own (`STORY_JOINS`): Flayn on every
+# route but Crimson Flower, Seteth with her, Catherine, Cyril and Shamir on Silver Snow, Gilbert on Azure Moon. A student recruited from
+# another house is an addition the maps show as a stand-in or a joiner 'if recruited'.
+ROUTE_ARMY = {'cf': (2, 5, 6, 7, 8, 9, 10, 11), 'ss': (6, 7, 8, 9, 10, 11, 26, 27, 32, 33, 34),
+              'am': (3, 12, 13, 14, 15, 16, 17, 18, 26, 27, 30), 'vw': (4, 19, 20, 21, 22, 23, 24, 25, 26, 27)}
 PART_TWO = 12            # the first chapter whose battle the routes choose (fixed_flow.bin)
+# The first chapter of Part II: the chapter change (0x3d8980) sets the Part II flag (+0x2449f of the game state, which the paralogue
+# check 0x3f10c0 reads) for a scenario with bit 6 at +0x24, Chapter 13's on every route, and runs the time skip (0x3d91b0) as it does.
+TIME_SKIP = 13
+# Who joins your army without a recruit talk, read in the program (0x3d7720, run as each scenario ends): Flayn after scenario 6 in
+# every house; after scenario 11, on Silver Snow (route 0) Catherine, Cyril, Shamir and Seteth, on Azure Moon and Verdant Wind (1 and 2)
+# Seteth if Flayn is in your army, on Crimson Flower none; Gilbert at Azure Moon's time skip (0x3d91b0). {person: (the first chapter
+# whose battle they're in, the routes they're in from Chapter 12)}: in White Clouds every house whose route is one of those.
+STORY_JOINS = {27: (7, ('ss', 'am', 'vw')), 26: (PART_TWO, ('ss', 'am', 'vw')), 32: (PART_TWO, ('ss',)), 33: (PART_TWO, ('ss',)),
+               34: (PART_TWO, ('ss',)), 30: (TIME_SKIP, ('am',))}
+# Who leaves your army at the time skip (0x3d91b0), recruited from another house and alive: Ashe on Silver Snow and Verdant Wind, Lorenz
+# on Silver Snow and Azure Moon (only the 'has joined' bit stays: Part II's battles test him 'recruited before the timeskip', not 'is
+# recruited'); each fights you in Part II, Ashe in Ambush at Ailell and Lorenz in The Great Bridge Coup, where defeating him offers
+# Persuade or Kill (PersuadeKill: text table 0 #483-485), and persuaded he rejoins. Crimson Flower keeps both.
+LEFT_AT_TIMESKIP = {'ss': (14, 19), 'am': (19,), 'vw': (14,)}
+# A unit of your route who leaves your army as Part II begins and may be lost for good there (0x3d7720, as scenario 12 ends): Dedue on
+# Azure Moon is only away if War for the Weak (scenario 43) was cleared in Part I, and lost otherwise; The Great Bridge Coup brings him
+# back on turn 2 unless he was lost (its events 49 and 50). {(route, person): (what keeps him, the chapter whose battle brings him back)}
+LOST_UNLESS = {('am', 12): ('War for the Weak was cleared in Part I', 16)}
 # The scenario byte with each route's lose condition (D.scenario: +41 the Black Eagles' and Silver Snow's, +42 Azure Moon's, +43
 # Verdant Wind's, +44 Crimson Flower's).
 DEFEAT_FIELD = {D.SILVER_SNOW: 41, D.AZURE_MOON: 42, D.VERDANT_WIND: 43, D.CRIMSON_FLOWER: 44, 4: 41}
@@ -437,9 +456,11 @@ STUDENTS = {
     'be': [2, 5, 6, 7, 8, 9, 10, 11], 'bl': [3, 12, 13, 14, 15, 16, 17, 18], 'gd': [4, 19, 20, 21, 22, 23, 24, 25],
 }
 PROLOGUE_ARMY = [0, 2, 3, 4]
-# The faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events), with the chapter each check opens
-# from: Catherine 4, Cyril and Shamir 5, Hanneman and Manuela 8, Alois 11.
-RECRUITS = {32: 4, 34: 5, 33: 5, 28: 8, 29: 8, 31: 11}
+# The faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events, `recruit_talks`), each from the first
+# chapter its route and chapter checks let a house have them (`can_have`): Shamir from 5, Hanneman and Manuela from 8 and Alois from 11 in
+# every house; Catherine from 4 and Cyril from 5 for the Blue Lions and the Golden Deer only, on the Black Eagles' side only on Silver
+# Snow from Chapter 12 (where both join on their own), never on Crimson Flower.
+RECRUITS = (32, 34, 33, 28, 29, 31)
 PLAYER_SLOT = 299        # the person a slot you fill holds ("Player")
 NO_ARMY = 4              # a unit record's army byte: 0 yours, 1 the foe, 2 green, 3 a third army, 4 none (never on the map)
 # A unit record's rank (+33) of 4, 5 or 6 isn't a unit but a reinforcement point: from the turn it's placed, a copy of the record comes in
@@ -671,8 +692,9 @@ def holds(t, ctx):
         return ctx['start']
     if name in ('IsRecruited', 'WasRecruitedPreTimeskip'):
         # Whether a person is in your army (`recruited`: White Clouds' maps take none, Part II's the route's students, `ROUTE_ARMY`),
-        # which Part II's battles test as recruited before the timeskip too.
-        res = args[1] in ctx.get('recruited', ())
+        # which Part II's battles test as recruited before the timeskip too. One who left at the time skip (`left`: the battle's
+        # `LEFT_AT_TIMESKIP`) was recruited before it, but isn't now.
+        res = args[1] in ctx.get('recruited', ()) and (name == 'WasRecruitedPreTimeskip' or args[1] not in ctx.get('left', ()))
         return not res if args[0] else res
     if name == 'CheckDeathStatus' and args[2] == 4:
         # (negated, a slot, 4): whether the unit's person was lost before this battle (Chapter 13's Seteth joins unless he was). The maps
@@ -701,8 +723,9 @@ class Battle:
         # battle from table 0, its scripts placing the rest by slot.
         self.table = house[2] if self.scen['per_house'] else 1 if self.scen['cf_table'] and house[3] == (D.CRIMSON_FLOWER,) else 0
         self.tables = tabs
-        # Who is in your army: the route's students from Chapter 12, no one in White Clouds' battles.
+        # Who is in your army: the route's students from Chapter 12, no one in White Clouds' battles; who left it at the time skip.
         self.army = (ROUTE_ARMY.get(house[0], ()) if len(house[3]) == 1 and house in ROUTES else ()) + tuple(extra)
+        self.left = LEFT_AT_TIMESKIP.get(house[0], ()) if house in ROUTES else ()
         # A switched-off event never runs (fe16_data.script): it isn't read at all; a wait for one never ends (`_simplify`).
         self.events = [e for e in D.script(s) if not e['off']]
         self.event_nums = {e['num'] for e in self.events}
@@ -761,7 +784,7 @@ class Battle:
     def on_map(self, diff):
         """Who can be on the map on a difficulty: the start's units and points, and what later events can bring."""
         placed, ran = self.start(diff)
-        course = {'diff': diff, 'routes': self.house[3], 'recruited': self.army}
+        course = {'diff': diff, 'routes': self.house[3], 'recruited': self.army, 'left': self.left}
         return set(placed) | set(self.points) | {a[1][0] for x in self.events if x['num'] not in ran and x['trigger'][0] not in LOAD_TRIGGERS
                                                  and on_course(x['conditions'], course) is not False
                                                  for a in x['actions'] if a[0] in SPAWNS}
@@ -769,7 +792,7 @@ class Battle:
     def context(self, diff):
         """What a time is read for on a difficulty (`describe`)."""
         placed, ran = self.start(diff)
-        return {'diff': diff, 'routes': self.house[3], 'recruited': self.army, 'ran': ran, 'placed': self.on_map(diff)}
+        return {'diff': diff, 'routes': self.house[3], 'recruited': self.army, 'left': self.left, 'ran': ran, 'placed': self.on_map(diff)}
 
     def described(self, e, diff):
         """An event's time on a difficulty, its areas named by their corners (a unit's note can't outline them)."""
@@ -795,7 +818,7 @@ class Battle:
             for e in starts:
                 if e['num'] in done:
                     continue
-                ctx = {'diff': diff, 'routes': self.house[3], 'start': True, 'ran': ran, 'recruited': recruited,
+                ctx = {'diff': diff, 'routes': self.house[3], 'start': True, 'ran': ran, 'recruited': recruited, 'left': self.left,
                        'pending': {x['num'] for x in starts if x['num'] not in done}}
                 v = holds(e['conditions'], ctx)
                 if v is None:
@@ -855,6 +878,36 @@ def can_run(b, e, ctx):
     """Whether an event can run on a difficulty, route and army: its own checks of them (`on_course`) and what it waits for (a wait for
     an event that never runs there, `_simplify`)."""
     return on_course(e['conditions'], ctx) is not False and _simplify(b, e['conditions'], ctx) is not False
+
+
+def _top_and(t):
+    """A condition's checks joined by 'and' at its top, as a list."""
+    if t[0] != 'and':
+        return [t]
+    return [x for c in t[1] for x in _top_and(c)]
+
+
+def superseded(b, e, ctx):
+    """Whether an event never runs because an earlier one of the same kind always runs in its place: it waits for that one not to have
+    run, and the other's checks are its own but for course checks of the other's that hold on this difficulty, route and army
+    (`on_course`) and a wait of its own for this one. The Great Bridge Coup's events 28 and 29: with Lorenz in your army (Verdant Wind)
+    the Alliance General's set comes, never Lorenz's own; The Battle of Garreg Mach's 67 and 72, 77 and 82: Silver Snow's Shamir and
+    Catherine, yours already, never arrive as green units, a Knight of Seiros coming for each."""
+    mine = _top_and(e['conditions'])
+    for x in mine:
+        if x[0] != 'HasOtherScriptRun' or x[1][0] or x[1][2]:
+            continue
+        other = b.by_num.get(x[1][1])
+        if other is None or other['num'] >= e['num'] or other['trigger'][0] != e['trigger'][0]:
+            continue
+        if not any(on_course(y, ctx) is True for y in _top_and(other['conditions'])):
+            continue    # only where the other's own checks of route and army are what decide it
+        rest = sorted(repr(y) for y in mine if y != x)
+        theirs = sorted(repr(y) for y in _top_and(other['conditions'])
+                        if not (y[0] == 'HasOtherScriptRun' and y[1][1] == e['num']) and on_course(y, ctx) is not True)
+        if on_course(other['conditions'], ctx) is not False and theirs == rest:
+            return True
+    return False
 
 
 def on_course(t, ctx):
@@ -1041,7 +1094,7 @@ def ai_words(b, slot, diff, came=None):
     r = b.record(slot)
     if r['army'] in (0, NO_ARMY):
         return None
-    ctx = {'diff': diff, 'routes': b.house[3], 'recruited': b.army}
+    ctx = {'diff': diff, 'routes': b.house[3], 'recruited': b.army, 'left': b.left}
     placed, ran = b.start(diff)
     ends = b.ends()
 
@@ -2522,7 +2575,7 @@ def reinforcements(b, victory, joiners=None):
             r = b.record(slot)
             u, inv = unit_entry(b, slot, tile, d, victory)
             u['difficulties'] = [dname]
-            until, stop_areas = point_until(b, slot, ends, {'diff': d, 'routes': b.house[3], 'recruited': b.army})
+            until, stop_areas = point_until(b, slot, ends, {'diff': d, 'routes': b.house[3], 'recruited': b.army, 'left': b.left})
             when = repeat_words(r['rank'], None) + until
             g = {'_event': ('point', r['rank'], when), 'when': {dname: when}, 'units': [u], '_inv': {dname: [(u, inv)]}}
             if stop_areas:
@@ -2547,7 +2600,7 @@ def reinforcements(b, victory, joiners=None):
                     at.setdefault(args[0], (args[1], args[2]))
             if not at:
                 continue
-            ctx = {'diff': d, 'routes': b.house[3], 'recruited': b.army}
+            ctx = {'diff': d, 'routes': b.house[3], 'recruited': b.army, 'left': b.left}
             # A student another house's: the event runs only if you recruited them (`ROUTE_ARMY` holds your own).
             extra = list(dict.fromkeys(a[1] for n, a in _flat(e['conditions']) if n == 'IsRecruited' and a[1] not in b.army))
             only_if = []
@@ -2557,6 +2610,8 @@ def reinforcements(b, victory, joiners=None):
                 only_if = extra
             if _simplify(b, e['conditions'], dict(ctx, recruited=tuple(b.army) + tuple(extra), ran=ran)) is False:
                 continue    # it waits for an event that never runs on this difficulty, route and army
+            if superseded(b, e, ctx):
+                continue    # an earlier event always runs in its place here
             w = describe(b, e, dict(ctx, recruited=tuple(b.army) + tuple(extra), ran=ran, placed=on_map))
             if joiners is not None and d == 0:
                 for slot, tile in at.items():
@@ -2569,6 +2624,13 @@ def reinforcements(b, victory, joiners=None):
                         j['areas'] = w['areas']
                     if only_if:
                         j['note'] = 'If ' + ' and '.join(D.person_shown_name(p) for p in only_if) +                             (' is' if len(only_if) == 1 else ' are') + ' in your army'
+                    # One who comes back unless lost before the battle (it waits for an event testing that, kind 4), and is lost unless
+                    # something kept him (`LOST_UNLESS`: Azure Moon's Dedue in The Great Bridge Coup).
+                    lost = LOST_UNLESS.get((b.house[0], r['person'])) if b.house in ROUTES else None
+                    if lost and any(x[0] == 'HasOtherScriptRun' and not x[1][0] and not x[1][2] and x[1][1] in b.by_num and any(
+                            y[0] in ('CheckDeathStatus', 'IsCharacterIDSlain') and y[1][2] == 4 for y in _flat(b.by_num[x[1][1]]['raw']))
+                            for x in _flat(e['raw'])):
+                        j['note'] = f'If {lost[0]}'
                     joiners.setdefault(e['num'], []).append(j)
             if only_if:
                 continue   # a foe an army without that student meets instead stands in for them (`standIn`), not as an arrival
@@ -3098,6 +3160,11 @@ DLC_PARALOGUES = {
 
 # The persons a paralogue is about who aren't units of yours: Rhea (Eternal Guardian) and Sothis (Tales of the Red Canyon).
 NOT_IN_ARMY = (36, 37)
+# DeathFlag (condition 1190: negated, a person, a kind, a value; `0x545754` -> `0x547d50`, the kinds by the table at `0xd171ac`) reads
+# the person's status byte (+0xac of their unit in your army's list): kinds 0, 1 and 4 its death bits (2 and 3, set by `0x414700` with
+# the chapter they fell in), kinds 2 and 3 bits 0 and 1, which a join sets (0x3d7720's `orr #3`) and a leave clears bit 0 of (the time
+# skip, `0x3d91b0`; Dedue's departure, `0x68d870`): in your army. Dividing the World tests kinds 2 and 3 for Hilda.
+DEATH_IN_ARMY = (2, 3)
 SUPPORT_RANK = {1: 'C', 2: 'B', 3: 'A', 4: 'S'}
 # The flags the paralogue script tests, where they're traced: Crimson Flower's Protecting Garreg Mach (its events 137 and 138, battle
 # flags 0 and 1 set when Seteth and Flayn are defeated) sets 68 and 69.
@@ -3120,6 +3187,74 @@ def _script_holds(t, route, chapter):
     return None
 
 
+_TALKS = {}
+
+
+def recruit_talks():
+    """{person: [the condition each recruit talk of the monastery's script is offered under]}: its RecruitTalk events (the person, then
+    four text numbers), each with the checks of the group heads above it. The eighteen students of the other houses have no checks;
+    Catherine, Cyril, Shamir, Hanneman, Manuela, Alois and Hilda have route and chapter checks; the lords, Hubert and Dedue have none."""
+    if not _TALKS:
+        events = D.parse_events(D.archive_file(D.PARALOGUE_SCRIPT))
+        heads = {e['num']: e for e in events if e['trigger'][1] & 1}
+        for e in events:
+            if e['off']:
+                continue
+            conds, h = [e['conditions']], heads.get(e['trigger'][2])
+            while h is not None:
+                conds.append(h['conditions'])
+                h = heads.get(h['trigger'][2])
+            for name, args in e['actions']:
+                if name == 'RecruitTalk':
+                    _TALKS.setdefault(args[0], []).append(('and', conds))
+    return _TALKS
+
+
+HOUSE_OF = {'be': 'be', 'bl': 'bl', 'gd': 'gd', 'cf': 'be', 'ss': 'be', 'am': 'bl', 'vw': 'gd'}
+# The route the monastery's script tests (Route): a house's in White Clouds (the Black Eagles' is Silver Snow's, 0), a route's own from
+# Chapter 12.
+ROUTE_NUMBER = {'be': D.SILVER_SNOW, 'bl': D.AZURE_MOON, 'gd': D.VERDANT_WIND, 'cf': D.CRIMSON_FLOWER, 'ss': D.SILVER_SNOW,
+                'am': D.AZURE_MOON, 'vw': D.VERDANT_WIND}
+
+
+def _route_number(key, chapter):
+    return ROUTE_NUMBER[key if chapter >= PART_TWO else HOUSE_OF[key]]
+
+
+def in_army(p, key, chapter):
+    """Whether a person is surely in your army in the battle of `chapter` on a house or route (`key`): a house's own student in White
+    Clouds, the route's army from Chapter 12 (`ROUTE_ARMY`), or one who has joined on their own by then (`STORY_JOINS`)."""
+    if key not in HOUSE_OF:
+        return False
+    if chapter >= TIME_SKIP and (key, p) in LOST_UNLESS:
+        return False    # away from the time skip, and perhaps lost (Dedue on Azure Moon)
+    if chapter >= PART_TWO and key in ROUTE_ARMY:
+        return p in ROUTE_ARMY[key]
+    if p in STUDENTS[HOUSE_OF[key]]:
+        return True
+    first, routes = STORY_JOINS.get(p, (None, ()))
+    return first is not None and first <= chapter and any(HOUSE_OF[r] == HOUSE_OF[key] for r in routes)
+
+
+def can_have(p, key, chapter):
+    """Whether a person can be in your army in the battle of `chapter` on a house or route: surely (`in_army`), or by a recruit talk of
+    the monastery's script whose route and chapter checks hold by then (`recruit_talks`); never a student of another house no talk
+    recruits (Dedue, Hubert, the lords). None where no file read says (the DLC's people), and for a battle of no house (Cindered
+    Shadows)."""
+    if key not in HOUSE_OF:
+        return None
+    if in_army(p, key, chapter):
+        return True
+    if (key, p) in LOST_UNLESS:
+        return chapter >= LOST_UNLESS[(key, p)][1]    # back in that battle, if he wasn't lost
+    talks = recruit_talks().get(p)
+    if talks:
+        return any(_script_holds(c, _route_number(key, ch), ch) for c in talks for ch in range(1, chapter + 1))
+    if any(p in people for people in STUDENTS.values()):
+        return False
+    return None
+
+
 def paralogue_windows():
     """When each paralogue can be fought on each route (the monastery script `D.PARALOGUE_SCRIPT`: SetParalogueAvailability opens or
     closes it, by the chapter the calendar is in, the route and, for some, a support or a flag). {scenario: {route key: (first chapter,
@@ -3137,12 +3272,24 @@ def paralogue_windows():
             if name == 'SetParalogueAvailability':
                 found.setdefault(args[0], []).append((args[1], ('and', conds)))
     house_route = {'cf': D.SILVER_SNOW, 'ss': D.SILVER_SNOW, 'am': D.AZURE_MOON, 'vw': D.VERDANT_WIND}
+    persons = dict(D.paralogues())
     out = {}
     for s, evs in found.items():
+        people = [p for p in persons.get(s, ()) if p not in NOT_IN_ARMY]
         for key, label, _, (route,) in ROUTES:
             last = max(k for k, x in enumerate(D.flow(route)) if x is not None)
             at = lambda ch: route if ch >= PART_TWO else house_route[key]  # noqa: E731
-            opened = [ch for ch in range(last + 1) if any(v and _script_holds(c, at(ch), ch) is not False for v, c in evs)]
+
+            def manned(ch, c):
+                """The paralogue check (0x3f10c0) wants its persons in your army, either of two before the time skip and both after
+                it, and a DeathFlag of kind 2 or 3 (the person's in-army bits, `DEATH_IN_ARMY`) that person too: whether they can be,
+                on this route by this chapter (`can_have`; what no file says counts as can)."""
+                must = [a[1] for n, a in _flat(c) if n == 'DeathFlag' and a[2] in DEATH_IN_ARMY and a[3] and not a[0]]
+                ok = [can_have(p, key, ch) is not False for p in people]
+                some = all(ok) if ch >= TIME_SKIP else any(ok) or not ok
+                return some and all(can_have(p, key, ch) is not False for p in must)
+            opened = [ch for ch in range(last + 1)
+                      if any(v and _script_holds(c, at(ch), ch) is not False and manned(ch, c) for v, c in evs)]
             if not opened:
                 continue
             first = opened[0]
@@ -3156,19 +3303,44 @@ def paralogue_windows():
     return out
 
 
-def needs_words(needs, persons, routes):
-    """A paralogue's requirements in words: its persons in your army (where a route's house hasn't got them), a support level, someone
-    alive, a flag."""
+def needs_words(needs, persons, routes, windows):
+    """A paralogue's requirements in words: its persons in your army where a route's army may lack them (the paralogue check, 0x3f10c0:
+    either of two before the time skip, both after it; a DeathFlag of kind 2 or 3 that person besides, `DEATH_IN_ARMY`), a support
+    level, someone alive (DeathFlag's other kinds), a flag."""
     out = []
-    others = [p for p in persons if p not in NOT_IN_ARMY and any(p not in ROUTE_ARMY[r] for r in routes)]
-    if others:
-        out.append(' and '.join(D.person_shown_name(p) for p in others) + ' in your army')
+    people = [p for p in persons if p not in NOT_IN_ARMY]
+    must = list(dict.fromkeys(a[1] for n, a in needs if n == 'DeathFlag' and a[2] in DEATH_IN_ARMY and a[3] and not a[0]))
+    names = lambda ps: _and_words([D.person_shown_name(p) for p in ps])  # noqa: E731
+
+    def lacking(p, at):
+        """Whether a route may not have the person in your army at its chapter in `at` ({route: chapter})."""
+        return any(not in_army(p, r, ch) for r, ch in at.items())
+    early = {r: windows[r][0] for r in routes if windows[r][0] < TIME_SKIP}
+    late = {r: max(windows[r][0], TIME_SKIP) for r in routes if windows[r][1] >= TIME_SKIP}
+    said, either, words = [], False, ''
+    if early:
+        # Either person will do, unless a route always has one; a DeathFlag's person must be there besides (Dividing the World's Hilda,
+        # one of its two, so she alone).
+        said = [p for p in must if lacking(p, early)]
+        either = bool(people) and not set(must) & set(people) and all(lacking(p, early) for p in people)
+        words = ', '.join(x for x in (names(said) if said else '', _or_words([D.person_shown_name(p) for p in people]) if either else '')
+                          if x)
+    after = [p for p in dict.fromkeys(people + must) if lacking(p, late)] if late else []
+    extra = [p for p in after if either or p not in said]
+    if words and extra and not either:
+        out.append(f'{words} in your army, and {names(extra)} too from Chapter {TIME_SKIP}')
+    elif words and extra:
+        out.append(f'{words} in your army, and from Chapter {TIME_SKIP} {names(after)}')
+    elif words:
+        out.append(f'{words} in your army')
+    elif after:
+        out.append(f'{names(after)} in your army' + (f' from Chapter {TIME_SKIP}' if early else ''))
     flags = []
     for name, args in needs:
         if name == 'Characters' and not args[0]:
             a, b = D.person_shown_name(args[1]), D.person_shown_name(args[2])
             out.append(f'{a} and {b} at support {SUPPORT_RANK.get(args[3], args[3])} or above')
-        elif name == 'DeathFlag' and args[3]:
+        elif name == 'DeathFlag' and args[3] and args[2] not in DEATH_IN_ARMY:
             out.append(f'{D.person_shown_name(args[1])} alive')
         elif name == 'CheckEventFlag':
             flags.append(args[1])
@@ -3297,16 +3469,18 @@ def recruited_words(p):
     return f'you recruited {D.person_shown_name(p)} into your house before this battle'
 
 
-def swapped_later(b, m, victory):
+def swapped_later(b, m, victory, keys=None):
     """A foe the script leaves out once you've recruited them, where no stand-in takes their tile at the start (`standIn`): the events
     that test the student recruited (`RECRUIT_CHECKS`) bring other foes instead, later or elsewhere (Verdant Wind's To War at Gronder: a
     Kingdom General for Ingrid in the third army's phase; Crimson Flower's Siege of Arianrhod: a Kingdom General beside Ingrid's tile),
     or take the student off the map. The student's note says so, on the map and among the reinforcements (the user's call: the map
-    still shows the student, and says the battle may differ)."""
+    still shows the student, and says the battle may differ). Not for one no house or route fighting it can have recruited by then
+    (`could_join`: Crimson Flower's Catherine, Verdant Wind's Dedue), nor one who left at the time skip (`LEFT_AT_TIMESKIP`), whom the
+    battle never counts as recruited."""
     units = m['units'] + [u for g in m.get('reinforcements', []) for u in g['units']]
     tested = dict.fromkeys(a[1] for e in b.events for n, a in _flat(e['raw']) if n in RECRUIT_CHECKS and not a[0])
     for p in tested:
-        if p in b.army or p in LORDS or p in (0, 1):
+        if p in b.army or p in LORDS or p in (0, 1) or p in b.left or not could_join(p, keys):
             continue
         name = D.person_shown_name(p)
         mine = [u for u in units if u['name'] == name and u['type'] != 'ally' and not u.get('standIn')]
@@ -3357,6 +3531,32 @@ def swapped_later(b, m, victory):
                 u['note'] = f"{u['note']}; {words}" if u.get('note') else words[0].upper() + words[1:]
 
 
+def persuade_notes(b, m):
+    """A foe whose defeat offers Persuade or Kill (PersuadeKill, action 660: the person, two talks; the menu's 'You can persuade ... to
+    become your ally', text table 0 #483-485): its event runs once the unit is at 0 HP (CheckDeathStatus kind 1) if an opening event
+    ran that tests the person recruited before the timeskip, and persuaded the person rejoins your army (Ambush at Ailell's Ashe, its
+    events 11 and 29-31; The Great Bridge Coup's Lorenz, 11 and 77-80: `LEFT_AT_TIMESKIP`). The unit's note says so."""
+    units = m['units'] + [u for g in m.get('reinforcements', []) for u in g['units']]
+    for e in b.events:
+        for n, a in e['actions']:
+            if n != 'PersuadeKill':
+                continue
+            # Its checks and those of the events it waits on (Lorenz's comes after event 77, which waits for him to fall).
+            p, leaves = a[0], list(_flat(e['raw']))
+            waited = [b.by_num[x[1][1]] for x in leaves
+                      if x[0] == 'HasOtherScriptRun' and not x[1][0] and x[1][2] and x[1][1] in b.by_num]
+            near = leaves + [y for w in waited for y in _flat(w['raw'])]
+            fallen = any(x[0] == 'CheckDeathStatus' and not x[1][0] and x[1][2] == 1 for x in near)
+            before = any(x[0] == 'WasRecruitedPreTimeskip' and not x[1][0] and x[1][1] == p for x in near)
+            if not (fallen and before):
+                continue
+            name = D.person_shown_name(p)
+            words = f'if you recruited {name} before the time skip, once defeated {name} can be persuaded to become your ally again'
+            for u in units:
+                if u['name'] == name and u['type'] != 'ally' and words not in u.get('note', ''):
+                    u['note'] = f"{u['note']}; {words}" if u.get('note') else words[0].upper() + words[1:]
+
+
 def battle_list():
     """Every story battle once per way it's fought: White Clouds (the Prologue to Chapter 11) once, or once per house where the houses
     fight it differently (`PER_HOUSE`); from Chapter 12 each route's own battles (fixed_flow.bin), once per route that fights them."""
@@ -3384,6 +3584,52 @@ def battle_list():
                     'chapter': min(plan['windows'][k][0] for k in plan['keys']), 'route': 'Paralogue', 'shared': False,
                     'paralogue': plan})
     return out
+
+
+def recruit_maps(p):
+    """Where a recruit's gear counts from, as (map id, source kind): the first chapter each house can have them in White Clouds
+    (`can_have`), one map where every house can from the same chapter; a Black Eagles' route's Chapter 12 where its house couldn't
+    before (Silver Snow's Catherine and Cyril). A house's chapter whose battle every house fights (Cyril's 5) counts from the house's own
+    chapter before it ('-later')."""
+    firsts = {}
+    for key, _, _, _ in HOUSES:
+        first = next((c for c in range(1, PART_TWO) if can_have(p, key, c)), None)
+        if first is not None:
+            firsts[key] = first
+    if len(firsts) == len(HOUSES) and len(set(firsts.values())) == 1:
+        c = next(iter(firsts.values()))
+        return [(f'fe16-{c}-{key}', 'kit') for key in firsts] if c in PER_HOUSE else [(f'fe16-{c}', 'kit')]
+    out = []
+    for key, c in firsts.items():
+        if c in PER_HOUSE:
+            out.append((f'fe16-{c}-{key}', 'kit'))
+        else:
+            assert c - 1 in PER_HOUSE, (p, key, c)
+            out.append((f'fe16-{c - 1}-{key}', 'kit-later'))
+    for key, _, _, (route,) in ROUTES:
+        if HOUSE_OF[key] not in firsts and can_have(p, key, PART_TWO):
+            out.append((f'fe16-{D.flow(route)[PART_TWO]}-{key}', 'kit'))
+    return out
+
+
+def map_keys(entry):
+    """The houses or routes that fight a map, each with the last chapter it's fought in there: a White Clouds chapter every house plays
+    by the three houses, a house's or route's own by it, a paralogue by its routes at their windows' ends. None for a battle of no house
+    (Cindered Shadows, the auxiliary battles)."""
+    plan = entry.get('paralogue')
+    if plan:
+        return [(k, plan['windows'][k][1]) for k in plan['keys']]
+    if entry.get('aux') or entry.get('cs'):
+        return None
+    if entry['chapter'] < PART_TWO and not entry['own']:
+        return [(h[0], entry['chapter']) for h in HOUSES]
+    return [(entry['line'][0], entry['chapter'])]
+
+
+def could_join(p, keys):
+    """Whether a person can be in your army for one of the houses or routes that fight a map (`map_keys`, `can_have`): a stand-in for
+    one who can't (Catherine before Chapter 4, Hilda for the Black Eagles in White Clouds, Dedue outside the Blue Lions) never comes."""
+    return keys is None or any(can_have(p, k, ch) is not False for k, ch in keys)
 
 
 DOWN_STAIRS = {'fe16-24-ss'}
@@ -3439,7 +3685,8 @@ def main():
                 m['heading'] = 'Paralogue'
                 m['availableIn'] = [names[k] for k in plan['keys']]
                 m['notes'].append(window_words(plan['windows'], plan['keys']) + '.')
-                needs = needs_words([n for k in plan['keys'] for n in plan['windows'][k][2]], plan['persons'], plan['keys'])
+                needs = needs_words([n for k in plan['keys'] for n in plan['windows'][k][2]], plan['persons'], plan['keys'],
+                                    plan['windows'])
                 if s in DLC_PARALOGUES:
                     needs = [DLC_PARALOGUES[s][1]]
                     m['notes'].append('Comes with the Expansion Pass.')
@@ -3481,8 +3728,12 @@ def main():
             m['units'] = gm._merge_units(per_diff, b.diffs)
             if b.diffs != DIFFS:
                 m['difficulties'] = list(b.diffs)
-            # Stand-ins: a student another house can recruit is replaced, on the same tile, by a soldier of their class.
+            # Stand-ins: a student another house can recruit is replaced, on the same tile, by a soldier of their class; not one no house
+            # fighting it can have recruited by then (`could_join`).
+            keys = map_keys(entry)
             for p in b.recruit_checks():
+                if not could_join(p, keys):
+                    continue
                 base, _ = b.start(0)
                 alt, _ = b.start(0, recruited=(p,))
                 gone = [slot for slot in base if slot not in alt and b.record(slot)['person'] == p]
@@ -3507,7 +3758,8 @@ def main():
                         if u.get('difficulties') == list(b.diffs):
                             u.pop('difficulties')
                 m['reinforcements'] = rein
-            swapped_later(b, m, victory)
+            swapped_later(b, m, victory, keys)
+            persuade_notes(b, m)
             # Chests (`D.chests`, the .bai's records after the unit tables): each on a chest tile is on the map with what it holds, and a
             # source. Conflict in the Holy Tomb's twenty records stand on the Crest Stones in its walls, the looters' (`looting`).
             for c in D.chests(s, b.table):
@@ -3892,14 +4144,14 @@ def main():
             for g in D.starting_items(p):
                 if 10 <= g < 600:
                     source(item_name(g), f'fe16-1-{key}', 'kit', f'Carried by {D.person_shown_name(p)} on joining')
-    # The faculty and knights you can recruit (the monastery's script, file 360: each RecruitTalk's chapter check) bring their own gear
-    # (persondata section 6): Catherine her Thunderbrand from Chapter 4.
-    for p, chapter in RECRUITS.items():
-        ids = [f'fe16-{chapter}-{h[0]}' for h in HOUSES] if chapter in PER_HOUSE else [f'fe16-{chapter}']
-        for g in D.starting_items(p):
-            if 10 <= g < 600:
-                for map_id in ids:
-                    source(item_name(g), map_id, 'kit', f'Carried by {D.person_shown_name(p)} on joining')
+    # The faculty and knights you can recruit (the monastery's script, file 360: each RecruitTalk's route and chapter checks) bring their
+    # own gear (persondata section 6): Catherine her Thunderbrand from Chapter 4 for the Blue Lions and the Golden Deer, from Chapter 12
+    # on Silver Snow.
+    for p in RECRUITS:
+        for map_id, kind in recruit_maps(p):
+            for g in D.starting_items(p):
+                if 10 <= g < 600:
+                    source(item_name(g), map_id, kind, f'Carried by {D.person_shown_name(p)} on joining')
     scene_gifts(source, scen_ids)
     # The monastery's armory (fixed_shopdata.bin section 0): open from Chapter 1 (after the Prologue), its stock by the shop's level
     # (+16, +17, +18: how many, 0xFF unlimited, 0 none). What raises the level isn't traced yet (README).

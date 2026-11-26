@@ -538,7 +538,17 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Carried by Hilda on joining"
     },
     {
-      "mapId": "fe16-5",
+      "mapId": "fe16-4-bl",
+      "kind": "kit-later",
+      "text": "Carried by Cyril on joining"
+    },
+    {
+      "mapId": "fe16-4-gd",
+      "kind": "kit-later",
+      "text": "Carried by Cyril on joining"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "kit",
       "text": "Carried by Cyril on joining"
     },
@@ -596,6 +606,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from an Iron Axe at the blacksmith (professor level D+): 390 gold and 6 Smithing Stone"
     },
     {
+      "mapId": "fe16-12-ss",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level D+): 390 gold and 6 Smithing Stone"
+    },
+    {
       "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from an Iron Axe at the blacksmith (professor level D+): 390 gold and 6 Smithing Stone"
@@ -635,6 +650,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 700 gold and 10 Smithing Stone"
     },
@@ -709,6 +729,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 960 gold and 4 Wootz Steel"
     },
@@ -1265,6 +1290,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 740 gold and 2 Black-Sand Steel"
     },
     {
+      "mapId": "fe16-12-ss",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 740 gold and 2 Black-Sand Steel"
+    },
+    {
       "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 740 gold and 2 Black-Sand Steel"
@@ -1357,6 +1387,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Steel Axe at the blacksmith (professor level B+): 770 gold and 2 Arcane Crystal"
     },
@@ -1696,6 +1731,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
     },
     {
+      "mapId": "fe16-12-ss",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
+    },
+    {
       "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from an Iron Axe at the blacksmith (professor level C+): 2,000 gold and 2 Venomstone"
@@ -1980,6 +2020,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from an Iron Axe at the blacksmith (professor level E+): 360 gold and 6 Smithing Stone"
     },
     {
+      "mapId": "fe16-12-ss",
+      "kind": "forge",
+      "text": "Forged from an Iron Axe at the blacksmith (professor level E+): 360 gold and 6 Smithing Stone"
+    },
+    {
       "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from an Iron Axe at the blacksmith (professor level E+): 360 gold and 6 Smithing Stone"
@@ -2023,6 +2068,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
     },
     {
+      "mapId": "fe16-12-ss",
+      "kind": "forge",
+      "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
+    },
+    {
       "mapId": "fe16-89-cs",
       "kind": "forge",
       "text": "Forged from a Steel Axe at the blacksmith (professor level D+): 590 gold and 10 Smithing Stone"
@@ -2062,6 +2112,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Silver Axe at the blacksmith (professor level B+): 1,040 gold and 16 Smithing Stone"
     },
@@ -2568,17 +2623,17 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Dropped by Catherine"
     },
     {
-      "mapId": "fe16-4-be",
-      "kind": "kit",
-      "text": "Carried by Catherine on joining"
-    },
-    {
       "mapId": "fe16-4-bl",
       "kind": "kit",
       "text": "Carried by Catherine on joining"
     },
     {
       "mapId": "fe16-4-gd",
+      "kind": "kit",
+      "text": "Carried by Catherine on joining"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "kit",
       "text": "Carried by Catherine on joining"
     }
@@ -3613,7 +3668,7 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
     {
-      "mapId": "fe16-20-ss",
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Brave Axe at the blacksmith (professor level B+): 1,440 gold and 6 Wootz Steel"
     },
@@ -3661,6 +3716,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Killer Axe at the blacksmith (professor level C+): 1,120 gold and 4 Black-Sand Steel"
     },
@@ -3753,7 +3813,7 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     },
     {
-      "mapId": "fe16-15-ss",
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Bolt Axe at the blacksmith (professor level B+): 1,150 gold and 4 Arcane Crystal"
     },
@@ -4194,6 +4254,11 @@ export const FE16_ITEM_SOURCES: Record<string, ItemSource[]> = {
     },
     {
       "mapId": "fe16-91-cs",
+      "kind": "forge",
+      "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
+    },
+    {
+      "mapId": "fe16-12-ss",
       "kind": "forge",
       "text": "Forged from a Venin Axe at the blacksmith (professor level C+): 3,000 gold and 4 Venomstone"
     },

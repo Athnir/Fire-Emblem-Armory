@@ -1,6 +1,6 @@
 import { storyOrder } from '../../logic/spoiler'
 import { ALL_MAPS } from './index'
-import { FATES_JOINS } from './fatesJoins'
+import { FATES_JOINS, NO_CASTLE_AFTER, PARALOGUE_AFTER, PARALOGUE_PARENT } from './fatesJoins'
 import type { StoryFork, StoryOrder } from './mapSet'
 import type { ChapterMap } from './types'
 
@@ -13,20 +13,7 @@ const ROUTES = ['Birthright', 'Conquest', 'Revelation'] as const
 
 /** The chapter whose completion opens the Dragon's Gate, which holds the DLC maps (Serenes Forest, "Downloadable Content"). */
 export const DLC_OPENS_AFTER = 6
-/** Paralogue 1 (Mozu's) opens after Chapter 8 (Gamer Guides): not confirmed in-game. */
-const MOZU_OPENS_AFTER = 8
 
-/**
- * Each child's fixed parent: the one who is always the same (the other is whoever you marry). A child's paralogue opens the
- * chapter after that parent joins your army for good: the user's rule, with Soleil's father Laslow joining in Conquest 12 so
- * hers opens in 13, and Shigure following his mother Azura, not his father. Paralogues 2 to 22, in the game's order;
- * the parents match who each child's chapter says to talk to.
- */
-const FIXED_PARENT: Record<number, string> = {
-  2: 'Corrin', 3: 'Azura', 4: 'Jakob', 5: 'Silas', 6: 'Kaze', 7: 'Ryoma', 8: 'Takumi', 9: 'Saizo', 10: 'Kaden', 11: 'Hinata',
-  12: 'Azama', 13: 'Subaki', 14: 'Hayato', 15: 'Xander', 16: 'Leo', 17: 'Benny', 18: 'Keaton', 19: 'Arthur', 20: 'Odin',
-  21: 'Laslow', 22: 'Niles',
-}
 /**
  * Jakob joins in Chapter 6 for a female Corrin but only after Chapter 15 for a male one (the game's castle_join.bin puts him and
  * Felicia in the castle from Chapter 15 on every route), which only the player knows: his
@@ -34,13 +21,24 @@ const FIXED_PARENT: Record<number, string> = {
  */
 const JOINS_LATE: Record<string, number> = { Jakob: 15 }
 
-/** The chapter whose completion opens a paralogue on a route: its child's fixed parent has joined for good. */
+/** The first chapter from `chapter` with a My Castle visit after it: Revelation 16 goes straight on into 17 (its ending skips
+ * the castle), so what opens there opens after 17. */
+function castleAfter(chapter: number, route: string): number {
+  let n = chapter
+  while (NO_CASTLE_AFTER[route]?.includes(n)) n++
+  return n
+}
+
+/**
+ * The chapter whose completion opens a paralogue on a route, as the program checks it (0x3d2e6c): the chapter its record says to
+ * clear first (Chapter 7; Birthright 15 for Paralogue 6) and, for a child's, the chapter its fixed parent joins your army for
+ * good (the other parent is whoever you marry), whichever is later, at the next My Castle visit. Soleil's father Laslow joins in
+ * Conquest 12, so hers opens in 13; Shigure follows his mother Azura, not his father; Corrin, Kana's parent, is always there.
+ */
 export function paralogueOpensAfter(paralogue: number, route: string): number {
-  if (paralogue === 1) return MOZU_OPENS_AFTER
-  const parent = FIXED_PARENT[paralogue]
-  const joins = JOINS_LATE[parent] ?? FATES_JOINS[route]?.[parent] ?? DLC_OPENS_AFTER
-  // Nobody opens before the castle does (Chapter 6 completed), whatever chapter the parent joined in.
-  return Math.max(joins, DLC_OPENS_AFTER)
+  const parent = PARALOGUE_PARENT[paralogue]
+  const joins = !parent || parent === 'Corrin' ? 0 : (JOINS_LATE[parent] ?? FATES_JOINS[route]?.[parent] ?? 0)
+  return castleAfter(Math.max(PARALOGUE_AFTER[paralogue][route], joins), route)
 }
 
 const words = {
@@ -64,10 +62,11 @@ function storyFor(route: (typeof ROUTES)[number]): StoryOrder {
       const m = byId.get(id)
       if (m?.route === 'DLC') return after(maps, DLC_OPENS_AFTER)
       if (m?.route === 'Paralogue' && m.availableIn?.some((r) => r === route)) return after(maps, paralogueOpensAfter(m.chapter, route))
-      // A chapter's challenge can be scouted once that chapter is cleared; a paralogue's as soon as the paralogue opens.
+      // A chapter's challenge can be scouted at the castle visit after that chapter (Revelation 16's after 17); a paralogue's as
+      // soon as the paralogue opens.
       if (m?.route === 'Challenge' && m.availableIn?.some((r) => r === route)) {
         const base = byId.get(m.challengeOf!)!
-        return after(maps, base.route === 'Paralogue' ? paralogueOpensAfter(base.chapter, route) : base.chapter)
+        return after(maps, base.route === 'Paralogue' ? paralogueOpensAfter(base.chapter, route) : castleAfter(base.chapter, route))
       }
       return Infinity
     },

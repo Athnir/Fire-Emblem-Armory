@@ -124,6 +124,10 @@ describe("Fates' challenge battles", () => {
   it("open once their chapter is cleared, and a paralogue's as soon as the paralogue does", () => {
     expect(reached('Birthright', 7).has('fe14b-7-challenge')).toBe(false)
     expect(reached('Birthright', 8).has('fe14b-7-challenge')).toBe(true)
+    // Revelation 16's ending goes straight on into 17 (ev::ChapterSetSkipChapterSaveCastle): no castle visit to scout it from
+    // until 17 is cleared.
+    expect(reached('Revelation', 17).has('fe14r-16-challenge')).toBe(false)
+    expect(reached('Revelation', 18).has('fe14r-16-challenge')).toBe(true)
     // The shared chapters' challenges, on both routes that have challenges.
     expect(reached('Revelation', 6).has('fe14-5-challenge')).toBe(true)
     expect(reached('Conquest', 27).has('fe14-5-challenge')).toBe(false)

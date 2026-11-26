@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ALL_MAPS } from '../../data/maps'
-import { FATES_JOINS } from '../../data/maps/fatesJoins'
+import { FATES_JOINS, NO_CASTLE_AFTER, PARALOGUE_AFTER, PARALOGUE_PARENT } from '../../data/maps/fatesJoins'
 import { FATES_FORK } from '../../data/maps/fatesStory'
 import { ALL_WEAPONS } from '../../data/weapons'
 import { FATES_PROGRESS, LOTTERY_CHAPTERS } from '../../data/weapons/fatesCastle'
@@ -42,9 +42,10 @@ describe("Fates' route choice", () => {
     const at = (route: Route, chapter: number) => reachOf(story(route), on(route, chapter).at, route)
     expect(at('Birthright', 6).has(dlc.id)).toBe(false)
     expect(at('Birthright', 7).has(dlc.id)).toBe(true)
+    // Mozu's record (CID_X001) names Chapter 7 and no parent: it opens once Chapter 7 is cleared.
     const mozu = ALL_MAPS.find((m) => m.route === 'Paralogue' && m.chapter === 1)!
-    expect(at('Conquest', 8).has(mozu.id)).toBe(false)
-    expect(at('Conquest', 9).has(mozu.id)).toBe(true)
+    expect(at('Conquest', 7).has(mozu.id)).toBe(false)
+    expect(at('Conquest', 8).has(mozu.id)).toBe(true)
     // Paralogue 7 is Ryoma's child, so it follows Ryoma joining for good: Birthright 13, so the paralogue opens in 14.
     const hoshido = ALL_MAPS.find((m) => m.route === 'Paralogue' && m.chapter === 7)!
     expect(at('Birthright', 13).has(hoshido.id)).toBe(false)
@@ -61,15 +62,53 @@ describe("Fates' route choice", () => {
     // Shigure follows his mother Azura (Conquest 9), not his father: Chapter 10.
     expect(at('Conquest', 9).has(para(3).id)).toBe(false)
     expect(at('Conquest', 10).has(para(3).id)).toBe(true)
-    // Azura is with you from Birthright 5, but nothing opens before the castle: Chapter 7.
-    expect(at('Birthright', 6).has(para(3).id)).toBe(false)
-    expect(at('Birthright', 7).has(para(3).id)).toBe(true)
+    // Azura is with you from Birthright 5, but every paralogue's record names Chapter 7 to clear first: Chapter 8.
+    expect(at('Birthright', 7).has(para(3).id)).toBe(false)
+    expect(at('Birthright', 8).has(para(3).id)).toBe(true)
+    // Kana's parent is Corrin, always there: Chapter 8 on every route.
+    for (const route of ['Birthright', 'Conquest', 'Revelation'] as const) {
+      expect(at(route, 7).has(para(2).id), route).toBe(false)
+      expect(at(route, 8).has(para(2).id), route).toBe(true)
+    }
+    // Midori's record names Birthright 15 to clear first (Kaze is there from 4): Chapter 16 there, 12 on Conquest (Kaze, 11).
+    expect(at('Birthright', 15).has(para(6).id)).toBe(false)
+    expect(at('Birthright', 16).has(para(6).id)).toBe(true)
+    expect(at('Conquest', 11).has(para(6).id)).toBe(false)
+    expect(at('Conquest', 12).has(para(6).id)).toBe(true)
     // Revelation has its own join chapters: Laslow joins in 17.
     expect(at('Revelation', 17).has(para(21).id)).toBe(false)
     expect(at('Revelation', 18).has(para(21).id)).toBe(true)
+    // Ryoma and Azama join in Revelation 16, whose ending goes straight on into 17 with no My Castle visit: Shiro's and Mitama's
+    // open in 18.
+    for (const p of [7, 12]) {
+      expect(at('Revelation', 17).has(para(p).id), `Paralogue ${p}`).toBe(false)
+      expect(at('Revelation', 18).has(para(p).id), `Paralogue ${p}`).toBe(true)
+    }
     // Jakob's son waits for the later of his two dates.
     expect(at('Birthright', 15).has(para(4).id)).toBe(false)
     expect(at('Birthright', 16).has(para(4).id)).toBe(true)
+  })
+
+  it("reads each paralogue's opening from its chapter record, and the chapters with no My Castle visit after them", () => {
+    // CID_X001-X022: Chapter 7 on every route, but Birthright 15 for Paralogue 6.
+    for (const [n, after] of Object.entries(PARALOGUE_AFTER)) {
+      expect([n, after]).toEqual([n, { Birthright: n === '6' ? 15 : 7, Conquest: 7, Revelation: 7 }])
+    }
+    // The parents match who each child's chapter says to talk to; Mozu's names none.
+    expect(PARALOGUE_PARENT).toEqual({
+      2: 'Corrin', 3: 'Azura', 4: 'Jakob', 5: 'Silas', 6: 'Kaze', 7: 'Ryoma', 8: 'Takumi', 9: 'Saizo', 10: 'Kaden', 11: 'Hinata',
+      12: 'Azama', 13: 'Subaki', 14: 'Hayato', 15: 'Xander', 16: 'Leo', 17: 'Benny', 18: 'Keaton', 19: 'Arthur', 20: 'Odin',
+      21: 'Laslow', 22: 'Niles',
+    })
+    // Every parent of a paralogue a route can reach joins on it (Corrin is always there; Jakob's dates are by Corrin's gender).
+    for (const m of ALL_MAPS.filter((x) => x.route === 'Paralogue')) {
+      const parent = PARALOGUE_PARENT[m.chapter]
+      for (const route of m.availableIn ?? []) {
+        if (parent && parent !== 'Corrin' && parent !== 'Jakob') expect([m.id, route, FATES_JOINS[route]?.[parent]]).not.toContain(undefined)
+      }
+    }
+    // Their scripts call ev::ChapterSetSkipChapterSaveCastle: every route's 27 goes into the Endgame, Revelation 16 into 17.
+    expect(NO_CASTLE_AFTER).toEqual({ Birthright: [27], Conquest: [27], Revelation: [16, 27] })
   })
 })
 
@@ -128,6 +167,14 @@ describe('the weapon list under the block', () => {
     expect(player('Revelation', 2)).toHaveLength(5)
     // The Faceless carry their fists on the Chapter 4 map.
     expect(listed('Birthright', 4).has('Shackled Fist')).toBe(true)
+  })
+
+  it("counts a recruit who brings nothing as joined, so a later chapter's preset gear isn't theirs", () => {
+    // Kagero joins at the end of Revelation 11 (C011's end handler places Support01, her slot empty); Revelation 13's Player group
+    // lists her with a Steel Shuriken, a preset the game never hands to a unit already in your army.
+    const kit = (id: string) => ALL_MAPS.find((m) => m.id === id)!.kit ?? []
+    expect(kit('fe14r-11').some((k) => k.name === 'Kagero')).toBe(false)
+    expect(kit('fe14r-13').some((k) => k.name === 'Kagero')).toBe(false)
   })
 
   it("gives Corrin's Yato only from the chapter the game puts it in his hands", () => {

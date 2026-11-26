@@ -196,6 +196,25 @@ NSO decompressed and relocated, loaded at 0).
   route's students back only if recruited), so the maps take each route's house students as in your army (Silver Snow's without
   Edelgard and Hubert) and show a student another house could have taken as a stand-in. CheckDeathStatus (negated, a slot, 4) asks
   whether the unit's person was lost before the battle (Chapter 13's Seteth joins unless he was): the maps take no one as lost.
+  Who joins without a talk is the program's (0x3d7720, as a scenario ends): Flayn every house after scenario 6; after scenario 11
+  Catherine, Cyril, Shamir and Seteth on Silver Snow, Seteth on Azure Moon and Verdant Wind if Flayn is yours, none on Crimson
+  Flower; Gilbert at Azure Moon's time skip (0x3d91b0); Dedue leaves Azure Moon after scenario 12, only away if War for the Weak (scenario 43)
+  was cleared, else lost, and The Great Bridge Coup brings him back on turn 2 unless he was lost (its events 49 and 50). The routes'
+  armies (`ROUTE_ARMY`) hold them. At the time skip (0x3d91b0) a recruited Ashe leaves Silver Snow and Verdant Wind, a recruited
+  Lorenz Silver Snow and Azure Moon (only the 'has joined' bit stays, so the battles test them 'recruited before the timeskip', not
+  'is recruited': `LEFT_AT_TIMESKIP`); Ambush at Ailell and The Great Bridge Coup fight them, and defeating one runs PersuadeKill (the
+  person, two talks: the menu's 'You can persuade ... to become your ally', text table 0 #483-485), which brings him back persuaded.
+  A stand-in for someone no house fighting the map can have by then never comes (`can_have`), and of two events of one kind where the
+  later waits for the earlier not to have run, the later never runs where the earlier's own route and army checks hold (`superseded`:
+  Silver Snow's Chapter 12 sends a Knight of Seiros for Shamir and for Catherine, never them; Verdant Wind's Chapter 16 the Alliance
+  General's set, never Lorenz's).
+- **Recruit talks** (file 360's RecruitTalk events: the person, then four text numbers; `recruit_talks`): the eighteen students of
+  the other houses under no checks; Catherine on Silver Snow (route 0) from Chapter 12, or from Chapter 4 for the Blue Lions and the
+  Golden Deer (1 and 2); Cyril the same from Chapter 5; Shamir from 5, Hanneman and Manuela from 8, Alois from 11 for every house;
+  Hilda for the Blue Lions, or on Silver Snow from Chapter 12. The lords, Hubert and Dedue have none, so no other house takes them.
+  DeathFlag (condition 1190: negated, a person, a kind, a value; `0x545754` -> `0x547d50`, the kinds by
+  the table at `0xd171ac`) reads the person's status byte (+0xac of their unit in your army's list): kinds 0, 1 and 4 its death
+  bits, kinds 2 and 3 bits 0 and 1, which a join sets and a leave clears bit 0 of: in your army.
 - **Blue tiles** (MakeMapTilesBlue: a rectangle and whether to mark or clear it): the opening marks the defended locations a foe takes
   to win (Chapters 12 and 14) and the destinations a unit is sent to (Rumored Nuptials' Ingrid); the maps draw them as objectives where
   the battle's conditions name them. Other blue tiles (Fort Merceus' gates, the onager Protecting Garreg Mach's Church Soldier makes for)
@@ -204,9 +223,12 @@ NSO decompressed and relocated, loaded at 0).
   SetParalogueAvailability (the scenario, 1 or 0), by the chapter the calendar is in (ChapterSelect: negated, a chapter, how it
   compares), the route (the Black Eagles count as Silver Snow, 0, until the routes part) and, for some, a support (Characters: negated,
   two persons, a level, how it compares: Eternal Guardian's Byleth and Rhea, Weathervanes of Fódlan's Annette and Gilbert, Forgotten
-  Hero's Byleth and Marianne, each at C), someone alive (DeathFlag: Dividing the World's Hilda) or flags (Legend of the Lake on Crimson
-  Flower: 68 and 69, set when Seteth and Flayn fall in its Chapter 15). The flow's paralogue table (section 4) names the persons each
-  is about; the maps count them in your army. Every route that fights one alike shares its map; Foreign Land and Sky's scenario sets
+  Hero's Byleth and Marianne, each at C), someone in your army (DeathFlag kinds 2 and 3: Dividing the World's Hilda) or flags (Legend
+  of the Lake on Crimson Flower: 68 and 69, set when Seteth and Flayn fall in its Chapter 15). The flow's paralogue table (section 4)
+  names the persons each is about, whom the check at 0x3f10c0 wants in your army: either of two before the time skip, both after it.
+  A paralogue opens on a route from the first chapter its script opens it in where they can be yours (`can_have`): Dividing the World
+  for the Blue Lions and the Golden Deer from Chapter 10, on Silver Snow from 12 (Hilda's talk), never on Crimson Flower. The maps
+  count them in your army. Every route that fights one alike shares its map; Foreign Land and Sky's scenario sets
   +36 bit 1, and Crimson Flower fights its second unit table (the Church's army). Each paralogue's starting foes match Fire Emblem
   Wiki's on every difficulty.
 - **The DLC's battles** (scenarios 86-99) are in the DLC's own archive: scenario s's .bai is DLC file 483 + 2s, its .bsi the next
@@ -570,9 +592,11 @@ clear colour), Silver Snow 20's light stone paths, a64's lawns and a62's dirt fr
   random foes show no items. 52 units are marked: every steal source Fire Emblem Wiki's item pages give for an item the rule counts,
   but Crimson Flower's Flayn (below), with The Face Beneath's Death Knight's Accuracy Ring and The Great Bridge Coup's Acheron's Evasion
   Ring ('Steal from Acheron (reinforcement)'), which the wiki's chapter pages give.
-- Recruits' gear: the faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events, each with the
-  chapter it opens from: Catherine 4, Cyril and Shamir 5, Hanneman and Manuela 8, Alois 11) carry their persondata section 6 items
-  on joining (Catherine's Thunderbrand).
+- Recruits' gear: the faculty and knights the monastery's script lets you recruit (file 360's RecruitTalk events, `recruit_talks`)
+  carry their persondata section 6 items on joining, from the first chapter each house can recruit them (`recruit_maps`): Shamir 5,
+  Hanneman and Manuela 8, Alois 11 for every house; Catherine (her Thunderbrand) from 4 and Cyril from 5 for the Blue Lions and the
+  Golden Deer only, and on the Black Eagles' side from Silver Snow's Chapter 12, never in White Clouds or on Crimson Flower. Chapter
+  5 is every house's battle, so Cyril's counts from each house's Chapter 4 ('kit-later').
 - `scripts/fe16_hit_table.py`: the true hit table.
 - `scripts/build-fe16-battalions.py` (`src/data/fe16/fe16Battalions.ts`, the Battalions tab): every battalion something gives you,
   and those only foes lead (foe-only, with who leads them: their unit records' +34), with its stats by level, its gambit and the
@@ -587,7 +611,9 @@ clear colour), Silver Snow 20's light stone paths, a64's lawns and a62's dirt fr
   notes list them too ('Battalions given when the battle is won: ...').
 - Students swapped later or elsewhere (`swapped_later`): where no stand-in takes a recruited student's tile at the start, the events
   that test the student recruited bring the foe on the student's own tile instead (else every foe they bring), or place the student
-  only while not recruited ('Dedue isn't in it'), and the student's note says so; the map still shows the student (the user's call).
+  only while not recruited, and the student's note says so; the map still shows the student (the user's call). Not where no house or
+  route fighting the map can have them by then (Verdant Wind's Dedue at Gronder, Crimson Flower's Catherine), nor for one who left at
+  the time skip.
   A stand-in's `when` reads after 'if': 'you recruited Felix into your house before this battle'.
 - Every area a time names is outlined (`outline_named_areas` in `build-fe16-maps.py`): the areas that bring a group in, and those its
   time names by their corners, the areas that stop a reinforcement point among them (`point_until`: Sword and Shield of Seiros'

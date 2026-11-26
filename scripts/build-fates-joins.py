@@ -11,26 +11,106 @@ The game has no table of who joins when, so it's read from how the chapters use 
   3. a recruitable green unit (the Ally group) in the chapter before that run began is the chapter they joined in.
 `src/logic/__tests__/fatesSpoiler.test.ts` checks the result against Serenes Forest's recruitment pages for every parent.
 
+When a paralogue opens is the program's (0x3d2e6c, run as a chapter ends): each chapter record of GameData.bin (CID_*, 28 bytes)
+names the chapter to clear first on each route (+0x0d Birthright, +0x0e Conquest, +0x0f Revelation: that chapter's index, the
+record's +0x08) and a fixed parent (+0x10, a person's index, the person record's +0x1c; 0 for none), who must be in your army and
+married to someone of the other gender. Every paralogue names Chapter 7 on every route but Midori's, which names Birthright 15;
+Mozu's names no parent. The chapters a route goes on from with no My Castle visit are those whose script calls
+ev::ChapterSetSkipChapterSaveCastle(1) (Revelation 16, every route's 27), so nothing opens in the castle before the next one.
+
 Needs the dumped game files in data-raw/fates/romfs/ (git-ignored). Run:
     python scripts/build-fates-joins.py
 """
 import json
 import os
+import re
+import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fates_cmb import Script  # noqa: E402
 from fates_dispos import read as read_dispos  # noqa: E402
-from fates_maps import MAPS, ROOT, find, find_script, terrain, text_for  # noqa: E402
+from fates_lz import decompress  # noqa: E402
+from fates_maps import MAPS, RAW, ROOT, find, find_script, terrain, text_for  # noqa: E402
 from fates_terrain import read as read_terrain  # noqa: E402
 
 OUT = os.path.join(ROOT, 'src', 'data', 'maps', 'fatesJoins.ts')
-# The fixed parents of the children's paralogues (the other parent is whoever you marry). Jakob is left out: he joins in 6 or
-# only much later depending on Corrin's gender, which no chapter file can say.
-PARENTS = ['Azura', 'Silas', 'Kaze', 'Ryoma', 'Takumi', 'Saizo', 'Kaden', 'Hinata', 'Azama', 'Subaki', 'Hayato', 'Xander', 'Leo',
-           'Benny', 'Keaton', 'Arthur', 'Odin', 'Laslow', 'Niles']
 ROUTES = {'Birthright': 'fe14b', 'Conquest': 'fe14c', 'Revelation': 'fe14r'}
 PLAYER = ('Player', 'PlayerM', 'PlayerF')
+B = 0x20  # GameData.bin's pointers count from its header's end
+CHAPTER, PERSON = 0x1c, 0x98  # record sizes, counted from each record's ID pointer
+# The parents whose joins are read here: every paralogue's but Corrin's (always in your army) and Jakob's, who joins in 6 or
+# only after Chapter 15 depending on Corrin's gender (castle/castle_join.bin), which no chapter file can say.
+NOT_READ = ('Corrin', 'Jakob')
+
+
+def paralogue_records(text):
+    """{paralogue: (the chapter to clear first on each route, the fixed parent's name or None)} from the CID_X records."""
+    d = decompress(open(os.path.join(RAW, 'GameData.bin.lz'), 'rb').read())
+    u32 = lambda o: struct.unpack_from('<I', d, o)[0]  # noqa: E731
+
+    def s(ptr):
+        if not 0 < ptr < len(d) - B:
+            return ''
+        end = d.find(b'\0', B + ptr)
+        try:
+            return d[B + ptr:end].decode('shift_jis')
+        except UnicodeDecodeError:
+            return ''
+
+    def table(prefix, size):
+        o = next(o for o in range(B, len(d) - 4, 4) if s(u32(o)).startswith(prefix))
+        while s(u32(o)).startswith(prefix):
+            yield o
+            o += size
+
+    chapters = {o: s(u32(o))[4:] for o in table('CID_', CHAPTER)}
+    code_at = {d[o + 8]: code for o, code in chapters.items()}  # +0x08: the chapter's own index
+    people = {struct.unpack_from('<H', d, o + 0x1c)[0]: o for o in table('PID_', PERSON)}
+
+    def person(index):
+        o = people[index]
+        pid = s(u32(o))
+        return 'Corrin' if pid.startswith('PID_プレイヤー') else text[s(u32(o + 0x0c))]
+
+    out = {}
+    for o, code in chapters.items():
+        m = re.fullmatch(r'X(\d{3})', code)
+        if not m:
+            continue
+        assert d[o + 9] == 1, (code, d[o + 9])  # +9: the chapter's kind, 1 a paralogue
+        after = {}
+        for i, route in enumerate(ROUTES):
+            first = code_at[d[o + 0x0d + i]]
+            assert re.fullmatch(r'[ABC]\d{3}', first), (code, first)
+            after[route] = int(first[1:])
+        parent = struct.unpack_from('<H', d, o + 0x10)[0]
+        out[int(m.group(1))] = (after, person(parent) if parent else None)
+    return dict(sorted(out.items()))
+
+
+def no_castle_after():
+    """{route: [chapters]}: the story chapters whose script calls ev::ChapterSetSkipChapterSaveCastle(1), so the next chapter
+    follows with no My Castle visit between (Revelation 16's ending runs Chapter 17's opening at once)."""
+    out = {route: [] for route in ROUTES}
+    for map_id, (code, route, n) in MAPS.items():
+        if route not in ('Shared', *ROUTES):
+            continue
+        path = find_script(code)
+        if not path or b'ChapterSetSkipChapterSaveCastle' not in open(path, 'rb').read():
+            continue
+        s = Script(path)
+        for h in s.handlers():
+            try:
+                ins = s.disasm(h)
+            except ValueError:
+                continue
+            if any(op == 'call' and str(arg).startswith('ev::ChapterSetSkipChapterSaveCastle') and ins[i - 1][1:] == ('int', 1)
+                   for i, (_, op, arg) in enumerate(ins)):
+                for r in ROUTES if route == 'Shared' else [route]:
+                    if n not in out[r]:
+                        out[r].append(n)
+    return {r: sorted(chs) for r, chs in out.items()}
 
 
 def chapters(route):
@@ -41,6 +121,12 @@ def chapters(route):
 
 def main():
     text = text_for()
+    paralogues = paralogue_records(text)
+    # The fixed parents of the children's paralogues, in the paralogues' order.
+    PARENTS = []
+    for _, parent in paralogues.values():
+        if parent and parent not in NOT_READ and parent not in PARENTS:
+            PARENTS.append(parent)
 
     def name(pid):
         return text.get('M' + pid) or text.get('MPID_' + pid.split('_')[-1])
@@ -99,6 +185,7 @@ def main():
             recruited = [c for c in nums if who in seen[c]['ally'] and 6 <= c < start]
             joins[who] = max(recruited) if recruited else start
         result[route] = joins
+    skipped = no_castle_after()
     lines = [
         '/*',
         " * GENERATED by scripts/build-fates-joins.py from the game's chapter files. Do not edit by hand.",
@@ -106,9 +193,23 @@ def main():
         '',
         "/** The chapter each character joins your army for good, by route (a temporary guest who leaves doesn't count). */",
         'export const FATES_JOINS: Record<string, Record<string, number>> = ' + json.dumps(result, ensure_ascii=False),
+        '',
+        "/** The story chapter each paralogue's record (GameData.bin, CID_X001-X022, +0x0d to +0x0f) says to clear first on each",
+        " * route: Chapter 7, or Birthright 15 for Paralogue 6. It opens once that chapter is cleared (0x3d2e6c). */",
+        'export const PARALOGUE_AFTER: Record<number, Record<string, number>> = '
+        + json.dumps({n: after for n, (after, _) in paralogues.items()}, ensure_ascii=False),
+        '',
+        "/** Each child's paralogue's fixed parent (its record's +0x10), who must be in your army and married to someone of the",
+        " * other gender for it to open; the child's other parent is whoever they marry. Mozu's (Paralogue 1) names none. */",
+        'export const PARALOGUE_PARENT: Record<number, string> = '
+        + json.dumps({n: parent for n, (_, parent) in paralogues.items() if parent}, ensure_ascii=False),
+        '',
+        '/** The story chapters each route goes on from with no My Castle visit (their script calls',
+        ' * ev::ChapterSetSkipChapterSaveCastle), so nothing that opens in the castle opens before the next one. */',
+        'export const NO_CASTLE_AFTER: Record<string, number[]> = ' + json.dumps(skipped, ensure_ascii=False),
     ]
     open(OUT, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
-    print('wrote', OUT, {r: len(v) for r, v in result.items()})
+    print('wrote', OUT, {r: len(v) for r, v in result.items()}, len(paralogues), 'paralogues; no castle after', skipped)
 
 
 if __name__ == '__main__':

@@ -398,10 +398,11 @@ def main():
         recruits = []
 
         def recruit(u):
-            """Notes a unit joining your army here, with its own items."""
+            """Notes a unit joining your army here, with its own items: none for some (Kagero at the end of Revelation 11, whose
+            Support01 slot holds nothing), who have joined all the same, so a later Player group's preset gear isn't theirs."""
             pid = u['pid'] or ''
-            if u['items'] and (named(pid) or character(pid)) and route in ('Shared', 'Birthright', 'Conquest', 'Revelation'):
-                mine = {'name': name(pid), 'items': [item(n) for n, fl in u['items'] if ever(fl)]}
+            if (named(pid) or character(pid)) and route in ('Shared', 'Birthright', 'Conquest', 'Revelation'):
+                mine = {'name': name(pid), 'items': [item(n) for n, fl in u['items'] or [] if ever(fl)]}
                 if mine not in recruits:
                     recruits.append(mine)
 
@@ -867,7 +868,8 @@ def first_kits(result):
             joined |= {k['name'] for k in result[map_id]['recruits']}
     for map_id, r in result.items():
         kit = [k for k in r['kit'] if (map_id, k['name']) in keep]
-        r['kit'] = kit + [k for k in r.pop('recruits') if k not in kit]
+        # A recruit who brings nothing has joined (above) but leaves no kit.
+        r['kit'] = kit + [k for k in r.pop('recruits') if k not in kit and k['items']]
 
 
 if __name__ == '__main__':

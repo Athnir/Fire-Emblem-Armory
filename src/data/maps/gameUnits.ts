@@ -3970,7 +3970,7 @@ export const GAME_UNITS: Record<string, GameUnits> = {
     ],
     starts: [[10, 1], [9, 2], [11, 2], [4, 1], [9, 4], [8, 1], [7, 4], [6, 2], [6, 1], [12, 1], [6, 3], [8, 2], [8, 3], [10, 3]],
     corrin: [10, 1],
-    kit: [{ name: "Corrin", items: ["Yato", "Armorslayer", "Dragonstone"] }, { name: "Kagero", items: ["Steel Shuriken"] }, { name: "Kaden", items: ["Beaststone"] }, { name: "Keaton", items: ["Beaststone"] }],
+    kit: [{ name: "Corrin", items: ["Yato", "Armorslayer", "Dragonstone"] }, { name: "Kaden", items: ["Beaststone"] }, { name: "Keaton", items: ["Beaststone"] }],
     forced: [{ name: "Kaden", tile: [8, 3] }, { name: "Keaton", tile: [10, 3] }],
     joins: [
     ],
