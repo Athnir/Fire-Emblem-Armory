@@ -65,12 +65,66 @@ BUILDINGS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data
 # The maps whose villages the user saw as ruins (the review of every map): their houses drawn in ruins.
 RUINED = ('fe17-c002-', 'fe17-m006', 'fe17-s012')
 PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall', 'q': 'Large Pillar'}
-# The colours a map's scene gets wrong, set by hand (the user's calls): the Last Engage's sky round its island the void, black.
-FILLS = {'fe17-m026': {'wd': '#0b0b0e'}}
+# The colours a map's scene gets wrong, set by hand (the user's calls): the Last Engage's sky round its island the void, black; the
+# Mysterious Merchant's courtyard green grass, not dirt (its photos' sunlit grass).
+FILLS = {'fe17-m026': {'wd': '#0b0b0e'}, 'fe17-s002': {'ta': '#6a6816'}}
 # The maps whose junk (wz, two tiles by two) its scene draws as wooden shacks (the user, the Desert Dunes stages): drawn as shacks.
 SHACKS = ('fe17-c005-',)
 # The maps whose dais of large pillars round a floor with stairs is a small stone fort (the user, the Caring Princess's: a fort fix).
 DAIS_FORTS = {'fe17-s013'}
+
+# The user's review (2026-11-26): its tiles drawn as the game names them, by each map's own terrain ids at the start (TIDS, kept as
+# each grid is encoded; `game_looks`).
+# Its rocks (岩) and boulders (大岩) rock outcrops (`decor` 'outcrop', in the rock's own colour: the user, the bricks and the cliffs
+# among the ground are rock outcroppings), but a block of rocks along the map's edge bigger than EDGE_CLIFF its cliffs (A Clash of
+# Forces' snowy rims); its peaks and cliffs (山, 崖) standing apart from the map's edge, no bigger than SMALL_PEAK, outcrops too (the
+# user: the cliffs not on the map's edge), and every one on the maps the user named (the Four Hounds': all the bricks).
+EDGE_CLIFF, SMALL_PEAK = 12, 6
+ROCKS, PEAKS = {'TID_岩', 'TID_大岩'}, {'TID_山', 'TID_崖'}
+ROCK_CODE = {'TID_岩': 'wt', 'TID_大岩': 'wa', 'TID_山': 'wb', 'TID_崖': 'wb'}
+ALL_OUTCROPS = ('fe17-m023',)
+# What stands on a wall's tile, drawn over it: its large pillars (大柱), beacons (篝火: braziers, lit; 篝火消 put out), candelabras
+# (燭台), statues (石像), coffins (石棺) and palisades (防柵) (the user: pillars, candlesticks, statues, braziers as Radiant Dawn's
+# torches; not void, nor ruins on a black ground).
+DECOR_TIDS = {'TID_大柱': 'pillar', 'TID_篝火': 'brazier', 'TID_篝火常': 'brazier', 'TID_篝火消': 'brazierOut', 'TID_燭台': 'candle',
+              'TID_石像': 'statue', 'TID_石棺': 'coffin', 'TID_防柵': 'palisade'}
+# Lone buildings its scene stands round columns on (the user, the Hero-King's dais: pillars).
+PILLARS = {'fe17-s014': [(24, 23), (22, 23), (21, 20), (25, 20)]}
+# The maps whose scenes leave what's beyond their walls black (the Final Guardian's, the Azure Twin's): the tiles off its limits
+# (進入不可) the void there, its walls walls (the user: the void tiles are actually walls).
+VOID_BEYOND = ('fe17-m025', 'fe17-s008')
+# A cave whose walls are its rock (the user, the Brash General's: cave walls, all but its temple's, the box x0, x1, y0, y1).
+CAVE_WALLS = {'fe17-g002': (2, 10, 19, 23)}
+# Bridges its scenes build of stone (`t8`, a bridge's numbers: A Land in Bloom's, the Sage Lord's white bridges).
+STONE_BRIDGES = ('fe17-m004', 'fe17-s010')
+# Roads its scene paves with white stone (the user, Queen Lumera's garden: a cobble's pattern, not a dirt road's): paving, `gf`.
+PAVED_ROADS = ('fe17-m002',)
+# A town its scene paves well past its roads (the user, Serenity in Ruin's: cobble should cover most of the town), traced on its lit
+# render (its stone's hue, the town's rows): its paving `gb` with a plain's numbers, its colour off the render, the rows from the top.
+TOWN_PAVING = {'fe17-m017': ('#785345', 31, [
+    '..##........................#',
+    '..############............###',
+    '..####.......#####......#####',
+    '..###.........#####....###..#',
+    '..###.........###......##...#.##',
+    '..#...#.....##..###....##...##',
+    '......##...##...#......#.....#',
+    '..##..#########...#....####.##',
+    '...##...###......##....#....#',
+    '...##..####...###......##...#',
+    '...##..#...#..###......##',
+    '....##..#####..###.....######.#',
+    '.....#########..####....####',
+    '....#.........#....##',
+    '....#...###.........#',
+    '........###.........#...###',
+])}
+# A building block its scene shows as no fort (the user, Dancer in the Ruins: its towers, in its walls' stone).
+NO_FORTS = ('fe17-m015',)
+# A sigil set in a castle's floor (the Ancestor's): that floor, its numbers the same (the user: stone like the floor round it).
+SIGILS = ('TID_魔法陣', 'TID_魔法陣_氷結界')
+# Each map's terrain id per app tile at the start: {map id: {(x, y): tid}} (an overlap's, the tile's under it).
+TIDS = {}
 
 # Each terrain kind by the game's terrain id: its letter (scripts/terrain_codes.py GAME['fe17']).
 LETTER = {
@@ -1352,13 +1406,16 @@ LIT_FILLS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__
 
 
 def stairwells(m):
-    """Each Stairs tile with no Stairs beside it made stairs going down (`gl`); whether the map has any."""
+    """Each Stairs tile the game marks for no battle (階段_戦禁: where its foes come up from below) with no Stairs beside it made
+    stairs going down (`gl`); a lone plain Stairs tile is a step down to a lower floor, kept stairs (the user, the Mysterious Merchant's:
+    stairs going down only where they go off the map). Whether the map has any."""
+    ids = TIDS.get(m['id'], {})
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     h, w = len(rows), len(rows[0]) if rows else 0
     found = False
     for y in range(h):
         for x in range(w):
-            if rows[y][x] == 'tc' and not any(0 <= x + dx < w and 0 <= y + dy < h and rows[y + dy][x + dx] == 'tc'
+            if rows[y][x] == 'tc' and ids.get((x + 1, h - y)) == 'TID_階段_戦禁' and not any(0 <= x + dx < w and 0 <= y + dy < h and rows[y + dy][x + dx] == 'tc'
                                               for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
                 rows[y][x] = 'gl'
                 found = True
@@ -1366,16 +1423,26 @@ def stairwells(m):
     return found
 
 
+def on_floor(key):
+    tid = key[1] if isinstance(key, tuple) else key
+    return isinstance(tid, str) and tid.startswith('TID_床')
+
+
 def encode_grid(t, terrain, used_tids, map_id):
     tiles = start_tiles(t, terrain)
     names = TILE_NAMES.setdefault(map_id, {})
+    ids = TIDS.setdefault(map_id, {})
     rows = []
     for z in range(t['z'] + t['height'] - 1, t['z'] - 1, -1):
         line = []
         for x in range(t['x'], t['x'] + t['width']):
             key = tiles[x, z]
             used_tids.setdefault(key, set()).add(map_id)
-            code = encode(GAME, letter_of(key))
+            ids[tuple(app_tile(t, x, z))] = key[1] if isinstance(key, tuple) else key
+            letter = letter_of(key)
+            if key in SIGILS and sum(on_floor(tiles.get((x + dx, z + dz))) for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1))) >= 2:
+                letter = '1'
+            code = encode(GAME, letter)
             names.setdefault(code, {}).setdefault(tile_name(key), []).append(app_tile(t, x, z))
             line.append(code)
         rows.append(''.join(line))
@@ -1883,7 +1950,7 @@ def main():
             # off the screen, the median per code: data-raw/fe17-emu-fills.json; the user: the renders aren't the game's look).
             m['fills'].update(EMU_FILLS.get(m['id'], {}))
             separate(m['fills'])
-            m['fills'].update(FILLS.get(m['id'], {}))
+            m['fills'].update(FILLS.get(m['id']) or FILLS.get(m['id'].removesuffix('-sk'), {}))
             # Stone set among its grass (fe17_ground's paving: the Tempest Trials' cobble patches) as paving, the plain's numbers.
             paved = {tuple(t) for t in ground[m['id']].get('paving', [])}
             if paved:
@@ -1898,6 +1965,15 @@ def main():
         # the user's notes, Chapter 25's five), drawn as stairs going down (`gl`, the stairs' numbers); the flights stay stairs.
         if stairwells(m):
             info.setdefault('gl', dict(info['tc'], name='Stairs going down'))
+        game_looks(m)
+    # The codes the game's own looks bring in, with the numbers of what they're drawn over.
+    used = {r[i:i + 2] for m in maps for r in m['grid'] for i in range(0, len(r), 2)}
+    if 't8' in used:
+        info['t8'] = dict(info['tb'], name='Bridge')
+    if 'gf' in used:
+        info['gf'] = dict(info['tl'], name='Ground')
+    if 'gb' in used:
+        info.setdefault('gb', dict(info['ta']))
     # A building drawn as itself works as the Edifice it is, named by what it is.
     for code in sorted(pieces):
         info[code] = dict(info['oe'], name=PIECE_NAMES[code[0]])
@@ -1915,6 +1991,8 @@ def main():
 WATERS = ('we', 'tg', 'wl', 'tf', 'wk')
 # The ground units walk, and the walls kept a step darker than every kind of it (the user: the Ancestor's walls blended with its floor).
 GROUNDS, WALLS = ('ta', 't1', 'tc', 'td', 'ga', 'gb', 't3', 't2'), ('wa', 'wb', 'wt')
+# The darkest a wall is drawn (its value): the viewer draws a wall darker than its void line (src/logic/mapFills.ts) as the void.
+WALL_LEAST = 0.16
 
 
 def separate(fills):
@@ -1936,11 +2014,18 @@ def separate(fills):
     if not grounds:
         return
     low = min(colorsys.rgb_to_hsv(*rgb(fills[c]))[2] for c in grounds)
+    under = min(grounds, key=lambda c: colorsys.rgb_to_hsv(*rgb(fills[c]))[2])
     for c in WALLS:
         if c in fills:
             h, s, v = colorsys.rgb_to_hsv(*rgb(fills[c]))
-            if v > low - 0.1:
-                fills[c] = hexc(*colorsys.hsv_to_rgb(h, s, max(0, low - 0.1)))
+            # Never pushed into the void (the user: the Final Guardian's, the Instructor's and the Azure Twin's walls came out as the
+            # void, their stairs' shaded photos pulling them down): a wall its scene leaves all but black a step under its ground, in
+            # the ground's own hue.
+            if v < WALL_LEAST:
+                gh, gs, _ = colorsys.rgb_to_hsv(*rgb(fills[under]))
+                fills[c] = hexc(*colorsys.hsv_to_rgb(gh, gs, max(WALL_LEAST, low - 0.1)))
+            elif v > low - 0.1:
+                fills[c] = hexc(*colorsys.hsv_to_rgb(h, s, max(WALL_LEAST, low - 0.1)))
 
     def drawn(c):
         lum = colorsys.rgb_to_hls(*rgb(fills[c]))[1]
@@ -2042,6 +2127,123 @@ def ship_wood(m):
                 m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'crates'})
 
 
+def past_edge(tiles, w, h):
+    """A house block only one tile deep against the map's edge carried one tile past it, the tiles off the map included (the user, the
+    Desert Dunes' and the Oasis's houses the edge cuts: houses running off the map, not bare blocks or a house's front alone)."""
+    xs, ys = [t[0] for t in tiles], [t[1] for t in tiles]
+    out = set(tiles)
+    if min(xs) == max(xs) and min(xs) in (1, w):
+        out |= {(0 if min(xs) == 1 else w + 1, y) for _, y in tiles}
+    if min(ys) == max(ys) and min(ys) in (1, h):
+        out |= {(x, 0 if min(ys) == 1 else h + 1) for x, _ in list(out)}
+    return out
+
+
+def parts(tiles):
+    """Tiles in groups side by side."""
+    left, out = set(tiles), []
+    while left:
+        part, todo = set(), [next(iter(left))]
+        while todo:
+            p = todo.pop()
+            if p in part or p not in left:
+                continue
+            part.add(p)
+            todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+        left -= part
+        out.append(part)
+    return out
+
+
+def game_looks(m):
+    """A map's tiles drawn as the game names them (TIDS; the user's review, 2026-11-26): its rocks, boulders and lone peaks rock
+    outcrops in their own colour, its sky (空) the void, its large pillars, beacons, candelabras, statues, coffins and palisades drawn
+    over their tiles on the ground round them, a cave's walls its rock, a crater in lava the lava, stone bridges, paved roads and towns,
+    low walls and bare buildings in its walls' stone; its bridges whole and its ruins varied."""
+    mid = m['id']
+    own = mid.removesuffix('-sk')
+    ids = TIDS.get(mid, {})
+    h, w = m['height'], m['width']
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+
+    def code(x, y):
+        return rows[h - y][x - 1] if 1 <= x <= w and 1 <= y <= h else None
+
+    def recode(old, new):
+        for r in rows:
+            r[:] = [new if c == old else c for c in r]
+    decor = dict(m.get('decor') or {})
+    looks, looks_as = dict(m.get('wallLooks') or {}), dict(m.get('looksAs') or {})
+    fills = m.get('fills') or {}
+    # Rock outcrops, block by block.
+    seen = set()
+    for (x, y), tid in sorted(ids.items()):
+        if tid not in ROCK_CODE or (x, y) in seen or code(x, y) != ROCK_CODE[tid]:
+            continue
+        kinds = ROCKS if tid in ROCKS else PEAKS
+        block, todo = set(), [(x, y)]
+        while todo:
+            p = todo.pop()
+            if p in block or ids.get(p) not in kinds or code(*p) != ROCK_CODE[ids[p]]:
+                continue
+            block.add(p)
+            todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+        seen |= block
+        edge = any(a in (1, w) or b in (1, h) for a, b in block)
+        for a, b in block:
+            if (own.startswith(ALL_OUTCROPS) or ids[a, b] == 'TID_大岩' or (kinds is ROCKS and not (edge and len(block) > EDGE_CLIFF))
+                    or (kinds is PEAKS and not edge and len(block) <= SMALL_PEAK)):
+                decor.setdefault(f'{a},{b}', 'outcrop')
+    for (x, y), tid in ids.items():
+        k = f'{x},{y}'
+        if tid in DECOR_TIDS and code(x, y) in ('wa', 'wj'):
+            decor.setdefault(k, DECOR_TIDS[tid])
+        elif tid == 'TID_空' and code(x, y) == 'wd':
+            looks[k] = 'void'
+        elif tid == 'TID_進入不可' and own.startswith(VOID_BEYOND) and code(x, y) == 'wa':
+            looks[k] = 'void'
+        elif tid == 'TID_噴火口' and code(x, y) == 'wd' and any(code(x + dx, y + dy) == 'wp' for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            # A crater amid the lava the lava round it (the user, the Lady of the Plains' volcano: keep these as lava), its numbers kept.
+            looks_as[k] = 'wp'
+        elif tid == 'TID_壁' and own in CAVE_WALLS and code(x, y) == 'wa':
+            x0, x1, y0, y1 = CAVE_WALLS[own]
+            if not (x0 <= x <= x1 and y0 <= y <= y1):
+                looks_as[k] = 'wt'
+    for x, y in PILLARS.get(own, ()):
+        decor[f'{x},{y}'] = 'pillar'
+    if own in PILLARS and m.get('ruins'):
+        m['ruins'] = [k for k in m['ruins'] if k not in {f'{x},{y}' for x, y in PILLARS[own]}]
+    # Low walls and the buildings its scene shows as no house, fort or stall in its walls' stone (the user: the Kingdom of Might's
+    # stone bricks one colour, the Ancestor's low walls its ice).
+    if fills.get('wa'):
+        if any(tid == 'TID_低い壁' for tid in ids.values()):
+            fills['wg'] = fills['wa']
+        if any(c == 'oe' for r in rows for c in r):
+            fills['oe'] = fills['wa']
+    if own.startswith(PAVED_ROADS) and any('tl' in r for r in rows):
+        recode('tl', 'gf')
+        fills['gf'] = fills.get('tl', '#c6c3b4')
+    if own in TOWN_PAVING:
+        colour, top, mask = TOWN_PAVING[own]
+        for i, line in enumerate(mask):
+            for x, c in enumerate(line, 1):
+                if c == '#' and code(x, top - i) in ('ta', 'tl', 'ga'):
+                    rows[h - (top - i)][x - 1] = 'gb'
+        fills['gb'] = colour
+    if own.startswith(STONE_BRIDGES):
+        recode('tb', 't8')
+    m['grid'] = [''.join(r) for r in rows]
+    if any(c in ('tb', 't8') for r in rows for c in r):
+        m['wideBridges'] = True
+    if m.get('ruins'):
+        m['variedRuins'] = True
+    for field, value in (('decor', decor), ('wallLooks', looks), ('looksAs', looks_as)):
+        if value:
+            m[field] = value
+    if 'outcrop' in decor.values():
+        m['outcropTint'] = True
+
+
 def split_rects(tiles, max_w=6, max_h=4):
     """A block's tiles parted into rectangles two to six wide and up to four tall, the biggest first: (rects, tiles left over)."""
     left = set(tiles)
@@ -2070,15 +2272,18 @@ def draw_buildings(m, blocks):
     (`decor`), a ruin (or a ruined village's house) in ruins (`ruins`); the rest stay blocks of wall. Returns the piece codes used."""
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     h = len(rows)
+    width = m['width']
     ruined = m['id'].startswith(RUINED)
     whole = {'r': set(), 'c': set()}
     cuts = []
     for b in blocks:
         tiles = {tuple(t) for t in b['tiles']}
+        kind = 'ruins' if b['kind'] == 'house' and ruined else b['kind']
+        if kind == 'house':
+            tiles = past_edge(tiles, width, h)
         xs, ys = [t[0] for t in tiles], [t[1] for t in tiles]
         w, tall = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
         box = len(tiles) == w * tall
-        kind = 'ruins' if b['kind'] == 'house' and ruined else b['kind']
         if kind == 'ruins':
             m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
         elif kind == 'house' and box and 2 <= w <= 6 and tall <= 4:
@@ -2086,7 +2291,16 @@ def draw_buildings(m, blocks):
         elif kind == 'house':
             # A block of several houses (and what stands between them) the scene shows as one: parted into houses, the biggest
             # rectangles first, each two to six wide (the user, Chapter 19's town: houses, not blocks of wall).
-            rects, _ = split_rects(tiles)
+            rects, left = split_rects(tiles)
+            # What's left over: a strip against the map's edge carried past it (a house the edge cuts), else a small house on its tile.
+            for strip in parts(left):
+                carried = past_edge(strip, width, h)
+                cx, cy = [t[0] for t in carried], [t[1] for t in carried]
+                cw, ch = max(cx) - min(cx) + 1, max(cy) - min(cy) + 1
+                if carried != strip and len(carried) == cw * ch and 2 <= max(cw, ch) <= 6 and min(cw, ch) <= 4:
+                    rects.append(carried)
+                else:
+                    m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'house' for x, y in strip if 1 <= x <= width and 1 <= y <= h})
             owner = {}
             for k, rect in enumerate(rects):
                 whole['r'] |= rect
@@ -2096,7 +2310,7 @@ def draw_buildings(m, blocks):
                 for n in ((x + 1, y), (x, y - 1)):
                     if n in owner and owner[n] != k:
                         cuts.append(((x - 1, h - y), (n[0] - 1, h - n[1])))
-        elif kind == 'fort' and (box or gated(tiles, w, tall)) and 3 <= w <= 6 and 2 <= tall <= 4:
+        elif kind == 'fort' and not m['id'].startswith(NO_FORTS) and (box or gated(tiles, w, tall)) and 3 <= w <= 6 and 2 <= tall <= 4:
             whole['c'] |= tiles
         elif kind == 'stall':
             for x, y in tiles:
@@ -2117,14 +2331,16 @@ def draw_buildings(m, blocks):
     for group, tiles in whole.items():
         if not tiles:
             continue
-        marked = [row[:] for row in rows]
+        # A ring of tiles round the map, for houses carried past its edge: each piece placed as if the house went on.
+        marked = [['..'] * (width + 2)] + [['..'] + row[:] + ['..'] for row in rows] + [['..'] * (width + 2)]
         for x, y in tiles:
-            marked[h - y][x - 1] = 'XB'
+            marked[h - y + 1][x] = 'XB'
         placed = map_pieces.place([''.join(r) for r in marked], 'XB', group, {'XB'}, side_on=group == 'r',
-                                  cuts=cuts if group == 'r' else ())
+                                  cuts=[((a[0] + 1, a[1] + 1), (b[0] + 1, b[1] + 1)) for a, b in cuts] if group == 'r' else ())
         for x, y in tiles:
-            rows[h - y][x - 1] = placed[h - y][2 * (x - 1):2 * x]
-            used.add(rows[h - y][x - 1])
+            if 1 <= x <= width and 1 <= y <= h:
+                rows[h - y][x - 1] = placed[h - y + 1][2 * x:2 * x + 2]
+                used.add(rows[h - y][x - 1])
     if any('XS' in r for r in rows):
         placed = map_pieces.stalls([''.join(r) for r in rows], 'XS')
         rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in placed]

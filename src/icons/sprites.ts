@@ -8167,6 +8167,76 @@ export const SHACK: Record<'a' | 'b' | 'c' | 'd', Sprite> = {
   },
 }
 
+/** A palisade no one but fliers cross (Engage's 防柵: the user, not a ruin on a black ground): two rows of sharpened stakes, a log
+ * lashed across them, on the ground round it. */
+export const PALISADE: Sprite = {
+  palette: { o: '#2a1a0e', w: '#7a4f2c', l: '#a8743f', t: '#d9c39a' },
+  rows: [
+    '.t...t....',
+    'olo.olo.t.',
+    'olwoolwolo',
+    'olwoolwolw',
+    'oooooooooo',
+    'llllllllll',
+    'oooooooooo',
+    'olwoolwolw',
+    'olwoolwolw',
+    'oooooooooo',
+  ],
+}
+
+/** A stone coffin no unit enters, seen from above (Engage's 石棺, one to a tile: the user, not a drop into the dark): its lid's
+ * border round a gold emblem, narrower at its foot. */
+export const COFFIN: Sprite = {
+  palette: SARCOPHAGUS_PALETTE,
+  rows: [
+    '...oooo...',
+    '..oLLLLo..',
+    '.oLLLLLLo.',
+    '.oLssssLo.',
+    '.oLsggsLo.',
+    '.oLsggsLo.',
+    '.oLssssLo.',
+    '..oLLLLo..',
+    '..oSSSSo..',
+    '...oooo...',
+  ],
+}
+
+/** A statue on its plinth on one tile (Engage's 石像 standing alone: the user, statues, not a block of wall). */
+export const STATUE_SMALL: Sprite = {
+  palette: STATUE_PALETTE,
+  rows: [
+    '....oo....',
+    '...ollo...',
+    '...olmo...',
+    '..ollmmo..',
+    '.olllmmdo.',
+    '..ollmdo..',
+    '..olmmdo..',
+    '.oooooooo.',
+    '.oLLLLLDo.',
+    '.oooooooo.',
+  ],
+}
+
+/** A brazier put out (Engage's 篝火消: the user, its dark stand read as a pillar): the torch on its post, its bowl's coals cold. */
+export const TORCH_UNLIT: Sprite = {
+  palette: { o: '#3a2a1a', d: '#5a4a3a', k: '#2a221c', w: '#8b5a2b' },
+  rows: [
+    '..........',
+    '..........',
+    '...ddd....',
+    '..dkkkd...',
+    '...ddd....',
+    '...owo....',
+    '....w.....',
+    '....w.....',
+    '....w.....',
+    '...ooo....',
+  ],
+}
+
 /** Every sprite defined after ALL_SPRITES, for the same checks. */
 export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(RAMPART_GATE).map(([k, v]) => [`RAMPART_GATE_${k}`, v])),
@@ -8198,4 +8268,5 @@ export const LATER_SPRITES = {
   ...Object.fromEntries(Object.entries(SMALL_SHOP_SIGN).map(([k, v]) => [`SMALL_SHOP_SIGN_${k}`, v])),
   STONE_PILE, CORAL, SUPPLY_CACHE, SUPPLY_CRATES, SUPPLY_CRATE_PIECE: supplyMarked(cratePiece(false, false, false, false), 5, 5),
   ...Object.fromEntries((['a', 'b', 'c', 'd'] as const).map((q) => [`BIG_PILLAR_${q}`, bigPillarPiece(q)])),
+  PALISADE, COFFIN, STATUE_SMALL, TORCH_UNLIT,
 }

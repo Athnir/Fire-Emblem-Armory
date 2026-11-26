@@ -19,7 +19,7 @@ import {
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
   CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, GARDEN, roundFountainPiece, BOAT_BOW, ICE_CRYSTALS, frozenFountainPiece, canopyPiece,
   roundYurtPiece, zenGardenPiece, bigTreePiece, OBSTACLE, WARP_SIGIL, WARP_PAD, FLAME_WALL, FLAME_VENT, cratePiece, boulderPiece, slabPiece, bonePiece, RUBBLE_VARIANTS, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
-  STONE_PILE, CORAL, SUPPLY_CACHE, bigPillarPiece, SUPPLY_CRATES, supplyMarked,
+  STONE_PILE, CORAL, SUPPLY_CACHE, bigPillarPiece, SUPPLY_CRATES, supplyMarked, PALISADE, COFFIN, STATUE_SMALL, TORCH_UNLIT,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wholeBridgeBoxes, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -1821,11 +1821,14 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   'roof-slate': canopyPiece('slate', 0, 0, 1, 1), 'roof-grey': canopyPiece('grey', 0, 0, 1, 1), 'roof-tan': canopyPiece('tan', 0, 0, 1, 1),
   'roof-green': canopyPiece('green', 0, 0, 1, 1), 'roof-brown': canopyPiece('brown', 0, 0, 1, 1),
   roundYurt: roundYurtPiece(1, 1, 3, 3), zenGarden: zenGardenPiece(1, 1), cherry: CHERRY_TREE, walledHouse: VILLAGE_HOUSE.middleFront,
-  stones: STONE_PILE, thickPillar: PILLAR_TOP, torch: CANDLESTICK, outcrop: BOULDER,
+  stones: STONE_PILE, thickPillar: PILLAR_TOP, torch: CANDLESTICK, outcrop: BOULDER, palisade: PALISADE, coffin: COFFIN,
+  // A brazier, lit (Radiant Dawn's Part 2 Ch.2 torch: the user, braziers are no candlesticks) or put out.
+  brazier: TORCH, brazierOut: TORCH_UNLIT,
 }
 /** Decor drawn in place of its tile's own icon: rocks where the game's bones lie, barrels, and Fates' big trees, boulders, rubble,
  * crates, stalls, roofs, yurts, gardens and walled house over its rubble and buildings. */
 const REPLACES_ICON = new Set(['rock', 'barrel', 'cherry', 'rubble', 'crates', 'pillar', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch', 'outcrop',
+  'palisade', 'coffin', 'brazier', 'brazierOut',
   'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
   'roof-tan', 'roof-green', 'roof-brown'])
 /** Ground of planks: a ship's deck, a pier's or a hall's boards, a road of boards, a wooden pedestal. */
@@ -1833,7 +1836,8 @@ const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
 const DECOR_ON_GROUND = new Set(['statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table', 'candelabra', 'garden', 'tree', 'slab', 'ice',
   'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
-  'roof-tan', 'roof-green', 'roof-brown', 'roundYurt', 'zenGarden', 'cherry', 'walledHouse', 'warpSigil', 'warpPad', 'stones', 'thickPillar', 'torch', 'outcrop'])
+  'roof-tan', 'roof-green', 'roof-brown', 'roundYurt', 'zenGarden', 'cherry', 'walledHouse', 'warpSigil', 'warpPad', 'stones', 'thickPillar', 'torch', 'outcrop',
+  'palisade', 'coffin', 'brazier', 'brazierOut'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 /** What's drawn over a tile (`decor`); in a block the user turned round (`mirror`), its partner's across the block, flipped (Radiant
  * Dawn's Part 3 Ch.12's carriage, the user: it faced away from its horse). */
@@ -1851,8 +1855,13 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   // the others.
   if (kind === 'outcrop') {
     const [u, d, l, r] = [same(0, 1), same(0, -1), same(-1, 0), same(1, 0)]
-    return u || d || l || r ? boulderPiece(!u, !l, !r, !d, variety(x, y)) : BOULDER
+    const rock = u || d || l || r ? boulderPiece(!u, !l, !r, !d, variety(x, y)) : BOULDER
+    // In the colour of the rock it's drawn over (`outcropTint`: Engage's, as its scenes draw them).
+    const own = map.outcropTint && codeAt(map, [x, y])
+    return own ? tintedRock(rock, fillOf(map, own)) : rock
   }
+  // A statue standing alone on its tile (Engage's), its plinth under it; statues two tiles by two are drawn whole below.
+  if (kind === 'statue' && !([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => same(dx, dy))) return STATUE_SMALL
   // Thick pillars two tiles by two are one great pillar (Echoes' 太柱: the user, 2x2 pillars), a lone one its top on its base.
   if (kind === 'thickPillar') {
     const [x0, x1, y0, y1] = blocks2x2(map, 'thickPillar').get(tileKey([x, y])) ?? [x, x, y, y]
@@ -1939,6 +1948,11 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const top = same(0, -1)
   const left = same(1, 0)
   return top ? (left ? pieces.a : pieces.b) : left ? pieces.c : pieces.d
+}
+
+/** A boulder's or an outcrop's piece in a rock's own colour (its lit top a step lighter, its shaded side and outline darker). */
+function tintedRock(s: Sprite, base: string): Sprite {
+  return { ...s, palette: { ...s.palette, o: shade(base, -0.62), d: shade(base, -0.3), g: base, l: shade(base, 0.3) } }
 }
 
 /** The box (x0, x1, y0, y1) round a tile's block of decor of its kind. */
@@ -3728,12 +3742,13 @@ function Legend({
     }
     // A code whose every tile is drawn as rocks (Awakening's Chapter 9's bones) is the rocks' line.
     if ((map.decor || map.looksAs) && map.grid.every((row, i) => rowCodes(row).every((c, x) => c !== l ||
-      ['rock', 'ice', 'frozenFountain', 'cherry', 'rubble', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch', 'outcrop'].includes(map.decor?.[tileKey([x + 1, map.height - i])] ?? '') ||
+      ['rock', 'ice', 'frozenFountain', 'cherry', 'rubble', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch', 'outcrop',
+        'palisade', 'coffin', 'brazier', 'brazierOut', 'pillar', 'candle', 'statue'].includes(map.decor?.[tileKey([x + 1, map.height - i])] ?? '') ||
       !!map.looksAs?.[tileKey([x + 1, map.height - i])] ||
       /^(stall|roof)-/.test(map.decor?.[tileKey([x + 1, map.height - i])] ?? ''))))
       continue
     // Fences, sandbags and outer walls (Radiant Dawn's one terrain), and pillars among castle walls: a line for each look.
-    if (map.wallLooks && (l === 'wg' || l === 'w0' || l === 'wx' || l === 'w7' || l === 'wa' || l === 'wb')) {
+    if (map.wallLooks && (l === 'wg' || l === 'w0' || l === 'wx' || l === 'w7' || l === 'wa' || l === 'wb' || l === 'wd')) {
       const looks = new Set(
         map.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => {
           const t: Tile = [x + 1, map.height - i]
@@ -3804,7 +3819,8 @@ function Legend({
     walledHouse: 'House (no unit enters)', warpSigil: 'Sigil: it sends a unit standing on it to its platform',
     warpPad: 'Warp platform: where a sigil sends a unit',
     stones: 'Heap of stones (no unit enters)', thickPillar: 'Pillar (no unit enters)', torch: 'Torch (no unit enters)',
-    outcrop: 'Rock outcrop (no unit enters)',
+    outcrop: 'Rock outcrop (no unit enters)', palisade: 'Palisade (only fliers cross it)', coffin: 'Coffin (no unit enters)',
+    brazier: 'Brazier (no unit enters)', brazierOut: 'Brazier, unlit (no unit enters)',
   }
   // A roof over a building fliers cross (Three Houses') says so, with the building's name.
   const roofLabel = (kind: string) => {
@@ -3812,8 +3828,26 @@ function Legend({
     if (!at || !kind.startsWith('roof-') || !terrainInfo(map, terrainAt(map, at)).move?.Fliers) return DECOR_LABEL[kind]
     return `${terrainName(map, at)}, its roof (only fliers cross it)`
   }
+  // Statues standing alone (Engage's) are the small statue's line.
+  const lone = (kind: string) => Object.entries(map.decor ?? {}).some(([k, v]) => {
+    if (v !== kind) return false
+    const [x, y] = k.split(',').map(Number)
+    return ![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => map.decor?.[tileKey([x + dx, y + dy])] === kind)
+  })
+  // An outcrop says what the game calls it and who crosses it, tile by tile (Engage's rocks and peaks let fliers over, its boulders
+  // no one), in its rock's colour where the map gives one.
+  for (const [k, v] of Object.entries(map.decor ?? {})) {
+    if (v !== 'outcrop') continue
+    const t = k.split(',').map(Number) as Tile
+    const fliers = !!terrainInfo(map, terrainAt(map, t)).move?.Fliers
+    const code = codeAt(map, t)
+    items.push({
+      label: `${terrainName(map, t)} (a rock outcrop: ${fliers ? 'only fliers cross it' : 'no unit enters'})`,
+      sprite: map.outcropTint && code ? tintedRock(BOULDER, fillOf(map, code)) : BOULDER,
+    })
+  }
   for (const kind of new Set(Object.values(map.decor ?? {})))
-    if (DECOR_LABEL[kind]) items.push({ label: roofLabel(kind), sprite: kind === 'statue' ? STATUE.a : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
+    if (DECOR_LABEL[kind] && kind !== 'outcrop') items.push({ label: roofLabel(kind), sprite: kind === 'statue' ? (lone(kind) ? STATUE_SMALL : STATUE.a) : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE

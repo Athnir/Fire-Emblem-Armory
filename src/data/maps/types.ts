@@ -343,6 +343,7 @@ export interface ChapterMap {
     | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
     | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown'
     | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad' | 'stones' | 'thickPillar' | 'torch' | 'outcrop'
+    | 'palisade' | 'coffin' | 'brazier' | 'brazierOut'
   >
   /** The blocks its roofs and stalls are drawn over, (x0, x1, y0, y1) each, where buildings side by side would join into one block of
    * one paint (Three Houses': each building block parted into the rectangles a roof covers, the user's call: roofs as Fates' are). */
@@ -444,6 +445,9 @@ export interface ChapterMap {
   /** Its ruins' pieces varied tile to tile, a ruin's wall among fallen drums, blocks and arch stones (Three Houses': the user, other
    * rubble tiles to break them up). */
   variedRuins?: true
+  /** Its rock outcrops (`decor` 'outcrop') in the colour of the rock they're drawn over, as its scenes draw them (Engage's: tan
+   * sandstone on the beach, dark rock in the volcano, snowy rock in the north). */
+  outcropTint?: true
   /** What a wall that shares its numbers with other kinds is, by the 3D model on it (Radiant Dawn's: its fences, sandbags and outer
    * walls are one terrain, as its pillars and castle walls are): "x,y" -> sandbags, a low outer wall or a pillar; a fence has none. A
    * wall the art draws as something else: a low stone wall (the GBA games' fences), rock (Gaiden's cave walls' faces, which fliers

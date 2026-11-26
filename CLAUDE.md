@@ -579,7 +579,22 @@ new game, so the same fixes don't have to be caught again. When the user settles
   drawn as wooden shacks over their tiles, its crack a badge, `SHACKS`: the Desert Dunes'; a dais of large pillars round a floor with
   stairs a small stone fort, `DAIS_FORTS`: the Caring Princess's, both the user's calls; a ship's low walls its rails and a mast the
   game names a mast; a fort whose block lacks only its gate in its front row drawn whole, the gate its own tile, the Sage Lord's; rubble
-  across a bridge over water the bridge broken, its planks, the Crux of Fate's: the user's calls). Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
+  across a bridge over water the bridge broken, its planks, the Crux of Fate's: the user's calls; and the user's look of 2026-11-26,
+  its tiles drawn as the game names them by each map's own terrain ids, `game_looks`: its rocks (岩) and boulders (大岩) rock
+  outcrops in the rock's own colour (`outcropTint`), but a block of rock along the map's edge bigger than twelve tiles its cliffs,
+  its peaks and cliffs (山, 崖) standing apart from the edge, six tiles or fewer, outcrops too, and the Four Hounds' every one; its
+  sky (空) the void, as the Last Engage's; its large pillars (大柱) pillars, its candelabras (燭台) candlesticks, its beacons (篝火)
+  braziers, Radiant Dawn's lit torch (the user: braziers are no candlesticks), one put out (篝火消) unlit, its statues (石像), coffins
+  (石棺) and palisades (防柵) themselves, all on the ground round them
+  (the palisades' photos read black); a lone Stairs tile stairs going down only where the game marks it for no battle (階段_戦禁,
+  where its foes come up), a lone plain one a step down to a lower floor (the Mysterious Merchant's); its bridges whole
+  (`wideBridges`), stone where its scene builds them so (A Land in Bloom's, the Sage Lord's); Queen Lumera's white stone road
+  paving and Serenity in Ruin's town paved as its render shows it; a crater amid the lava the lava; the Brash General's walls its
+  cave's rock but its temple's; low walls and buildings drawn as no house, fort or stall in its walls' stone (the Kingdom of Might's,
+  the Ancestor's), Dancer in the Ruins' towers no fort; a sigil set in a castle's floor that floor; houses the map's edge cuts
+  carried past it (the Desert Dunes', the Oasis's), a lone leftover a small house; its ruins varied; and no wall pushed into the
+  void by its shaded stairs' photo colours (`WALL_LEAST`), what lies beyond the Final Guardian's and the Azure Twin's walls the void).
+  Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
   out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages; a desert whose plain the render gives its sand's colour has
   its plain drawn as darker, redder earth and its walls a clear step under the sand, `fe16_ground.desert`: the user, Battle in the

@@ -35,3 +35,15 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Three Houses | Crimson Flower 35 (`fe16-35-cf`) | The ground outside the walls (grass and dirt now, no paving) | "can load it up manually to check" |
 | Three Houses | Crimson Flower 37 (`fe16-37-cf`) | Which of its houses stand and which are in ruins (all in ruins now) | "Can load manually if needed" |
 | Gaiden | Its forts, every map (the fort tile, $DA: 103 tiles on 40 maps) | Draw them as the supply tile (`nd`: a fort's numbers, a grain sack before a crate), as Echoes' supplies, which remake them, are drawn since its review of 2026-11-25; Gaiden is frozen, so it waits for this pass | "lets make a supply tile variant for the fort that we can use for 2 and 15, will replace them in 2 in the final run but they are not really fort tiles" |
+| Engage | Tempest Trials, final stage, maps 1 to 6 (`fe17-c000-1-1` to `fe17-c000-6-1`) | Each map against the game: all six cards show map 1's emulator photos (one set, taken once) and its colours; each map's grid is its own already (its opening script takes islands and bridges away), its sky the void since 2026-11-26 | "will need to manually go through each level of this map to get the correct version of the map, i think you grabbed the first floor version for all of them" |
+| Engage | Tempest Trial, Verdant Plain, map 4 (`fe17-c001-4-1`) | The whole map against the game | "manual" |
+| Engage | Fell Xenologue 5, The Fell Heir (`fe17-e005`) | The whole map against the game | "manual" |
+| Engage | Fell Xenologue 6, Seven Bracelets (`fe17-e006`) | The whole map against the game (marked good) | "manual" |
+| Engage | Divine Paralogue, The Doting Sister, and its skirmish (`fe17-g005`, `fe17-g005-sk`) | Its bridges (drawn whole since 2026-11-26) and the rest of the map against the game | "bridge issues. manually check", "manual" |
+| Engage | Divine Paralogue, The Shepherd Exalt (`fe17-g006`) | The whole map against the game, its altars too | "manual" |
+| Engage | Chapter 7, Dark Emblem (`fe17-m007`) | The whole map against the game | "seems off, i will look at it manually ingame" |
+| Engage | Chapter 18, The Cold Voyage (`fe17-m018`) | Its wooden blocks (the game's Ship, drawn in the ship's wood): crates on the decks rather than the ships' walls | "will have to manually check this one, the wood blocks are for decortave crates insted of boat walls" |
+| Engage | Chapter 19, The Dead Town (`fe17-m019`) | Its houses, (10, 17) first | "village gore (10, 17) , will check manually" |
+| Engage | Paralogue, The Caring Princess (`fe17-s013`) | The whole map against the game, its ship and dais | "will look at manually" |
+| Engage | Paralogue, The Connector (`fe17-s015`) | The whole map against the game | "manual" |
+| Three Houses | Chapter 9 (`fe16-9`) | Its ruins (varied tile to tile since 2026-11-26) against the game | "manual" |

@@ -437,3 +437,65 @@ describe("Engage's maps' kinds kept apart and drawn as their scenes show them", 
     expect(castle).toHaveLength(14)
   })
 })
+
+// The user's review (2026-11-26): Engage's tiles drawn as the game names them, by each map's own terrain ids.
+describe("Engage's tiles drawn as the game names them", () => {
+  const codes = (id: string) => map(id).grid.flatMap(rowCodes)
+  const decor = (id: string) => map(id).decor ?? {}
+  const count = (id: string, kind: string) => Object.values(decor(id)).filter((d) => d === kind).length
+  const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+  it('draws its rocks and boulders as rock outcrops in their own colour, keeping the cliffs along the edge', () => {
+    // the Four Hounds' bricks, every boulder and peak; Seashore Travels' boulders
+    expect(count('fe17-m023', 'outcrop')).toBe(181)
+    expect(map('fe17-m023').outcropTint).toBe(true)
+    expect(count('fe17-m016', 'outcrop')).toBe(71)
+    // A Clash of Forces: its six outcrops in the middle, not the snowy rims along its edges
+    expect(count('fe17-m009', 'outcrop')).toBe(17)
+    expect(decor('fe17-m009')['1,19']).toBeUndefined()
+    // the Verdant Plain's lone peak among its grass, not the peaks at its corners
+    expect([decor('fe17-c001-3-1')['8,11'], decor('fe17-c001-3-1')['1,16']]).toEqual(['outcrop', undefined])
+    expect(['4,14', '8,8', '6,6', '8,5'].map((k) => decor('fe17-m001')[k])).toEqual(['outcrop', 'outcrop', 'outcrop', 'outcrop'])
+  })
+  it('draws the sky as the void, and its pillars, lights, statues, coffins and palisades over their tiles', () => {
+    for (const id of ['fe17-c000-1-1', 'fe17-c000-6-1', 'fe17-g003', 'fe17-m003', 'fe17-m010'])
+      expect(Object.values(map(id).wallLooks ?? {}), id).toContain('void')
+    expect(map('fe17-g003').wallLooks?.['13,11']).toBe('void')
+    // the Retaking the Castle's chamber: pillars and candelabras
+    expect([decor('fe17-m005')['10,20'], decor('fe17-m005')['11,25']]).toEqual(['pillar', 'candle'])
+    // the Kingless Castle's beacons braziers, lit or put out (Radiant Dawn's torch: the user, braziers are no candlesticks)
+    expect([count('fe17-m020', 'brazier'), count('fe17-m020', 'brazierOut')]).toEqual([9, 4])
+    expect(decor('fe17-m020')['5,19']).toBe('brazierOut')
+    expect([decor('fe17-m002')['7,7'], decor('fe17-m002')['7,9']]).toEqual(['statue', 'statue'])
+    expect([decor('fe17-s006')['6,21'], decor('fe17-s006')['4,21']]).toEqual(['coffin', 'pillar'])
+    expect(decor('fe17-c003-1-1')['5,6']).toBe('palisade')
+    expect(['24,23', '22,23', '21,20', '25,20'].map((k) => decor('fe17-s014')[k])).toEqual(['pillar', 'pillar', 'pillar', 'pillar'])
+    expect(map('fe17-s014').ruins ?? []).not.toContain('22,23')
+  })
+  it('keeps its walls out of the void and makes stairs going down only of the stairs its foes come up', () => {
+    // the Final Guardian's walls a dark stone, what lies beyond them the void
+    const wall = map('fe17-m025').fills!.wa!
+    expect(Math.max(...[1, 3, 5].map((i) => parseInt(wall.slice(i, i + 2), 16)))).toBeGreaterThan(40)
+    expect(map('fe17-m025').wallLooks?.['1,32']).toBe('void')
+    expect(codes('fe17-s002').filter((c) => c === 'gl')).toHaveLength(2) // (11, 16) and (17, 16); its plain stairs flights
+    expect(codes('fe17-s005').filter((c) => c === 'gl')).toHaveLength(0)
+    expect(codes('fe17-m025').filter((c) => c === 'gl')).toHaveLength(5)
+  })
+  it('draws its bridges whole, stone ones stone, its paved road and town paved, a crater amid lava the lava, a cave its rock', () => {
+    expect(map('fe17-c002-2-1').wideBridges).toBe(true)
+    for (const id of ['fe17-m004', 'fe17-s010']) expect([codes(id).includes('t8'), codes(id).includes('tb')], id).toEqual([true, false])
+    expect(FE17_TERRAIN.t8!.move).toEqual(FE17_TERRAIN.tb!.move)
+    expect(codes('fe17-m002').filter((c) => c === 'gf')).toHaveLength(56)
+    expect(codes('fe17-m017').filter((c) => c === 'gb').length).toBeGreaterThan(150)
+    expect(map('fe17-g004').looksAs?.['24,25']).toBe('wp')
+    expect([map('fe17-g002').looksAs?.['17,11'], map('fe17-g002').looksAs?.['2,23']]).toEqual(['wt', undefined])
+  })
+  it("draws the houses the map's edge cuts as houses, low walls and bare buildings in its walls' stone, a sigil in a floor that floor", () => {
+    // the Desert Dunes: houses running off the left, right and bottom edges
+    expect([at('fe17-c005-2-1', 1, 7), at('fe17-c005-2-1', 17, 16), at('fe17-c005-2-1', 6, 1)]).toEqual(['rc', 'ra', 'rc'])
+    expect([map('fe17-m008').fills?.wg, map('fe17-m008').fills?.oe]).toEqual([map('fe17-m008').fills?.wa, map('fe17-m008').fills?.wa])
+    expect(map('fe17-g001').fills?.wg).toBe(map('fe17-g001').fills?.wa)
+    expect(codes('fe17-m015').some((c) => /^c[a-i]$/.test(c))).toBe(false) // its towers, no fort
+    expect([at('fe17-g001', 18, 28), at('fe17-g001', 4, 28)]).toEqual(['t1', 't1'])
+    expect(map('fe17-m006').variedRuins).toBe(true)
+  })
+})
