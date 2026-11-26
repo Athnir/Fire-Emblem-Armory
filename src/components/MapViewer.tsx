@@ -1170,8 +1170,8 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (code === 'bb' && /tree/i.test(name)) return TREE
     if (code === 'b0' && /bridge/i.test(name)) return BRIDGE_PLANKS
   }
-  // Supplies that work as a fort (Echoes' own code for them): cargo on a ship still its crates (the legend's too), elsewhere the supplies.
-  if (code === 'nd' && hasDeck(map)) return at ? crateOrHeap(map, at, CRATES) : CRATES
+  // Supplies that work as a fort (Echoes' own code for them): on a ship's deck its cargo, crates; elsewhere the supplies.
+  if (at && code === 'nd' && shipCargo(map, at)) return crateOrHeap(map, at, CRATES)
   // What plays as a pillar but is a thicket or coral (Echoes' one terrain for all three: the user's review), drawn as it.
   if (at && code === 'b3') {
     const name = terrainName(map, at)
@@ -1311,6 +1311,10 @@ function hasDeck(map: ChapterMap): boolean {
   return HAS_DECK.get(map)!
 }
 
+/** Supplies that work as a fort beside a ship's deck: its cargo (Echoes': the user, crates on its ships), not the supply tile. */
+const shipCargo = (map: ChapterMap, [x, y]: Tile) =>
+  ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => codeAt(map, [x + dx, y + dy]) === 't3')
+
 /** Whether a tile is drawn as crates: cargo, a crate prop, supplies filed with the walls or on a ship, crates laid over a tile. */
 function isCrateAt(map: ChapterMap, t: Tile): boolean {
   if (t[0] < 1 || t[1] < 1 || t[0] > map.width || t[1] > map.height) return false
@@ -1320,7 +1324,7 @@ function isCrateAt(map: ChapterMap, t: Tile): boolean {
   if (c === 'o4') return map.props?.[tileKey(t)] === 'box'
   if (c === 'wg') return /suppl/i.test(terrainName(map, t))
   if (c === 'bb') return /suppl/i.test(terrainName(map, t)) && hasDeck(map)
-  if (c === 'nd') return hasDeck(map)
+  if (c === 'nd') return shipCargo(map, t)
   return false
 }
 
@@ -3740,6 +3744,13 @@ function Legend({
     }
     // Rubble is drawn as what it is tile by tile (rubble, a ruin's walls, the trees, graves, stones and barrels a game names): a line
     // for each look the map has.
+    // Supplies (Echoes'): the supply tile, and crates where they're a ship's cargo.
+    if (l === 'nd') {
+      const tiles = map.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x): Tile[] => (c === 'nd' ? [[x + 1, map.height - i]] : [])))
+      if (tiles.some((t) => shipCargo(map, t))) items.push({ label: `${name} (a ship's cargo)`, sprite: CRATES, swatch: fillOf(map, 't3') })
+      if (tiles.some((t) => !shipCargo(map, t))) items.push({ label, sprite: SUPPLY_CACHE, swatch: fillOf(map, l), code: l })
+      continue
+    }
     if (l === 'wj' || l === 'b3') {
       const looks = new Map<Sprite, string>()
       map.grid.forEach((row, i) =>

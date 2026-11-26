@@ -7074,17 +7074,18 @@ export const SUPPLY_BOXES: Sprite = {
 }
 
 /** Supplies that work as a fort (Echoes' 補給, which the game names apart from its forts: the user's call, a supply tile, not a fort;
- * Gaiden's forts, which they remake, in the final pass): a grain sack tied with a red cord before a crate, in Echoes' warm orange. */
+ * Gaiden's forts, which they remake, in the final pass): a grain sack tied with a red cord before a crate, in Echoes' warm orange, a
+ * little green + on the sack (the user's: they heal). */
 export const SUPPLY_CACHE: Sprite = {
-  palette: { o: '#3b2614', w: '#c8783e', W: '#9a5428', l: '#e6a466', s: '#ecd09a', S: '#b8935c', t: '#a33a22' },
+  palette: { o: '#3b2614', w: '#c8783e', W: '#9a5428', l: '#e6a466', s: '#ecd09a', S: '#b8935c', t: '#a33a22', g: '#2f9e44' },
   rows: [
     '....oooooo',
     '.tt.ollllo',
     '..t.owwwwo',
     '.osooWWWWo',
-    'osssowwwwo',
-    'ossssoWWWo',
-    'osssSowwwo',
+    'ossgowwwwo',
+    'osgggoWWWo',
+    'ossgSowwwo',
     'osssSoooo.',
     'oSSSSo....',
     '.oooo.....',
