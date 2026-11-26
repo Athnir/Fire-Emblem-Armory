@@ -32,7 +32,7 @@ EMU_FILLS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data
 # Water the photos give a colour that isn't blue (a river under its bank's shade) keeps the app's blue; the ground units walk and the
 # walls kept a step apart (a wall at least 0.1 darker in value than every ground).
 EMU_WATER = ('we', 'wl', 'tg')
-EMU_GROUNDS, EMU_WALLS = ('ta', 't0', 't1', 'tw', 'ga', 'gb', 'te', 'td', 'tc', 'tb'), ('wa', 'wb', 'wt', 'wn', 'wx', 'w0', 'w1')
+EMU_GROUNDS, EMU_WALLS = ('ta', 't0', 't1', 'tw', 'ga', 'gb', 'te', 'td', 'tc', 'tb', 'ge', 'gf'), ('wa', 'wb', 'wt', 'wn', 'wx', 'w0', 'w1')
 
 
 def photo_fills(rows, photo):
@@ -59,6 +59,28 @@ def lit_fill(rows, photo, code):
         return None
     lit = cs[cs.mean(1) >= np.median(cs.mean(1))]
     return '#%02x%02x%02x' % tuple(int(round(v)) for v in np.median(lit, axis=0))
+
+
+def three_stones(rows, photo, refs):
+    """A Floor's tiles (`t1`, rows from the top) parted into its three stones (`STONES`: its slate, grey and tan, each a code and the
+    tile the user named): {(c, r): code} for each that changes."""
+    col = {(c, r): rgb for c, r, *rgb in photo}
+    h = len(rows)
+    lum = lambda rgb: 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]  # noqa: E731
+    warm = lambda rgb: rgb[0] - rgb[2]  # noqa: E731
+    (dark, dt), (grey, gt), (tan, tt) = refs
+    d, g, t = (col[(x - 1, h - y)] for x, y in (dt, gt, tt))
+    darkest, warmest = (lum(d) + (lum(g) + lum(t)) / 2) / 2, (warm(g) + warm(t)) / 2
+    out = {}
+    for r, row in enumerate(rows):
+        for c, code in enumerate(row):
+            if code != 't1' or (c, r) not in col:
+                continue
+            rgb = col[(c, r)]
+            new = dark if lum(rgb) < darkest else tan if warm(rgb) > warmest else grey
+            if new != code:
+                out[c, r] = new
+    return out
 
 
 def _lab(rgb):
@@ -195,10 +217,14 @@ PAVED_PLAIN = {12: ('road', 12, 14), 18: 'one', 32: 'one', 33: 'grass', 35: 'one
 COUNTRY_PLAIN = {36}
 # Grass the photos show brown under a sunset (Crimson Flower 34: the user, the grass missing) drawn as grass, its hue turned green.
 GREEN_GRASS = {14, 33, 36}
-# Floor its grey stone paths cross (Silver Snow 20: the user, then the stone tiles' colours again: its courtyards tan, its paths
-# grey-blue, in shade too): in the top-down colours, a Floor tile this light (L*) and this neutral (b* at most) is the path, `ge`
-# with the Floor's numbers.
-LIGHT_PATHS = {17: (0, 7)}
+# Floor its grey stone paths cross (the user's third look: its courtyards tan, its paths grey-blue, in shade too): in the top-down
+# colours, a Floor tile this light (L*) and this neutral (b* at most) is the path, `ge` with the Floor's numbers.
+LIGHT_PATHS = {}
+# A Floor of three stones, each tile the one its photo colour is nearest, by the tiles the user named as each (Silver Snow 20, the
+# user's fourth look: (18, 20), (15, 20) and (16, 29) are its three main stones): dark slate `ge`, cool grey `gf` and warm tan `t1`,
+# all with the Floor's numbers. A tile darker than halfway from the slate to the light stones is slate, else the warmer of the two
+# (its red over its blue) halfway between them tan; shade darkens the light stones but leaves their warmth.
+STONES = {17: (('ge', (18, 20)), ('gf', (15, 20)), ('t1', (16, 29)))}
 # Bridges and floors drawn as boards (`gi`, their own numbers): Verdant Wind 29's wooden platform (the user: a wood structure, no
 # railings), Chapter 7's wooden stage that burns (the game's Floor that turns to fire: the user, the structure is wood).
 BOARDS = {21: (10,), 7: (79,)}
@@ -206,7 +232,7 @@ BOARDS = {21: (10,), 7: (79,)}
 STAIRS_UP = {'fe16-24-ss': [(13, 27), (13, 28), (5, 21), (21, 21)]}
 # Tiles drawn as what the user saw there, their numbers kept (a77: (5, 17) a grave among the ruins, (15, 16) a stone, (12, 12) to
 # (13, 13) one stone outcrop; Chapter 5's impassable (9, 14) and (13, 14) candlesticks).
-TILE_DECOR = {29: {(5, 17): 'grave', (12, 12): 'outcrop', (13, 12): 'outcrop', (13, 13): 'outcrop', (15, 16): 'rock'},
+TILE_DECOR = {29: {(5, 17): 'grave', (12, 12): 'outcrop', (13, 12): 'outcrop', (13, 13): 'outcrop', (15, 16): 'stones'},
               5: {(9, 14): 'candle', (13, 14): 'candle'}}
 # Icons that stand on the ground round them: a photo's colour there is the HUD's or the icon's, not the ground's (the user: Chapter 2's
 # chest on purple, a64's yellow strongholds, a82's fort).
@@ -3666,6 +3692,10 @@ def main():
             elif not country:
                 for (c, r), new in photo_split(rows, photo).items():
                     rows[r][c] = new
+            # A Floor of three stones (`STONES`), by the per-tile photo colours.
+            if stage in STONES:
+                for (c, r), new in three_stones(rows, photo, STONES[stage]).items():
+                    rows[r][c] = new
             # A Floor's lighter stone paths, by the top-down colours (`LIGHT_PATHS`).
             if stage in LIGHT_PATHS and str(stage) in tops:
                 lightest, most_b = LIGHT_PATHS[stage]
@@ -3701,10 +3731,14 @@ def main():
         if country:
             rows = [['gg' if code == 'ta' else code for code in row] for row in rows]
         m['grid'] = [''.join(r) for r in rows]
-        for base, looks in (('ta', {'ga', 'gb', 'gf', 'gg'}), ('t1', {'ge'})):
+        for base, looks in (('ta', {'ga', 'gb', 'gg'} | (set() if stage in STONES else {'gf'})),
+                            ('t1', {'ge'} | ({'gf'} if stage in STONES else set()))):
             if base in m.get('terrainOverrides', {}):
                 for look in {code for row in rows for code in row} & looks:
                     m['terrainOverrides'][look] = dict(m['terrainOverrides'][base])
+        # A Floor's three stones named as floors, each its own (`STONES`).
+        if stage in STONES:
+            m.setdefault('terrainOverrides', {}).update({'ge': {'name': 'Floor (dark stone)'}, 'gf': {'name': 'Floor (grey stone)'}})
         m['fills'] = dict(g['fills']) if g else {}
         if photo:
             present = {code for row in rows for code in row}
@@ -3717,6 +3751,9 @@ def main():
             # A Floor's stone paths, and a night path traced by eye, in the colour of their lit tiles, not their shade's.
             for paths, code in ((LIGHT_PATHS, 'ge'), (DIRT_PATHS, 'ga')):
                 if stage in paths and lit_fill(rows, photo, code):
+                    m['fills'][code] = lit_fill(rows, photo, code)
+            for code, _ in STONES.get(stage, ()):
+                if lit_fill(rows, photo, code):
                     m['fills'][code] = lit_fill(rows, photo, code)
             # An icon on the ground stands on the ground round it, not the HUD's or its own colour in the photos.
             for code in ICON_ON_GROUND:

@@ -1416,7 +1416,8 @@ describe("Three Houses' maps as its stages draw them", () => {
     expect(at('fe16-29-vw', 4, 24)).toBe('gi')
     expect(codes('fe16-7-be').filter((c) => c === 'gi').length).toBe(19)
     expect(terrainInfo(map('fe16-7-be'), 'gi').name).toBe('Floor')
-    expect(map('fe16-a77').decor).toMatchObject({ '5,17': 'grave', '12,12': 'outcrop', '13,12': 'outcrop', '13,13': 'outcrop', '15,16': 'rock' })
+    // a77's (15, 16) Echoes' heap of a few stones (the user's fourth look: "15s rock outcroping")
+    expect(map('fe16-a77').decor).toMatchObject({ '5,17': 'grave', '12,12': 'outcrop', '13,12': 'outcrop', '13,13': 'outcrop', '15,16': 'stones' })
     // its bridges drawn whole, a rail along each side over the water (Silver Snow 22's, a67's at (8, 13))
     for (const id of ['fe16-22-ss', 'fe16-a67']) expect(map(id).wideBridges, id).toBe(true)
   })
@@ -1439,11 +1440,14 @@ describe("Three Houses' maps as its stages draw them", () => {
     expect([map('fe16-5').decor?.['9,14'], map('fe16-5').decor?.['13,14']]).toEqual(['candle', 'candle'])
   })
 
-  it("paints every roof of Crimson Flower 32 grey and of 35 brown, and parts Silver Snow 20's grey paths from its tan courtyards", () => {
+  it("paints every roof of Crimson Flower 32 grey and of 35 brown, and parts Silver Snow 20's floor into its three stones", () => {
     const roofs = (id: string) => new Set(Object.values(map(id).decor ?? {}).filter((k) => k.startsWith('roof-')))
     expect(roofs('fe16-32-cf')).toEqual(new Set(['roof-grey']))
     expect(roofs('fe16-35-cf')).toEqual(new Set(['roof-brown']))
-    expect(codes('fe16-20-ss').filter((c) => c === 'ge').length).toBeGreaterThan(200)
+    // the user's fourth look: (18, 20) its dark slate, (15, 20) its grey stone, (16, 29) its tan, each with the Floor's numbers
+    expect([at('fe16-20-ss', 18, 20), at('fe16-20-ss', 15, 20), at('fe16-20-ss', 16, 29)]).toEqual(['ge', 'gf', 't1'])
+    for (const c of ['ge', 'gf', 't1']) expect(codes('fe16-20-ss').filter((k) => k === c).length, c).toBeGreaterThan(100)
+    expect(map('fe16-20-ss').terrainOverrides?.gf?.name).toBe('Floor (grey stone)')
   })
 
   it("gives Crimson Flower 36's water one colour, its ground a clear step over it", () => {

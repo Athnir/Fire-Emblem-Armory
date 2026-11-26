@@ -629,7 +629,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Crimson Flower 32's roofs all grey and 35's all brown (`ROOF_PAINT`); 36's water one colour, its ground a clear step over it
   (`ONE_WATER`); rubble set in walls drawn as them (`looksAs`); ruins varied tile to tile, a wall's stub among fallen drums, blocks and
   arches (`variedRuins`); a77's rocks one outcrop (decor 'outcrop'); fire orbs, ballistae and stairs on the ground round them, tile by
-  tile (`standOn`: their photo colour the HUD's or a carpet's). On every 3D game's map its walls
+  tile (`standOn`: their photo colour the HUD's or a carpet's). The user's fourth look (2026-11-26): Silver Snow 20's Floor its
+  three stones by the tiles the user named, (18, 20) its dark slate, (15, 20) its grey stone, (16, 29) its tan (`STONES`: by
+  each tile's photo brightness, then its warmth), its walls a step under the slate; a77's (15, 16) Echoes' heap of a few stones.
+  On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
   ground and wall codes).
   The Tellius games draw each kind by the game's own terrain names (their maps are 3D; colours come from their minimaps): plain,
@@ -1220,7 +1223,8 @@ A global switch (header, any game) that lets someone play along without being to
   Dawn for now (2026-11-24, the
   user: frozen until the final pass, as Part 3 Ch.1 and Ch.7 wait for the user to load them in the game; every map the user can't
   settle without the game is listed for that pass, `data-raw/final-pass.md`); Fates for now (2026-11-24, the user: its last notes
-  done; a note the user left unchanged or marked 'Check' waits for the final pass, `data-raw/final-pass.md`).
+  done; a note the user left unchanged or marked 'Check' waits for the final pass, `data-raw/final-pass.md`); Echoes
+  (2026-11-26, every map marked good).
 - **Games are finished one at a time** (the user's call, 2026-11-23: lock each game in rather than make bulk changes): a fix made for
   the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`; the GBA games' in `gba_maps.VIEW_RULES`), and another game takes it up when its
   own review reaches it, so no other game's maps change under the user.
