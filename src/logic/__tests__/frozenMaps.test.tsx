@@ -1,10 +1,11 @@
 /**
- * Frozen games: once the user has marked every map of a game good in the map review, its maps are frozen (the user's call,
- * 2026-11-23: tiles, textures and icons are shared by many maps and several games, so a change made for one game can quietly alter
- * another that was finished). Each frozen map is drawn here as the map page draws it (MapGrid at the start of the battle, on the
- * game's first difficulty), every icon's pixels inline, and the drawing's fingerprint must match the one taken when the game was
- * frozen (frozenMaps.json). A mismatch names the maps; `node scripts/frozen-maps.mjs check <game>` then compares their pictures with
- * the approved ones to show which look different.
+ * Watched games: once the user has marked a game's maps good in the map review, they're watched (the user's call, 2026-11-26, in place
+ * of the freeze of 2026-11-23: tiles, textures and icons are shared by many maps and several games, so a change made for one game can
+ * quietly alter another that was approved). Each watched map is drawn here as the map page draws it (MapGrid at the start of the
+ * battle, on the game's first difficulty), every icon's pixels inline, and the drawing's fingerprint must match the one taken when it
+ * was approved (frozenMaps.json). A mismatch names the maps; `node scripts/frozen-maps.mjs check <game>` then compares their pictures
+ * with the approved ones to show which look different. A change made for a game's own notes takes its baselines again; one that
+ * reaches other games' maps is asked about first (CLAUDE.md, Process).
  *
  *   FROZEN_FREEZE=fe4 npx vitest run frozenMaps     freeze a game (or take a changed one's fingerprints again once the user approves)
  *   FROZEN_SVG=current npx vitest run frozenMaps    write the frozen maps' drawings to data-raw/frozen-maps/<game>/current/ (the script)
@@ -114,7 +115,7 @@ describe('frozen games (every map marked good in the review)', () => {
         if (fingerprint(svg) !== print) changed.push(id)
       }
       expect(gone, `${game}: frozen maps no longer in the game`).toEqual([])
-      expect(changed, `${game}: frozen maps changed; run \`node scripts/frozen-maps.mjs check ${game}\` to see which look different`).toEqual([])
+      expect(changed, `${game}: watched maps changed; run \`node scripts/frozen-maps.mjs check ${game}\` to see which look different, and ask before keeping a change that reaches another game's maps`).toEqual([])
     }, 600_000)
   }
 })

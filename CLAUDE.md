@@ -1217,13 +1217,17 @@ A global switch (header, any game) that lets someone play along without being to
 - **Back each rule with a test where it can be checked** (e.g. no pillar icon on a tile no one can enter;
   only grinding maps spawn at random).
 - **Before calling a map done, look at it in the browser.**
-- **A game whose maps the user has all marked good in the review is frozen** (the user's call, 2026-11-23: tiles, textures and icons
-  are shared by many maps and games, so a change for one can quietly alter a finished one): `node scripts/frozen-maps.mjs freeze
-  <game>` takes each map's fingerprint (`src/logic/__tests__/frozenMaps.json`: the map page's own drawing, every icon inline) and its
-  approved picture (`data-raw/frozen-maps/<game>/baseline`, not committed). The test fails when a frozen map's drawing changes;
-  `node scripts/frozen-maps.mjs check <game>` then shows which maps look different (the changed pixels marked). A frozen map changes
-  only with the user's approval, and is frozen again after; a fingerprint that changed while nothing looks different is frozen again.
-  Frozen so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
+- **A game whose maps the user has marked good in the review is watched** (the user's call, 2026-11-26, in place of the freeze of
+  2026-11-23: the point is that approved maps don't change unnoticed, so the user needn't recheck older maps each time; tiles,
+  textures and icons are shared by many maps and games). `node scripts/frozen-maps.mjs freeze <game>` takes each map's fingerprint
+  (`src/logic/__tests__/frozenMaps.json`: the map page's own drawing, every icon inline) and its approved picture
+  (`data-raw/frozen-maps/<game>/baseline`, not committed); the test fails when a watched map's drawing changes, and `node
+  scripts/frozen-maps.mjs check <game>` shows which maps look different (the changed pixels marked). A watched game's maps change
+  freely for its own notes (the baselines taken again after). **A change that also redraws other games' maps is listed (which games,
+  which maps) and asked about before it's kept**: some changes should spread, the shared tiles that should read the same everywhere
+  (shops, supplies and the like); others shouldn't, as a change to a basic tile (a plain, a floor, a wall) spills over many maps and
+  can break them, so those stay scoped to their game. A fingerprint that changed while nothing looks different is taken again.
+  Watched so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
   Mystery of the Emblem (2026-11-23), Thracia 776 (2026-11-23), The Binding Blade (2026-11-23),
   The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23), Shadow Dragon (2026-11-24), New Mystery of the Emblem (2026-11-24); Awakening for now (2026-11-24, the user: frozen
   until the final pass, as Radiant Dawn, its DLC maps' villages waiting for the user to load them in the game); Radiant
@@ -1232,7 +1236,7 @@ A global switch (header, any game) that lets someone play along without being to
   settle without the game is listed for that pass, `data-raw/final-pass.md`); Fates for now (2026-11-24, the user: its last notes
   done; a note the user left unchanged or marked 'Check' waits for the final pass, `data-raw/final-pass.md`); Echoes
   (2026-11-26, every map marked good).
-- **Games are finished one at a time** (the user's call, 2026-11-23: lock each game in rather than make bulk changes): a fix made for
-  the game being finished is scoped to that game (a flag its builder sets, as `wideBridges`; the GBA games' in `gba_maps.VIEW_RULES`), and another game takes it up when its
-  own review reaches it, so no other game's maps change under the user.
+- **Games are finished one at a time** (the user's call, 2026-11-23): a fix made for the game being worked on is scoped to that game by
+  default (a flag its builder sets, as `wideBridges`; the GBA games' in `gba_maps.VIEW_RULES`), and another game takes it up when its
+  own review reaches it, or at once where the user agrees it should spread (a shared tile, above).
 - **Commit and push each finished step.** End commit messages with the co-author line.

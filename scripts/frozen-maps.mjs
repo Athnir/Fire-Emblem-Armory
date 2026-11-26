@@ -1,4 +1,5 @@
-// The frozen games' maps as pictures, and what changed (src/logic/__tests__/frozenMaps.test.tsx keeps their fingerprints).
+// The watched games' maps as pictures, and what changed (src/logic/__tests__/frozenMaps.test.tsx keeps their fingerprints; the
+// user's call, 2026-11-26: approved maps are watched, a change that reaches another game's maps is asked about first).
 //
 //   node scripts/frozen-maps.mjs freeze <game>   freeze a game whose maps the user has all marked good: fingerprints into frozenMaps.json,
 //                                                and each map's approved picture (data-raw/frozen-maps/<game>/baseline/<id>.png)
@@ -140,7 +141,7 @@ if (cmd === 'freeze') {
     }
   }
   b.close()
-  const failed = /frozen maps changed/.test(test)
+  const failed = /watched maps changed/.test(test)
   if (looks.length) console.log(`${game}: maps that look different (the differences in ${dir('diff')}):\n  ` + looks.join('\n  '))
   else if (failed) console.log(`${game}: the fingerprints changed but every map looks the same: freeze it again (node scripts/frozen-maps.mjs freeze ${game})`)
   else console.log(`${game}: every frozen map is as it was approved`)
