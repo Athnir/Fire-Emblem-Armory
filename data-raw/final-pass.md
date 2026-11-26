@@ -29,3 +29,22 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Engage | Paralogue, The Caring Princess (`fe17-s013`) | The whole map against the game, its ship and dais | "will look at manually" |
 | Engage | Paralogue, The Connector (`fe17-s015`) | The whole map against the game | "manual" |
 | Three Houses | Chapter 9 (`fe16-9`) | Its ruins (varied tile to tile since 2026-11-26) against the game | "manual" |
+
+## The look-over's checks (2026-11-26)
+
+What the look-over's fixes read from the files and code but couldn't play: each is in the apps as the files say it, to check in the
+game when the chapter comes up.
+
+| Game | Where | What to check |
+| --- | --- | --- |
+| Shadow Dragon and the Blade of Light | Chapter 16's villages | Whether a first recruit who has died still blocks the other village (3:$8D6D passes over a record whose +0x12 is 0xFF) |
+| Shadow Dragon and the Blade of Light | The enemy-phase recruits (Minerva, Catria, Palla, Est) | That a recruit that attacks fights before it joins (traced in code) |
+| Mystery of the Emblem | Book 1 Chapter 3, Navarre | His HP after Caeda's talk: the swap copies max HP too, so likely 19/19, not "out of 20" (the Roster's note and its test's override) |
+| Genealogy | Chapter 9, Altena | With Finn dead, Leif's talk with Altena isn't offered (read from the opening script only) |
+| Genealogy | Chapter 2, Chulainn | Whether he joins right after the arena win or at the next castle entry |
+| Genealogy | Chapter 6, Iuchar and Iucharba | That the second brother's talk is gone once the first has joined (one shared flag) |
+| The Blazing Blade | Cog of Destiny | The timing of its area-held reinforcements, pass by pass |
+| The Blazing Blade | Hector's 31x, Karla | What happens when one of the duel's two falls |
+| The Sacred Stones | Ephraim's Chapter 15 | Whether the chapter is lost if Eirika falls (unconfirmed, as before) |
+| New Mystery | Chapter 1, Gordin or Draug | That a deployment slot with flag 0x80 brings its unit in (answer Yes at Prologue III and look for Gordin) |
+| Awakening | Paralogue 10, Severa | Whether she walks to Holland from the start (her AI) or only after Chrom's or Cordelia's talk (the wiki) |
