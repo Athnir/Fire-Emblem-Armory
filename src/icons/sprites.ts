@@ -605,9 +605,9 @@ export const SKULL: Sprite = {
 export const BOSS_REINFORCEMENT: Sprite = { ...SKULL, palette: { ...SKULL.palette, o: '#c2410c' } }
 
 /** A small soldier: green for allies, red for named enemies. */
-export function figure(body: string, shade: string): Sprite {
+export function figure(body: string, shade: string, outline = OUTLINE): Sprite {
   return {
-    palette: { o: OUTLINE, b: body, s: shade, k: '#f1d3b0' },
+    palette: { o: outline, b: body, s: shade, k: '#f1d3b0' },
     rows: [
       '...oooo...',
       '..obbbbo..',
@@ -695,6 +695,58 @@ export const REINFORCEMENT: Sprite = {
 
 /** A unit joining your army mid-chapter: a blue figure, the colour of your starting tiles. */
 export const JOINER = figure('#3b82f6', '#1e4fa8')
+
+/**
+ * The colour-blind friendly markers (the map page's switch, off by default): each army a shape or an edge of its own, in Okabe and Ito's
+ * colours, which stay apart for red-green and blue-yellow colour blindness alike. Foes are vermillion dots, green units bluish-green
+ * diamonds and figures edged in white, partner and neutral units yellow triangles, units joining you sky blue, and arrivals hollow in
+ * orange (the ring, a dark figure edged in orange, the skull edged in orange).
+ */
+export const COLOUR_BLIND = (() => {
+  const vermillion = { o: '#4a1800', r: '#d55e00', l: '#f2a36b' }
+  const white = '#f5f5f5'
+  return {
+    commonEnemy: { palette: vermillion, rows: COMMON_ENEMY.rows } as Sprite,
+    commonPair: { palette: vermillion, rows: COMMON_PAIR.rows } as Sprite,
+    namedEnemy: figure('#d55e00', '#8a3c00'),
+    commonAlly: {
+      palette: { o: white, r: '#009e73', l: '#7fd6bb' },
+      rows: [
+        '..........',
+        '....oo....',
+        '...orro...',
+        '..orlrro..',
+        '.orrrrrro.',
+        '.orrrrrro.',
+        '..orrrro..',
+        '...orro...',
+        '....oo....',
+        '..........',
+      ],
+    } as Sprite,
+    ally: figure('#009e73', '#006b4e', white),
+    commonPartner: {
+      palette: { o: '#4a4300', r: '#f0e442', l: '#fbf6b5' },
+      rows: [
+        '..........',
+        '....oo....',
+        '...orro...',
+        '...orro...',
+        '..orlrro..',
+        '..orrrro..',
+        '.orrrrrro.',
+        '.orrrrrro.',
+        '.oooooooo.',
+        '..........',
+      ],
+    } as Sprite,
+    partner: figure('#f0e442', '#a39a1d'),
+    joiner: figure('#56b4e9', '#2b7bb0'),
+    reinforcement: { palette: { o: '#3d2600', r: '#e69f00' }, rows: REINFORCEMENT.rows } as Sprite,
+    namedReinforcement: figure('#3a2a14', '#24190b', '#e69f00'),
+    bossReinforcement: { ...SKULL, palette: { ...SKULL.palette, o: '#e69f00' } } as Sprite,
+  }
+})()
 
 /** Badge for "drops an item on defeat": a little gold sack, drawn in a tile's top-right corner. */
 export const DROP_BADGE: Sprite = {

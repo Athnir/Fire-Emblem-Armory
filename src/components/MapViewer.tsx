@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useReach } from './Reach'
+import { ColourBlindContext, useColourBlind } from './ColourBlind'
 import { useDifficulty } from './Difficulty'
 import { POT_TERRAIN_NOTE } from '../data/maps/fatesTerrain'
 import type { MapSet } from '../data/maps/mapSet'
@@ -19,7 +20,7 @@ import {
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
   CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, GARDEN, roundFountainPiece, BOAT_BOW, ICE_CRYSTALS, frozenFountainPiece, canopyPiece,
   roundYurtPiece, zenGardenPiece, bigTreePiece, OBSTACLE, WARP_SIGIL, WARP_PAD, FLAME_WALL, FLAME_VENT, cratePiece, boulderPiece, slabPiece, bonePiece, RUBBLE_VARIANTS, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
-  STONE_PILE, CORAL, SUPPLY_CACHE, bigPillarPiece, SUPPLY_CRATES, supplyMarked, PALISADE, COFFIN, STATUE_SMALL, TORCH_UNLIT,
+  STONE_PILE, CORAL, SUPPLY_CACHE, bigPillarPiece, SUPPLY_CRATES, supplyMarked, PALISADE, COFFIN, STATUE_SMALL, TORCH_UNLIT, COLOUR_BLIND,
 } from '../icons/sprites'
 import { applyChanges, arrivalTurn, beforeBuilding, doorMat, sceneryHouse, visitable, atStart, closedRooms, covers, describePotEffect, digAt, inTheFog, mapSteps, noteOn, notesOn, objectsAt, resolveTile, rowCodes, sameTile, terrainAt, terrainInfo, terrainName, tileKey, tilesInRadius, WATER_CODES, wholeBridgeBoxes, wideBridgeSpans, withStandIns, withSwitchWalls } from '../logic/maps'
 import { VOID_COLOUR, visibleFills } from '../logic/mapFills'
@@ -132,6 +133,54 @@ const TRAP_ZONE = '#e11d48'
 
 /** A challenge battle's foe groups (Fates), outlined and numbered each in its own colour. */
 const FOE_GROUP = ['#fbbf24', '#a78bfa']
+
+/** Okabe and Ito's colours, which stay apart for red-green and blue-yellow colour blindness alike: the colour-blind look's
+ * (`ColourBlindContext`; its markers are `COLOUR_BLIND`). */
+const OKABE = { orange: '#e69f00', sky: '#56b4e9', green: '#009e73', yellow: '#f0e442', blue: '#0072b2', vermillion: '#d55e00', purple: '#cc79a7' }
+type Line = { colour: string; dash?: string }
+/** Each kind of outline in the colour-blind look: a colour and dashes of its own. */
+const CB_LINE = {
+  objective: { colour: OKABE.sky },
+  area: { colour: OKABE.orange, dash: '2.4 1.2' },
+  foeArea: { colour: OKABE.vermillion, dash: '0.7 0.9' },
+  trap: { colour: OKABE.purple, dash: '3 1 0.8 1' },
+  dig: { colour: OKABE.yellow, dash: '1.5 1' },
+  fire: { colour: OKABE.vermillion, dash: '1.5 1' },
+  burn: { colour: OKABE.orange, dash: '2 1' },
+} satisfies Record<string, Line>
+const CB_FOE_GROUP: Line[] = [{ colour: OKABE.yellow, dash: '1.6 0.9' }, { colour: OKABE.purple, dash: '0.6 0.9' }]
+
+/** An outline in the colour-blind look: its colour and dashes a little thicker than the usual line, over a dark line of its own. */
+function CbRect({ x, y, width, height, line, strokeWidth, fillOpacity = 0 }: {
+  x: number
+  y: number
+  width: number
+  height: number
+  line: Line
+  strokeWidth: number
+  fillOpacity?: number
+}) {
+  return (
+    <g pointerEvents="none">
+      <rect x={x} y={y} width={width} height={height} fill={line.colour} fillOpacity={fillOpacity} stroke="#0a0a0a" strokeOpacity={0.75} strokeWidth={strokeWidth + 0.9} />
+      <rect x={x} y={y} width={width} height={height} fill="none" stroke={line.colour} strokeWidth={strokeWidth + 0.3} strokeDasharray={line.dash} />
+    </g>
+  )
+}
+
+/** A starting tile's corner marks: the lord's start, a forced unit's fixed tile or any other. The colour-blind look tells them apart by
+ * their corners too: the lord's all four, a forced unit's the other two. */
+type StartKind = 'start' | 'lord' | 'forced'
+function startCorners(kind: StartKind, cb: boolean): { fill: string; paths: (X: number, Y: number) => string[] } {
+  const tl = (X: number, Y: number) => `M${X} ${Y}h3l-3 3z`
+  const br = (X: number, Y: number) => `M${X + 10} ${Y + 10}h-3l3 -3z`
+  const tr = (X: number, Y: number) => `M${X + 10} ${Y}h-3l3 3z`
+  const bl = (X: number, Y: number) => `M${X} ${Y + 10}h3l-3 -3z`
+  if (!cb) return { fill: kind === 'lord' ? '#facc15' : kind === 'forced' ? FORCED : '#3b82f6', paths: (X, Y) => [tl(X, Y), br(X, Y)] }
+  if (kind === 'lord') return { fill: OKABE.yellow, paths: (X, Y) => [tl(X, Y), tr(X, Y), bl(X, Y), br(X, Y)] }
+  if (kind === 'forced') return { fill: OKABE.purple, paths: (X, Y) => [tr(X, Y), bl(X, Y)] }
+  return { fill: OKABE.sky, paths: (X, Y) => [tl(X, Y), br(X, Y)] }
+}
 
 /** A trap that goes off on its own (the GBA games' fire tiles, gas vents and arrow launchers). */
 const TRAP_SPRITE = { fire: LAVA_CRACK, gas: GAS_VENT, arrow: ARROW_TRAP } as const
@@ -2284,25 +2333,36 @@ function torchLight(map: ChapterMap, previewing: Set<string>): Set<string> {
   return out
 }
 
+/** The army markers as usual; the colour-blind look has its own set (`COLOUR_BLIND`). */
+const USUAL_MARKERS: typeof COLOUR_BLIND = {
+  commonEnemy: COMMON_ENEMY, commonPair: COMMON_PAIR, namedEnemy: NAMED_ENEMY, commonAlly: COMMON_ALLY, ally: ALLY, commonPartner: COMMON_PARTNER,
+  partner: PARTNER, joiner: JOINER, reinforcement: REINFORCEMENT, namedReinforcement: NAMED_REINFORCEMENT, bossReinforcement: BOSS_REINFORCEMENT,
+}
+const markers = (cb: boolean) => (cb ? COLOUR_BLIND : USUAL_MARKERS)
+
 /** Boss, named foes, allies and pairs get their own sprite; everyone else is a plain red marker. Drops are a badge on top. */
-function unitSprite(u: MapUnit): Sprite {
+function unitSprite(u: MapUnit, cb = false): Sprite {
+  const k = markers(cb)
   if (u.type === 'boss') return SKULL
-  if (u.type === 'named') return NAMED_ENEMY
+  if (u.type === 'named') return k.namedEnemy
   // The person icon is for named green units; generic ones are a plain green dot. A partner unit, or a neutral one (no game has
   // both), is the same in yellow.
-  if (u.type === 'ally' && (u.yellow || u.neutral)) return u.generic ? COMMON_PARTNER : PARTNER
-  if (u.type === 'ally') return u.generic ? COMMON_ALLY : ALLY
-  if (u.paired) return COMMON_PAIR
-  return COMMON_ENEMY
+  if (u.type === 'ally' && (u.yellow || u.neutral)) return u.generic ? k.commonPartner : k.partner
+  if (u.type === 'ally') return u.generic ? k.commonAlly : k.ally
+  if (u.paired) return k.commonPair
+  return k.commonEnemy
 }
 const UNIT_NAME: Record<MapUnit['type'], string> = { boss: 'Boss', named: 'Named enemy', enemy: 'Enemy', ally: 'Ally' }
 
 /** A reinforcement's marker: the orange ring, or a named foe's figure or a boss's skull in the ring's orange. */
-const reinforcementSprite = (u: MapUnit) => (u.type === 'boss' ? BOSS_REINFORCEMENT : u.type === 'named' ? NAMED_REINFORCEMENT : REINFORCEMENT)
+const reinforcementSprite = (u: MapUnit, cb = false) =>
+  u.type === 'boss' ? markers(cb).bossReinforcement : u.type === 'named' ? markers(cb).namedReinforcement : markers(cb).reinforcement
 
 /** A green joiner's marker: the person icon if it's named, a plain green dot if not; a partner's the same in yellow. */
-const joinerSprite = (j: Joiner) =>
-  !j.ally ? JOINER : j.yellow || j.neutral ? (j.generic ? COMMON_PARTNER : PARTNER) : j.generic ? COMMON_ALLY : ALLY
+const joinerSprite = (j: Joiner, cb = false) => {
+  const k = markers(cb)
+  return !j.ally ? k.joiner : j.yellow || j.neutral ? (j.generic ? k.commonPartner : k.partner) : j.generic ? k.commonAlly : k.ally
+}
 
 
 type Pot = Extract<MapObject, { type: 'pot' }>
@@ -2332,6 +2392,16 @@ function HealthPips({ bars, x, y, span }: { bars: number; x: number; y: number; 
 const arrivalFrom = (a: ShownArrival) => (a.kind === 'joiner' ? a.joiner.from : a.unit.from)
 
 const INFO_BELOW_KEY = 'fe-armory-map-info-below'
+const COLOUR_BLIND_KEY = 'fe-armory-map-colour-blind'
+
+/** Whether this device last turned the colour-blind friendly look on. */
+function savedColourBlind() {
+  try {
+    return localStorage.getItem(COLOUR_BLIND_KEY) === '1'
+  } catch {
+    return false
+  }
+}
 
 /** Whether this device last put the map's info panels below it. */
 function savedInfoBelow() {
@@ -2401,6 +2471,18 @@ export function MapViewer({ set }: { set: MapSet }) {
     setInfoBelow((v) => {
       try {
         localStorage.setItem(INFO_BELOW_KEY, v ? '0' : '1')
+      } catch {
+        // Not remembered this time.
+      }
+      return !v
+    })
+  }
+  // The colour-blind friendly look: markers, corners and outlines told apart by shape and dashes, in colours that stay apart.
+  const [colourBlind, setColourBlind] = useState(savedColourBlind)
+  function toggleColourBlind() {
+    setColourBlind((v) => {
+      try {
+        localStorage.setItem(COLOUR_BLIND_KEY, v ? '0' : '1')
       } catch {
         // Not remembered this time.
       }
@@ -2557,6 +2639,7 @@ export function MapViewer({ set }: { set: MapSet }) {
   const select = 'rounded border border-neutral-700 bg-neutral-900 px-2 py-1'
 
   return (
+    <ColourBlindContext.Provider value={colourBlind}>
     <div className="flex flex-col gap-4">
       {set.routes && (
       <div className="flex flex-wrap gap-1" role="group" aria-label="Route">
@@ -2662,6 +2745,15 @@ export function MapViewer({ set }: { set: MapSet }) {
           className={`rounded border px-2 py-1 ${infoBelow ? 'border-emerald-500 bg-emerald-950 text-emerald-200' : 'border-neutral-700 bg-neutral-900'}`}
         >
           {infoBelow ? 'Info below the map' : 'Info beside the map'}
+        </button>
+        <button
+          type="button"
+          onClick={toggleColourBlind}
+          aria-pressed={colourBlind}
+          title="Tells the armies apart by their markers' shapes and edges, the starting tiles by their corners and every outline by its dashes, in colours that stay apart for red-green and blue-yellow colour blindness."
+          className={`rounded border px-2 py-1 ${colourBlind ? 'border-sky-500 bg-sky-950 text-sky-200' : 'border-neutral-700 bg-neutral-900'}`}
+        >
+          {colourBlind ? 'Colour-blind friendly: on' : 'Colour-blind friendly'}
         </button>
         {steps.length > 0 && !reach.on && (
           <div className="flex items-center gap-1" role="group" aria-label="The map by turn">
@@ -2815,6 +2907,7 @@ export function MapViewer({ set }: { set: MapSet }) {
 
       <PotList map={map} onSelect={setSelected} selected={selected} broken={potsBroken} />
     </div>
+    </ColourBlindContext.Provider>
   )
 }
 
@@ -2848,6 +2941,7 @@ export function MapGrid({
   triggers: NonNullable<Arrival['areas']>
   onSelect: (t: Tile) => void
 }) {
+  const cb = useColourBlind()
   // SVG y grows downward, map y grows upward: screen row = height - y.
   const px = (x: number) => GUTTER + (x - 1) * CELL
   const py = (y: number) => (map.height - y) * CELL
@@ -3124,12 +3218,20 @@ export function MapGrid({
                 <rect x={X} y={Y} width={CELL} height={CELL} fill="#0b0912" opacity={0.5} />
               ))}
             {radius.has(tileKey(t)) && <rect x={X} y={Y} width={CELL} height={CELL} fill="#ffffff" opacity={0.22} />}
-            {starts.has(tileKey(t)) && (
+            {starts.has(tileKey(t)) && !cb && (
               <g fill={map.corrinStart && sameTile(map.corrinStart, t) ? '#facc15' : fixed.has(tileKey(t)) ? FORCED : '#3b82f6'}>
                 <path d={`M${X} ${Y}h3l-3 3z`} />
                 <path d={`M${X + 10} ${Y + 10}h-3l3 -3z`} />
               </g>
             )}
+            {starts.has(tileKey(t)) && cb && (() => {
+              const look = startCorners(map.corrinStart && sameTile(map.corrinStart, t) ? 'lord' : fixed.has(tileKey(t)) ? 'forced' : 'start', true)
+              return (
+                <g fill={look.fill} stroke="#0a0a0a" strokeWidth={0.35} strokeLinejoin="round">
+                  {look.paths(X, Y).map((d) => <path key={d} d={d} />)}
+                </g>
+              )
+            })()}
           </g>
         )
       })}
@@ -3162,9 +3264,15 @@ export function MapGrid({
         o.tiles.map((t) =>
           o.type === 'burn' ? (
             <g key={`burn${tileKey(t)}`} pointerEvents="none">
-              <rect x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="#f97316" fillOpacity={0.18} stroke={BURN} strokeWidth={1} strokeDasharray="2 1" />
+              {cb ? (
+                <CbRect x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} line={CB_LINE.burn} strokeWidth={1} fillOpacity={0.18} />
+              ) : (
+                <rect x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="#f97316" fillOpacity={0.18} stroke={BURN} strokeWidth={1} strokeDasharray="2 1" />
+              )}
               <SpriteG sprite={burned ? SUPPLIES : SUPPLY_BOXES} x={px(t[0])} y={py(t[1])} />
             </g>
+          ) : cb ? (
+            <CbRect key={`obj${tileKey(t)}`} x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} line={CB_LINE.objective} strokeWidth={1.2} />
           ) : (
             <rect key={`obj${tileKey(t)}`} x={px(t[0]) + 0.6} y={py(t[1]) + 0.6} width={CELL - 1.2} height={CELL - 1.2} fill="none" stroke="#38bdf8" strokeWidth={1.2} pointerEvents="none" />
           ),
@@ -3177,7 +3285,11 @@ export function MapGrid({
           const [l, b, r, t] = o.area
           return (
             <g key={`hid${tileKey(o.tile)}`} pointerEvents="none">
-              <rect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} fill="#c2410c" fillOpacity={0.14} stroke="#9a3412" strokeWidth={0.8} strokeDasharray="1.5 1" />
+              {cb ? (
+                <CbRect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} line={CB_LINE.dig} strokeWidth={0.8} fillOpacity={0.14} />
+              ) : (
+                <rect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} fill="#c2410c" fillOpacity={0.14} stroke="#9a3412" strokeWidth={0.8} strokeDasharray="1.5 1" />
+              )}
               <SpriteG sprite={BURIED} x={px(o.tile[0])} y={py(o.tile[1])} />
             </g>
           )
@@ -3201,7 +3313,11 @@ export function MapGrid({
           const [l, b, r, t] = o.area
           return (
             <g key={`fire${tileKey(o.tile)}`} pointerEvents="none">
-              <rect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} fill="#dc2626" fillOpacity={0.12} stroke="#dc2626" strokeWidth={0.8} strokeDasharray="1.5 1" />
+              {cb ? (
+                <CbRect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} line={CB_LINE.fire} strokeWidth={0.8} fillOpacity={0.12} />
+              ) : (
+                <rect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} fill="#dc2626" fillOpacity={0.12} stroke="#dc2626" strokeWidth={0.8} strokeDasharray="1.5 1" />
+              )}
               <SpriteG sprite={FLAME} x={px(o.tile[0])} y={py(o.tile[1])} />
             </g>
           )
@@ -3281,12 +3397,29 @@ export function MapGrid({
         return <SpriteG key={c.id} sprite={DRAGON_VEIN} x={px(x)} y={py(y)} className="animate-pulse" />
       })}
 
-      {/* Coloured rooms, swapped while a vein that swaps them is previewed. */}
+      {/* Coloured rooms, swapped while a vein that swaps them is previewed. The colour-blind look hatches the red ones, so the two read
+          apart without their colours. */}
+      {cb && map.rooms?.length ? (
+        <defs>
+          <pattern id="cb-hatch" width={2.5} height={2.5} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1={0} y1={0} x2={0} y2={2.5} stroke="#1c0f05" strokeOpacity={0.6} strokeWidth={0.8} />
+          </pattern>
+        </defs>
+      ) : null}
       {(map.rooms ?? []).flatMap((set, si) =>
         set.rects.map(([l, b, r, t]) => {
           const swapped = map.changes.some((c) => c.swapsRooms && previewing.has(c.id))
           const shown = swapped ? (set.color === 'red' ? 'blue' : 'red') : set.color
           const color = ROOM[shown]
+          if (cb) {
+            const [x, y, w, h] = [px(l) + 0.5, py(t) + 0.5, (r - l + 1) * CELL - 1, (t - b + 1) * CELL - 1]
+            return (
+              <g key={`room${si}:${l},${b}`} pointerEvents="none">
+                <rect x={x} y={y} width={w} height={h} fill={color} fillOpacity={ROOM_TINT[shown]} stroke={color} strokeWidth={0.6} />
+                {shown === 'red' && <rect x={x} y={y} width={w} height={h} fill="url(#cb-hatch)" />}
+              </g>
+            )
+          }
           return (
             <rect
               key={`room${si}:${l},${b}`}
@@ -3305,7 +3438,9 @@ export function MapGrid({
       )}
 
       {(map.foeGroups ?? []).flatMap((g, gi) =>
-        g.tiles.map((t) => (
+        g.tiles.map((t) => cb ? (
+          <CbRect key={`fg${gi}:${tileKey(t)}`} x={px(t[0]) + 0.5} y={py(t[1]) + 0.5} width={CELL - 1} height={CELL - 1} line={CB_FOE_GROUP[gi]} strokeWidth={0.8} fillOpacity={0.12} />
+        ) : (
           <rect
             key={`fg${gi}:${tileKey(t)}`}
             x={px(t[0]) + 0.5}
@@ -3334,7 +3469,7 @@ export function MapGrid({
         const [x, y, span] = [px(u.tile[0]), py(u.tile[1]), CELL * (u.size ?? 1)]
         return (
           <g key={`${i}:${tileKey(u.tile)}`}>
-            <SpriteG sprite={unitSprite(u)} x={x} y={y} size={span} />
+            <SpriteG sprite={unitSprite(u, cb)} x={x} y={y} size={span} />
             {u.drops?.length ? <SpriteG sprite={DROP_BADGE} x={x + span - 4.6} y={y - 0.4} size={5} /> : null}
             {u.looter && <SpriteG sprite={TORCH} x={x - 0.4} y={y + span - 4.6} size={5} />}
             {u.capturable && <SpriteG sprite={CAPTURE_BADGE} x={x + span - 4.6} y={y + span - 4.6} size={5} />}
@@ -3354,7 +3489,7 @@ export function MapGrid({
             textAnchor="end"
             fontSize={3.2}
             fontWeight="bold"
-            fill={FOE_GROUP[gi]}
+            fill={cb ? CB_FOE_GROUP[gi].colour : FOE_GROUP[gi]}
             stroke="#0a0a0a"
             strokeWidth={0.6}
             paintOrder="stroke"
@@ -3382,20 +3517,25 @@ export function MapGrid({
       {triggers.filter(({ rect }) => !(rect[0] === -1 && rect[1] === -1)).map(({ who, rect, step }) => {
         const [l, r] = rect[0] === -1 ? [1, map.width] : [rect[0], rect[2]]
         const [b, t] = rect[1] === -1 ? [1, map.height] : [rect[1], rect[3]]
-        const colour = who === 'enemy' ? '#ef4444' : '#f0883e'
+        const line = who === 'enemy' ? CB_LINE.foeArea : CB_LINE.area
+        const colour = cb ? line.colour : who === 'enemy' ? '#ef4444' : '#f0883e'
         return (
           <g key={`trig${who}${l},${b},${r},${t}${step ?? ''}`} pointerEvents="none">
-            <rect
-              x={px(l) + 0.5}
-              y={py(t) + 0.5}
-              width={(r - l + 1) * CELL - 1}
-              height={(t - b + 1) * CELL - 1}
-              fill={colour}
-              fillOpacity={0.08}
-              stroke={colour}
-              strokeWidth={0.7}
-              strokeDasharray="2 1.2"
-            />
+            {cb ? (
+              <CbRect x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} line={line} strokeWidth={0.7} fillOpacity={0.08} />
+            ) : (
+              <rect
+                x={px(l) + 0.5}
+                y={py(t) + 0.5}
+                width={(r - l + 1) * CELL - 1}
+                height={(t - b + 1) * CELL - 1}
+                fill={colour}
+                fillOpacity={0.08}
+                stroke={colour}
+                strokeWidth={0.7}
+                strokeDasharray="2 1.2"
+              />
+            )}
             {/* A group set off in steps (one area, then another): each area carries its step's number, as its time names it. */}
             {step !== undefined && (
               <text x={px(l) + 1.6} y={py(t) + 6.4} fontSize={5.5} fontWeight="bold" fill={colour} stroke="#0a0a0a" strokeWidth={0.6} paintOrder="stroke">
@@ -3409,6 +3549,11 @@ export function MapGrid({
         .filter((c) => c.zone)
         .map((c) => {
           const [l, b, r, t] = c.zone!
+          if (cb)
+            return (
+              <CbRect key={`zone${c.id}`} x={px(l) + 0.5} y={py(t) + 0.5} width={(r - l + 1) * CELL - 1} height={(t - b + 1) * CELL - 1} line={CB_LINE.trap}
+                strokeWidth={0.7} fillOpacity={previewing.has(c.id) ? 0 : 0.1} />
+            )
           return (
             <rect
               key={`zone${c.id}`}
@@ -3443,9 +3588,9 @@ export function MapGrid({
             y1={y1}
             x2={x2}
             y2={y2}
-            stroke={a.kind === 'joiner' ? '#60a5fa' : '#f0883e'}
+            stroke={cb ? (a.kind === 'joiner' ? OKABE.sky : OKABE.orange) : a.kind === 'joiner' ? '#60a5fa' : '#f0883e'}
             strokeWidth={0.9}
-            strokeDasharray="1.6 1"
+            strokeDasharray={cb && a.kind === 'joiner' ? '0.7 0.9' : '1.6 1'}
             markerEnd="url(#arrival-head)"
             pointerEvents="none"
           />
@@ -3456,7 +3601,7 @@ export function MapGrid({
         const span = CELL * (a.kind === 'reinforcement' ? (a.unit.size ?? 1) : 1)
         return (
           <g key={`arr${x},${y}`} pointerEvents="none">
-            <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner) : reinforcementSprite(a.unit)} x={px(x)} y={py(y)} size={span} />
+            <SpriteG sprite={a.kind === 'joiner' ? joinerSprite(a.joiner, cb) : reinforcementSprite(a.unit, cb)} x={px(x)} y={py(y)} size={span} />
             {a.kind === 'reinforcement' && a.unit.drops?.length ? <SpriteG sprite={DROP_BADGE} x={px(x) + span - 4.6} y={py(y) - 0.4} size={5} /> : null}
             {(a.kind === 'reinforcement' ? a.unit.looter : a.joiner.looter) ? <SpriteG sprite={TORCH} x={px(x) - 0.4} y={py(y) + span - 4.6} size={5} /> : null}
             {a.kind === 'reinforcement' && a.unit.capturable ? <SpriteG sprite={CAPTURE_BADGE} x={px(x) + span - 4.6} y={py(y) + span - 4.6} size={5} /> : null}
@@ -3570,6 +3715,8 @@ function Legend({
   triggers: NonNullable<Arrival['areas']>
   takeBy: MapSet['takeBy']
 }) {
+  const cb = useColourBlind()
+  const k = markers(cb)
   // Only what this map actually has, so small maps get a short legend (and only what can be seen, under Thracia's fog).
   // A gangplank is listed as one, not as the stairs or goal its tiles are to the game.
   const planks = new Set([...(map.gangplanks ?? []), ...(map.bridgeFloors ?? [])])
@@ -3583,7 +3730,11 @@ function Legend({
     sprite?: Sprite
     swatch?: string
     outline?: boolean
-    corners?: string
+    /** The outline's dashes (the colour-blind look). */
+    dash?: string
+    /** Hatched, as the colour-blind look draws the red rooms. */
+    hatch?: boolean
+    corners?: StartKind
     code?: TerrainCode
     wallPattern?: [number, number, number, number][]
   }[] = []
@@ -3646,7 +3797,7 @@ function Legend({
             ? u.generic ? 'Neutral unit (yellow)' : 'Named neutral unit (yellow)'
             : u.yellow ? (u.generic ? 'Partner unit (yellow)' : 'Named partner unit (yellow)') : u.generic ? 'Ally' : 'Named ally'
           : UNIT_NAME[u.type]
-    unitKinds.set(label, unitSprite(u))
+    unitKinds.set(label, unitSprite(u, cb))
   }
   for (const [label, sprite] of unitKinds) items.push({ label, sprite })
   if (map.units.some((u) => u.drops?.length) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.drops?.length))
@@ -3662,28 +3813,40 @@ function Legend({
   if (map.units.some((u) => u.steal?.length) || arrivals.some((a) => a.kind === 'reinforcement' && a.unit.steal?.length))
     items.push({ label: takeBy === 'capture' ? 'Holds something rare: capture it to take it' : "Holds something rare to steal (it doesn't drop it)", sprite: STEAL_BADGE })
   if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type !== 'boss' && a.unit.type !== 'named'))
-    items.push({ label: 'Reinforcement', sprite: REINFORCEMENT })
-  if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'named')) items.push({ label: 'Named foe arriving', sprite: NAMED_REINFORCEMENT })
-  if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'boss')) items.push({ label: 'Boss arriving', sprite: BOSS_REINFORCEMENT })
-  if (arrivals.some((a) => a.kind === 'joiner' && !a.joiner.ally)) items.push({ label: 'Joins your army', sprite: JOINER })
+    items.push({ label: 'Reinforcement', sprite: k.reinforcement })
+  if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'named')) items.push({ label: 'Named foe arriving', sprite: k.namedReinforcement })
+  if (arrivals.some((a) => a.kind === 'reinforcement' && a.unit.type === 'boss')) items.push({ label: 'Boss arriving', sprite: k.bossReinforcement })
+  if (arrivals.some((a) => a.kind === 'joiner' && !a.joiner.ally)) items.push({ label: 'Joins your army', sprite: k.joiner })
   const allies = arrivals.flatMap((a) => (a.kind === 'joiner' && a.joiner.ally ? [a.joiner] : []))
-  if (allies.some((j) => !j.yellow && !j.neutral && !j.generic)) items.push({ label: 'Named green unit arrives', sprite: ALLY })
-  if (allies.some((j) => !j.yellow && !j.neutral && j.generic)) items.push({ label: 'Green unit arrives', sprite: COMMON_ALLY })
-  if (allies.some((j) => j.yellow && !j.generic)) items.push({ label: 'Named partner unit arrives (yellow)', sprite: PARTNER })
-  if (allies.some((j) => j.yellow && j.generic)) items.push({ label: 'Partner unit arrives (yellow)', sprite: COMMON_PARTNER })
-  if (allies.some((j) => j.neutral && !j.generic)) items.push({ label: 'Named neutral unit arrives (yellow)', sprite: PARTNER })
-  if (allies.some((j) => j.neutral && j.generic)) items.push({ label: 'Neutral unit arrives (yellow)', sprite: COMMON_PARTNER })
-  if (triggers.length) items.push({ label: 'Area that brings a group in', swatch: '#f0883e', outline: true })
-  for (const set of map.rooms ?? []) items.push({ label: `${set.color === 'red' ? 'Red' : 'Blue'} room: ${set.effect}`, swatch: ROOM[set.color] })
-  if (map.changes.some((c) => c.zone)) items.push({ label: 'Trap: one of your units stopping inside springs it (tap it)', swatch: TRAP_ZONE, outline: true })
-  if (map.objectives.some((o) => o.type !== 'burn')) items.push({ label: 'Objective', swatch: '#38bdf8', outline: true })
+  if (allies.some((j) => !j.yellow && !j.neutral && !j.generic)) items.push({ label: 'Named green unit arrives', sprite: k.ally })
+  if (allies.some((j) => !j.yellow && !j.neutral && j.generic)) items.push({ label: 'Green unit arrives', sprite: k.commonAlly })
+  if (allies.some((j) => j.yellow && !j.generic)) items.push({ label: 'Named partner unit arrives (yellow)', sprite: k.partner })
+  if (allies.some((j) => j.yellow && j.generic)) items.push({ label: 'Partner unit arrives (yellow)', sprite: k.commonPartner })
+  if (allies.some((j) => j.neutral && !j.generic)) items.push({ label: 'Named neutral unit arrives (yellow)', sprite: k.partner })
+  if (allies.some((j) => j.neutral && j.generic)) items.push({ label: 'Neutral unit arrives (yellow)', sprite: k.commonPartner })
+  // An area a foe sets off (Fates' acid bogs: "as soon as an enemy reaches") is drawn red, a line of its own.
+  if (triggers.some((a) => a.who !== 'enemy'))
+    items.push({ label: 'Area that brings a group in', swatch: cb ? CB_LINE.area.colour : '#f0883e', dash: cb ? CB_LINE.area.dash : undefined, outline: true })
+  if (triggers.some((a) => a.who === 'enemy'))
+    items.push({ label: 'Area a foe reaching brings a group in', swatch: cb ? CB_LINE.foeArea.colour : '#ef4444', dash: cb ? CB_LINE.foeArea.dash : undefined, outline: true })
+  for (const set of map.rooms ?? [])
+    items.push({ label: `${set.color === 'red' ? 'Red' : 'Blue'} room: ${set.effect}`, swatch: ROOM[set.color], hatch: cb && set.color === 'red' })
+  if (map.changes.some((c) => c.zone))
+    items.push({
+      label: 'Trap: one of your units stopping inside springs it (tap it)',
+      swatch: cb ? CB_LINE.trap.colour : TRAP_ZONE,
+      dash: cb ? CB_LINE.trap.dash : undefined,
+      outline: true,
+    })
+  if (map.objectives.some((o) => o.type !== 'burn')) items.push({ label: 'Objective', swatch: cb ? CB_LINE.objective.colour : '#38bdf8', outline: true })
   if (map.objectives.some((o) => o.type === 'burn')) items.push({ label: 'Supplies to burn (objective)', sprite: SUPPLY_BOXES })
   if ([...map.units, ...arrivals.map((a) => (a.kind === 'reinforcement' ? a.unit : a.joiner))].some((u) => u.goesTo))
     items.push({ label: 'Where the tapped unit is headed', swatch: GOES_TO, outline: true })
-  for (const [gi, g] of (map.foeGroups ?? []).entries()) items.push({ label: `${g.label}'s tiles`, swatch: FOE_GROUP[gi], outline: true })
-  if (map.starts.length) items.push({ label: 'Starting tile', corners: '#3b82f6' })
-  if (map.corrinStart) items.push({ label: "Lord's start", corners: '#facc15' })
-  if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: FORCED })
+  for (const [gi, g] of (map.foeGroups ?? []).entries())
+    items.push({ label: `${g.label}'s tiles`, swatch: cb ? CB_FOE_GROUP[gi].colour : FOE_GROUP[gi], dash: cb ? CB_FOE_GROUP[gi].dash : undefined, outline: true })
+  if (map.starts.length) items.push({ label: 'Starting tile', corners: 'start' })
+  if (map.corrinStart) items.push({ label: "Lord's start", corners: 'lord' })
+  if (map.forced?.some((f) => f.tile)) items.push({ label: 'Forced unit (fixed tile)', corners: 'forced' })
   // Kinds of tile the game gives one name (Mystery of the Emblem's castle gate and its flanks, both "Castle") are labelled by what
   // each is, so the legend keeps them apart.
   // A building's pieces are one line: the building's.
@@ -3877,10 +4040,22 @@ function Legend({
           ) : it.corners ? (
             // The same corner marks the map draws on a starting tile.
             <svg width={16} height={16} viewBox="0 0 10 10" className="inline-block shrink-0 rounded-sm bg-[#b89a6a]" aria-hidden>
-              <g fill={it.corners}>
-                <path d="M0 0h3l-3 3z" />
-                <path d="M10 10h-3l3 -3z" />
+              <g fill={startCorners(it.corners, cb).fill} {...(cb ? { stroke: '#0a0a0a', strokeWidth: 0.35, strokeLinejoin: 'round' as const } : {})}>
+                {startCorners(it.corners, cb).paths(0, 0).map((d) => <path key={d} d={d} />)}
               </g>
+            </svg>
+          ) : it.outline && cb ? (
+            // The outline as the colour-blind look draws it: its colour and dashes over a dark line.
+            <svg width={16} height={16} viewBox="0 0 10 10" className="inline-block shrink-0" aria-hidden>
+              <rect x={1.2} y={1.2} width={7.6} height={7.6} fill={it.swatch} fillOpacity={0.12} stroke="#0a0a0a" strokeOpacity={0.75} strokeWidth={2.1} />
+              <rect x={1.2} y={1.2} width={7.6} height={7.6} fill="none" stroke={it.swatch} strokeWidth={1.4} strokeDasharray={it.dash} />
+            </svg>
+          ) : it.hatch ? (
+            <svg width={12} height={12} viewBox="0 0 10 10" className="inline-block shrink-0 rounded-sm" aria-hidden>
+              <rect width={10} height={10} fill={it.swatch} />
+              {[2.5, 5, 7.5, 10, 12.5, 15, 17.5].map((o) => (
+                <line key={o} x1={o - 10} y1={10} x2={o} y2={0} stroke="#1c0f05" strokeOpacity={0.6} strokeWidth={1} />
+              ))}
             </svg>
           ) : (
             <span
@@ -3953,6 +4128,7 @@ function TileInfo({
   burned: boolean
   onToggleBurn: () => void
 }) {
+  const cb = useColourBlind()
   if (!tile) {
     return (
       <section className="rounded border border-neutral-800 p-4 text-sm text-neutral-500">
@@ -4009,7 +4185,7 @@ function TileInfo({
       {units.map((u, i) => (
         <div key={`${u.name}-${i}`}>
           <p className={u.type === 'ally' ? (u.yellow || u.neutral ? 'text-yellow-300' : 'text-green-300') : 'text-red-300'}>
-            <PixelIcon sprite={unitSprite(u)} /> {u.yellow ? 'Partner unit' : u.neutral ? 'Neutral' : UNIT_NAME[u.type]}:{' '}
+            <PixelIcon sprite={unitSprite(u, cb)} /> {u.yellow ? 'Partner unit' : u.neutral ? 'Neutral' : UNIT_NAME[u.type]}:{' '}
             <span className="font-medium">{u.name}</span>
             {u.paired && !u.partner && u.type === 'enemy' && ' (two, paired up)'}
           </p>
@@ -4040,7 +4216,7 @@ function TileInfo({
       {here.map((a, i) =>
         a.kind === 'joiner' ? (
           <p key={`j${i}`} className={a.joiner.yellow || a.joiner.neutral ? 'text-yellow-300' : a.joiner.ally ? 'text-green-300' : 'text-blue-300'}>
-            <PixelIcon sprite={joinerSprite(a.joiner)} />{' '}
+            <PixelIcon sprite={joinerSprite(a.joiner, cb)} />{' '}
             {a.joiner.yellow
               ? 'Arrives as a partner unit (yellow)'
               : a.joiner.neutral ? 'Arrives neutral (yellow)' : a.joiner.ally ? 'Arrives as a green unit' : 'Joins your army'}:{' '}
@@ -4056,7 +4232,7 @@ function TileInfo({
         ) : (
           <div key={`r${i}`}>
             <p className="text-orange-300">
-              <PixelIcon sprite={reinforcementSprite(a.unit)} /> Reinforcement ({a.group})
+              <PixelIcon sprite={reinforcementSprite(a.unit, cb)} /> Reinforcement ({a.group})
               {a.unit.type === 'boss' ? ', boss' : a.unit.type === 'named' ? ', named foe' : ''}: <span className="font-medium">{a.unit.name}</span>
               {a.unit.paired && !a.unit.partner && ' (two, paired up)'}
               {a.unit.from && !sameTile(a.unit.from, a.unit.tile) && (

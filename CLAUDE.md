@@ -1206,6 +1206,17 @@ A global switch (header, any game) that lets someone play along without being to
 - **Everything fits a phone screen.** Tapping a weapon scrolls to its datasheet. A select is never wider than the screen (the game
   picker's longest option made the whole page scroll sideways): `src/index.css`.
 - **Wording works for every game** ("Lord's start", not "Corrin's start").
+- **The map page has a colour-blind friendly switch** (the user's call, 2026-11-26), beside "Info beside the map", remembered on the
+  device and off by default, so the watched maps keep their look. When it's on, nothing is told apart by colour alone, and the colours
+  are Okabe and Ito's, which stay apart for red-green and blue-yellow colour blindness alike (`COLOUR_BLIND` in `src/icons/sprites.ts`,
+  `ColourBlindContext`):
+  - each army's markers have a shape or an edge of their own: foes are vermillion dots, green units bluish-green diamonds and figures
+    edged in white, partner and neutral units yellow triangles, units joining you sky blue, and arrivals are hollow in orange;
+  - the lord's start has all four corners marked, and a forced unit's tile the other two;
+  - every outline has dashes of its own over a dark line, and the red rooms are hatched;
+  - the legend and the tile panel follow the switch.
+  A test checks that every pair of armies stays apart under simulated protanopia, deuteranopia and tritanopia
+  (`colourBlind.test.tsx`). Terrain needs nothing: its textures and icons already tell it apart.
 
 ## Process
 
