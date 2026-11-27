@@ -69,6 +69,13 @@ RUINED = ('fe17-c002-', 'fe17-m006', 'fe17-s012')
 # replace most of the current boxes"), the thin stacks along the canals, the market stands among them, crates ("the market
 # stands are boxes actually").
 CANAL_TOWNS = ('fe17-g005',)
+# The maps whose walls their scene builds of brick models (Stone_Wall06Brick, which a ruin's names match), the game's plain structures
+# (建造物), drawn as their walls' blocks, not ruins, and their rubble rubble wherever it lies, never a ruin's walls in a line (the user, in
+# the game, 2026-11-27: Fell Xenologue 5's "the various ruin tiles into bricks and the rubble stays rubble").
+BRICK_WALLS = ('fe17-e005',)
+# The maps whose lone stairs are staircases, none going down (the user, in the game, 2026-11-27: Fell Xenologue 5's "all staircases are
+# not down staircases on this map").
+NO_STAIRWELLS = ('fe17-e005',)
 PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall', 'q': 'Large Pillar'}
 # The colours a map's scene gets wrong, set by hand (the user's calls): the Last Engage's sky round its island the void, black; the
 # Mysterious Merchant's courtyard green grass, not dirt (its photos' sunlit grass); The Doting Sister's buildings its streets' dark
@@ -1678,7 +1685,10 @@ LIT_FILLS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__
 def stairwells(m):
     """Each Stairs tile the game marks for no battle (階段_戦禁: where its foes come up from below) with no Stairs beside it made
     stairs going down (`gl`); a lone plain Stairs tile is a step down to a lower floor, kept stairs (the user, the Mysterious Merchant's:
-    stairs going down only where they go off the map). Whether the map has any."""
+    stairs going down only where they go off the map), and none on a map whose stairs are all staircases (NO_STAIRWELLS). Whether the
+    map has any."""
+    if m['id'].startswith(NO_STAIRWELLS):
+        return False
     ids = TIDS.get(m['id'], {})
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     h, w = len(rows), len(rows[0]) if rows else 0
@@ -2552,6 +2562,8 @@ def game_looks(m):
         m['wideBridges'] = True
     if m.get('ruins'):
         m['variedRuins'] = True
+    if own.startswith(BRICK_WALLS):
+        m['plainRubble'] = True
     for field, value in (('decor', decor), ('wallLooks', looks), ('looksAs', looks_as)):
         if value:
             m[field] = value
@@ -2618,6 +2630,8 @@ def draw_buildings(m, blocks):
     for b in blocks:
         tiles = {tuple(t) for t in b['tiles']}
         kind = 'ruins' if b['kind'] == 'house' and ruined else b['kind']
+        if kind == 'ruins' and m['id'].startswith(BRICK_WALLS):
+            kind = None
         if kind == 'house':
             tiles = past_edge(tiles, width, h)
         xs, ys = [t[0] for t in tiles], [t[1] for t in tiles]

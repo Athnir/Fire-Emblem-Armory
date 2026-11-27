@@ -650,12 +650,18 @@ new game, so the same fixes don't have to be caught again. When the user settles
   braziers, Radiant Dawn's lit torch (the user: braziers are no candlesticks), one put out (篝火消) unlit, its statues (石像), coffins
   (石棺) and palisades (防柵) themselves, all on the ground round them
   (the palisades' photos read black); a lone Stairs tile stairs going down only where the game marks it for no battle (階段_戦禁,
-  where its foes come up), a lone plain one a step down to a lower floor (the Mysterious Merchant's); its bridges whole
+  where its foes come up), a lone plain one a step down to a lower floor (the Mysterious Merchant's), but none going down on Fell
+  Xenologue 5, whose stairs are all staircases (`NO_STAIRWELLS`: the user, in the game, 2026-11-27, "all staircases are not down
+  staircases on this map"); an effect laid over stairs (its Miasma on stairs) the stairs under its badge, on the stairs' ground
+  (Fell Xenologue 5's (25, 4), the middle of its flight, "25-4 is a staircase"; Chapter 19's (9, 19) the same); its bridges whole
   (`wideBridges`), stone where its scene builds them so (A Land in Bloom's, the Sage Lord's); Queen Lumera's white stone road
   paving and Serenity in Ruin's town paved as its render shows it; a crater amid the lava the lava; the Brash General's walls its
   cave's rock but its temple's; low walls and buildings drawn as no house, fort or stall in its walls' stone (the Kingdom of Might's,
   the Ancestor's), Dancer in the Ruins' towers no fort; a sigil set in a castle's floor that floor; houses the map's edge cuts
-  carried past it (the Desert Dunes', the Oasis's), a lone leftover a small house; its ruins varied; and no wall pushed into the
+  carried past it (the Desert Dunes', the Oasis's), a lone leftover a small house; its ruins varied, but the walls a scene builds of
+  brick models (Stone_Wall06Brick, which a ruin's names match; the game's plain structures, 建造物) its walls' blocks, and its rubble
+  rubble wherever it lies, never a ruin's walls in a line (`BRICK_WALLS`, `plainRubble`: Fell Xenologue 5's, the user, in the game,
+  2026-11-27, "the various ruin tiles into bricks and the rubble stays rubble"); and no wall pushed into the
   void by its shaded stairs' photo colours (`WALL_LEAST`), what lies beyond the Final Guardian's and the Azure Twin's walls the void).
   Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left

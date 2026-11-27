@@ -454,6 +454,9 @@ export interface ChapterMap {
   /** Its ruins' pieces varied tile to tile, a ruin's wall among fallen drums, blocks and arch stones (Three Houses': the user, other
    * rubble tiles to break them up). */
   variedRuins?: true
+  /** Its rubble drawn as rubble wherever it lies, never a ruin's walls where it runs in a line (Engage's Fell Xenologue 5: the user,
+   * in the game, "the rubble stays rubble"). */
+  plainRubble?: true
   /** Its rock outcrops (`decor` 'outcrop') in the colour of the rock they're drawn over, as its scenes draw them (Engage's: tan
    * sandstone on the beach, dark rock in the volcano, snowy rock in the north). */
   outcropTint?: true

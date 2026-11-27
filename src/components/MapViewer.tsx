@@ -1255,9 +1255,9 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (/stone|rock/i.test(name)) return BOULDER
     if (/barrel/i.test(name)) return BARREL
     if (/cracked wall/i.test(name)) return CRACKED_WALL
-    // Rubble laid in a line three tiles or more is a ruin's wall (Engage's ruined walls and mazes); the rest is rubble, its three
-    // small rocks (the user's call).
-    if (/ruin/i.test(name) || inLine(map, at, 'wj', 3)) return RUINS
+    // Rubble laid in a line three tiles or more is a ruin's wall (Engage's ruined walls and mazes), but on a map whose rubble is all
+    // rubble (`plainRubble`: Fell Xenologue 5's, the user); the rest is rubble, its three small rocks (the user's call).
+    if (/ruin/i.test(name) || (!map.plainRubble && inLine(map, at, 'wj', 3))) return RUINS
   }
   // A house in ruins (a Fates challenge's, its village spent; Engage's ruined villages) is a ruin's walls; its village before it no
   // house but rubble-strewn ground (GroundDetail's stones).
@@ -2112,6 +2112,11 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
         out.set(tileKey([x, y]), set)
         continue
       }
+      // An effect laid over stairs on the stairs (onStairs).
+      if (onStairs(map, [x, y])) {
+        out.set(tileKey([x, y]), 'tc')
+        continue
+      }
       // A barrel beside a pier's or a ship's boards stands on the wood (`barrelsOnWood`: The Sacred Stones' Eirika 9, the user).
       if (map.barrelsOnWood && c === 'o1') {
         let wood: TerrainCode | undefined
@@ -2320,6 +2325,12 @@ const TERRAIN_SPRITE: Partial<Record<TerrainCode, Sprite>> = {
 
 /** An effect laid over woods or pillars keeps their icon under its badge. */
 const UNDER_SPRITE: Partial<Record<TerrainCode, Sprite>> = { eb: TREE, ed: TREE, eh: PILLAR }
+/** An effect laid over stairs, which the game names so ("Miasma on stairs": Engage's), keeps the stairs under its badge, on the stairs'
+ * ground (Fell Xenologue 5's (25, 4), the middle of its flight: the user, in the game, "25-4 is a staircase"). */
+const onStairs = (map: ChapterMap, t: Tile) => {
+  const c = codeAt(map, t)
+  return !!c && c[0] === 'e' && BADGE_TERRAIN.has(c) && / on stairs$/i.test(terrainName(map, t))
+}
 
 /** Terrain whose own icon is a building you visit (a village, the GBA games' houses, a church: Thracia 776's churches you visit, the
  * user, not a house on them): a village or house standing on it needs no house drawn on top. */
@@ -3264,7 +3275,7 @@ export function MapGrid({
                 })}
               </>
             )}
-            {UNDER_SPRITE[letter] && <SpriteG sprite={UNDER_SPRITE[letter]} x={X} y={Y} />}
+            {(UNDER_SPRITE[letter] || onStairs(map, t)) && <SpriteG sprite={UNDER_SPRITE[letter] ?? STAIRS} x={X} y={Y} />}
             {yard && <SpriteG sprite={yard} x={X} y={Y} />}
             {scenery ? (
               <SpriteG sprite={map.yurts ? YURT_HOUSE : TOWN_HOUSE} x={X} y={Y} />
