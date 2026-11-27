@@ -337,7 +337,7 @@ export interface ChapterMap {
    * (Mystery of the Emblem's deserts), an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24), stairs on a
    * floor or path (Mystery of the Emblem's, which play as the tile they're on), rocks where the game's bones lie (Awakening's Chapter 9,
    * whose scene draws rocks there), Echoes' heaps of stones, thick pillars (one great pillar a block two by two) and torches (drawn as
-   * candlesticks: the user). */
+   * candlesticks: the user), and tables holding vases, one table along a run of them (Fates' Paralogue 22's partitions: the user). */
   decor?: Record<
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
@@ -346,7 +346,7 @@ export interface ChapterMap {
     | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
     | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown'
     | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad' | 'stones' | 'thickPillar' | 'torch' | 'outcrop'
-    | 'palisade' | 'coffin' | 'brazier' | 'brazierOut'
+    | 'palisade' | 'coffin' | 'brazier' | 'brazierOut' | 'vaseTable'
   >
   /** The blocks its roofs and stalls are drawn over, (x0, x1, y0, y1) each, where buildings side by side would join into one block of
    * one paint (Three Houses': each building block parted into the rectangles a roof covers, the user's call: roofs as Fates' are). */

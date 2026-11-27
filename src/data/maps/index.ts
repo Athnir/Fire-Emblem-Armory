@@ -164,6 +164,7 @@ function withGameLooks(map: ChapterMap): ChapterMap {
     ...(game.standOn ? { standOn: game.standOn } : {}),
     ...(game.greyRoofs ? { greyRoofs: true as const } : {}),
     ...(game.muckAsBog ? { muckAsBog: true as const } : {}),
+    ...(game.boldFences ? { boldFences: true as const } : {}),
     ...(game.bridgeFloors ? { bridgeFloors: game.bridgeFloors, wholeBridges: game.wholeBridges } : {}),
     ...(game.warps ? { warps: game.warps } : {}),
     ...(game.links && !map.links ? { links: game.links } : {}),

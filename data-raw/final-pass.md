@@ -6,10 +6,6 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Game | Map | What to check | The user's note |
 | --- | --- | --- | --- |
 | Awakening | Rogues & Redeemers 1 and 2 (`fe13-dlc13`, `fe13-dlc14`) | The same: the villages' look; but its map has no villages (a ruined stone maze in a forest): the user asked what their note meant there (2026-11-26) | "same note as 3" |
-| Fates | Paralogue 16, Abducted (`fe14-x16`) | The whole map against the game: the render's overgrown halls are hard to read | "Map image issues" |
-| Fates | Museum Melee (`fe14-dlc-6b`) | The rest of the map against the game (its Exit tiles a purple pad and its sky the void since 2026-11-26) | "will wan to look at manually for this map for the rest" |
-| Fates | Paralogue 16's challenge (`fe14-x16-challenge`) | Its stairs, with Paralogue 16 above | "Check" |
-| Fates | Paralogue 22 and its challenge (`fe14-x22`, `fe14-x22-challenge`) | Its stairs: (9, 3) to (9, 4), (19, 3) to (19, 4), (2, 24) to (3, 24), (22, 24) to (23, 24) and its openings | kept for the manual check; "Check" |
 | Three Houses | Silver Snow 26 (`fe16-26-ss`; Verdant Wind 26 the same stage) | The whole map against the game: its neon lights make the photos too odd to grade by | "will have to manually load the map" |
 | Three Houses | Crimson Flower 37 (`fe16-37-cf`) | Which of its houses stand and which are in ruins (all in ruins now) | "Can load manually if needed" |
 | Gaiden | Its forts, every map (the fort tile, $DA: 103 tiles on 40 maps) | Draw them as the supply tile (`nd`: a fort's numbers, a grain sack before a crate), as Echoes' supplies, which remake them, are drawn since its review of 2026-11-25; Gaiden is frozen, so it waits for this pass | "lets make a supply tile variant for the fort that we can use for 2 and 15, will replace them in 2 in the final run but they are not really fort tiles" |
@@ -33,6 +29,9 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Radiant Dawn | Part 3 Ch.7, Rivals Collide (`fe10-3-7`) | "7 is all dirt", "just make sure that you can see the difference between the river and the dirt tiles" (2026-11-26) | Its plain dirt (`PLAIN_AS`), its river a muddy riverbed a clear step darker (`FILL_FIXES`) |
 | Awakening | Champions of Yore 1-3 and Lost Bloodlines 1-3 (`fe13-dlc1` to `fe13-dlc3`, `fe13-dlc7` to `fe13-dlc9`) | "yeah they're the zoomed out type, redraw them", "lost bloodlines is also zoomed out" (2026-11-26, from the Outrealm Gate) | Their villages' buildings drawn as Shadow Dragon's and New Mystery's walled compounds ("you can use the ones from 11 and 12": `walledVillages`, `va`-`vi`, `fliers_buildings`), and Paralogues 2, 3, 13, 18 and 20's, the same building |
 | Awakening | Paralogue 14, Shadow in the Sands (`fe13-par14`) | "it really is only one tile for the villages" (2026-11-26, through a Citra mod putting its files under Chapter 5's: the heights stayed Chapter 5's) | Nothing to change: its villages are single tiles, as drawn |
+| Fates | Paralogue 16 and its challenge (`fe14-x16`, `fe14-x16-challenge`) | "all of the partition tiles are candlesticks and lighting" (2026-11-26) | Its partitions candlesticks (`PARTITION_DECOR`); its stairs and the rest unremarked |
+| Fates | Paralogue 22 and its challenge (`fe14-x22`, `fe14-x22-challenge`) | "from (11, 23) to (17, 12), all partitions are candles. the remaining partition groups are all 1x3 tables holding vases" (2026-11-26) | Candles in that box, tables holding vases the rest (`vaseTable`; the lone one at (17, 3), under a chest, a table too) |
+| Fates | Museum Melee (`fe14-dlc-6b`) | "all partitions on this map and the wooden boxes connected to each other ... are wooden fences like in fe 10 3-2, the single wooden boxes are however still wooden boxes. all the breakable tiles are all stone bricks" (2026-11-26) | Fences bold, the two single boxes crates, its breakable walls stone bricks in its walls' grey (`FENCE_MAPS`) |
 | Three Houses | Chapter 9 (`fe16-9`) | Its ruins (varied tile to tile since 2026-11-26) against the game | "manual" |
 
 ## The look-over's checks (2026-11-26)

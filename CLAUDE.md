@@ -433,7 +433,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   flights either side of its carpet stairs (`STEPS`); Conquest 23's three partitions braziers, Radiant Dawn's lit torch
   (`TILE_DECOR`), Conquest 26's torches (篝火) candlesticks (`NAMED_DECOR`); Revelation 13's obstacles on the stone or the dock's wood
   under each in its photos; Revelation 21's rooms red and blue as its photos show the battle starting (the other way round from the
-  user's scouting screenshots). The chapters written by hand take the builder's looks too
+  user's scouting screenshots). The final pass (2026-11-26, the user's notes): Paralogue 16's partitions candlesticks ('candlesticks and
+  lighting'), Paralogue 22's candles from (11, 23) to (17, 12) and the rest tables holding vases, one table along each run of three
+  (`PARTITION_DECOR`, decor `vaseTable`), their challenges the same; Museum Melee's partitions, and its boxes joined in pairs, wooden
+  fences bold as Radiant Dawn's, its single boxes crates and its breakable walls stone bricks in its walls' grey, its photos' cracked
+  grey stone (`FENCE_MAPS`). A decor over a tile fliers cross says so in the legend. The chapters written by hand take the builder's looks too
   (`index.ts`'s `withGameLooks`); a hall's few plain tiles its floor (`PLAIN_AS_FLOOR`: Revelation 25's); a pot on its round stone base; Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
   same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, Birthright 25's walls
   standing alone in its halls its pillars (`decor`: the user's calls); where its buildings join into blocks the house rule can't part

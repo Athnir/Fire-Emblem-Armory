@@ -749,7 +749,7 @@
   }
  },
  "fates": {
-  "frozen": "2026-11-26",
+  "frozen": "2026-11-27",
   "maps": {
    "fe14-1": "f5e69b2020d254304ef2",
    "fe14-2": "9a60d2ec7ddb54141cc7",
@@ -840,18 +840,18 @@
    "fe14-x13": "da15fd7abe9bdf271062",
    "fe14-x14": "06acd9a34846bdbb4746",
    "fe14-x15": "ce4fe0a5cc04efe514ec",
-   "fe14-x16": "4f863d70aba4aa1bb8b4",
+   "fe14-x16": "d0e3ae6b24c8c8951fd0",
    "fe14-x17": "2a0ea67c5b9310d634d2",
    "fe14-x18": "53e6f4503fe5f5b9b0d3",
    "fe14-x19": "827a6aaf34730ac8712b",
    "fe14-x20": "880a83c6bac6e2be81a3",
    "fe14-x21": "08bbc53dbd8e09f552c1",
-   "fe14-x22": "a144c3e51e2c01c822dc",
+   "fe14-x22": "0738df9525cc3b51bad5",
    "fe14-dlc-40": "6017dc3fd4c4c8892f9f",
    "fe14-dlc-67": "b44377514b51c34ce09d",
    "fe14-dlc-68": "c47268d7b98ede51c90d",
    "fe14-dlc-6a": "8f7bd76f3f5d53d29d12",
-   "fe14-dlc-6b": "f2af77e6479337e1c68a",
+   "fe14-dlc-6b": "0076be070c40de408259",
    "fe14-dlc-6d": "1e75a36ea7633d49a6ff",
    "fe14-dlc-6f": "cb2c5e6e09bc9aeb9a3c",
    "fe14-dlc-70": "a26ebcfc0e4805b8b61d",
@@ -927,13 +927,13 @@
    "fe14-x13-challenge": "6c7ee394a18974cb3539",
    "fe14-x14-challenge": "65af6eb0ff15ad072762",
    "fe14-x15-challenge": "88686e1b7f45fcc1ee00",
-   "fe14-x16-challenge": "48bc5cc4871b982e8e6b",
+   "fe14-x16-challenge": "710a9a05354d96c69274",
    "fe14-x17-challenge": "f0c641a0bda5c6a0b8ae",
    "fe14-x18-challenge": "86d00a04516e6484ba05",
    "fe14-x19-challenge": "ee0057449339642ef407",
    "fe14-x20-challenge": "734ca05d7f27181f4af2",
    "fe14-x21-challenge": "64ba4c5907f70940dd3a",
-   "fe14-x22-challenge": "7a594cc802697a6550f2"
+   "fe14-x22-challenge": "5e1059933c6a76e1eca5"
   }
  },
  "fe15": {

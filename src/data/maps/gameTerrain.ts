@@ -36,7 +36,7 @@ export interface GameTerrain {
   /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */
   ruins?: string[]
   /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user), or the void (Museum Melee's sky). */
-  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void'>
+  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void' | 'fence' | 'wall'>
   /** Tiles drawn as another code, their numbers kept (Boo Camp's partitions as its walls, Museum Melee's Exit as a purple pad). */
   looksAs?: Record<string, TerrainCode>
   /** The ground an icon stands on, by tile (Ghostly Gold's rubble on grass, Revelation 13's obstacles on stone or wood). */
@@ -45,6 +45,8 @@ export interface GameTerrain {
   greyRoofs?: true
   /** Its muck drawn as a bog, no icon (Boo Camp's: the user). */
   muckAsBog?: true
+  /** Its wooden fences bold, light wood edged dark (Museum Melee's, as Radiant Dawn's: the user). */
+  boldFences?: true
   /** Floor its art draws as wooden bridges, drawn as them, and those bridges' boxes (Revelation 13's: the user). */
   bridgeFloors?: string[]
   wholeBridges?: [number, number, number, number][]
@@ -4361,6 +4363,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14-x16': {
     code: 'X016',
     fills: { ga: '#b0ac7a', t1: '#5d5d3d', ta: '#898d4b', wa: '#7e6a58' },
+    decor: { '18,14': 'candle', '18,16': 'candle', '18,18': 'candle', '19,14': 'candle', '19,18': 'candle', '20,14': 'candle', '20,18': 'candle', '21,14': 'candle', '21,18': 'candle', '7,13': 'candle', '7,14': 'candle', '7,18': 'candle', '7,19': 'candle', '8,13': 'candle', '8,14': 'candle', '8,18': 'candle', '8,19': 'candle' },
     width: 27,
     height: 25,
     grid: [
@@ -4667,7 +4670,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14-x22': {
     code: 'X022',
     fills: { t1: '#74685c', wa: '#554b44' },
-    decor: { '19,3': 'stairs', '19,4': 'stairs', '2,24': 'stairs', '22,24': 'stairs', '23,24': 'stairs', '3,24': 'stairs', '9,3': 'stairs', '9,4': 'stairs' },
+    decor: { '11,12': 'candle', '11,13': 'candle', '11,17': 'candle', '11,18': 'candle', '11,19': 'candle', '12,12': 'candle', '12,13': 'candle', '12,17': 'candle', '13,17': 'candle', '13,23': 'candle', '14,23': 'candle', '15,17': 'candle', '15,23': 'candle', '16,12': 'candle', '16,13': 'candle', '16,17': 'candle', '17,12': 'candle', '17,13': 'candle', '17,17': 'candle', '17,18': 'candle', '17,19': 'candle', '17,3': 'vaseTable', '19,15': 'vaseTable', '19,16': 'vaseTable', '19,17': 'vaseTable', '19,21': 'vaseTable', '19,22': 'vaseTable', '19,23': 'vaseTable', '19,3': 'stairs', '19,4': 'stairs', '2,24': 'stairs', '22,24': 'stairs', '23,24': 'stairs', '3,24': 'stairs', '9,15': 'vaseTable', '9,16': 'vaseTable', '9,17': 'vaseTable', '9,21': 'vaseTable', '9,22': 'vaseTable', '9,23': 'vaseTable', '9,3': 'stairs', '9,4': 'stairs' },
     width: 27,
     height: 29,
     grid: [
@@ -4937,9 +4940,10 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14-dlc-6b': {
     code: 'E000',
     fills: { ge: '#733f90', t1: '#938e7b', ta: '#8a4550', wa: '#6a6b5e' },
-    decor: { '10,9': 'crates', '12,13': 'pillar', '14,9': 'crates', '15,10': 'crates', '15,11': 'crates', '15,15': 'crates', '15,16': 'crates', '15,5': 'crates', '16,5': 'crates', '8,5': 'crates', '9,10': 'crates', '9,11': 'crates', '9,15': 'crates', '9,16': 'crates', '9,5': 'crates' },
-    wallLooks: { '1,1': 'void', '1,18': 'void', '1,19': 'void', '1,2': 'void', '1,26': 'void', '1,27': 'void', '1,28': 'void', '1,29': 'void', '1,3': 'void', '1,4': 'void', '1,5': 'void', '1,6': 'void', '1,7': 'void', '16,28': 'void', '16,29': 'void', '17,26': 'void', '17,27': 'void', '17,28': 'void', '17,29': 'void', '18,20': 'void', '18,21': 'void', '18,24': 'void', '18,25': 'void', '18,26': 'void', '18,27': 'void', '18,28': 'void', '18,29': 'void', '19,10': 'void', '19,11': 'void', '19,15': 'void', '19,16': 'void', '19,17': 'void', '19,18': 'void', '19,19': 'void', '19,20': 'void', '19,28': 'void', '19,29': 'void', '19,9': 'void', '2,1': 'void', '2,2': 'void', '2,28': 'void', '2,29': 'void', '2,3': 'void', '2,4': 'void', '2,5': 'void', '2,6': 'void', '2,7': 'void', '20,1': 'void', '20,18': 'void', '20,19': 'void', '20,4': 'void', '20,5': 'void', '20,6': 'void', '21,19': 'void', '21,5': 'void', '22,5': 'void', '23,19': 'void', '23,20': 'void', '23,28': 'void', '23,29': 'void', '23,5': 'void', '3,1': 'void', '3,2': 'void', '3,29': 'void', '3,3': 'void', '3,4': 'void', '3,5': 'void', '3,6': 'void', '3,7': 'void', '4,1': 'void', '4,17': 'void', '4,18': 'void', '4,2': 'void', '4,28': 'void', '4,29': 'void', '4,3': 'void', '4,4': 'void', '4,5': 'void', '4,6': 'void', '4,7': 'void', '4,8': 'void', '5,10': 'void', '5,11': 'void', '5,15': 'void', '5,16': 'void', '5,17': 'void', '5,18': 'void', '5,19': 'void', '5,26': 'void', '5,27': 'void', '5,28': 'void', '5,29': 'void', '5,9': 'void', '6,20': 'void', '6,23': 'void', '6,24': 'void', '6,25': 'void', '6,26': 'void', '6,27': 'void', '6,28': 'void', '6,29': 'void', '7,26': 'void', '7,27': 'void', '7,28': 'void', '7,29': 'void', '8,28': 'void', '8,29': 'void' },
+    decor: { '10,9': 'crates', '12,13': 'pillar', '14,9': 'crates' },
+    wallLooks: { '1,1': 'void', '1,18': 'void', '1,19': 'void', '1,2': 'void', '1,26': 'void', '1,27': 'void', '1,28': 'void', '1,29': 'void', '1,3': 'void', '1,4': 'void', '1,5': 'void', '1,6': 'void', '1,7': 'void', '15,10': 'fence', '15,11': 'fence', '15,15': 'fence', '15,16': 'fence', '15,18': 'wall', '15,19': 'wall', '15,5': 'fence', '16,18': 'wall', '16,19': 'wall', '16,28': 'void', '16,29': 'void', '16,5': 'fence', '17,18': 'wall', '17,19': 'wall', '17,21': 'fence', '17,24': 'fence', '17,26': 'void', '17,27': 'void', '17,28': 'void', '17,29': 'void', '17,7': 'wall', '17,8': 'wall', '18,20': 'void', '18,21': 'void', '18,24': 'void', '18,25': 'void', '18,26': 'void', '18,27': 'void', '18,28': 'void', '18,29': 'void', '18,7': 'wall', '18,8': 'wall', '19,10': 'void', '19,11': 'void', '19,15': 'void', '19,16': 'void', '19,17': 'void', '19,18': 'void', '19,19': 'void', '19,20': 'void', '19,28': 'void', '19,29': 'void', '19,7': 'fence', '19,8': 'fence', '19,9': 'void', '2,1': 'void', '2,2': 'void', '2,28': 'void', '2,29': 'void', '2,3': 'void', '2,4': 'void', '2,5': 'void', '2,6': 'void', '2,7': 'void', '2,8': 'fence', '20,1': 'void', '20,18': 'void', '20,19': 'void', '20,4': 'void', '20,5': 'void', '20,6': 'void', '21,19': 'void', '21,20': 'fence', '21,4': 'fence', '21,5': 'void', '22,4': 'fence', '22,5': 'void', '22,6': 'fence', '23,19': 'void', '23,2': 'fence', '23,20': 'void', '23,28': 'void', '23,29': 'void', '23,3': 'fence', '23,4': 'fence', '23,5': 'void', '3,1': 'void', '3,2': 'void', '3,29': 'void', '3,3': 'void', '3,4': 'void', '3,5': 'void', '3,6': 'void', '3,7': 'void', '4,1': 'void', '4,17': 'void', '4,18': 'void', '4,2': 'void', '4,28': 'void', '4,29': 'void', '4,3': 'void', '4,4': 'void', '4,5': 'void', '4,6': 'void', '4,7': 'void', '4,8': 'void', '5,10': 'void', '5,11': 'void', '5,15': 'void', '5,16': 'void', '5,17': 'void', '5,18': 'void', '5,19': 'void', '5,2': 'fence', '5,26': 'void', '5,27': 'void', '5,28': 'void', '5,29': 'void', '5,7': 'fence', '5,8': 'fence', '5,9': 'void', '6,20': 'void', '6,23': 'void', '6,24': 'void', '6,25': 'void', '6,26': 'void', '6,27': 'void', '6,28': 'void', '6,29': 'void', '6,7': 'wall', '6,8': 'wall', '7,18': 'wall', '7,19': 'wall', '7,23': 'fence', '7,24': 'fence', '7,26': 'void', '7,27': 'void', '7,28': 'void', '7,29': 'void', '7,7': 'wall', '7,8': 'wall', '8,18': 'wall', '8,19': 'wall', '8,28': 'void', '8,29': 'void', '8,5': 'fence', '9,10': 'fence', '9,11': 'fence', '9,15': 'fence', '9,16': 'fence', '9,18': 'wall', '9,19': 'wall', '9,5': 'fence' },
     looksAs: { '19,2': 'ge', '19,3': 'ge' },
+    boldFences: true,
     width: 23,
     height: 29,
     grid: [

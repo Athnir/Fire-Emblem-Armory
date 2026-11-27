@@ -5125,6 +5125,33 @@ export function slabPiece(top: boolean, left: boolean, right: boolean, bottom: b
   return { palette: { o: '#3a3028', l: '#d2c6ae', m: '#a89b84', d: '#7a6e5c' }, rows }
 }
 
+/** A table holding vases, seen from above (Fates' Paralogue 22, its partitions three tiles long: the user, '1x3 tables holding vases'):
+ * one wooden top along a run of tiles, a tile at a time, its rim and corners only where the table ends (`top` and the rest: that side
+ * has no table beyond it), its grain along the table, and a blue vase standing on each tile. */
+export function vaseTablePiece(top: boolean, left: boolean, right: boolean, bottom: boolean, along: 'ns' | 'ew'): Sprite {
+  const x0 = left ? 1 : 0, x1 = right ? 8 : 9, y0 = top ? 1 : 0, y1 = bottom ? 8 : 9
+  // The vase: a rim, a neck, a round body with a lit side, on its foot (x 3-6, y 2-7).
+  const VASE = ['.kk.', 'kwwk', 'kBbk', 'kBbk', 'kbbk', '.kk.']
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      if (x < x0 || x > x1 || y < y0 || y > y1) return '.'
+      if (y >= 2 && y <= 7 && x >= 3 && x <= 6 && VASE[y - 2][x - 3] !== '.') return VASE[y - 2][x - 3]
+      // Its corners rounded a pixel where two of its edges meet.
+      const edgeX = (x === x0 && left) || (x === x1 && right)
+      const edgeY = (y === y0 && top) || (y === y1 && bottom)
+      if (edgeX && edgeY) return '.'
+      if (edgeX || edgeY) return 'o'
+      if ((top && y === y0 + 1) || (left && x === x0 + 1)) return 'L'
+      if ((bottom && y === y1 - 1) || (right && x === x1 - 1)) return 'D'
+      const across = along === 'ns' ? x : y
+      return across === 2 || across === 7 ? 'g' : 'W'
+    }).join(''))
+  return {
+    palette: { o: '#3a2616', L: '#c9955c', W: '#a8743f', g: '#8f6034', D: '#7c5129', k: '#1f2a44', w: '#e8eef6', B: '#9cc0e8', b: '#4f7cc0' },
+    rows,
+  }
+}
+
 /** A great bone over a block of tiles (Awakening's Chapter 10, the giant skeleton's ribs: the user, one bone structure, not an icon a
  * tile): pale bone a tile at a time, rounded at the block's outer corners, its grain running along the bone (`along`), shaded along its
  * outer sides, a pore here and there. */

@@ -147,6 +147,14 @@ NAMED_DECOR = {'fe14c-26': {'篝火': 'candle'}}
 # What's drawn over a tile, by tile: Conquest 23's three partitions braziers (the user: braziers, Radiant Dawn's Part 2 Ch.2 lit torch,
 # not candlesticks).
 TILE_DECOR = {'fe14c-23': {(14, 21): 'brazier', (22, 19): 'brazier', (29, 21): 'brazier'}}
+# What a map's partitions are, by box (x0, y0, x1, y1 in map tiles), the last kind the rest (`decor`; the user's final pass, 2026-11-26):
+# Paralogue 16's all candlesticks ('candlesticks and lighting'), Paralogue 22's candles from (11, 23) to (17, 12) and the rest tables
+# holding vases, three tiles long ('1x3 tables holding vases'). Their challenges are the same maps.
+PARTITION_DECOR = {'fe14-x16': ([], 'candle'), 'fe14-x22': ([((11, 12, 17, 23), 'candle')], 'vaseTable')}
+# Partitions, and its boxes (CRATE_BUILDINGS) joined to another, wooden fences, bold as Radiant Dawn's; its single boxes crates and its
+# breakable walls stone bricks in its walls' grey, as its photos show them, cracked grey stone (Museum Melee's: the user, 'wooden fences
+# like in fe 10 3-2', 'all the breakable tiles are all stone bricks').
+FENCE_MAPS = {'fe14-dlc-6b'}
 # The ground an icon stands on, by tile (`standOn`): Ghostly Gold's rubble on its grass (the user: the backdrop of these on grass),
 # Revelation 13's obstacles on the stone or the dock's wood under each in its photos (the user: some on the wrong ground).
 STAND_ON = {'fe14-dlc-6a': {(19, 8): 'ta', (22, 11): 'ta', (22, 12): 'ta'},
@@ -1075,6 +1083,19 @@ def main():
         for (x0, y0, x1, y1), colour in TOWN_STALLS.get(map_id, []):
             decor.update({f'{x},{y}': f'stall-{colour}' for x, y in rects([(x0, y0, x1, y1)])})
         decor.update({f'{x},{y}': 'crates' for x, y in TOWN_CRATES.get(map_id, [])})
+        if map_id in PARTITION_DECOR:
+            boxes, rest = PARTITION_DECOR[map_id]
+            for x, y in every('wg'):
+                decor[f'{x},{y}'] = next((k for (x0, y0, x1, y1), k in boxes if x0 <= x <= x1 and y0 <= y <= y1), rest)
+        if map_id in FENCE_MAPS:
+            crates = {tuple(map(int, k.split(','))) for k, v in decor.items() if v == 'crates'}
+            joined = {(x, y) for x, y in crates if {(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)} & crates}
+            for x, y in every('wg') | joined:
+                looks[f'{x},{y}'] = 'fence'
+                decor.pop(f'{x},{y}', None)
+            for b in m['breakables']:
+                looks[f"{b['tile'][0]},{b['tile'][1]}"] = 'wall'
+            m['boldFences'] = True
         for x0, y0, x1, y1, colour in ROOFS.get(map_id, []):
             decor.update({f'{x},{y}': f'roof-{colour}' for x, y in rects([(x0, y0, x1, y1)])})
         for box in WALLED_HOUSES.get(map_id, []):
@@ -1256,7 +1277,7 @@ def main():
         "  /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */",
         '  ruins?: string[]',
         "  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user), or the void (Museum Melee's sky). */",
-        "  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void'>",
+        "  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void' | 'fence' | 'wall'>",
         "  /** Tiles drawn as another code, their numbers kept (Boo Camp's partitions as its walls, Museum Melee's Exit as a purple pad). */",
         '  looksAs?: Record<string, TerrainCode>',
         "  /** The ground an icon stands on, by tile (Ghostly Gold's rubble on grass, Revelation 13's obstacles on stone or wood). */",
@@ -1265,6 +1286,8 @@ def main():
         "  greyRoofs?: true",
         "  /** Its muck drawn as a bog, no icon (Boo Camp's: the user). */",
         "  muckAsBog?: true",
+        "  /** Its wooden fences bold, light wood edged dark (Museum Melee's, as Radiant Dawn's: the user). */",
+        "  boldFences?: true",
         "  /** Floor its art draws as wooden bridges, drawn as them, and those bridges' boxes (Revelation 13's: the user). */",
         "  bridgeFloors?: string[]",
         "  wholeBridges?: [number, number, number, number][]",
@@ -1307,6 +1330,8 @@ def main():
             lines.append('    greyRoofs: true,')
         if m.get('muckAsBog'):
             lines.append('    muckAsBog: true,')
+        if m.get('boldFences'):
+            lines.append('    boldFences: true,')
         if m.get('bridgeFloors'):
             lines.append('    bridgeFloors: [' + ', '.join(f"'{t}'" for t in m['bridgeFloors']) + '],')
             lines.append('    wholeBridges: [' + ', '.join(f'[{a}, {b}, {c}, {d}]' for a, b, c, d in m['wholeBridges']) + '],')
