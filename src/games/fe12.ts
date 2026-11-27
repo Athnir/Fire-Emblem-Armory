@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { ChapterWeapons } from '../components/ChapterWeapons'
-import type { ChapterWeaponsConfig, ItemSource } from '../components/ChapterWeapons'
+import type { ChapterWeaponsConfig } from '../components/ChapterWeapons'
 import { Fe12Forge } from '../components/Fe12Forge'
 import { Fe12Supports } from '../components/Fe12Supports'
 import { MapViewer } from '../components/MapViewer'
@@ -11,8 +11,6 @@ import { FE12_TRIANGLE } from '../data/fe12/fe12Triangle'
 import { turnsUpAt, walkFork } from '../logic/spoiler'
 import { onDifficulty } from '../components/Difficulty'
 import type { GameParts } from '.'
-
-const dlc = (s: ItemSource) => s.kind.startsWith('dlc-')
 
 const WEAPONS: ChapterWeaponsConfig = {
   weapons: FE12_LISTED,
@@ -25,9 +23,7 @@ const WEAPONS: ChapterWeaponsConfig = {
   effectiveMultiplier: 3,
   rankLabel: (w) => (w.rank ? `Rank ${w.rank}` : 'No weapon rank'),
   shopName: 'shops',
-  routeName: (m) => (m.route === 'Extra' ? 'Archanean Chronicles' : m.route === 'DLC' ? 'DLC' : undefined),
-  // The three downloadable chapters' items (on the cartridge, opened by the Nintendo WFC download in 2009-2010).
-  optional: [{ label: 'Show DLC items', covers: dlc }],
+  // Nothing comes from the Archanean Chronicles or the downloadable chapters: one-map scenarios that keep nothing (build-fe12-maps.py).
   // The battle preparations' armory forges from Chapter 1 (MapTableData +0x18 0x04).
   extra: (w) => createElement(Fe12Forge, { weapon: w, opensAt: 'fe12-1' }),
 }
@@ -69,7 +65,7 @@ const parts: GameParts = {
     const index = new Map(story.maps.map((m, i) => [m.id, i]))
     const at = index.get(mapId)
     return FE12_LISTED.filter((w) => {
-      const sources = (FE12_ITEM_SOURCES[w.name] ?? []).filter((s) => !dlc(s) && onDifficulty(difficulty, s.difficulties))
+      const sources = (FE12_ITEM_SOURCES[w.name] ?? []).filter((s) => onDifficulty(difficulty, s.difficulties))
       const first = Math.min(Infinity, ...sources.map((s) => turnsUpAt(story, s.mapId, s.kind.endsWith('-later'))))
       return first === at
     }).length

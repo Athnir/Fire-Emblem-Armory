@@ -2,8 +2,9 @@ import type { ChapterWeapon } from '../../components/ChapterWeapons'
 import { FE12_ITEM_SOURCES } from './fe12ItemSources'
 import { FE12_WEAPONS } from './fe12Weapons'
 
-/** A source only foes give: what they carry and don't drop, on the story's maps or the downloadable ones. */
-const foeKind = (kind: string) => kind.replace(/^dlc-/, '').startsWith('foe')
+/** A source only foes give: what they carry and don't drop (the story's maps alone: the Chronicles and downloadable chapters give
+ * nothing). */
+const foeKind = (kind: string) => kind.startsWith('foe')
 
 /**
  * The weapons the weapon page lists: those something in the game hands out or a unit carries. A weapon only foes carry and never drop

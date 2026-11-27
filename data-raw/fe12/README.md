@@ -88,7 +88,9 @@ forge slots). Shadow Dragon's layouts where the tables match (`data-raw/fe11/REA
   10, Ogma in 4, Cain in 8, Athena in 13x, Est in 15) brings new copies, and Chapter 1's deployment brings in Gordin or Draug where
   the answers left him out (said with the answer). A talk's recruit among the starting foes says so on the unit before the stand-ins
   copy it (Jeorge, Astram, Sedgar, Wolf). The Archanean Chronicles' and the downloadable chapters' casts are their own and nothing
-  comes back from them (no ChapterNext, the convoy off): their units' gear is no source, as Path of Radiance's trial maps keep nothing.
+  comes back from them (no ChapterNext, the convoy off): they're one-map scenarios, so nothing on them (their units' gear, chests,
+  villages, drops) is a source, as Path of Radiance's trial maps keep nothing (the user's call, 2026-11-26), and the weapon page has no
+  DLC switch.
 - **Scripts**: Shadow Dragon's bytecode (`scripts/fe11_cmb.py`), with opcodes it never used (a switch's 0x44 dup and 0x3b jump if true,
   0x1f, 0x43 increment, 0x21 / 0x24 / 0x26 arithmetic, 0x33 >). Handler types: 0x03 and 0x17 a turn, 0x04 an area, 0x06 a tutorial
   step, 0x08 a talk, 0x09 a battle talk, 0x0b a death (startup.cmb's for Marth and the Avatar set gf_gameover), 0x18 a hidden treasure

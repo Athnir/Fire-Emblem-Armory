@@ -121,8 +121,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
 ## Weapons & forging
 
 - **List only what the player can get:** sold, forged, given, in a chest, village or hidden spot, dropped,
-  carried by a recruit, or stealable. A side story with a cast of its own gives no unit gear, as Path of Radiance's trial maps keep
-  nothing (New Mystery's Archanean Chronicles and DLC chapters: the look-over, 2026-11-26).
+  carried by a recruit, or stealable. A one-map scenario with a cast of its own that hands nothing back to the story gives the weapon
+  page nothing (its units' gear, chests, villages and drops alike), as Path of Radiance's trial maps keep nothing (New Mystery's
+  Archanean Chronicles and DLC chapters: the user's call, 2026-11-26); a side story of several chapters whose finish pays into the
+  main game (Fell Xenologue, Cindered Shadows) is listed behind its switch instead.
 - **Your units' gear counts once, from the chapter each unit first joins** (`kitAt` on a weapon in Path of Radiance and Radiant
   Dawn, `kit` in Fates): the weapon page says nothing about it, the weapon simply turns up in the list at the right chapter. In Path
   of Radiance (`build-fe9-items.py`'s `kit()`) a group a script places on your side (Ranulf's in Ch.23's opening), the first

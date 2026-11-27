@@ -1675,15 +1675,13 @@ def main():
     def source(iid, mid, kind, text, ds=None, limited=None):
         if iid.endswith('_FALSE'):
             return  # a double's false copy is never yours
-        if mid.startswith(('fe12-ac', 'fe12-dl')) and kind in ('kit', 'kit-later'):
-            # The Archanean Chronicles and the downloadable chapters have casts of their own (the Chronicles' PID_TR_ people; the
-            # downloadable chapters' made afresh, SetGameMode(2), the convoy off) and hand nothing back to the story (no ChapterNext):
-            # what their units carry is never yours, as nothing on Path of Radiance's trial maps is.
+        if mid.startswith(('fe12-ac', 'fe12-dl')):
+            # The Archanean Chronicles and the downloadable chapters are one-map scenarios with casts of their own (the Chronicles'
+            # PID_TR_ people; the downloadable chapters' made afresh, SetGameMode(2), the convoy off) that hand nothing back to the
+            # story (no ChapterNext): nothing found, carried or dropped there is ever yours, as nothing on Path of Radiance's trial
+            # maps is, so they give the weapon page nothing (the user's call, 2026-11-26).
             return
         name = item_name(iid)
-        # The downloadable chapters' sources sit behind the weapon page's DLC switch.
-        if mid.startswith('fe12-dl'):
-            kind = 'dlc-' + kind
         e = {'mapId': mid, 'kind': kind, 'text': text, **({'limited': limited} if limited else {})}
         if e not in sources[name]:
             sources[name].append(e)

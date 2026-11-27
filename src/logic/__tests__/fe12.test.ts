@@ -128,11 +128,6 @@ describe("New Mystery of the Emblem's maps", () => {
     expect(prep('Iron Sword').some((id) => id.startsWith('fe12-p'))).toBe(false)
   })
 
-  it("puts the downloadable chapters' items behind the DLC switch", () => {
-    const dl = Object.values(FE12_ITEM_SOURCES).flat().filter((s) => s.mapId.startsWith('fe12-dl'))
-    expect(dl.length).toBeGreaterThan(0)
-    expect(dl.every((s) => s.kind.startsWith('dlc-'))).toBe(true)
-  })
 })
 
 /** Fire Emblem Wiki's chapter boxes (New Mystery tab, Normal): the grid's columns and rows, the foes on the map at the start, and
@@ -323,9 +318,8 @@ describe("New Mystery of the Emblem's joins, as the placements make them", () =>
     expect(rows('Steel Lance', 'fe12-1')).toEqual([['kit', 'Carried by Draug on joining (if the answer at the end of Prologue V was No)']])
   })
 
-  it("takes nothing from the side stories: their casts are their own, their units' gear never yours", () => {
-    const side = Object.values(FE12_ITEM_SOURCES).flat().filter((s) => /^fe12-(ac|dl)/.test(s.mapId))
-    expect(side.some((s) => s.kind.replace(/^dlc-/, '').startsWith('kit'))).toBe(false)
+  it("takes nothing from the Chronicles and the downloadable chapters: one-map scenarios that keep nothing (the user's call)", () => {
+    expect(Object.values(FE12_ITEM_SOURCES).flat().filter((s) => /^fe12-(ac|dl)/.test(s.mapId))).toEqual([])
     expect(map('fe12-dl1').joiners!.map((j) => j.name)).toEqual(['Michalis', 'Feena'])
   })
 
