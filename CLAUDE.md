@@ -705,7 +705,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   walls"); its unknown terrain (???) that the grid gives another kind after the rooms the chapter's script opens, each block a
   closed room behind the doors beside it, opened with the door as the grid lays it after (`script_rooms`: Shambhala's three, SC26's
   CheckDoorOpened events running each room's SetupTerrainEffects; "the voids in blocks by doors are rooms that are able to be opened
-  but only with the story scripts"). The user's third look
+  but only with the story scripts"), and the group its script walks into a room as its door opens (Bias's, Pittacus's, Thales's)
+  shown with that room open (`opens` on the group: the user, "can you read the data of whats in there like you did in the earlier
+  games?"). The user's third look
   (2026-11-26): its craters, which take 20% of HP a turn, the cracked magma; its Avo Floor a gold ring round a dot (chevrons read as a
   ledge's); Chapter 4's altars its candle stands, one right over a pillar that pillar's top (`ALTAR_CANDLES`), Chapter 5's two
   impassable tiles candlesticks; Chapter 10's altar platform paved (`STONE_BOXES`), Chapter 3's night path traced by eye on the photos

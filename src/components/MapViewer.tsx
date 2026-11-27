@@ -2582,10 +2582,12 @@ export function MapViewer({ set }: { set: MapSet }) {
   }, [map, standIns, difficulty])
   // The map's states through its turns, and every change made in the one shown: the previewed ones, and its turns' up to `step`.
   const steps = useMemo(() => mapSteps(map), [map])
-  const active = useMemo(
-    () => (step ? new Set([...previewing, ...steps.slice(0, step).flatMap((s) => s.ids)]) : previewing),
-    [previewing, steps, step],
-  )
+  const active = useMemo(() => {
+    const made = step ? new Set([...previewing, ...steps.slice(0, step).flatMap((s) => s.ids)]) : previewing
+    // A group shown that comes through a door opening its room (`opens`: Three Houses' Shambhala) shows the room open, with it in.
+    const through = (map.reinforcements ?? []).flatMap((g) => (groups.has(g.id) && g.opens ? [g.opens] : []))
+    return through.length ? new Set([...made, ...through]) : made
+  }, [previewing, steps, step, map, groups])
 
   const potsBroken = map.changes.some((c) => c.breaksAllPots && active.has(c.id))
   // The map with every previewed change's terrain patch applied.

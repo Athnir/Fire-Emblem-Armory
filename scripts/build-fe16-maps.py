@@ -3955,6 +3955,15 @@ def main():
                     note(becomes, after_info)
                     patch.append({'tile': [c + 1, b.h - r], 'becomes': becomes})
                 note('ws', dict(tile_info(UNKNOWN), name='??? (a room the chapter opens)'))
+                # Who stands in the room comes through its door (the script's Walk and spawns on CheckDoorOpened): showing them shows
+                # the room open, through the door its time names first.
+                inside = {(c + 1, b.h - r) for r, c in room}
+                for g in m.get('reinforcements', []):
+                    tiles = {tuple(u['tile']) for u in g['units'] if u.get('tile')}
+                    when = ' '.join(g['when'].values()) if isinstance(g.get('when'), dict) else g.get('when') or ''
+                    named = sorted((when.find(f'({c + 1}, {b.h - r})'), c + 1, b.h - r) for r, c in doors if f'({c + 1}, {b.h - r})' in when)
+                    if tiles and tiles <= inside and named:
+                        g['opens'] = f'room-{named[0][1]}-{named[0][2]}'
                 for r, c in doors:
                     x, y = c + 1, b.h - r
                     becomes, after_info = kind_code(b.rows[r][c][1])

@@ -161,6 +161,9 @@ export interface ReinforcementGroup extends Arrival {
   /** The game's own group number ("Group 3"). */
   label: string
   units: (MapUnit & { from?: Tile })[]
+  /** The change it comes through (`MapChange.id`): a door that opens the closed room it stands in (Three Houses' Shambhala). Shown,
+   * the map shows that change made, so the room's open with its units in it. */
+  opens?: string
 }
 
 /** A playable unit that joins mid-chapter, walking in from `from` to `tile`. */
