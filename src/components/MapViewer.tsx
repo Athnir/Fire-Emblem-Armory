@@ -3997,20 +3997,29 @@ function Legend({
           return c === l ? [wallLook(map, t) ?? (map.looksAs?.[tileKey(t)] ? 'as' : 'own')] : []
         })),
       )
+      // A pit's or the void's line by its own tiles' name where the code's tiles go by several (Engage's Chapter 7: its sky the void,
+      // its collapsed floor holes).
+      const lookName = (look: string) => {
+        const names = new Set(map.grid.flatMap((row, i) => rowCodes(row).flatMap((c, x) => {
+          const t: Tile = [x + 1, map.height - i]
+          return c === l && wallLook(map, t) === look ? [terrainName(map, t)] : []
+        })))
+        return names.size === 1 ? [...names][0] : name
+      }
       if (looks.has('sandbags')) items.push({ label: 'Sandbags', sprite: SANDBAG_WALL })
       if (looks.has('pillar')) items.push({ label: 'Pillar', sprite: PILLAR_TOP })
       if (looks.has('wall'))
         items.push({ label: 'Outer wall', swatch: lowWallFill(map), wallPattern: BRICKS })
       if (looks.has('stone')) items.push({ label: `${name} (a low stone wall)`, swatch: stoneWallFill(map), wallPattern: BRICKS })
       if (looks.has('rock')) items.push({ label: `${name} (a cave's wall)`, swatch: caveFace(map), code: 'wt' })
-      if (looks.has('pit')) items.push({ label: `${name} (a pit)`, swatch: TERRAIN_FILL.wd!, code: 'wd' })
+      if (looks.has('pit')) items.push({ label: `${lookName('pit')} (a pit)`, swatch: TERRAIN_FILL.wd!, code: 'wd' })
       if (looks.has('ship')) items.push({ label: `${name} (a ship's wooden wall)`, swatch: TERRAIN_FILL.w9!, wallPattern: WALL_PATTERN.w9!.lines })
       if (looks.has('bricks')) items.push({ label: name, swatch: fillOf(map, l), wallPattern: BRICKS })
       if (looks.has('wood')) items.push({ label: `${name} (a ship's mast, cabin or hull)`, swatch: shipWood(map), code: 't3' })
       if (looks.has('timber')) items.push({ label: `${name} (a wooden wall)`, swatch: TIMBER, code: 't3' })
       if (looks.has('cliff')) items.push({ label: `${name} (a cliff)`, swatch: cliffRock(map), code: 'wt' })
       if (looks.has('sky')) items.push({ label: `${name} (the sky below)`, swatch: skyBelow(map), code: 'wf' })
-      if (looks.has('void')) items.push({ label: `${name} (a drop into the dark)`, swatch: VOID_COLOUR })
+      if (looks.has('void')) items.push({ label: `${lookName('void')} (a drop into the dark)`, swatch: VOID_COLOUR })
       if (!looks.has('own')) continue
     }
     // Rubble is drawn as what it is tile by tile (rubble, a ruin's walls, the trees, graves, stones and barrels a game names): a line

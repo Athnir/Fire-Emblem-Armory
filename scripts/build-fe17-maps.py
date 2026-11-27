@@ -2467,6 +2467,10 @@ def game_looks(m):
             decor.setdefault(k, DECOR_TIDS[tid])
         elif tid == 'TID_空' and code(x, y) == 'wd':
             looks[k] = 'void'
+        elif tid == 'TID_崩れた床' and code(x, y) == 'wd':
+            # A collapsed floor a hole, as the Tellius games' bridge holes are drawn (the user, in the game, 2026-11-27: Chapter 7's
+            # "cliff tiles in that map are actually holes", "build them as the bridge holes in the radiant games").
+            looks[k] = 'pit'
         elif tid == 'TID_進入不可' and own.startswith(VOID_BEYOND) and code(x, y) == 'wa':
             looks[k] = 'void'
         elif tid == 'TID_噴火口' and code(x, y) == 'wd' and any(code(x + dx, y + dy) == 'wp' for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):

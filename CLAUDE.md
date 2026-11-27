@@ -627,7 +627,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   its tiles drawn as the game names them by each map's own terrain ids, `game_looks`: its rocks (岩) and boulders (大岩) rock
   outcrops in the rock's own colour (`outcropTint`), but a block of rock along the map's edge bigger than twelve tiles its cliffs,
   its peaks and cliffs (山, 崖) standing apart from the edge, six tiles or fewer, outcrops too, and the Four Hounds' every one; its
-  sky (空) the void, as the Last Engage's; its large pillars (大柱) pillars, its candelabras (燭台) candlesticks, its beacons (篝火)
+  sky (空) the void, as the Last Engage's, and its collapsed floor (崩れた床) holes, as the Tellius games' bridge holes are drawn
+  (`wallLooks` 'pit': Chapter 7's, the user, in the game, 2026-11-27, "cliff tiles in that map are actually holes", "build them as
+  the bridge holes in the radiant games"; Fell Xenologue 3's, Path to War, and the Divine Paralogue The Lonely Heir's the same); its
+  large pillars (大柱) pillars, its candelabras (燭台) candlesticks, its beacons (篝火)
   braziers, Radiant Dawn's lit torch (the user: braziers are no candlesticks), one put out (篝火消) unlit, its statues (石像), coffins
   (石棺) and palisades (防柵) themselves, all on the ground round them
   (the palisades' photos read black); a lone Stairs tile stairs going down only where the game marks it for no battle (階段_戦禁,
