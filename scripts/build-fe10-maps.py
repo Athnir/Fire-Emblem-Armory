@@ -2096,7 +2096,21 @@ def look_fixes(m):
             m.get('fills', {}).pop(code, None)
         else:
             m.setdefault('fills', {})[code] = colour
+    # A torch stands on the ground round it, its object tile (`oe`) drawn on the ground most of its neighbours are (`standOn`: the
+    # user, in the game, 2026-11-26: Part 3 Ch.1's on its cobbles, not a block of stone).
+    code_at = {(i // 2 + 1, h - y): r[i:i + 2] for y, r in enumerate(m['grid']) for i in range(0, len(r), 2)}
+    for c in m.get('changes', []):
+        x, y = c['tile']['default'] if c.get('trigger') == 'torch' else (0, 0)
+        if code_at.get((x, y)) == 'oe':
+            beside = Counter(code_at.get((x + dx, y + dy)) for dx in (-1, 0, 1) for dy in (-1, 0, 1))
+            beside = [k for k, _ in beside.most_common() if k in TORCH_GROUND]
+            if beside:
+                m.setdefault('standOn', {})[f'{x},{y}'] = beside[0]
     return m
+
+
+# The ground a torch's tile can be drawn on: the walkable ground's codes.
+TORCH_GROUND = {'t0', 't1', 't2', 't3', 't4', 't7', 'ga', 'gb', 'gc', 'gd', 'ge'}
 
 
 # What a wall tile sharing its numbers with other kinds is drawn as, by the game's terrain name (`wallLooks`).

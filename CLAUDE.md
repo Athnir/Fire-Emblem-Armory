@@ -740,7 +740,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Ch.3's cliffs the app's grey rock, Part 3 Ch.6's shallows a muddy riverbed (the wiki's bigger capture of the map, its fog lifted: the
   user, 'mostly dirt'), the map at night as dark as Part 2 Ch.2, its trees in shade (`NIGHT_MAPS`: the user), Part 3 Ch.1's plain
   cobbles and Part 3 Ch.7's dirt, its river a muddy riverbed a clear step darker than the dirt (`PLAIN_AS`, `FILL_FIXES`: the user,
-  in the game, 2026-11-26: the river and the dirt told apart), and the Tower's abyss and its walls beyond its floor the void, black (`FILL_FIXES`: Endgame (1), (3) and (5), the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
+  in the game, 2026-11-26: the river and the dirt told apart), its torches on the ground round them, not a block of stone (`standOn`:
+  the user, the same day, Part 3 Ch.1's on its cobbles; Part 2 Ch.2's and Part 4 Ch.1's too), and the Tower's abyss and its walls beyond its floor the void, black (`FILL_FIXES`: Endgame (1), (3) and (5), the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
   before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats), a tent whose units come out of its side turned
   side-on, its door that way (`tentDoors`: Part 3 Ch.3's three, the user); a breakable wall the game gives a plain wall's
   code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone); its outer walls in the castle walls' colour as

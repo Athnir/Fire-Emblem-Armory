@@ -31,7 +31,7 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 
 | Game | Map | What the user saw | Done |
 | --- | --- | --- | --- |
-| Radiant Dawn | Part 3 Ch.1, Laguz and Beorc (`fe10-3-1`) | "ch.1 plains are cobble" (2026-11-26, through a chapter jump: `scripts/fe10_jump.py`) | Its plain paving (`PLAIN_AS`) |
+| Radiant Dawn | Part 3 Ch.1, Laguz and Beorc (`fe10-3-1`) | "ch.1 plains are cobble" (2026-11-26, through a chapter jump: `scripts/fe10_jump.py`) | Its plain paving (`PLAIN_AS`); "the torches should be on cobble not stone bricks": every Radiant Dawn torch on the ground round it (`standOn`) |
 | Radiant Dawn | Part 3 Ch.7, Rivals Collide (`fe10-3-7`) | "7 is all dirt", "just make sure that you can see the difference between the river and the dirt tiles" (2026-11-26) | Its plain dirt (`PLAIN_AS`), its river a muddy riverbed a clear step darker (`FILL_FIXES`) |
 | Three Houses | Chapter 9 (`fe16-9`) | Its ruins (varied tile to tile since 2026-11-26) against the game | "manual" |
 
