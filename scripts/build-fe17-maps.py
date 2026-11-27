@@ -2361,8 +2361,8 @@ def gated(tiles, w, tall):
 
 
 def ship_wood(m):
-    """A ship's edifices (the game's 'Ship') drawn in the ship's wood, and the obstacles on its decks as crates (the user, Chapter 18:
-    wood for ships, not bricks or stones)."""
+    """A ship's edifices (the game's 'Ship') drawn in the ship's wood, every one a wooden wall, never crates, and the obstacles on its
+    decks as crates (the user, Chapter 18: wood for ships, not bricks or stones; in the game, all its Ship tiles wooden walls)."""
     h = len(m['grid'])
     names = {}
     for code, o in (m.get('terrainOverrides') or {}).items():
@@ -2390,6 +2390,9 @@ def ship_wood(m):
             c = rows[h - y][x - 1]
             if c == 'oe' and name(x, y) == 'Ship':
                 m['wallLooks'] = dict(m.get('wallLooks') or {}, **{f'{x},{y}': 'wood'})
+                # Every Ship tile (no unit enters) the ship's wooden wall, never the crates its scene stands on some of them (the user,
+                # in the game, 2026-11-27: Chapter 18's "all tiles that are ship (impassable) as wood wall tiles").
+                (m.get('decor') or {}).pop(f'{x},{y}', None)
             elif c == 'wj' and 'Obstacle' in name(x, y) and any((x + dx, y + dy) in decks for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
                 m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'crates'})
 

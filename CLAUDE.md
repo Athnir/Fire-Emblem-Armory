@@ -622,7 +622,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   map's colour its scene gets wrong set by hand, `FILLS`: the Last Engage's sky black round its island; its junk two tiles by two
   drawn as wooden shacks over their tiles, its crack a badge, `SHACKS`: the Desert Dunes'; a dais of large pillars round a floor with
   stairs a small stone fort, `DAIS_FORTS`: the Caring Princess's, both the user's calls; a ship's low walls its rails and a mast the
-  game names a mast; a fort whose block lacks only its gate in its front row drawn whole, the gate its own tile, the Sage Lord's; rubble
+  game names a mast; every tile the game names Ship (no unit enters) the ship's wooden wall, its deck's wood a step darker, never the
+  crates its scene stands on some (`ship_wood`: the user, in the game, 2026-11-27, Chapter 18's "all tiles that are ship (impassable)
+  as wood wall tiles"; Chapter 19's and the Caring Princess's the same), the crates only its decks' obstacles; a fort whose block lacks only its gate in its front row drawn whole, the gate its own tile, the Sage Lord's; rubble
   across a bridge over water the bridge broken, its planks, the Crux of Fate's: the user's calls; and the user's look of 2026-11-26,
   its tiles drawn as the game names them by each map's own terrain ids, `game_looks`: its rocks (岩) and boulders (大岩) rock
   outcrops in the rock's own colour (`outcropTint`), but a block of rock along the map's edge bigger than twelve tiles its cliffs,
