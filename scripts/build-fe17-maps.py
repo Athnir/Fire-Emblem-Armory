@@ -64,6 +64,11 @@ GROUND = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-ra
 BUILDINGS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-raw', 'fe17-buildings.json')
 # The maps whose villages the user saw as ruins (the review of every map): their houses drawn in ruins.
 RUINED = ('fe17-c002-', 'fe17-m006', 'fe17-s012')
+# Canal towns as the user saw them in the game (2026-11-27, The Doting Sister's): their blocks the scene heaps crates on bare stone
+# like their other buildings ("the boxes are almost completely bricks ... the white bricks are the same as the bricks that should
+# replace most of the current boxes"), the thin stacks along the canals, the market stands among them, crates ("the market
+# stands are boxes actually").
+CANAL_TOWNS = ('fe17-g005',)
 PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall', 'q': 'Large Pillar'}
 # The colours a map's scene gets wrong, set by hand (the user's calls): the Last Engage's sky round its island the void, black; the
 # Mysterious Merchant's courtyard green grass, not dirt (its photos' sunlit grass).
@@ -2582,6 +2587,8 @@ def draw_buildings(m, blocks):
         xs, ys = [t[0] for t in tiles], [t[1] for t in tiles]
         w, tall = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
         box = len(tiles) == w * tall
+        if m['id'].startswith(CANAL_TOWNS) and kind in ('crates', 'stall'):
+            kind = 'crates' if min(w, tall) == 1 else None
         if kind == 'ruins':
             m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
         elif kind == 'house' and scene_houses(b) and not (box and 2 <= w <= 6 and tall <= 4):

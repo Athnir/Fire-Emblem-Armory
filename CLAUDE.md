@@ -454,7 +454,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   cuts carried past it, what stands between them its crates, market goods or the block's own tiles (`fe17_buildings.py --houses`,
   `houses` and `between` on a block: the user, in the game, 2026-11-27, Chapter 19's town had "way too many tiles for villages together,
   instead of where they should be split to different houses", and "do the same for the other maps too"); where the scene's houses don't
-  account for a block (Chapter 13's market, houses built of parts no name says), its biggest rectangles. Awakening's building
+  account for a block (Chapter 13's market, houses built of parts no name says), its biggest rectangles; a canal town's blocks the
+  scene heaps crates on bare stone like its other buildings, only the thin stacks along its canals, its market stands among them,
+  crates (`CANAL_TOWNS`: The Doting Sister's, the user, in the game, 2026-11-27, "the boxes are almost completely bricks", "the market
+  stands are boxes actually"). Awakening's building
   over a village (a block of walls two to six wide standing just above its tile) is the village's house drawn whole, the village its
   door mat (`map_pieces.village_houses`: the user, Chapter 8's villages), and a building fliers cross (the DLC's and Paralogues 2, 3,
   13, 18 and 20's `w8`, the game's walled compound of three little houses round a yard, the zoomed-out villages: the user, in the

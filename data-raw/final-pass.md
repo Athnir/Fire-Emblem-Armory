@@ -12,7 +12,6 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Engage | Tempest Trial, Verdant Plain, map 4 (`fe17-c001-4-1`) | The whole map against the game | "manual" |
 | Engage | Fell Xenologue 5, The Fell Heir (`fe17-e005`) | The whole map against the game | "manual" |
 | Engage | Fell Xenologue 6, Seven Bracelets (`fe17-e006`) | The whole map against the game (marked good) | "manual" |
-| Engage | Divine Paralogue, The Doting Sister, and its skirmish (`fe17-g005`, `fe17-g005-sk`) | Its bridges (drawn whole since 2026-11-26) and the rest of the map against the game | "bridge issues. manually check", "manual" |
 | Engage | Divine Paralogue, The Shepherd Exalt (`fe17-g006`) | The whole map against the game, its altars too | "manual" |
 
 ## Checked in the game
@@ -33,6 +32,7 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Engage | Chapter 18, The Cold Voyage (`fe17-m018`, and its skirmish) | "please have all tiles that are ship (impassable) as wood wall tiles" (2026-11-27, through an Eden mod pointing the world map's encounters at its map) | Every Ship tile the ship's wooden wall, the crates its scene stands on some of them gone (`ship_wood`), the crates only its decks' obstacles; Chapter 19's and the Caring Princess's Ship tiles the same (both still to check) |
 | Engage | Chapter 19, The Dead Town (`fe17-m019`, and its skirmish) | "main issue i have it seems with this is you have way to many tiles for villages together, insted of where they should be split to different houses" (2026-11-27, through the Eden mod) | Its town's blocks parted into the houses its scene stands there, each house model's own tiles (`fe17_buildings.py --houses`), the crates between them crates; its Ship tiles wooden walls since Chapter 18's note |
 | Engage | Paralogue, The Caring Princess (`fe17-s013`, and its skirmish) | "the caring princess matches" (2026-11-27, through the Eden mod) | Nothing to change (its Ship tiles wooden walls since Chapter 18's note) |
+| Engage | Divine Paralogue, The Doting Sister, and its skirmish (`fe17-g005`, `fe17-g005-sk`) | "we dont really have anything for his map, the boxes are almsot compleatly bricks, the market stands are boxes actually, the white bricks are the same as the bricks that should replace most of the current boxes" (2026-11-27, through the Eden mod; its bridges unremarked) | Its blocks of crates bare stone bricks like its other buildings, the thin stacks along its canals (the market stands among them) crates (`CANAL_TOWNS`) |
 
 ## The look-over's checks (2026-11-26)
 
