@@ -71,8 +71,10 @@ RUINED = ('fe17-c002-', 'fe17-m006', 'fe17-s012')
 CANAL_TOWNS = ('fe17-g005',)
 PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall', 'q': 'Large Pillar'}
 # The colours a map's scene gets wrong, set by hand (the user's calls): the Last Engage's sky round its island the void, black; the
-# Mysterious Merchant's courtyard green grass, not dirt (its photos' sunlit grass).
-FILLS = {'fe17-m026': {'wd': '#0b0b0e'}, 'fe17-s002': {'ta': '#6a6816'}}
+# Mysterious Merchant's courtyard green grass, not dirt (its photos' sunlit grass); The Doting Sister's buildings its streets' dark
+# slate and its streets a mauve grey (in the game, 2026-11-27: "the bricks should be more grey than white ... basically swap the colors
+# of the bricks and the cobble and darken the cobble to grey insted of white").
+FILLS = {'fe17-m026': {'wd': '#0b0b0e'}, 'fe17-s002': {'ta': '#6a6816'}, 'fe17-g005': {'t1': '#6f6870', 'oe': '#3b3a49'}}
 # The maps whose junk (wz, two tiles by two) its scene draws as wooden shacks (the user, the Desert Dunes stages): drawn as shacks.
 SHACKS = ('fe17-c005-',)
 # The maps whose dais of large pillars round a floor with stairs is a small stone fort (the user, the Caring Princess's: a fort fix).
