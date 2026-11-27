@@ -200,12 +200,14 @@ EMU_TOP = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-r
 # a wall you break over them (the user: one breakable overlay over the tile it is), previewed broken as the kind the grid gives them
 # after (the tile's second byte).
 BREAKABLE = (38, 95)
-# Kinds a map draws in ruins rather than standing (the user: Chapter 9's buildings, Verdant Wind 29's broken stones among its marsh),
-# by battle map: the codes drawn so.
-RUIN_STAGES = {9: ('w7',), 21: ('wt',)}
-# Maps whose houses stand in ruins (the user, in the game, 2026-11-26: Crimson Flower 37's "houses are standing but all are in ruins",
-# "a ruined house structure for them"): each roof over its block caved in, its rafters showing (decor 'ruin-<paint>').
-RUINED_HOUSES = {25}
+# Kinds a map draws in ruins rather than standing (the user: Verdant Wind 29's broken stones among its marsh), by battle map: the codes
+# drawn so.
+RUIN_STAGES = {21: ('wt',)}
+# Maps whose houses are in ruins, drawn whole over their boxes as the roofs are (the user, 2026-11-26): 'caved', standing with each
+# roof caved in, its rafters showing (decor 'ruin-<paint>': Crimson Flower 37's, "the houses are standing but all are in ruins", "a
+# ruined house structure for them"); 'roofless', destroyed, the ring of their walls round the fallen roof's heaps (decor 'shell': the
+# Chapel Ruins', Chapter 9's, "the ruins are also destroyed houses", as its photos show them).
+RUINED_HOUSES = {25: 'caved', 9: 'roofless'}
 # A map's roofs where the photos show no clear colour: its slate, else grey stone (the user: roofs as Fates' are, so the buildings
 # stand out from the ground).
 ROOF_DEFAULT = {13: 'slate', 26: 'slate'}
@@ -4038,7 +4040,7 @@ def main():
     # A house its stage shows razed, its walls standing as a ruin (the user, the Prologue's village at (11, 13)), and the buildings a
     # map's photos show in ruins (`RUIN_STAGES`): drawn in ruins. Every other building its roofs seen from above, each block parted
     # into the rectangles they cover, each roof's paint from the photos (the user: buildings blended into the ground; roofs as Fates'),
-    # caved in where a map's houses stand in ruins (`RUINED_HOUSES`).
+    # caved in or gone where a map's houses are in ruins (`RUINED_HOUSES`).
     for m in maps:
         stage = stage_of[m['id']]
         rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
@@ -4074,7 +4076,8 @@ def main():
                         paint = roof_paint(here, default)
                     paint = ROOF_PAINT.get(stage, paint)
                     for cc, rr in cells:
-                        m.setdefault('decor', {})[f'{cc + 1},{h - rr}'] = f"{'ruin' if stage in RUINED_HOUSES else 'roof'}-{paint}"
+                        m.setdefault('decor', {})[f'{cc + 1},{h - rr}'] = {'caved': f'ruin-{paint}', 'roofless': 'shell'}.get(
+                            RUINED_HOUSES.get(stage), f'roof-{paint}')
                     boxes.append([c0 + 1, c0 + w, h - (r0 + hh - 1), h - r0])
         if boxes:
             m['decorBoxes'] = boxes

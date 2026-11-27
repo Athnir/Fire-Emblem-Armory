@@ -657,10 +657,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   its buildings are roofs seen from above as Fates' are (each block parted into the rectangles a roof covers, at most four tiles
   either way, `decorBoxes`; each roof's paint from the photos' top-down mosaics half a tile north of it, `data-raw/fe16-emu-top.json`,
   where the tilted camera draws a roof: red tile, tan, brown, green copper, slate, else grey), the ruined ones in ruins (`RUIN_STAGES`:
-  Chapter 9's buildings, Verdant Wind 29's broken stones), and houses that stand in ruins ruined houses, each roof over its box caved
-  in, the charred ridge beam and rafters across the dark of the burnt-out house, the shingles round each hole sooted, its holes placed
-  by where it stands (`RUINED_HOUSES`, decor `ruin-<paint>`: Crimson Flower 37's, slate; the user, in the game, 2026-11-26: 'the houses
-  are standing but all are in ruins', 'a ruined house structure for them'); a breakable wall drawn as the walls
+  Verdant Wind 29's broken stones), and houses in ruins drawn whole over their boxes too (`RUINED_HOUSES`, each varied by where it
+  stands): standing ones each roof caved in, the charred ridge beam and rafters across the dark of the burnt-out house, the shingles
+  round each hole sooted (decor `ruin-<paint>`: Crimson Flower 37's, slate; the user, in the game, 2026-11-26: 'the houses are standing
+  but all are in ruins', 'a ruined house structure for them'), destroyed ones roofless, the ring of their stone walls crumbled through
+  in a place or two round the fallen roof's heaps, broken slabs and a fallen beam (decor `shell`: the Chapel Ruins', Chapter 9's and
+  the maps on its stage; the user, 2026-11-27: 'the ruins are also destroyed houses', as its photos show them); a breakable wall drawn as the walls
   round it (a plain wall in its own colour where none are) with the crack of a wall you break, previewed broken as the grid's second
   byte has it (`breakablesAsWalls`); the Avo Floor a gold chevron pattern of its own, apart from Cover's (`avoFloors`); altars in rows
   and blocks the stone they're built of (a lone one keeps its altar), the Altar fliers cross pillars, the graves round the Holy Tomb

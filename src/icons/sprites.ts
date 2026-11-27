@@ -5033,6 +5033,81 @@ export function ruinedRoofPiece(colour: CanopyColour, i: number, j: number, cw: 
   return sprite
 }
 
+/** A destroyed house seen from above, its roof gone (Three Houses' Chapel Ruins: the user, its ruins are destroyed houses, as its
+ * photos show them roofless): the ring of its stone walls, crumbled through in a place or two, the floor inside shaded under its north
+ * and west walls, heaps of the fallen roof with broken slabs round them, and in a house longer than two tiles a fallen beam across it.
+ * `seed` (the house's place on the map) varies them, as `ruinedRoofPiece`'s. */
+const RUIN_SHELL = new Map<string, Sprite>()
+const SHELL_PALETTE: Sprite['palette'] = {
+  o: '#2f2d29', w: '#c4c0b4', W: '#9d998d', S: '#7f7a6e', f: '#aaa497', F: '#9c968a', h: '#8f7f61', H: '#ad9b78', d: '#655842',
+  g: '#6f7674', G: '#959c99', b: '#5b4431',
+}
+export function ruinedShellPiece(i: number, j: number, cw: number, ch: number, seed: number): Sprite {
+  const key = `${i},${j},${cw},${ch},${seed}`
+  const cached = RUIN_SHELL.get(key)
+  if (cached) return cached
+  const W = cw * 10
+  const H = ch * 10
+  const long = Math.max(W, H)
+  const tall = H > W
+  const n = long > 20 ? 2 : 1
+  // The fallen roof's heaps, along the house's length.
+  const heaps = Array.from({ length: n }, (_, k) => {
+    const a = (long * (k + 0.5)) / n + (ruinHash(seed, k, 11) - 0.5) * (long / n) * 0.4
+    const b = Math.min(W, H) / 2 + (ruinHash(seed, k, 12) - 0.5) * 2
+    return { x: tall ? b : a, y: tall ? a : b, r: Math.min(3.4, Math.min(W, H) * 0.26) + ruinHash(seed, k, 13) * 0.8, p: ruinHash(seed, k, 14) * 2 * Math.PI }
+  })
+  const heapAt = (X: number, Y: number) => heaps.find((o) => {
+    const dx = X + 0.5 - o.x
+    const dy = Y + 0.5 - o.y
+    return Math.hypot(dx, dy) < o.r * (1 + 0.18 * Math.sin(3 * Math.atan2(dy, dx) + o.p))
+  })
+  // The wall crumbled through: a gap of two or three pixels in one or two of its sides.
+  const ring = 2 * (W + H) - 12
+  const gaps = Array.from({ length: n }, (_, k) => ({ at: Math.floor(ruinHash(seed, k, 15) * ring), len: 2 + Math.floor(ruinHash(seed, k, 16) * 2) }))
+  const ringPos = (X: number, Y: number) => (Y === 1 ? X - 1 : X === W - 2 ? W - 3 + Y - 1 : Y === H - 2 ? W - 3 + H - 3 + (W - 2 - X) : 2 * (W - 3) + H - 3 + (H - 2 - Y))
+  // A beam fallen across a longer house: up to twelve pixels long, at a slant to the house's length, between its heaps.
+  const beam = long > 20 ? (() => {
+    const len = Math.min(long * 0.4, 12)
+    const turn = (tall ? Math.PI / 2 : 0) + (ruinHash(seed, 17) - 0.5) * 1.1
+    const cx = tall ? W / 2 : long / 2 + (ruinHash(seed, 18) - 0.5) * long * 0.3
+    const cy = tall ? long / 2 + (ruinHash(seed, 18) - 0.5) * long * 0.3 : H / 2
+    return { ax: cx - (Math.cos(turn) * len) / 2, ay: cy - (Math.sin(turn) * len) / 2, bx: cx + (Math.cos(turn) * len) / 2, by: cy + (Math.sin(turn) * len) / 2 }
+  })() : undefined
+  const onBeam = (X: number, Y: number) => {
+    if (!beam) return false
+    const { ax, ay, bx, by } = beam
+    const t = Math.max(0, Math.min(1, ((X + 0.5 - ax) * (bx - ax) + (Y + 0.5 - ay) * (by - ay)) / ((bx - ax) ** 2 + (by - ay) ** 2)))
+    return Math.hypot(X + 0.5 - ax - t * (bx - ax), Y + 0.5 - ay - t * (by - ay)) < 0.6
+  }
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const X = i * 10 + x
+      const Y = j * 10 + y
+      if (X === 0 || Y === 0 || X === W - 1 || Y === H - 1) return 'o'
+      if (X === 1 || Y === 1 || X === W - 2 || Y === H - 2) {
+        const p = ringPos(X, Y)
+        if (gaps.some((g) => (p - g.at + ring) % ring < g.len)) return ruinHash(seed, X, Y, 19) < 0.5 ? 'g' : 'S'
+        return Y === 1 || X === 1 ? 'w' : 'W'
+      }
+      const heap = heapAt(X, Y)
+      if (heap) {
+        const dx = X + 0.5 - heap.x
+        const dy = Y + 0.5 - heap.y
+        return Math.hypot(dx, dy) > heap.r - 0.9 && dx + dy > 0 ? 'd' : dx + dy < -heap.r * 0.4 ? 'H' : 'h'
+      }
+      if (onBeam(X, Y)) return 'b'
+      const r = ruinHash(seed, X, Y, 20)
+      if (r < 0.07) return 'g'
+      if (r < 0.1) return 'G'
+      if (X === 2 || Y === 2) return 'S'
+      return r > 0.85 ? 'F' : 'f'
+    }).join(''))
+  const sprite = { palette: SHELL_PALETTE, rows }
+  RUIN_SHELL.set(key, sprite)
+  return sprite
+}
+
 /** A round yurt seen from above (Fates' Birthright 8: the user, its houses as yurts): its felt roof in rings round the crown, the poles
  * running out from it, lit from the top left; the tile (`tx`, `ty` from the block's top left) of a yurt inscribed in its block (`bw` x
  * `bh` tiles), the ground beyond it showing. */

@@ -339,7 +339,8 @@ export interface ChapterMap {
    * whose scene draws rocks there), Echoes' heaps of stones, thick pillars (one great pillar a block two by two) and torches (drawn as
    * candlesticks: the user), and tables holding vases, one table along a run of them (Fates' Paralogue 22's partitions: the user); a
    * house's roof seen from above in its paint (`roof-`), or the same caved in where the house stands in ruins (`ruin-`: Three Houses'
-   * Crimson Flower 37, the user). */
+   * Crimson Flower 37, the user), and a destroyed house, its roof gone, the ring of its walls round the rubble (`shell`: its Chapel
+   * Ruins, the user). */
   decor?: Record<
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
@@ -347,7 +348,7 @@ export interface ChapterMap {
     | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab' | 'ice' | 'frozenFountain'
     | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
     | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown' | 'ruin-red' | 'ruin-blue' | 'ruin-yellow' | 'ruin-slate'
-    | 'ruin-grey' | 'ruin-tan' | 'ruin-green' | 'ruin-brown'
+    | 'ruin-grey' | 'ruin-tan' | 'ruin-green' | 'ruin-brown' | 'shell'
     | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad' | 'stones' | 'thickPillar' | 'torch' | 'outcrop'
     | 'palisade' | 'coffin' | 'brazier' | 'brazierOut' | 'vaseTable'
   >
