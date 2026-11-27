@@ -1371,7 +1371,7 @@ describe("Three Houses' maps as its stages draw them", () => {
 
   // The user's notes on every map, 2026-11-25 (the second round).
   const at = (id: string, x: number, y: number) => terrainAt(map(id), [x, y])
-  it('draws every building as its roofs seen from above, each roof a box of its own, and the ruined ones in ruins', () => {
+  it('draws every building as its roofs seen from above, each roof a box of its own, and the ruined ones in ruins or caved in', () => {
     for (const m of FE16_MAPS) {
       const boxes = m.decorBoxes ?? []
       for (let y = 1; y <= m.height; y++)
@@ -1379,7 +1379,7 @@ describe("Three Houses' maps as its stages draw them", () => {
           if (terrainAt(m, [x, y]) !== 'w7') continue
           const key = tileKey([x, y])
           if (m.ruins?.includes(key)) continue
-          expect(m.decor?.[key], `${m.id} ${key}`).toMatch(/^roof-/)
+          expect(m.decor?.[key], `${m.id} ${key}`).toMatch(/^(roof|ruin)-/)
           // in one box, every box at most four tiles either way
           expect(boxes.filter(([x0, x1, y0, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1).length, `${m.id} ${key}`).toBe(1)
         }
@@ -1388,12 +1388,17 @@ describe("Three Houses' maps as its stages draw them", () => {
     // Crimson Flower 31's and 34's town roofs are red tile; Azure Moon 21's slate.
     for (const id of ['fe16-31-cf', 'fe16-34-cf']) expect(new Set(Object.values(map(id).decor!)), id).toEqual(new Set(['roof-red']))
     expect(Object.values(map('fe16-21-am').decor!).filter((d) => d === 'roof-slate').length).toBeGreaterThan(100)
-    // Chapter 9's buildings and Crimson Flower 37's burning houses in ruins, Verdant Wind 29's broken stones among its marsh too.
-    for (const id of ['fe16-9', 'fe16-37-cf']) {
-      const w7 = map(id).grid.flatMap(rowCodes).filter((c) => c === 'w7').length
-      expect(map(id).ruins!.length, id).toBe(w7)
-      expect(map(id).decor ?? {}, id).toEqual({})
-    }
+    // Chapter 9's buildings in ruins, Verdant Wind 29's broken stones among its marsh too.
+    const w7 = map('fe16-9').grid.flatMap(rowCodes).filter((c) => c === 'w7').length
+    expect(map('fe16-9').ruins!.length).toBe(w7)
+    expect(map('fe16-9').decor ?? {}).toEqual({})
+    // Crimson Flower 37's houses stand, every one in ruins (the user, in the game): its slate roofs caved in over their boxes, and only
+    // there.
+    const c37 = map('fe16-37-cf')
+    expect(c37.ruins).toBeUndefined()
+    expect(Object.keys(c37.decor!).length).toBe(c37.grid.flatMap(rowCodes).filter((c) => c === 'w7').length)
+    expect(new Set(Object.values(c37.decor!))).toEqual(new Set(['ruin-slate']))
+    expect(FE16_MAPS.filter((m) => Object.values(m.decor ?? {}).some((d) => d.startsWith('ruin-'))).map((m) => m.id)).toEqual(['fe16-37-cf'])
     expect(map('fe16-29-vw').ruins!.every((k) => terrainAt(map('fe16-29-vw'), k.split(',').map(Number) as [number, number]) === 'wt')).toBe(true)
   })
 
@@ -1520,7 +1525,7 @@ describe("Three Houses' maps as its stages draw them", () => {
 
   it("draws rubble set in Chapter 6's walls as the walls, a77's rocks one outcrop, ruins varied, and Silver Snow 24's fire orb, ballista and stairs on the floor", () => {
     expect([map('fe16-6').looksAs?.['18,11'], map('fe16-6').looksAs?.['6,18']]).toEqual(['wa', 'wa'])
-    for (const id of ['fe16-9', 'fe16-37-cf']) expect(map(id).variedRuins, id).toBe(true)
+    expect(map('fe16-9').variedRuins).toBe(true)
     const on = map('fe16-24-ss').standOn ?? {}
     expect([on['3,18'], on['23,18'], on['13,17']]).toEqual(['tw', 'tw', 'tw'])
   })

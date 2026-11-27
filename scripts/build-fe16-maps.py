@@ -200,15 +200,19 @@ EMU_TOP = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data-r
 # a wall you break over them (the user: one breakable overlay over the tile it is), previewed broken as the kind the grid gives them
 # after (the tile's second byte).
 BREAKABLE = (38, 95)
-# Kinds a map draws in ruins rather than standing (the user: Chapter 9's buildings, Crimson Flower 37's burning houses, Verdant Wind
-# 29's broken stones among its marsh), by battle map: the codes drawn so.
-RUIN_STAGES = {9: ('w7',), 25: ('w7',), 21: ('wt',)}
+# Kinds a map draws in ruins rather than standing (the user: Chapter 9's buildings, Verdant Wind 29's broken stones among its marsh),
+# by battle map: the codes drawn so.
+RUIN_STAGES = {9: ('w7',), 21: ('wt',)}
+# Maps whose houses stand in ruins (the user, in the game, 2026-11-26: Crimson Flower 37's "houses are standing but all are in ruins",
+# "a ruined house structure for them"): each roof over its block caved in, its rafters showing (decor 'ruin-<paint>').
+RUINED_HOUSES = {25}
 # A map's roofs where the photos show no clear colour: its slate, else grey stone (the user: roofs as Fates' are, so the buildings
 # stand out from the ground).
 ROOF_DEFAULT = {13: 'slate', 26: 'slate'}
 # A map whose roofs are all one, whatever the photos read: Verdant Wind 29's wooden palisade, Crimson Flower 31's and 34's red tiles,
-# 32's grey slate and 35's brown (the user's third look: the other colours were the walls and grass the photos sampled).
-ROOF_PAINT = {21: 'brown', 12: 'red', 14: 'red', 16: 'grey', 23: 'brown'}
+# 32's grey slate and 35's brown (the user's third look: the other colours were the walls and grass the photos sampled), 37's ruined
+# houses slate (the fires in its photos redden a few).
+ROOF_PAINT = {21: 'brown', 12: 'red', 14: 'red', 16: 'grey', 23: 'brown', 25: 'slate'}
 # Where the game's Plain is a town's paving (the user: Crimson Flower 31's road and paths, Silver Snow 22's, a63's and a64's city
 # streets, a83's castle cobbles): its paving; 'grass', with its lawns (a64's (8, 9) and (7, 7)); ('road', x0, x1), its grey road
 # those columns and the rest its tan stone paths (31's: the user, '(12, 6) to (14, 1) should be stone ... the path is a tan stone
@@ -4033,7 +4037,8 @@ def main():
             info[code] = dict(info[base], name=name)
     # A house its stage shows razed, its walls standing as a ruin (the user, the Prologue's village at (11, 13)), and the buildings a
     # map's photos show in ruins (`RUIN_STAGES`): drawn in ruins. Every other building its roofs seen from above, each block parted
-    # into the rectangles they cover, each roof's paint from the photos (the user: buildings blended into the ground; roofs as Fates').
+    # into the rectangles they cover, each roof's paint from the photos (the user: buildings blended into the ground; roofs as Fates'),
+    # caved in where a map's houses stand in ruins (`RUINED_HOUSES`).
     for m in maps:
         stage = stage_of[m['id']]
         rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
@@ -4069,7 +4074,7 @@ def main():
                         paint = roof_paint(here, default)
                     paint = ROOF_PAINT.get(stage, paint)
                     for cc, rr in cells:
-                        m.setdefault('decor', {})[f'{cc + 1},{h - rr}'] = f'roof-{paint}'
+                        m.setdefault('decor', {})[f'{cc + 1},{h - rr}'] = f"{'ruin' if stage in RUINED_HOUSES else 'roof'}-{paint}"
                     boxes.append([c0 + 1, c0 + w, h - (r0 + hh - 1), h - r0])
         if boxes:
             m['decorBoxes'] = boxes

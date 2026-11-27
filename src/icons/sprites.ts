@@ -4964,6 +4964,75 @@ export function canopyPiece(colour: CanopyColour, i: number, j: number, cw: numb
   return sprite
 }
 
+/** A house standing in ruins, seen from above (Three Houses' Crimson Flower 37: the user, Fhirdiad's houses all stand, every one in
+ * ruins): `canopyPiece`'s roof in its paint over the standing walls, caved in, the burnt-out dark of the house showing through with its
+ * charred ridge beam and rafters still across it (some fallen), the shingles round each hole sooted and a few gone. One hole in a house
+ * up to two tiles long, two in a longer one; `seed` (the house's place on the map) places them, so no two houses look alike. */
+const RUIN_ROOF = new Map<string, Sprite>()
+const ruinHash = (...ns: number[]) => {
+  let h = 2166136261
+  for (const n of ns) h = Math.imul(h ^ n, 16777619)
+  h = Math.imul(h ^ (h >>> 13), 0x5bd1e995)
+  return ((h ^ (h >>> 15)) >>> 0) / 4294967296
+}
+const sooted = (hex: string) =>
+  '#' + [1, 3, 5].map((k) => Math.round(parseInt(hex.slice(k, k + 2), 16) * 0.55).toString(16).padStart(2, '0')).join('')
+export function ruinedRoofPiece(colour: CanopyColour, i: number, j: number, cw: number, ch: number, seed: number): Sprite {
+  const key = `${colour},${i},${j},${cw},${ch},${seed}`
+  const cached = RUIN_ROOF.get(key)
+  if (cached) return cached
+  const W = cw * 10
+  const H = ch * 10
+  const tall = ch > cw
+  const long = tall ? H : W
+  const short = tall ? W : H
+  const mid = short / 2
+  const n = long > 20 ? 2 : 1
+  const holes = Array.from({ length: n }, (_, k) => ({
+    a: (long * (k + 0.5)) / n + (ruinHash(seed, k, 1) - 0.5) * (long / n) * 0.3,
+    b: mid + (ruinHash(seed, k, 2) - 0.5) * short * 0.25,
+    ra: (long / n) * (0.26 + ruinHash(seed, k, 3) * 0.12),
+    rb: short * (0.26 + ruinHash(seed, k, 4) * 0.1),
+    p1: ruinHash(seed, k, 5) * 2 * Math.PI,
+    p2: ruinHash(seed, k, 6) * 2 * Math.PI,
+  }))
+  // A hole's edge ragged: its radius swelling and shrinking round it.
+  const inHole = (a: number, b: number, grow: number) => holes.some((o) => {
+    const da = (a + 0.5 - o.a) / (o.ra * grow)
+    const db = (b + 0.5 - o.b) / (o.rb * grow)
+    const t = Math.atan2(db, da)
+    return Math.hypot(da, db) < 1 + 0.2 * Math.sin(3 * t + o.p1) + 0.12 * Math.sin(5 * t + o.p2)
+  })
+  const rows = Array.from({ length: 10 }, (_, y) =>
+    Array.from({ length: 10 }, (_, x) => {
+      const X = i * 10 + x
+      const Y = j * 10 + y
+      if (X === 0 || Y === 0 || X === W - 1 || Y === H - 1) return 'o'
+      const across = tall ? X : Y
+      const along = tall ? Y : X
+      const lit = across + 0.5 < mid
+      const ridge = Math.abs(across + 0.5 - mid) < 0.6
+      // The eaves stay, over the walls standing under them.
+      const eaves = X < 2 || Y < 2 || X > W - 3 || Y > H - 3
+      if (!eaves && inHole(along, across, 1)) {
+        if (ridge) return 'R'
+        if (along % 3 === 1 && ruinHash(seed, Math.floor(along / 3), lit ? 7 : 8) > 0.3) return lit ? 'b' : 'B'
+        return ruinHash(seed, X, Y, 10) < 0.1 ? 'a' : 'h'
+      }
+      if (ridge) return 'r'
+      if ((!eaves && inHole(along, across, 1.3)) || ruinHash(seed, X, Y, 9) < 0.03) return 'k'
+      const board = across % 3 === 1
+      return lit ? (board ? 's' : 'c') : board ? 'c' : 'C'
+    }).join(''))
+  const p = CANOPY_COLOURS[colour]
+  const sprite = {
+    palette: { o: '#2b211a', r: '#3d2b20', c: p.c, C: p.C, s: p.s, k: sooted(p.C), h: '#17120f', a: '#3a3430', b: '#6e4d34', B: '#563b28', R: '#4b3323' },
+    rows,
+  }
+  RUIN_ROOF.set(key, sprite)
+  return sprite
+}
+
 /** A round yurt seen from above (Fates' Birthright 8: the user, its houses as yurts): its felt roof in rings round the crown, the poles
  * running out from it, lit from the top left; the tile (`tx`, `ty` from the block's top left) of a yurt inscribed in its block (`bw` x
  * `bh` tiles), the ground beyond it showing. */

@@ -657,7 +657,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   its buildings are roofs seen from above as Fates' are (each block parted into the rectangles a roof covers, at most four tiles
   either way, `decorBoxes`; each roof's paint from the photos' top-down mosaics half a tile north of it, `data-raw/fe16-emu-top.json`,
   where the tilted camera draws a roof: red tile, tan, brown, green copper, slate, else grey), the ruined ones in ruins (`RUIN_STAGES`:
-  Chapter 9's buildings, Crimson Flower 37's burning houses, Verdant Wind 29's broken stones); a breakable wall drawn as the walls
+  Chapter 9's buildings, Verdant Wind 29's broken stones), and houses that stand in ruins ruined houses, each roof over its box caved
+  in, the charred ridge beam and rafters across the dark of the burnt-out house, the shingles round each hole sooted, its holes placed
+  by where it stands (`RUINED_HOUSES`, decor `ruin-<paint>`: Crimson Flower 37's, slate; the user, in the game, 2026-11-26: 'the houses
+  are standing but all are in ruins', 'a ruined house structure for them'); a breakable wall drawn as the walls
   round it (a plain wall in its own colour where none are) with the crack of a wall you break, previewed broken as the grid's second
   byte has it (`breakablesAsWalls`); the Avo Floor a gold chevron pattern of its own, apart from Cover's (`avoFloors`); altars in rows
   and blocks the stone they're built of (a lone one keeps its altar), the Altar fliers cross pillars, the graves round the Holy Tomb
@@ -1341,9 +1344,12 @@ A global switch (header, any game) that lets someone play along without being to
   ask, 2026-11-26): Path of Radiance's restored debug title (`data-raw/fe9/README.md`), Radiant Dawn's `scripts/fe10_jump.py` (a
   copy of the extracted disc whose New Game opens the chapter with its developer roster), written into a copy, never as cheats
   (RetroAchievements); a copy shares the game's save file, so the user's save is backed up first and nothing is saved in it.
-  Awakening's in Citra: a mod (`%APPDATA%\Citra\load\mods 40000000A0500omfs`) with the chapter's files from the cartridge
+  Awakening's in Citra: a mod (`%APPDATA%\Citra\load\mods\00040000000A0500\romfs`) with the chapter's files from the cartridge
   (`data/`, `m/E/`, `map/`, `scripts/`, named by its key: `X014`) under the next story chapter's key on the user's save (`005`),
   so that chapter loads it (its heights stay the story chapter's); removed once the user has looked (Paralogue 14, 2026-11-26).
+  Three Houses' in Eden, as for its photos: the auxiliary battle Battle in the Mountains pointed at the stage (its scenario record's
+  map byte, written through Eden's debugger connection while the game runs, never halting it), which the user deploys again from the
+  autosave before it (Silver Snow 26 and Crimson Flower 37, 2026-11-26); Eden's debugger connection is switched off again after.
 - **Check counts against outside sources in the tests** (enemy totals per map, wiki or fireemblemwod.com),
   with every exception explained.
 - **Back each rule with a test where it can be checked** (e.g. no pillar icon on a tile no one can enter;

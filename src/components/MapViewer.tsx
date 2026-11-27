@@ -19,7 +19,7 @@ import {
   SEALED_DOOR, STAIR_FORT_PIECES, BRIDGE_SIDE, OPEN_DOOR, RAISED_BRIDGE, ALTAR, ALTAR_PIECES, MAST, FORT_PIECES, RAMPART_GATE, MAP_EVENT, CHERRY_TREE,
   WOOD_FORT_PIECES, HALL_PIECES, KEEP_PIECES, SUPPLY_DEPOT, LEVER, LAUNCHER, RUINS, CRACKED_WALL, STATUE, BRIDGE_PLANKS, WINDMILL, YURT,
   SUPPLY_BOXES, TENT_PIECES, TENT_SIDE, SANDBAG_WALL, PILLAR_TOP, UMBRELLA, PALM, PARASOL, DRAGON_STATUE, SHACK, ROCK_PEAK,
-  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, GARDEN, roundFountainPiece, BOAT_BOW, ICE_CRYSTALS, frozenFountainPiece, canopyPiece,
+  CASTLE_ROW, STAIRS_DOWN, WIDE_STAIRWELL, HORSE, CARRIAGE, SARCOPHAGUS, STONE_TABLE, YURT_HOUSE, YURT_FORT, GARDEN, roundFountainPiece, BOAT_BOW, ICE_CRYSTALS, frozenFountainPiece, canopyPiece, ruinedRoofPiece,
   roundYurtPiece, zenGardenPiece, bigTreePiece, OBSTACLE, WARP_SIGIL, WARP_PAD, FLAME_WALL, FLAME_VENT, cratePiece, boulderPiece, slabPiece, bonePiece, vaseTablePiece, RUBBLE_VARIANTS, HOUSE_DOOR, SHOP_ROOF, SHOP_SIGN, SHOP_SIGN_CLEAR, ARENA_PIECES, SMALL_SHOP, SMALL_SHOP_SIGN, EAVES, DEPOT_FRONT, layered, recoloured,
   STONE_PILE, CORAL, SUPPLY_CACHE, bigPillarPiece, SUPPLY_CRATES, supplyMarked, PALISADE, COFFIN, STATUE_SMALL, TORCH_UNLIT, COLOUR_BLIND,
 } from '../icons/sprites'
@@ -1867,6 +1867,8 @@ const changeTile = (c: MapChange): Tile => c.tile.default
 /** A change that shuts the door on its own tile (a doorway open at the start). */
 const shutsDoor = (c: MapChange, t: Tile) => (c.patch ?? []).some((p) => p.becomes === 'ob' && sameTile(p.tile, t))
 
+/** The holes of the ruined house the legend shows. */
+const RUIN_ICON = 8
 /** What the game draws on a tile that its terrain doesn't say (`decor`): a door nothing opens in a wall and a stone bridge's side
  * (Gaiden's), bones on the ground (Mystery of the Emblem's deserts). */
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
@@ -1881,6 +1883,10 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   'roof-red': canopyPiece('red', 0, 0, 1, 1), 'roof-blue': canopyPiece('blue', 0, 0, 1, 1), 'roof-yellow': canopyPiece('yellow', 0, 0, 1, 1),
   'roof-slate': canopyPiece('slate', 0, 0, 1, 1), 'roof-grey': canopyPiece('grey', 0, 0, 1, 1), 'roof-tan': canopyPiece('tan', 0, 0, 1, 1),
   'roof-green': canopyPiece('green', 0, 0, 1, 1), 'roof-brown': canopyPiece('brown', 0, 0, 1, 1),
+  'ruin-red': ruinedRoofPiece('red', 0, 0, 1, 1, RUIN_ICON), 'ruin-blue': ruinedRoofPiece('blue', 0, 0, 1, 1, RUIN_ICON),
+  'ruin-yellow': ruinedRoofPiece('yellow', 0, 0, 1, 1, RUIN_ICON), 'ruin-slate': ruinedRoofPiece('slate', 0, 0, 1, 1, RUIN_ICON),
+  'ruin-grey': ruinedRoofPiece('grey', 0, 0, 1, 1, RUIN_ICON), 'ruin-tan': ruinedRoofPiece('tan', 0, 0, 1, 1, RUIN_ICON),
+  'ruin-green': ruinedRoofPiece('green', 0, 0, 1, 1, RUIN_ICON), 'ruin-brown': ruinedRoofPiece('brown', 0, 0, 1, 1, RUIN_ICON),
   roundYurt: roundYurtPiece(1, 1, 3, 3), zenGarden: zenGardenPiece(1, 1), cherry: CHERRY_TREE, walledHouse: VILLAGE_HOUSE.middleFront,
   stones: STONE_PILE, thickPillar: PILLAR_TOP, torch: CANDLESTICK, outcrop: BOULDER, palisade: PALISADE, coffin: COFFIN,
   // A brazier, lit (Radiant Dawn's Part 2 Ch.2 torch: the user, braziers are no candlesticks) or put out.
@@ -1891,13 +1897,15 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
 const REPLACES_ICON = new Set(['rock', 'barrel', 'cherry', 'rubble', 'crates', 'pillar', 'roundYurt', 'zenGarden', 'walledHouse', 'stones', 'thickPillar', 'torch', 'outcrop',
   'palisade', 'coffin', 'brazier', 'brazierOut',
   'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
-  'roof-tan', 'roof-green', 'roof-brown'])
+  'roof-tan', 'roof-green', 'roof-brown', 'ruin-red', 'ruin-blue', 'ruin-yellow', 'ruin-slate', 'ruin-grey', 'ruin-tan', 'ruin-green',
+  'ruin-brown'])
 /** Ground of planks: a ship's deck, a pier's or a hall's boards, a road of boards, a wooden pedestal. */
 const WOOD_GROUND = new Set<TerrainCode>(['t3', 'gi', 'gh', 'gj', 'ty'])
 /** Decor that is a building or a heap standing on the ground around it, not marks on its tile. */
 const DECOR_ON_GROUND = new Set(['vaseTable', 'statue', 'windmill', 'yurt', 'crates', 'rock', 'umbrella', 'palm', 'parasol', 'pillar', 'dragon', 'shack', 'barrel', 'bones', 'house', 'grave', 'horse', 'carriage', 'sarcophagus', 'rubble', 'candle', 'table', 'candelabra', 'garden', 'tree', 'slab', 'ice',
   'stall-red', 'stall-blue', 'stall-yellow', 'stall-orange', 'stall-purple', 'roof-red', 'roof-blue', 'roof-yellow', 'roof-slate', 'roof-grey',
-  'roof-tan', 'roof-green', 'roof-brown', 'roundYurt', 'zenGarden', 'cherry', 'walledHouse', 'warpSigil', 'warpPad', 'stones', 'thickPillar', 'torch', 'outcrop',
+  'roof-tan', 'roof-green', 'roof-brown', 'ruin-red', 'ruin-blue', 'ruin-yellow', 'ruin-slate', 'ruin-grey', 'ruin-tan', 'ruin-green',
+  'ruin-brown', 'roundYurt', 'zenGarden', 'cherry', 'walledHouse', 'warpSigil', 'warpPad', 'stones', 'thickPillar', 'torch', 'outcrop',
   'palisade', 'coffin', 'brazier', 'brazierOut'])
 /** A tile's decor: a statue's piece by its place in the two by two (its other tiles beside it). */
 /** What's drawn over a tile (`decor`); in a block the user turned round (`mirror`), its partner's across the block, flipped (Radiant
@@ -1980,6 +1988,11 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   if (kind && /^(stall|roof)-/.test(kind)) {
     const [x0, x1, y0, y1] = decorBox(map, [x, y])
     return canopyPiece(kind.split('-')[1] as Parameters<typeof canopyPiece>[0], x - x0, y1 - y, x1 - x0 + 1, y1 - y0 + 1)
+  }
+  // A house standing in ruins (Three Houses' Crimson Flower 37): its roof caved in over its block, its holes by where the house stands.
+  if (kind?.startsWith('ruin-')) {
+    const [x0, x1, y0, y1] = decorBox(map, [x, y])
+    return ruinedRoofPiece(kind.slice(5) as Parameters<typeof canopyPiece>[0], x - x0, y1 - y, x1 - x0 + 1, y1 - y0 + 1, x0 * 31 + y1 * 17)
   }
   // A round yurt (Birthright 8) or a small garden (Birthright 9) over its block.
   if (kind === 'roundYurt') {
@@ -4043,6 +4056,9 @@ function Legend({
     'roof-red': 'House, its roof (no unit enters)', 'roof-blue': 'House, its roof (no unit enters)', 'roof-yellow': 'House, its roof (no unit enters)',
     'roof-slate': 'House, its roof (no unit enters)', 'roof-grey': 'House, its roof (no unit enters)', 'roof-tan': 'House, its roof (no unit enters)',
     'roof-green': 'House, its roof (no unit enters)', 'roof-brown': 'House, its roof (no unit enters)',
+    'ruin-red': 'House in ruins (no unit enters)', 'ruin-blue': 'House in ruins (no unit enters)', 'ruin-yellow': 'House in ruins (no unit enters)',
+    'ruin-slate': 'House in ruins (no unit enters)', 'ruin-grey': 'House in ruins (no unit enters)', 'ruin-tan': 'House in ruins (no unit enters)',
+    'ruin-green': 'House in ruins (no unit enters)', 'ruin-brown': 'House in ruins (no unit enters)',
     roundYurt: 'Yurt (no unit enters)', zenGarden: 'Garden (no unit enters)', cherry: 'Cherry trees (no unit enters)',
     walledHouse: 'House (no unit enters)', warpSigil: 'Sigil: it sends a unit standing on it to its platform',
     warpPad: 'Warp platform: where a sigil sends a unit',
@@ -4055,6 +4071,7 @@ function Legend({
     const at = Object.entries(map.decor ?? {}).find(([, k]) => k === kind)?.[0].split(',').map(Number) as Tile | undefined
     const fliers = !!at && !!terrainInfo(map, terrainAt(map, at)).move?.Fliers
     if (at && kind.startsWith('roof-') && fliers) return `${terrainName(map, at)}, its roof (only fliers cross it)`
+    if (at && kind.startsWith('ruin-') && fliers) return `${terrainName(map, at)} in ruins (only fliers cross it)`
     // Anything else drawn over a tile fliers cross says so (Fates' candlesticks and tables on its partitions).
     if (fliers && DECOR_LABEL[kind]?.endsWith('(no unit enters)')) return DECOR_LABEL[kind].replace('(no unit enters)', '(only fliers cross it)')
     return DECOR_LABEL[kind]

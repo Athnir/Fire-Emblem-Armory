@@ -337,14 +337,17 @@ export interface ChapterMap {
    * (Mystery of the Emblem's deserts), an altar no unit steps onto (Shadow Dragon and the Blade of Light's Chapter 24), stairs on a
    * floor or path (Mystery of the Emblem's, which play as the tile they're on), rocks where the game's bones lie (Awakening's Chapter 9,
    * whose scene draws rocks there), Echoes' heaps of stones, thick pillars (one great pillar a block two by two) and torches (drawn as
-   * candlesticks: the user), and tables holding vases, one table along a run of them (Fates' Paralogue 22's partitions: the user). */
+   * candlesticks: the user), and tables holding vases, one table along a run of them (Fates' Paralogue 22's partitions: the user); a
+   * house's roof seen from above in its paint (`roof-`), or the same caved in where the house stands in ruins (`ruin-`: Three Houses'
+   * Crimson Flower 37, the user). */
   decor?: Record<
     string,
     | 'door' | 'bones' | 'bridge' | 'altar' | 'stairs' | 'statue' | 'windmill' | 'yurt' | 'crates' | 'rock' | 'umbrella' | 'palm' | 'parasol'
     | 'pillar' | 'dragon' | 'shack' | 'barrel' | 'downstairs' | 'house' | 'fountain' | 'grave' | 'horse' | 'carriage'
     | 'sarcophagus' | 'rubble' | 'candle' | 'table' | 'candelabra' | 'garden' | 'tree' | 'slab' | 'ice' | 'frozenFountain'
     | 'stall-red' | 'stall-blue' | 'stall-yellow' | 'stall-orange' | 'stall-purple' | 'roof-red' | 'roof-blue' | 'roof-yellow'
-    | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown'
+    | 'roof-slate' | 'roof-grey' | 'roof-tan' | 'roof-green' | 'roof-brown' | 'ruin-red' | 'ruin-blue' | 'ruin-yellow' | 'ruin-slate'
+    | 'ruin-grey' | 'ruin-tan' | 'ruin-green' | 'ruin-brown'
     | 'roundYurt' | 'zenGarden' | 'cherry' | 'walledHouse' | 'warpSigil' | 'warpPad' | 'stones' | 'thickPillar' | 'torch' | 'outcrop'
     | 'palisade' | 'coffin' | 'brazier' | 'brazierOut' | 'vaseTable'
   >
