@@ -61,6 +61,16 @@ class Scene:
             self._world[key] = m
         return self._world[key]
 
+    def ancestors(self, tr):
+        """A Transform's ancestors as (path id, GameObject name), nearest first."""
+        out = []
+        t = tr.read() if tr is not None else None
+        while t is not None and t.m_Father.path_id:
+            f = t.m_Father
+            t = f.read()
+            out.append((f.path_id, t.m_GameObject.read().m_Name))
+        return out
+
     def texture(self, ptr):
         key = (id(ptr.assetsfile), ptr.file_id, ptr.path_id)
         if key not in self._tex:
@@ -105,7 +115,9 @@ class Scene:
         except Exception:
             return False
 
-    def renderers(self):
+    def renderers(self, owners=False):
+        """(name, material, world positions, uvs, triangles) for each drawn submesh; with `owners`, also its GameObject's
+        ancestors' names, nearest first (what model a part belongs to)."""
         from UnityPy.helpers.MeshHelper import MeshHandler
         hidden = self.lod_hidden()
         for obj in self.env.objects:
@@ -153,7 +165,8 @@ class Scene:
                 if any(s in mat.m_Name for s in SKIP_MATERIAL):
                     continue
                 base = getattr(mesh.m_SubMeshes[si], 'baseVertex', 0) or 0
-                yield go.m_Name, mat, P, UV, np.array(subs[si], np.int64) + base
+                tri = np.array(subs[si], np.int64) + base
+                yield (go.m_Name, mat, P, UV, tri, self.ancestors(tr)) if owners else (go.m_Name, mat, P, UV, tri)
 
 
 def render(field, window, px=24):

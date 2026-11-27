@@ -1817,6 +1817,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      0,
+      11
+     ],
+     [
+      0,
+      12
+     ],
+     [
+      1,
+      11
+     ],
+     [
+      1,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -1836,6 +1857,15 @@
    ]
   },
   {
+   "between": {
+    "2,4": null,
+    "2,5": "house",
+    "3,4": "house",
+    "3,5": "stall",
+    "4,4": "house",
+    "4,5": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -1871,6 +1901,63 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      4,
+      9
+     ],
+     [
+      4,
+      10
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      5,
+      10
+     ]
+    ],
+    [
+     [
+      5,
+      11
+     ],
+     [
+      5,
+      12
+     ],
+     [
+      6,
+      11
+     ],
+     [
+      6,
+      12
+     ]
+    ],
+    [
+     [
+      2,
+      8
+     ],
+     [
+      2,
+      9
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      3,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -1930,6 +2017,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      4,
+      15
+     ],
+     [
+      4,
+      16
+     ],
+     [
+      5,
+      15
+     ],
+     [
+      5,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -1957,6 +2065,22 @@
    ]
   },
   {
+   "between": {
+    "8,2": null,
+    "9,3": "stall"
+   },
+   "houses": [
+    [
+     [
+      7,
+      3
+     ],
+     [
+      8,
+      3
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "DesertStorageDoor",
@@ -1984,6 +2108,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      7,
+      6
+     ],
+     [
+      7,
+      7
+     ],
+     [
+      8,
+      6
+     ],
+     [
+      8,
+      7
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2011,6 +2156,39 @@
    ]
   },
   {
+   "between": {
+    "9,15": "stall"
+   },
+   "houses": [
+    [
+     [
+      8,
+      16
+     ],
+     [
+      8,
+      17
+     ],
+     [
+      9,
+      16
+     ],
+     [
+      9,
+      17
+     ]
+    ],
+    [
+     [
+      10,
+      15
+     ],
+     [
+      10,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2050,6 +2228,55 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      11,
+      12
+     ],
+     [
+      11,
+      13
+     ],
+     [
+      12,
+      12
+     ],
+     [
+      12,
+      13
+     ]
+    ],
+    [
+     [
+      9,
+      10
+     ],
+     [
+      9,
+      11
+     ],
+     [
+      10,
+      10
+     ],
+     [
+      10,
+      11
+     ]
+    ],
+    [
+     [
+      11,
+      11
+     ],
+     [
+      12,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2101,6 +2328,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      12,
+      17
+     ],
+     [
+      12,
+      18
+     ],
+     [
+      13,
+      17
+     ],
+     [
+      13,
+      18
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2120,6 +2368,15 @@
    ]
   },
   {
+   "between": {
+    "13,5": "house",
+    "13,6": "stall",
+    "14,5": "house",
+    "14,6": "stall",
+    "15,5": "house",
+    "15,6": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -2155,6 +2412,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      15,
+      14
+     ],
+     [
+      15,
+      15
+     ],
+     [
+      16,
+      14
+     ],
+     [
+      16,
+      15
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2182,6 +2460,13 @@
    ]
   },
   {
+   "between": {
+    "18,10": null,
+    "18,9": "house",
+    "19,10": "house",
+    "19,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2209,6 +2494,23 @@
    ]
   },
   {
+   "between": {
+    "19,13": null,
+    "19,14": "stall",
+    "19,15": "house"
+   },
+   "houses": [
+    [
+     [
+      18,
+      12
+     ],
+     [
+      19,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "DesertWoodChair_Combat",
@@ -2260,6 +2562,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      0,
+      11
+     ],
+     [
+      0,
+      12
+     ],
+     [
+      1,
+      11
+     ],
+     [
+      1,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2279,6 +2602,15 @@
    ]
   },
   {
+   "between": {
+    "2,4": null,
+    "2,5": "house",
+    "3,4": "house",
+    "3,5": "stall",
+    "4,4": "house",
+    "4,5": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -2314,6 +2646,63 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      4,
+      9
+     ],
+     [
+      4,
+      10
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      5,
+      10
+     ]
+    ],
+    [
+     [
+      5,
+      11
+     ],
+     [
+      5,
+      12
+     ],
+     [
+      6,
+      11
+     ],
+     [
+      6,
+      12
+     ]
+    ],
+    [
+     [
+      2,
+      8
+     ],
+     [
+      2,
+      9
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      3,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2373,6 +2762,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      4,
+      15
+     ],
+     [
+      4,
+      16
+     ],
+     [
+      5,
+      15
+     ],
+     [
+      5,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -2400,6 +2810,22 @@
    ]
   },
   {
+   "between": {
+    "8,2": null,
+    "9,3": "stall"
+   },
+   "houses": [
+    [
+     [
+      7,
+      3
+     ],
+     [
+      8,
+      3
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "DesertStorageDoor",
@@ -2427,6 +2853,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      7,
+      6
+     ],
+     [
+      7,
+      7
+     ],
+     [
+      8,
+      6
+     ],
+     [
+      8,
+      7
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2454,6 +2901,39 @@
    ]
   },
   {
+   "between": {
+    "9,15": "stall"
+   },
+   "houses": [
+    [
+     [
+      8,
+      16
+     ],
+     [
+      8,
+      17
+     ],
+     [
+      9,
+      16
+     ],
+     [
+      9,
+      17
+     ]
+    ],
+    [
+     [
+      10,
+      15
+     ],
+     [
+      10,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2493,6 +2973,55 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      11,
+      12
+     ],
+     [
+      11,
+      13
+     ],
+     [
+      12,
+      12
+     ],
+     [
+      12,
+      13
+     ]
+    ],
+    [
+     [
+      9,
+      10
+     ],
+     [
+      9,
+      11
+     ],
+     [
+      10,
+      10
+     ],
+     [
+      10,
+      11
+     ]
+    ],
+    [
+     [
+      11,
+      11
+     ],
+     [
+      12,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2544,6 +3073,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      12,
+      17
+     ],
+     [
+      12,
+      18
+     ],
+     [
+      13,
+      17
+     ],
+     [
+      13,
+      18
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2563,6 +3113,15 @@
    ]
   },
   {
+   "between": {
+    "13,5": "house",
+    "13,6": "stall",
+    "14,5": "house",
+    "14,6": "stall",
+    "15,5": "house",
+    "15,6": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -2598,6 +3157,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      15,
+      14
+     ],
+     [
+      15,
+      15
+     ],
+     [
+      16,
+      14
+     ],
+     [
+      16,
+      15
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2625,6 +3205,13 @@
    ]
   },
   {
+   "between": {
+    "18,10": null,
+    "18,9": "house",
+    "19,10": "house",
+    "19,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2652,6 +3239,23 @@
    ]
   },
   {
+   "between": {
+    "19,13": null,
+    "19,14": "stall",
+    "19,15": "house"
+   },
+   "houses": [
+    [
+     [
+      18,
+      12
+     ],
+     [
+      19,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "DesertWoodChair_Combat",
@@ -2685,6 +3289,41 @@
  ],
  "fe17-c005-2-1": [
   {
+   "between": {
+    "1,10": "stall",
+    "1,4": "house",
+    "1,5": "house",
+    "1,6": "stall",
+    "1,8": "stall",
+    "1,9": "house",
+    "2,10": "stall",
+    "2,4": "house",
+    "2,5": "house",
+    "2,8": "stall",
+    "2,9": "stall"
+   },
+   "houses": [
+    [
+     [
+      1,
+      11
+     ],
+     [
+      2,
+      11
+     ]
+    ],
+    [
+     [
+      0,
+      7
+     ],
+     [
+      1,
+      7
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -2752,6 +3391,13 @@
    ]
   },
   {
+   "between": {
+    "2,1": "house",
+    "2,2": "house",
+    "3,1": "house",
+    "3,2": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2779,6 +3425,11 @@
    ]
   },
   {
+   "between": {
+    "5,1": null,
+    "6,1": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BagB_Desert_Combat1",
@@ -2798,6 +3449,45 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      6,
+      6
+     ],
+     [
+      6,
+      7
+     ],
+     [
+      7,
+      6
+     ],
+     [
+      7,
+      7
+     ]
+    ],
+    [
+     [
+      5,
+      8
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      6,
+      8
+     ],
+     [
+      6,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2841,6 +3531,17 @@
    ]
   },
   {
+   "between": {
+    "10,1": "house",
+    "10,2": "house",
+    "11,1": "house",
+    "11,2": "house",
+    "8,2": "house",
+    "8,3": "house",
+    "9,2": "house",
+    "9,3": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2884,6 +3585,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      9,
+      10
+     ],
+     [
+      9,
+      11
+     ],
+     [
+      10,
+      10
+     ],
+     [
+      10,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -2911,6 +3633,15 @@
    ]
   },
   {
+   "between": {
+    "11,5": null,
+    "11,6": "stall",
+    "11,7": "house",
+    "12,5": "house",
+    "12,6": "house",
+    "12,7": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -2946,6 +3677,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      13,
+      11
+     ],
+     [
+      13,
+      12
+     ],
+     [
+      14,
+      11
+     ],
+     [
+      14,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -2991,6 +3743,15 @@
    ]
   },
   {
+   "between": {
+    "15,4": null,
+    "15,5": "house",
+    "16,4": "house",
+    "16,5": "stall",
+    "17,4": "house",
+    "17,5": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -3026,6 +3787,45 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      17,
+      9
+     ],
+     [
+      17,
+      10
+     ],
+     [
+      18,
+      9
+     ],
+     [
+      18,
+      10
+     ]
+    ],
+    [
+     [
+      15,
+      8
+     ],
+     [
+      15,
+      9
+     ],
+     [
+      16,
+      8
+     ],
+     [
+      16,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3061,6 +3861,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      17,
+      15
+     ],
+     [
+      17,
+      16
+     ],
+     [
+      18,
+      15
+     ],
+     [
+      18,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "BagB_Desert_Combat",
@@ -3082,6 +3903,41 @@
  ],
  "fe17-c005-2-2": [
   {
+   "between": {
+    "1,10": "stall",
+    "1,4": "house",
+    "1,5": "house",
+    "1,6": "stall",
+    "1,8": "stall",
+    "1,9": "house",
+    "2,10": "stall",
+    "2,4": "house",
+    "2,5": "house",
+    "2,8": "stall",
+    "2,9": "stall"
+   },
+   "houses": [
+    [
+     [
+      1,
+      11
+     ],
+     [
+      2,
+      11
+     ]
+    ],
+    [
+     [
+      0,
+      7
+     ],
+     [
+      1,
+      7
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -3149,6 +4005,13 @@
    ]
   },
   {
+   "between": {
+    "2,1": "house",
+    "2,2": "house",
+    "3,1": "house",
+    "3,2": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3176,6 +4039,11 @@
    ]
   },
   {
+   "between": {
+    "5,1": null,
+    "6,1": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BagB_Desert_Combat1",
@@ -3195,6 +4063,45 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      6,
+      6
+     ],
+     [
+      6,
+      7
+     ],
+     [
+      7,
+      6
+     ],
+     [
+      7,
+      7
+     ]
+    ],
+    [
+     [
+      5,
+      8
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      6,
+      8
+     ],
+     [
+      6,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3238,6 +4145,17 @@
    ]
   },
   {
+   "between": {
+    "10,1": "house",
+    "10,2": "house",
+    "11,1": "house",
+    "11,2": "house",
+    "8,2": "house",
+    "8,3": "house",
+    "9,2": "house",
+    "9,3": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3281,6 +4199,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      9,
+      10
+     ],
+     [
+      9,
+      11
+     ],
+     [
+      10,
+      10
+     ],
+     [
+      10,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3308,6 +4247,15 @@
    ]
   },
   {
+   "between": {
+    "11,5": null,
+    "11,6": "stall",
+    "11,7": "house",
+    "12,5": "house",
+    "12,6": "house",
+    "12,7": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -3343,6 +4291,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      13,
+      11
+     ],
+     [
+      13,
+      12
+     ],
+     [
+      14,
+      11
+     ],
+     [
+      14,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3388,6 +4357,15 @@
    ]
   },
   {
+   "between": {
+    "15,4": null,
+    "15,5": "house",
+    "16,4": "house",
+    "16,5": "stall",
+    "17,4": "house",
+    "17,5": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -3423,6 +4401,45 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      17,
+      9
+     ],
+     [
+      17,
+      10
+     ],
+     [
+      18,
+      9
+     ],
+     [
+      18,
+      10
+     ]
+    ],
+    [
+     [
+      15,
+      8
+     ],
+     [
+      15,
+      9
+     ],
+     [
+      16,
+      8
+     ],
+     [
+      16,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3458,6 +4475,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      17,
+      15
+     ],
+     [
+      17,
+      16
+     ],
+     [
+      18,
+      15
+     ],
+     [
+      18,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "BagB_Desert_Combat",
@@ -3544,6 +4582,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      0,
+      6
+     ],
+     [
+      0,
+      7
+     ],
+     [
+      1,
+      6
+     ],
+     [
+      1,
+      7
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3563,6 +4622,39 @@
    ]
   },
   {
+   "between": {
+    "2,15": "stall"
+   },
+   "houses": [
+    [
+     [
+      1,
+      16
+     ],
+     [
+      1,
+      17
+     ],
+     [
+      2,
+      16
+     ],
+     [
+      2,
+      17
+     ]
+    ],
+    [
+     [
+      3,
+      15
+     ],
+     [
+      3,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3602,6 +4694,55 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      2,
+      10
+     ],
+     [
+      2,
+      11
+     ],
+     [
+      3,
+      10
+     ],
+     [
+      3,
+      11
+     ]
+    ],
+    [
+     [
+      4,
+      12
+     ],
+     [
+      4,
+      13
+     ],
+     [
+      5,
+      12
+     ],
+     [
+      5,
+      13
+     ]
+    ],
+    [
+     [
+      4,
+      11
+     ],
+     [
+      5,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3653,6 +4794,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      5,
+      17
+     ],
+     [
+      5,
+      18
+     ],
+     [
+      6,
+      17
+     ],
+     [
+      6,
+      18
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3680,6 +4842,15 @@
    ]
   },
   {
+   "between": {
+    "6,5": "house",
+    "6,6": "stall",
+    "7,5": "house",
+    "7,6": "stall",
+    "8,5": "house",
+    "8,6": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -3715,6 +4886,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      8,
+      14
+     ],
+     [
+      8,
+      15
+     ],
+     [
+      9,
+      14
+     ],
+     [
+      9,
+      15
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3742,6 +4934,18 @@
    ]
   },
   {
+   "between": {
+    "10,19": "stall",
+    "10,20": "house",
+    "11,19": "stall",
+    "11,20": "stall",
+    "12,18": "stall",
+    "12,19": "house",
+    "12,20": "house",
+    "9,19": "stall",
+    "9,20": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BasketC",
@@ -3789,6 +4993,13 @@
    ]
   },
   {
+   "between": {
+    "11,10": null,
+    "11,9": "house",
+    "12,10": "house",
+    "12,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3816,6 +5027,23 @@
    ]
   },
   {
+   "between": {
+    "12,13": null,
+    "12,14": "stall",
+    "12,15": "house"
+   },
+   "houses": [
+    [
+     [
+      11,
+      12
+     ],
+     [
+      12,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "DesertWoodChair_Combat",
@@ -3872,6 +5100,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      0,
+      6
+     ],
+     [
+      0,
+      7
+     ],
+     [
+      1,
+      6
+     ],
+     [
+      1,
+      7
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3891,6 +5140,39 @@
    ]
   },
   {
+   "between": {
+    "2,15": "stall"
+   },
+   "houses": [
+    [
+     [
+      1,
+      16
+     ],
+     [
+      1,
+      17
+     ],
+     [
+      2,
+      16
+     ],
+     [
+      2,
+      17
+     ]
+    ],
+    [
+     [
+      3,
+      15
+     ],
+     [
+      3,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -3930,6 +5212,55 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      2,
+      10
+     ],
+     [
+      2,
+      11
+     ],
+     [
+      3,
+      10
+     ],
+     [
+      3,
+      11
+     ]
+    ],
+    [
+     [
+      4,
+      12
+     ],
+     [
+      4,
+      13
+     ],
+     [
+      5,
+      12
+     ],
+     [
+      5,
+      13
+     ]
+    ],
+    [
+     [
+      4,
+      11
+     ],
+     [
+      5,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -3981,6 +5312,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      5,
+      17
+     ],
+     [
+      5,
+      18
+     ],
+     [
+      6,
+      17
+     ],
+     [
+      6,
+      18
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -4008,6 +5360,15 @@
    ]
   },
   {
+   "between": {
+    "6,5": "house",
+    "6,6": "stall",
+    "7,5": "house",
+    "7,6": "stall",
+    "8,5": "house",
+    "8,6": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -4043,6 +5404,27 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      8,
+      14
+     ],
+     [
+      8,
+      15
+     ],
+     [
+      9,
+      14
+     ],
+     [
+      9,
+      15
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -4070,6 +5452,18 @@
    ]
   },
   {
+   "between": {
+    "10,19": "stall",
+    "10,20": "house",
+    "11,19": "stall",
+    "11,20": "stall",
+    "12,18": "stall",
+    "12,19": "house",
+    "12,20": "house",
+    "9,19": "stall",
+    "9,20": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BasketC",
@@ -4117,6 +5511,13 @@
    ]
   },
   {
+   "between": {
+    "11,10": null,
+    "11,9": "house",
+    "12,10": "house",
+    "12,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -4144,6 +5545,23 @@
    ]
   },
   {
+   "between": {
+    "12,13": null,
+    "12,14": "stall",
+    "12,15": "house"
+   },
+   "houses": [
+    [
+     [
+      11,
+      12
+     ],
+     [
+      12,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "DesertWoodChair_Combat",
@@ -11649,6 +13067,61 @@
  ],
  "fe17-m006": [
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      3,
+      7
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      3,
+      9
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      4,
+      8
+     ],
+     [
+      4,
+      9
+     ]
+    ],
+    [
+     [
+      2,
+      4
+     ],
+     [
+      2,
+      5
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      3,
+      6
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "Wood01",
@@ -11708,6 +13181,19 @@
    ]
   },
   {
+   "between": {
+    "5,12": null,
+    "5,13": null,
+    "6,13": null
+   },
+   "houses": [
+    [
+     [
+      6,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseBSideWall_Combat",
@@ -11735,6 +13221,61 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      11,
+      4
+     ],
+     [
+      11,
+      5
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      12,
+      5
+     ],
+     [
+      13,
+      4
+     ],
+     [
+      13,
+      5
+     ]
+    ],
+    [
+     [
+      8,
+      3
+     ],
+     [
+      8,
+      4
+     ],
+     [
+      9,
+      3
+     ],
+     [
+      9,
+      4
+     ],
+     [
+      10,
+      3
+     ],
+     [
+      10,
+      4
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -11794,6 +13335,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      9,
+      8
+     ],
+     [
+      9,
+      9
+     ],
+     [
+      10,
+      8
+     ],
+     [
+      10,
+      9
+     ],
+     [
+      11,
+      8
+     ],
+     [
+      11,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseAFront_Combat",
@@ -11829,6 +13399,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      10,
+      11
+     ],
+     [
+      10,
+      12
+     ],
+     [
+      10,
+      13
+     ],
+     [
+      11,
+      11
+     ],
+     [
+      11,
+      12
+     ],
+     [
+      11,
+      13
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseBFrontWall_Combat",
@@ -11864,6 +13463,111 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      15,
+      12
+     ],
+     [
+      15,
+      13
+     ],
+     [
+      16,
+      12
+     ],
+     [
+      16,
+      13
+     ],
+     [
+      17,
+      12
+     ],
+     [
+      17,
+      13
+     ],
+     [
+      18,
+      12
+     ],
+     [
+      18,
+      13
+     ],
+     [
+      19,
+      12
+     ],
+     [
+      19,
+      13
+     ],
+     [
+      20,
+      12
+     ],
+     [
+      20,
+      13
+     ]
+    ],
+    [
+     [
+      16,
+      8
+     ],
+     [
+      16,
+      9
+     ],
+     [
+      16,
+      10
+     ],
+     [
+      17,
+      8
+     ],
+     [
+      17,
+      9
+     ],
+     [
+      17,
+      10
+     ]
+    ],
+    [
+     [
+      13,
+      10
+     ],
+     [
+      13,
+      11
+     ],
+     [
+      14,
+      10
+     ],
+     [
+      14,
+      11
+     ],
+     [
+      15,
+      10
+     ],
+     [
+      15,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -11971,6 +13675,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      15,
+      1
+     ],
+     [
+      15,
+      2
+     ],
+     [
+      16,
+      1
+     ],
+     [
+      16,
+      2
+     ],
+     [
+      17,
+      1
+     ],
+     [
+      17,
+      2
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -12006,6 +13739,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      17,
+      16
+     ],
+     [
+      17,
+      17
+     ],
+     [
+      18,
+      16
+     ],
+     [
+      18,
+      17
+     ],
+     [
+      19,
+      16
+     ],
+     [
+      19,
+      17
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseARoof_Combat",
@@ -12041,6 +13803,61 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      22,
+      5
+     ],
+     [
+      22,
+      6
+     ],
+     [
+      22,
+      7
+     ],
+     [
+      23,
+      5
+     ],
+     [
+      23,
+      6
+     ],
+     [
+      23,
+      7
+     ]
+    ],
+    [
+     [
+      21,
+      8
+     ],
+     [
+      21,
+      9
+     ],
+     [
+      21,
+      10
+     ],
+     [
+      22,
+      8
+     ],
+     [
+      22,
+      9
+     ],
+     [
+      22,
+      10
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -12100,6 +13917,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      22,
+      12
+     ],
+     [
+      22,
+      13
+     ],
+     [
+      23,
+      12
+     ],
+     [
+      23,
+      13
+     ],
+     [
+      24,
+      12
+     ],
+     [
+      24,
+      13
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "Wood01",
@@ -12137,6 +13983,61 @@
  ],
  "fe17-m006-sk": [
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      3,
+      7
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      3,
+      9
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      4,
+      8
+     ],
+     [
+      4,
+      9
+     ]
+    ],
+    [
+     [
+      2,
+      4
+     ],
+     [
+      2,
+      5
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      3,
+      6
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "Wood01",
@@ -12196,6 +14097,19 @@
    ]
   },
   {
+   "between": {
+    "5,12": null,
+    "5,13": null,
+    "6,13": null
+   },
+   "houses": [
+    [
+     [
+      6,
+      12
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseBSideWall_Combat",
@@ -12223,6 +14137,61 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      11,
+      4
+     ],
+     [
+      11,
+      5
+     ],
+     [
+      12,
+      4
+     ],
+     [
+      12,
+      5
+     ],
+     [
+      13,
+      4
+     ],
+     [
+      13,
+      5
+     ]
+    ],
+    [
+     [
+      8,
+      3
+     ],
+     [
+      8,
+      4
+     ],
+     [
+      9,
+      3
+     ],
+     [
+      9,
+      4
+     ],
+     [
+      10,
+      3
+     ],
+     [
+      10,
+      4
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -12282,6 +14251,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      9,
+      8
+     ],
+     [
+      9,
+      9
+     ],
+     [
+      10,
+      8
+     ],
+     [
+      10,
+      9
+     ],
+     [
+      11,
+      8
+     ],
+     [
+      11,
+      9
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseAFront_Combat",
@@ -12317,6 +14315,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      10,
+      11
+     ],
+     [
+      10,
+      12
+     ],
+     [
+      10,
+      13
+     ],
+     [
+      11,
+      11
+     ],
+     [
+      11,
+      12
+     ],
+     [
+      11,
+      13
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseBFrontWall_Combat",
@@ -12352,6 +14379,111 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      15,
+      12
+     ],
+     [
+      15,
+      13
+     ],
+     [
+      16,
+      12
+     ],
+     [
+      16,
+      13
+     ],
+     [
+      17,
+      12
+     ],
+     [
+      17,
+      13
+     ],
+     [
+      18,
+      12
+     ],
+     [
+      18,
+      13
+     ],
+     [
+      19,
+      12
+     ],
+     [
+      19,
+      13
+     ],
+     [
+      20,
+      12
+     ],
+     [
+      20,
+      13
+     ]
+    ],
+    [
+     [
+      16,
+      8
+     ],
+     [
+      16,
+      9
+     ],
+     [
+      16,
+      10
+     ],
+     [
+      17,
+      8
+     ],
+     [
+      17,
+      9
+     ],
+     [
+      17,
+      10
+     ]
+    ],
+    [
+     [
+      13,
+      10
+     ],
+     [
+      13,
+      11
+     ],
+     [
+      14,
+      10
+     ],
+     [
+      14,
+      11
+     ],
+     [
+      15,
+      10
+     ],
+     [
+      15,
+      11
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -12459,6 +14591,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      15,
+      1
+     ],
+     [
+      15,
+      2
+     ],
+     [
+      16,
+      1
+     ],
+     [
+      16,
+      2
+     ],
+     [
+      17,
+      1
+     ],
+     [
+      17,
+      2
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -12494,6 +14655,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      17,
+      16
+     ],
+     [
+      17,
+      17
+     ],
+     [
+      18,
+      16
+     ],
+     [
+      18,
+      17
+     ],
+     [
+      19,
+      16
+     ],
+     [
+      19,
+      17
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "FileneHouseARoof_Combat",
@@ -12529,6 +14719,61 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      22,
+      5
+     ],
+     [
+      22,
+      6
+     ],
+     [
+      22,
+      7
+     ],
+     [
+      23,
+      5
+     ],
+     [
+      23,
+      6
+     ],
+     [
+      23,
+      7
+     ]
+    ],
+    [
+     [
+      21,
+      8
+     ],
+     [
+      21,
+      9
+     ],
+     [
+      21,
+      10
+     ],
+     [
+      22,
+      8
+     ],
+     [
+      22,
+      9
+     ],
+     [
+      22,
+      10
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1",
@@ -12588,6 +14833,35 @@
    ]
   },
   {
+   "between": {},
+   "houses": [
+    [
+     [
+      22,
+      12
+     ],
+     [
+      22,
+      13
+     ],
+     [
+      23,
+      12
+     ],
+     [
+      23,
+      13
+     ],
+     [
+      24,
+      12
+     ],
+     [
+      24,
+      13
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "Wood01",
@@ -12765,6 +15039,30 @@
  ],
  "fe17-m013": [
   {
+   "between": {
+    "1,7": "house",
+    "1,8": "house",
+    "2,4": null,
+    "2,5": null,
+    "2,6": "stall",
+    "3,4": null,
+    "3,5": null,
+    "3,6": null,
+    "4,4": null,
+    "4,5": null
+   },
+   "houses": [
+    [
+     [
+      2,
+      7
+     ],
+     [
+      2,
+      8
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -12824,6 +15122,15 @@
    ]
   },
   {
+   "between": {
+    "1,10": "house",
+    "1,11": "house",
+    "1,12": "house",
+    "2,10": "house",
+    "2,11": "stall",
+    "2,12": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -12859,6 +15166,26 @@
    ]
   },
   {
+   "between": {
+    "1,14": "stall",
+    "1,15": "stall",
+    "1,16": "stall",
+    "1,17": "house",
+    "1,18": "stall",
+    "2,16": "stall"
+   },
+   "houses": [
+    [
+     [
+      2,
+      17
+     ],
+     [
+      2,
+      18
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -12902,6 +15229,16 @@
    ]
   },
   {
+   "between": {
+    "2,2": "stall",
+    "3,1": "house",
+    "3,2": "stall",
+    "4,1": "house",
+    "4,2": "stall",
+    "5,1": "house",
+    "5,2": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -12941,6 +15278,13 @@
    ]
   },
   {
+   "between": {
+    "5,10": "house",
+    "5,11": "house",
+    "6,10": "house",
+    "6,11": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -12968,6 +15312,48 @@
    ]
   },
   {
+   "between": {
+    "6,17": "stall",
+    "6,18": "house",
+    "7,15": "house",
+    "7,16": "house",
+    "7,17": "house",
+    "7,18": "house",
+    "8,15": "house",
+    "8,16": "house"
+   },
+   "houses": [
+    [
+     [
+      5,
+      15
+     ],
+     [
+      6,
+      15
+     ]
+    ],
+    [
+     [
+      5,
+      14
+     ],
+     [
+      6,
+      14
+     ]
+    ],
+    [
+     [
+      5,
+      16
+     ],
+     [
+      6,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -13035,6 +15421,36 @@
    ]
   },
   {
+   "between": {
+    "10,1": "house",
+    "10,2": "house",
+    "11,1": "house",
+    "11,2": "house",
+    "12,1": "stall",
+    "13,1": "stall",
+    "14,1": "house",
+    "15,1": "stall",
+    "16,1": "stall",
+    "17,1": "stall",
+    "7,2": "stall",
+    "7,3": "stall",
+    "8,2": "house",
+    "8,3": "stall",
+    "9,2": "stall",
+    "9,3": "stall"
+   },
+   "houses": [
+    [
+     [
+      8,
+      1
+     ],
+     [
+      9,
+      1
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -13118,6 +15534,15 @@
    ]
   },
   {
+   "between": {
+    "8,11": "stall",
+    "8,12": "stall",
+    "8,13": "stall",
+    "9,11": "stall",
+    "9,12": "house",
+    "9,13": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BasketC",
@@ -13153,6 +15578,15 @@
    ]
   },
   {
+   "between": {
+    "12,12": "house",
+    "12,13": "stall",
+    "13,12": "house",
+    "13,13": "stall",
+    "14,12": "house",
+    "14,13": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -13188,6 +15622,23 @@
    ]
   },
   {
+   "between": {
+    "13,5": "stall",
+    "13,6": "house",
+    "14,5": "stall",
+    "14,6": "house",
+    "14,7": "house",
+    "14,8": "house",
+    "15,5": "house",
+    "15,6": "stall",
+    "15,7": "house",
+    "15,8": "house",
+    "16,8": "house",
+    "16,9": "house",
+    "17,8": "house",
+    "17,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BagB_Desert_Combat",
@@ -13255,6 +15706,22 @@
    ]
   },
   {
+   "between": {
+    "14,16": null,
+    "14,17": null
+   },
+   "houses": [
+    [
+     [
+      13,
+      16
+     ],
+     [
+      13,
+      17
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VisitC01_LOD0_State1",
@@ -13282,6 +15749,17 @@
    ]
   },
   {
+   "between": {
+    "17,5": "house",
+    "17,6": "house",
+    "18,5": "house",
+    "18,6": "house",
+    "19,5": "house",
+    "19,6": "house",
+    "20,5": "house",
+    "20,6": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -13325,6 +15803,15 @@
    ]
   },
   {
+   "between": {
+    "18,11": "stall",
+    "18,12": "stall",
+    "19,11": "stall",
+    "19,12": "house",
+    "20,11": "stall",
+    "20,12": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BasketC",
@@ -13422,6 +15909,13 @@
    ]
   },
   {
+   "between": {
+    "26,8": "house",
+    "26,9": "house",
+    "27,8": "house",
+    "27,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -13451,6 +15945,30 @@
  ],
  "fe17-m013-sk": [
   {
+   "between": {
+    "1,7": "house",
+    "1,8": "house",
+    "2,4": null,
+    "2,5": null,
+    "2,6": "stall",
+    "3,4": null,
+    "3,5": null,
+    "3,6": null,
+    "4,4": null,
+    "4,5": null
+   },
+   "houses": [
+    [
+     [
+      2,
+      7
+     ],
+     [
+      2,
+      8
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "WoodBoxOpen_Combat",
@@ -13510,6 +16028,15 @@
    ]
   },
   {
+   "between": {
+    "1,10": "house",
+    "1,11": "house",
+    "1,12": "house",
+    "2,10": "house",
+    "2,11": "stall",
+    "2,12": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -13545,6 +16072,26 @@
    ]
   },
   {
+   "between": {
+    "1,14": "stall",
+    "1,15": "stall",
+    "1,16": "stall",
+    "1,17": "house",
+    "1,18": "stall",
+    "2,16": "stall"
+   },
+   "houses": [
+    [
+     [
+      2,
+      17
+     ],
+     [
+      2,
+      18
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -13588,6 +16135,16 @@
    ]
   },
   {
+   "between": {
+    "2,2": "stall",
+    "3,1": "house",
+    "3,2": "stall",
+    "4,1": "house",
+    "4,2": "stall",
+    "5,1": "house",
+    "5,2": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -13627,6 +16184,13 @@
    ]
   },
   {
+   "between": {
+    "5,10": "house",
+    "5,11": "house",
+    "6,10": "house",
+    "6,11": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -13654,6 +16218,48 @@
    ]
   },
   {
+   "between": {
+    "6,17": "stall",
+    "6,18": "house",
+    "7,15": "house",
+    "7,16": "house",
+    "7,17": "house",
+    "7,18": "house",
+    "8,15": "house",
+    "8,16": "house"
+   },
+   "houses": [
+    [
+     [
+      5,
+      15
+     ],
+     [
+      6,
+      15
+     ]
+    ],
+    [
+     [
+      5,
+      14
+     ],
+     [
+      6,
+      14
+     ]
+    ],
+    [
+     [
+      5,
+      16
+     ],
+     [
+      6,
+      16
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -13721,6 +16327,36 @@
    ]
   },
   {
+   "between": {
+    "10,1": "house",
+    "10,2": "house",
+    "11,1": "house",
+    "11,2": "house",
+    "12,1": "stall",
+    "13,1": "stall",
+    "14,1": "house",
+    "15,1": "stall",
+    "16,1": "stall",
+    "17,1": "stall",
+    "7,2": "stall",
+    "7,3": "stall",
+    "8,2": "house",
+    "8,3": "stall",
+    "9,2": "stall",
+    "9,3": "stall"
+   },
+   "houses": [
+    [
+     [
+      8,
+      1
+     ],
+     [
+      9,
+      1
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VaseA_Desert_Combat",
@@ -13804,6 +16440,15 @@
    ]
   },
   {
+   "between": {
+    "8,11": "stall",
+    "8,12": "stall",
+    "8,13": "stall",
+    "9,11": "stall",
+    "9,12": "house",
+    "9,13": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BasketC",
@@ -13839,6 +16484,15 @@
    ]
   },
   {
+   "between": {
+    "12,12": "house",
+    "12,13": "stall",
+    "13,12": "house",
+    "13,13": "stall",
+    "14,12": "house",
+    "14,13": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "DesertHouse_Emission_Far_Combat",
@@ -13874,6 +16528,23 @@
    ]
   },
   {
+   "between": {
+    "13,5": "stall",
+    "13,6": "house",
+    "14,5": "stall",
+    "14,6": "house",
+    "14,7": "house",
+    "14,8": "house",
+    "15,5": "house",
+    "15,6": "stall",
+    "15,7": "house",
+    "15,8": "house",
+    "16,8": "house",
+    "16,9": "house",
+    "17,8": "house",
+    "17,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BagB_Desert_Combat",
@@ -13941,6 +16612,22 @@
    ]
   },
   {
+   "between": {
+    "14,16": null,
+    "14,17": null
+   },
+   "houses": [
+    [
+     [
+      13,
+      16
+     ],
+     [
+      13,
+      17
+     ]
+    ]
+   ],
    "kind": "house",
    "names": [
     "VisitC01_LOD0_State1",
@@ -13968,6 +16655,17 @@
    ]
   },
   {
+   "between": {
+    "17,5": "house",
+    "17,6": "house",
+    "18,5": "house",
+    "18,6": "house",
+    "19,5": "house",
+    "19,6": "house",
+    "20,5": "house",
+    "20,6": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -14011,6 +16709,15 @@
    ]
   },
   {
+   "between": {
+    "18,11": "stall",
+    "18,12": "stall",
+    "19,11": "stall",
+    "19,12": "house",
+    "20,11": "stall",
+    "20,12": "stall"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "BasketC",
@@ -14108,6 +16815,13 @@
    ]
   },
   {
+   "between": {
+    "26,8": "house",
+    "26,9": "house",
+    "27,8": "house",
+    "27,9": "house"
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "PouchBag",
@@ -14759,6 +17473,12 @@
  ],
  "fe17-m017": [
   {
+   "between": {
+    "1,16": null,
+    "1,17": "house",
+    "1,18": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "FileneHouseABreakDoor_Combat"
@@ -14887,6 +17607,18 @@
    ]
   },
   {
+   "between": {
+    "6,16": null,
+    "6,17": null,
+    "6,18": null,
+    "7,16": "house",
+    "7,17": "house",
+    "7,18": null,
+    "8,16": null,
+    "8,17": null,
+    "8,18": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "FileneHouseBBreakRoof_Combat",
@@ -14961,6 +17693,18 @@
    ]
   },
   {
+   "between": {
+    "12,16": null,
+    "12,17": null,
+    "12,18": null,
+    "13,16": "house",
+    "13,17": "house",
+    "13,18": null,
+    "14,16": "crates",
+    "14,17": null,
+    "14,18": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1_Unsal",
@@ -15170,6 +17914,18 @@
    ]
   },
   {
+   "between": {
+    "26,25": null,
+    "26,26": null,
+    "26,27": null,
+    "27,25": "house",
+    "27,26": "house",
+    "27,27": null,
+    "28,25": null,
+    "28,26": null,
+    "28,27": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "OuterWall",
@@ -15244,6 +18000,18 @@
    ]
   },
   {
+   "between": {
+    "30,10": null,
+    "30,11": null,
+    "30,12": null,
+    "31,10": "house",
+    "31,11": "house",
+    "31,12": null,
+    "32,10": null,
+    "32,11": null,
+    "32,12": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "OuterWall",
@@ -15291,6 +18059,18 @@
    ]
   },
   {
+   "between": {
+    "30,21": null,
+    "30,22": null,
+    "30,23": null,
+    "31,21": "house",
+    "31,22": "house",
+    "31,23": null,
+    "32,21": null,
+    "32,22": null,
+    "32,23": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "FileneHouseBBreakRoof_Combat",
@@ -15394,6 +18174,12 @@
  ],
  "fe17-m017-sk": [
   {
+   "between": {
+    "1,16": null,
+    "1,17": "house",
+    "1,18": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "FileneHouseABreakDoor_Combat"
@@ -15522,6 +18308,18 @@
    ]
   },
   {
+   "between": {
+    "6,16": null,
+    "6,17": null,
+    "6,18": null,
+    "7,16": "house",
+    "7,17": "house",
+    "7,18": null,
+    "8,16": null,
+    "8,17": null,
+    "8,18": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "FileneHouseBBreakRoof_Combat",
@@ -15596,6 +18394,18 @@
    ]
   },
   {
+   "between": {
+    "12,16": null,
+    "12,17": null,
+    "12,18": null,
+    "13,16": "house",
+    "13,17": "house",
+    "13,18": null,
+    "14,16": "crates",
+    "14,17": null,
+    "14,18": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "WoodBoxA01Combatx1_Unsal",
@@ -15805,6 +18615,18 @@
    ]
   },
   {
+   "between": {
+    "26,25": null,
+    "26,26": null,
+    "26,27": null,
+    "27,25": "house",
+    "27,26": "house",
+    "27,27": null,
+    "28,25": null,
+    "28,26": null,
+    "28,27": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "OuterWall",
@@ -15879,6 +18701,18 @@
    ]
   },
   {
+   "between": {
+    "30,10": null,
+    "30,11": null,
+    "30,12": null,
+    "31,10": "house",
+    "31,11": "house",
+    "31,12": null,
+    "32,10": null,
+    "32,11": null,
+    "32,12": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "OuterWall",
@@ -15926,6 +18760,18 @@
    ]
   },
   {
+   "between": {
+    "30,21": null,
+    "30,22": null,
+    "30,23": null,
+    "31,21": "house",
+    "31,22": "house",
+    "31,23": null,
+    "32,21": null,
+    "32,22": null,
+    "32,23": null
+   },
+   "houses": [],
    "kind": "house",
    "names": [
     "FileneHouseBBreakRoof_Combat",
@@ -17514,6 +20360,10 @@
       16
      ],
      [
+      11,
+      17
+     ],
+     [
       12,
       15
      ],
@@ -18561,6 +21411,10 @@
      [
       11,
       16
+     ],
+     [
+      11,
+      17
      ],
      [
       12,

@@ -101,17 +101,31 @@ def house_footprints(map_id, m, scene, window):
         return json.load(open(path, encoding='utf-8'))
     x1, z1 = window[0], window[1]
     w, h = m['width'], m['height']
-    found = []
-    for name, _, P, _, tri in scene().renderers():
-        if not re.search(r'house', name, re.I):
+    # A house's parts (its walls, roof, front and door, each a model of its own in Chapter 6's Filene houses) gathered under the house
+    # they belong to: the furthest of a part's ancestors named a house (Chapter 6's FileneHouseA_Break_M006(2)), not a group of them
+    # ("House", "Grp_House", "Grp_IrcionHouseA"), else the part itself; its plan the parts' together.
+    extent = {}
+    for name, _, P, _, tri, owners in scene().renderers(owners=True):
+        houses = [a for a in owners if re.search(r'house', a[1], re.I) and not re.match(r'\s*(grp|group)|\s*houses?\s*$', a[1], re.I)]
+        if not (houses or re.search(r'house', name, re.I)):
             continue
+        key = houses[-1] if houses else (id(P), name)
         V = P[np.unique(tri)]
         lo, hi = V.min(0) / 5, V.max(0) / 5
+        label = houses[-1][1] if houses else name
+        if key in extent:
+            _, lo0, hi0 = extent[key]
+            lo, hi = np.minimum(lo, lo0), np.maximum(hi, hi0)
+        extent[key] = (label, lo, hi)
+    found = []
+    for label, lo, hi in extent.values():
         xs = range(int(np.ceil(lo[0] - 0.5)) - x1 + 1, int(np.floor(hi[0] - 0.5)) - x1 + 2)
         zs = range(int(np.ceil(lo[2] - 0.5)) - z1 + 1, int(np.floor(hi[2] - 0.5)) - z1 + 2)
         tiles = {(x, z) for x in xs for z in zs if 0 <= x <= w + 1 and 0 <= z <= h + 1}
-        if len(xs) and len(zs) and tiles:
-            found.append((re.sub(r'(_LOD\d+|\s*\(\d+\)|[\s_]\d+)+$', '', name), tiles))
+        # No house runs more than seven tiles: what does is a town's wall the scene names a house's (Chapter 19's HouseWallA, the
+        # length of its town), which would swallow the houses in its outline.
+        if len(xs) and len(zs) and tiles and max(len(xs), len(zs)) <= 7:
+            found.append((re.sub(r'(_LOD\d+|\s*\(\d+\)|[\s_]\d+)+$', '', label), tiles))
     kept = []
     for name, tiles in sorted(found, key=lambda f: -len(f[1])):
         if not any(len(tiles & k) >= 0.6 * len(tiles) for _, k in kept):
@@ -127,6 +141,7 @@ def add_houses(map_id, m, scene, window, blocks):
     and what stands on its other tiles (`between`: {"x,y": kind}, its crates and the like) (the user, Chapter 19's town: 'way too many
     tiles for villages together, instead of where they should be split to different houses')."""
     w, h = m['width'], m['height']
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     names = tile_names(map_id, m, scene, window)
     feet = house_footprints(map_id, m, scene, window)
     for b in blocks:
@@ -138,7 +153,9 @@ def add_houses(map_id, m, scene, window, blocks):
             ft = {tuple(t) for t in f['tiles']}
             on = ft & tiles
             if on:
-                past = {t for t in ft - tiles if not (1 <= t[0] <= w and 1 <= t[1] <= h)}
+                # Its plan's tiles past the map's edge, and its obstacles no unit enters under its roof (Chapter 19's (11, 17): the
+                # user, "a roof tile to make a full 3x3 house").
+                past = {t for t in ft - tiles if not (1 <= t[0] <= w and 1 <= t[1] <= h) or rows[h - t[1]][t[0] - 1] in ('wa', 'wj')}
                 houses.append(sorted([list(t) for t in on | past]))
         covered = {tuple(t) for hs in houses for t in hs}
         b['houses'] = houses

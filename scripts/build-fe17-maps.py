@@ -2539,6 +2539,17 @@ def split_rects(tiles, max_w=6, max_h=4):
         left -= best[1]
 
 
+def scene_houses(b):
+    """Whether a block's houses as its scene stands them account for it (scripts/fe17_buildings.py --houses): every house model on it
+    one of them, and the houses most of what isn't crates or market goods; else (houses built of parts no name says, Chapter 13's
+    market) the block is parted by rectangles."""
+    houses, between = b.get('houses') or [], b.get('between') or {}
+    if not houses or 'house' in between.values():
+        return False
+    goods = sum(1 for k in between.values() if k in ('crates', 'stall'))
+    return len(b['tiles']) - len(between) >= 0.6 * (len(b['tiles']) - goods)
+
+
 def draw_buildings(m, blocks):
     """Draws each block of a map's Edifice tiles as the building its scene shows there (scripts/fe17_buildings.py; the user's calls,
     the review of every map: villages, windmills, yurts, forts and ruins, not blocks of wall): a house drawn whole (`ra`-`rr`), a fort
@@ -2573,7 +2584,7 @@ def draw_buildings(m, blocks):
         box = len(tiles) == w * tall
         if kind == 'ruins':
             m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
-        elif kind == 'house' and b.get('houses'):
+        elif kind == 'house' and scene_houses(b) and not (box and 2 <= w <= 6 and tall <= 4):
             # The houses as the scene stands them, each house model's own tiles (scripts/fe17_buildings.py --houses; the user, in the
             # game, 2026-11-27: Chapter 19's town had "way too many tiles for villages together, instead of where they should be split
             # to different houses"), one past the map's edge carried past it; what stands between them its crates, else the block's
@@ -2593,6 +2604,10 @@ def draw_buildings(m, blocks):
                 m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'house' for x, y in left if 1 <= x <= width and 1 <= y <= h})
             houses(rects)
             m['decor'] = dict(m.get('decor') or {}, **{k: 'crates' for k, v in b['between'].items() if v == 'crates'})
+            for k, v in b['between'].items():
+                if v == 'stall':
+                    x, y = map(int, k.split(','))
+                    rows[h - y][x - 1] = 'XS'
         elif kind == 'house' and box and 2 <= w <= 6 and tall <= 4:
             whole['r'] |= tiles
         elif kind == 'house':

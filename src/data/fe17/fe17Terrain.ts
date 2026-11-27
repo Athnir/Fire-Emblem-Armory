@@ -93,9 +93,11 @@ export const FE17_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   rh: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
   ri: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
   rj: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
+  rk: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
   rl: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
   rm: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
   ro: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
   rp: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
+  rq: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
   rr: {"avo": 0, "def": 0, "heal": 0, "move": {"Cavalry": null, "Dragons": null, "Fliers": null, "Infantry": null}, "name": "House"},
 }
