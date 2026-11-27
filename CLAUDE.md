@@ -447,7 +447,10 @@ new game, so the same fixes don't have to be caught again. When the user settles
   villages the user saw as ruins (the Tempest Trials' c002, Chapter 6, Paralogue 12) have their houses in ruins. Awakening's building
   over a village (a block of walls two to six wide standing just above its tile) is the village's house drawn whole, the village its
   door mat (`map_pieces.village_houses`: the user, Chapter 8's villages), and a building fliers cross (the DLC's and Paralogues 2, 3,
-  13, 18 and 20's `w8`) the same over a village, or over a castle gate the castle drawn whole (`ca`-`ci`), the gate its front (the user:
+  13, 18 and 20's `w8`, the game's walled compound of three little houses round a yard, the zoomed-out villages: the user, in the
+  game, 2026-11-26, Champions of Yore's and Lost Bloodlines'; the paralogues stand the same building) Shadow Dragon's and New Mystery's
+  walled compound (`va`-`vi` on a map of `walledVillages`, a piece a tile: the user, 'you can use the ones from 11 and 12'), the
+  village below its gate its door mat, or over a castle gate the castle drawn whole (`ca`-`ci`), the gate its front (the user:
   villages and forts), each with the building's numbers (`fliers_buildings`); its towns' paler ground is cobbles (`gb`, the plain's
   numbers: the user's calls, Chapter 2's roads), and the cobbles those two looks don't find are found each its own way in its render
   (`fe13_ground.PAVING`: the Prologue's causeways by their busy grey stone, Chapter 1's cracked red ground by its warmth, Chapter 9's
@@ -1334,6 +1337,9 @@ A global switch (header, any game) that lets someone play along without being to
   ask, 2026-11-26): Path of Radiance's restored debug title (`data-raw/fe9/README.md`), Radiant Dawn's `scripts/fe10_jump.py` (a
   copy of the extracted disc whose New Game opens the chapter with its developer roster), written into a copy, never as cheats
   (RetroAchievements); a copy shares the game's save file, so the user's save is backed up first and nothing is saved in it.
+  Awakening's in Citra: a mod (`%APPDATA%\Citra\load\mods 40000000A0500omfs`) with the chapter's files from the cartridge
+  (`data/`, `m/E/`, `map/`, `scripts/`, named by its key: `X014`) under the next story chapter's key on the user's save (`005`),
+  so that chapter loads it (its heights stay the story chapter's); removed once the user has looked (Paralogue 14, 2026-11-26).
 - **Check counts against outside sources in the tests** (enemy totals per map, wiki or fireemblemwod.com),
   with every exception explained.
 - **Back each rule with a test where it can be checked** (e.g. no pillar icon on a tile no one can enter;

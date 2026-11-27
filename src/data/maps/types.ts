@@ -437,7 +437,9 @@ export interface ChapterMap {
    * they stand (the user: a fire wall tile with an up and a down look), the challenge's all down. */
   flameWalls?: string[]
   /** Its two-tile villages are walled compounds of little houses round a paved yard, as the DS games draw them (Shadow Dragon's and
-   * New Mystery's: the user's call), not the older games' small house with a low wall. */
+   * New Mystery's: the user's call), not the older games' small house with a low wall; and its villages' yards drawn whole (`va`-`vi`)
+   * the same compound, a piece a tile, a village before its gate its door mat (Awakening's DLC and paralogues: the user's call,
+   * 2026-11-26, the zoomed-out villages). */
   walledVillages?: true
   /** Tents turned side-on, their doors in their sides (Radiant Dawn's Part 3 Ch.3, where units come out the side: the user), by the
    * tent's middle tile: the side its door is on. */

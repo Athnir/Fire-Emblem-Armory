@@ -476,7 +476,9 @@ export const sceneryHouse = (code: TerrainCode, key: string, visits: Set<string>
  * army's tent (Radiant Dawn's camps) has its mat before it or at its side, where the game puts its visit. */
 export const beforeBuilding = (map: ChapterMap, [x, y]: Tile) => {
   const at = (t: Tile) => t[0] >= 1 && t[1] >= 1 && t[0] <= map.width && t[1] <= map.height ? terrainAt(map, t) : ''
-  return /^[rkp][a-i]$/.test(at([x, y + 1])) || [at([x, y + 1]), at([x - 1, y]), at([x + 1, y])].some((c) => /^u[a-i]$/.test(c))
+  // A walled village's gate (`walledVillages`: the middle of its compound's front, Awakening's) has a door mat before it too.
+  return /^[rkp][a-i]$/.test(at([x, y + 1])) || [at([x, y + 1]), at([x - 1, y]), at([x + 1, y])].some((c) => /^u[a-i]$/.test(c)) ||
+    (!!map.walledVillages && at([x, y + 1]) === 'vh')
 }
 /** Only where there's something to visit: a village tile before a house with nothing to visit there is no mat (Fates' Birthright 13:
  * the user, no door mat for the decorative ones), drawn as the ground before a house whose door is shut. */

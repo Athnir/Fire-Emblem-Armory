@@ -5,9 +5,7 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 
 | Game | Map | What to check | The user's note |
 | --- | --- | --- | --- |
-| Awakening | Champions of Yore 1, 2 and 3 (`fe13-dlc1` to `fe13-dlc3`) | Which village look the game gives its villages, zoomed in or zoomed out; the renders show them too small to tell | "Can't see the villages properly", "Village zoom needs to be checked" |
-| Awakening | Lost Bloodlines 1, 2 and 3 (`fe13-dlc7` to `fe13-dlc9`) | The same: the villages' look | "I'm not sure if it's the zoomed in or out type village" |
-| Awakening | Rogues & Redeemers 1 and 2 (`fe13-dlc13`, `fe13-dlc14`) | The same: the villages' look | "same note as 3" |
+| Awakening | Rogues & Redeemers 1 and 2 (`fe13-dlc13`, `fe13-dlc14`) | The same: the villages' look; but its map has no villages (a ruined stone maze in a forest): the user asked what their note meant there (2026-11-26) | "same note as 3" |
 | Fates | Paralogue 16, Abducted (`fe14-x16`) | The whole map against the game: the render's overgrown halls are hard to read | "Map image issues" |
 | Fates | Museum Melee (`fe14-dlc-6b`) | The rest of the map against the game (its Exit tiles a purple pad and its sky the void since 2026-11-26) | "will wan to look at manually for this map for the rest" |
 | Fates | Paralogue 16's challenge (`fe14-x16-challenge`) | Its stairs, with Paralogue 16 above | "Check" |
@@ -33,6 +31,8 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | --- | --- | --- | --- |
 | Radiant Dawn | Part 3 Ch.1, Laguz and Beorc (`fe10-3-1`) | "ch.1 plains are cobble" (2026-11-26, through a chapter jump: `scripts/fe10_jump.py`) | Its plain paving (`PLAIN_AS`); "the torches should be on cobble not stone bricks": every Radiant Dawn torch on the ground round it (`standOn`) |
 | Radiant Dawn | Part 3 Ch.7, Rivals Collide (`fe10-3-7`) | "7 is all dirt", "just make sure that you can see the difference between the river and the dirt tiles" (2026-11-26) | Its plain dirt (`PLAIN_AS`), its river a muddy riverbed a clear step darker (`FILL_FIXES`) |
+| Awakening | Champions of Yore 1-3 and Lost Bloodlines 1-3 (`fe13-dlc1` to `fe13-dlc3`, `fe13-dlc7` to `fe13-dlc9`) | "yeah they're the zoomed out type, redraw them", "lost bloodlines is also zoomed out" (2026-11-26, from the Outrealm Gate) | Their villages' buildings drawn as Shadow Dragon's and New Mystery's walled compounds ("you can use the ones from 11 and 12": `walledVillages`, `va`-`vi`, `fliers_buildings`), and Paralogues 2, 3, 13, 18 and 20's, the same building |
+| Awakening | Paralogue 14, Shadow in the Sands (`fe13-par14`) | "it really is only one tile for the villages" (2026-11-26, through a Citra mod putting its files under Chapter 5's: the heights stayed Chapter 5's) | Nothing to change: its villages are single tiles, as drawn |
 | Three Houses | Chapter 9 (`fe16-9`) | Its ruins (varied tile to tile since 2026-11-26) against the game | "manual" |
 
 ## The look-over's checks (2026-11-26)

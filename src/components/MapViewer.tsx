@@ -672,6 +672,13 @@ const codeAt = (map: ChapterMap, [x, y]: Tile): TerrainCode | undefined =>
 /** The pieces a two-tile village is drawn with: the DS games' walled compound of houses, as they draw it, else the older games' small
  * house with its low wall (both the user's calls). */
 const villagePieces = (map: ChapterMap) => (map.walledVillages ? WALLED_VILLAGE : VILLAGE_HOUSE)
+/** A village's yard drawn whole (`va`-`vi`) on a map of walled villages: the DS games' walled compound, its piece by its place (Awakening's
+ * DLC's and paralogues' compounds, the zoomed-out villages: the user's call, 2026-11-26, drawn as Shadow Dragon's and New Mystery's). */
+const COMPOUND_PLACE = {
+  a: 'leftTop', b: 'middleTop', c: 'rightTop', d: 'leftTop', e: 'middleTop', f: 'rightTop', g: 'leftFront', h: 'middleFront', i: 'rightFront',
+} as const
+const compoundPiece = (map: ChapterMap, code: TerrainCode): Sprite | undefined =>
+  map.walledVillages && /^v[a-i]$/.test(code) ? WALLED_VILLAGE[COMPOUND_PLACE[code[1] as keyof typeof COMPOUND_PLACE]] : undefined
 
 function twoTileVillage(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   const code = codeAt(map, [x, y])
@@ -1135,6 +1142,8 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile): Sprite | undef
 function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // Muck drawn as a bog, no icon over its mud (`muckAsBog`: Fates' Boo Camp, the user).
   if (code === 'db' && map.muckAsBog) return undefined
+  const compound = compoundPiece(map, code)
+  if (compound) return compound
   // A tile whose mark the game doesn't draw (`bareTiles`: a Fates challenge's spent village with no house over it).
   if (at && map.bareTiles?.includes(tileKey(at))) return undefined
   // Bones lying in a block, one great bone (`boneBlocks`: Awakening's Chapter 10, the user).
@@ -2103,8 +2112,9 @@ function groundUnder(map: ChapterMap): Map<string, TerrainCode> {
       // A mast stands on its deck, over the deck's colour and planks as a tree over the grass (the user, 2026-11-24: every game's).
       // So do supplies the game files with its walls (Awakening's crates: the user, Chapter 12's lone ones on the quay's cobbles), and
       // a round fountain's corners (`roundFountains`).
+      // So does a walled village's compound (`walledVillages`), its corners on the ground beside it.
       const standsOnGround = isMast(map, [x, y]) || (c === 'wg' && /suppl/i.test(terrainName(map, [x, y]))) ||
-        (!!map.roundFountains && /^f[a-i]$/.test(c))
+        (!!map.roundFountains && /^f[a-i]$/.test(c)) || !!compoundPiece(map, c)
       const building = ON_THE_GROUND.has(c) || (c === 'oe' && openBuilding(map)) || (c === 'oj' && !!map.villageBuildings) || standsOnGround
       if (!walledGround && !onGround && !standsOnGround && (c in fills || (TERRAIN_FILL[c] !== TERRAIN_FILL.ta && !building))) continue
       // A town's one-tile houses and a church alone (Thracia 776's: Chapter 14's town, the churches of 15, 17A and 21) stand on grass,
@@ -3036,14 +3046,14 @@ export function MapGrid({
         const letter = plank || map.bridgeFloors?.includes(tileKey(t)) ? 'tb' : underRock.get(tileKey(t)) ?? fountainRing(map, t) ?? terrainAt(map, t)
         const X = px(x)
         const Y = py(y)
-        // A village's pieces, and an entrance among them, stand in its yard.
-        const inYard =
+        // A village's pieces, and an entrance among them, stand in its yard (but a walled village's compound on the ground round it).
+        const inYard = !map.walledVillages && (
           (letter[0] === 'v' && PIECE.test(letter)) ||
           (VILLAGE_INSIDE.has(letter) && ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => {
             const n: Tile = [x + dx, y + dy]
             const c = n[0] >= 1 && n[1] >= 1 && n[0] <= map.width && n[1] <= map.height ? terrainAt(map, n) : undefined
             return !!c && c[0] === 'v' && PIECE.test(c)
-          }))
+          })))
         const built = buildings(map).has(tileKey(t))
         const scenery = !built && sceneryHouse(letter, tileKey(t), visits)
         const village = twoTileVillage(map, t)
@@ -3809,7 +3819,7 @@ function Legend({
   if (ownGround.some((o) => !doorMat(map, o.tile))) items.push({ label: 'Village', sprite: HOUSE })
   if (ownGround.some((o) => doorMat(map, o.tile)) || codes.has('oc') && map.grid.some((row, i) =>
     rowCodes(row).some((c, x) => c === 'oc' && doorMat(map, [x + 1, map.height - i]))))
-    items.push({ label: 'House to visit (at its door mat)', sprite: DOOR_MAT })
+    items.push({ label: map.walledVillages ? 'Village to visit (at the door mat before its gate)' : 'House to visit (at its door mat)', sprite: DOOR_MAT })
   if (map.changes.some((c) => c.trigger === 'trap' && !c.zone)) items.push({ label: 'Hidden pit (tap it)', sprite: PIT })
   // An area to search is a dig area; an item hidden on one tile (Awakening's Paralogue 14) is only a hidden item.
   const hidden = map.objects.filter((o) => o.type === 'hidden')
@@ -3999,6 +4009,11 @@ function Legend({
         }),
       )
       for (const [sprite, text] of looks) items.push({ label: text, sprite, swatch: fillOf(map, l) })
+      continue
+    }
+    // A walled village's compound: its gate, on the ground round it.
+    if (compoundPiece(map, l)) {
+      items.push({ label, sprite: WALLED_VILLAGE.middleFront, swatch: fillOf(map, plainOf(map) ?? 'ta'), code: l })
       continue
     }
     const yard = l === 'w8' || (PIECE.test(l) && l[0] === 'v')

@@ -1794,13 +1794,13 @@ def main():
         info['r' + p] = {**info[encode(GAME, '0')], 'name': 'House'}
     for p in 'abcdefghi':
         info['c' + p] = {**info['w8'], 'name': 'Castle'}
+        # A village's walled yard drawn whole over a building fliers cross (fliers_buildings), as that building.
+        info['v' + p] = {**info['w8'], 'name': 'Village houses and walls'}
         # A fountain's basin drawn whole over its edifice (FOUNTAINS), as the edifice.
         info['f' + p] = {**info['w0'], 'name': 'Fountain'}
     # Market stalls drawn over partitions (STALLS), as the partitions.
     for c in ('o5', 'o6', 'o7', 'o8'):
         info[c] = {**info['wg'], 'name': 'Market stall'}
-    global BUILDING
-    BUILDING = info['w8']
     gm.write_terrain(GAME, TITLE, SCRIPT, info, groups, {i: c['name'] for i, c in enumerate(D.classes())})
     by_index = {it['index']: it for it in D.items()}
     sources = defaultdict(list)
@@ -1983,8 +1983,6 @@ ROAD_ONLY = {'fe13-2': [(8, 3, 9, 7), (9, 8, 10, 17), (9, 18, 9, 20), (8, 20, 8,
 COBBLES = {'fe13-par17': ([(13, 18, 17, 21), (14, 16, 16, 17)], '#99906c')}
 
 
-# The game's Building that fliers cross (the DLC's and some paralogues'), for the houses drawn whole over it (fliers_buildings).
-BUILDING = None
 # Maps whose bones its scene draws as rocks (the user, Chapter 9: no bones, those are rocks): drawn as boulders, the bones' numbers kept.
 ROCKS = {'fe13-9'}
 
@@ -2102,8 +2100,11 @@ def scenery(m):
 
 def fliers_buildings(m):
     """A map with each block of the buildings fliers cross (`w8`, two to six wide and up to four tall) drawn whole: one standing over a
-    castle gate's tile is the castle (`ca`-`ci`), the gate its front (the user: the DLC's forts); the rest are houses (`ra`-`rr`), a
-    village just below one its door mat (as Chapter 8's: the user, villages). Each keeps the building's numbers."""
+    castle gate's tile is the castle (`ca`-`ci`), the gate its front (the user: the DLC's forts); the rest are the game's walled
+    compound of little houses round a yard, the zoomed-out villages (the user, in the game, 2026-11-26, Champions of Yore's and Lost
+    Bloodlines'; Paralogues 2, 3, 13, 18 and 20 stand the same building): a village's yard drawn whole (`va`-`vi`) on a map of walled
+    villages, so the DS games' walled compound (`walledVillages`), a village just below its gate its door mat. Each keeps the
+    building's numbers."""
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     h, w = len(rows), len(rows[0]) if rows else 0
     seen, castles, houses = set(), set(), set()
@@ -2127,12 +2128,13 @@ def fliers_buildings(m):
             (castles if 'bd' in below else houses).update(comp)
     if not castles and not houses:
         return m
-    if any(c[0] == 'r' and c[1] in 'abcdefghijklmnopqr' for r in rows for c in r):
-        raise SystemExit(f"{m['id']}: houses of both walls and buildings fliers cross: their numbers can't share the codes")
-    marked = [''.join('XC' if (x, y) in castles else 'XH' if (x, y) in houses else c for x, c in enumerate(r)) for y, r in enumerate(rows)]
-    m['grid'] = map_pieces.place(map_pieces.place(marked, 'XC', 'c', {'XC'}), 'XH', 'r', {'XH'}, side_on=True)
-    used = {r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2) if r[i] == 'r'}
-    m['terrainOverrides'] = {**(m.get('terrainOverrides') or {}), **{c: {**BUILDING, 'name': 'House'} for c in sorted(used)}}
+    if any(c[0] == 'v' and c[1] in 'abcdefghi' for r in rows for c in r):
+        raise SystemExit(f"{m['id']}: village pieces already on the map: the buildings' numbers can't share the codes")
+    marked = [''.join('XC' if (x, y) in castles else 'XV' if (x, y) in houses else c for x, c in enumerate(r)) for y, r in enumerate(rows)]
+    m['grid'] = map_pieces.place(map_pieces.place(marked, 'XC', 'c', {'XC'}), 'XV', 'v', {'XV'})
+    # Drawn as the DS games draw their villages' walled compounds (the user: 'you can use the ones from 11 and 12').
+    if houses:
+        m['walledVillages'] = True
     return m
 
 

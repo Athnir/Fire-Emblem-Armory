@@ -11,7 +11,7 @@ import { FE13_WEAPONS } from '../../data/fe13/fe13Weapons'
 import type { ChapterMap, Difficulty, MapUnit } from '../../data/maps/types'
 import { GAMES } from '../../games'
 import { fe13ForgeCost, fe13ForgeMax } from '../fe13Forge'
-import { atStart, rowCodes, terrainInfo, terrainName } from '../maps'
+import { atStart, doorMat, rowCodes, terrainInfo, terrainName, tileKey } from '../maps'
 import { roundFountainPiece } from '../../icons/sprites'
 import { reachOf, turnsUpAt } from '../spoiler'
 import { trueHit } from '../trueHit'
@@ -753,13 +753,21 @@ describe("Awakening's towns, buildings and scenery drawn as its scenes show them
     expect(codes('fe13-3').filter((c) => c === 't4').length).toBeGreaterThan(100)
     expect(codes('fe13-3')).not.toContain('t1')
   })
-  it('draws a building fliers cross over a village as its house, and one over a gate as the castle, each with the building\'s numbers', () => {
+  it('draws a building fliers cross over a village as the walled compound it is, and one over a gate as the castle, each with the building\'s numbers', () => {
+    // The zoomed-out villages, drawn as the DS games' walled compounds (the user, in the game, 2026-11-26), a village before the gate
+    // its door mat.
     for (const id of ['fe13-dlc1', 'fe13-dlc7', 'fe13-par13', 'fe13-par18', 'fe13-par2', 'fe13-par3', 'fe13-par20']) {
       expect(codes(id), id).not.toContain('w8')
-      expect(codes(id).some((c) => /^r[a-i]$/.test(c)), id).toBe(true)
-      for (const c of new Set(codes(id).filter((c) => /^r[a-r]$/.test(c))))
+      expect(map(id).walledVillages, id).toBe(true)
+      expect(codes(id).some((c) => /^v[a-i]$/.test(c)), id).toBe(true)
+      for (const c of new Set(codes(id).filter((c) => /^v[a-i]$/.test(c))))
         expect(terrainInfo(map(id), c).move, `${id} ${c}`).toEqual(FE13_TERRAIN.w8!.move)
+      const villages = map(id).objects.filter((o) => o.type === 'village')
+      expect(villages.length, id).toBeGreaterThan(0)
+      for (const v of villages) expect(doorMat(map(id), v.tile), `${id} ${tileKey(v.tile)}`).toBe(true)
     }
+    // Chapter 8's desert villages are another building (walls): houses drawn whole, not compounds.
+    expect(map('fe13-8').walledVillages).toBeUndefined()
     // The keeps over their gates: the DLC's islands and Paralogue 18.
     for (const id of ['fe13-dlc1', 'fe13-dlc7', 'fe13-par18']) expect(codes(id).filter((c) => c === 'ce').length, id).toBeGreaterThan(0)
     expect(FE13_TERRAIN.ce!.move).toEqual(FE13_TERRAIN.w8!.move)
