@@ -462,3 +462,28 @@ conditions, mandatory units and items agree, except these, still to check in-gam
   the Shine Barrier). A recruit brings its items along: not marked.
 - Drops are not here: the app reads them from the map data, which holds only units you can see. The placement files also
   list cutscene units (Petrine carries her Flame Lance in the chapter 7 files), so they can't say when a drop is available.
+
+## Checking things in the game: a chapter jump (Dolphin, `scripts/fe10_jump.py`)
+
+For a map the user checks in the game without a save there (the final pass, `data-raw/final-pass.md`): `python
+scripts/fe10_jump.py C0302` makes `Extracted Games Dolphin\FE 10 jump to C0302`, a copy of the extracted disc whose New Game
+opens on that chapter with its developer roster as your army. Boot its `DATA\sys\main.dol` in Dolphin and start a New Game (any
+difficulty); the story scenes play, then the battle. Every file of the copy is a hard link to the extracted disc's but the two
+patched, so it takes no room and the disc stays as it is. It shares the game's save file (`Wii/title/00010000/52464545/data`), so
+nothing is saved in it, and RetroAchievements doesn't know it. The script ids are `Cppnn`, part `pp`, `nn` 01 the part's Prologue
+(Part 3 Ch.1 is `C0302`, Ch.7 `C0308`); the user checked those two this way (2026-11-26). Unlike Path of Radiance
+(`data-raw/fe9/README.md`), Radiant Dawn's program has no debug title left to restore: its boot script ("GameController",
+0x803832e0) goes from the title to the file menu and the extras alone.
+
+- **The New Game's chapter** (`main.dol`): the file menu's three New Game calls (0x8019b938, 0x8019cb78, 0x8019d3dc: a new
+  file, one from a slot, one from a cleared game's) pass chapter record 1, Part 1's Prologue, as `li r4, 1` into 0x800609d8, which
+  writes it to the game state's chapter byte (0x803cab38 + 0x10, as 0x80061584 does for each next chapter) with the difficulty;
+  the copy's `li r4` is the chapter's record number. The chapter table is FE10Data's (0xB4 bytes a record, its `C0302` id first,
+  `MCT0302` +4, map folder +8, script +12, its number +0x84; GetChapterByIndex 0x8010b0cc, by id 0x8010b100).
+- **The army**: a chapter's battle setup calls `EvDevStart(map, roster)` before `MapLoad(map)`, and the retail startup.cmb's
+  EvDevStart (handler 257) is an empty function, so a chapter opened on a new game places no one (`InstantDisposRank` on the
+  roster places only units you have). The copy's script does `MapLoad(map)` and then `JoinRank(roster, 5)` with the same bytes
+  (`int 5` in its two-byte form keeps the length), as Part 3's Prologue joins Ike's team in its opening (`DisposLoad`, `JoinRank`
+  to team 5, your army; `DisposFree`). A script whose string table has no `JoinRank` (C0308's) gets it at the table's end, over
+  its padding, and the file's absolute offsets past it (the handler table's, each handler's name and code) move on by the bytes
+  added, a multiple of 4. The other armies are as a new game has them: on Part 3 Ch.7 the stand-ins take the Dawn Brigade's places.

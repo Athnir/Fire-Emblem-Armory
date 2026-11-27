@@ -1327,7 +1327,10 @@ A global switch (header, any game) that lets someone play along without being to
 
 - **Build the base from the data first; the user then checks in-game.** Their corrections become rules here.
 - **In a review, whatever needs the user's in-game check is noted to them and set aside;** what data dives and careful checks of
-  the files and code can settle is done first.
+  the files and code can settle is done first. A map the user has no save for is opened for them by a chapter jump (the user's
+  ask, 2026-11-26): Path of Radiance's restored debug title (`data-raw/fe9/README.md`), Radiant Dawn's `scripts/fe10_jump.py` (a
+  copy of the extracted disc whose New Game opens the chapter with its developer roster), written into a copy, never as cheats
+  (RetroAchievements); a copy shares the game's save file, so the user's save is backed up first and nothing is saved in it.
 - **Check counts against outside sources in the tests** (enemy totals per map, wiki or fireemblemwod.com),
   with every exception explained.
 - **Back each rule with a test where it can be checked** (e.g. no pillar icon on a tile no one can enter;
