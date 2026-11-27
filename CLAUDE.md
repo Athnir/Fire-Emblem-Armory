@@ -657,8 +657,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   (`wideBridges`), stone where its scene builds them so (A Land in Bloom's, the Sage Lord's); Queen Lumera's white stone road
   paving and Serenity in Ruin's town paved as its render shows it; Fell Xenologue 6's ground its stone, read off its scene's
   materials with the rock models its battle map hides left out and checked against its photos: its islands' paving stone slabs (`ge`,
-  a plain's numbers), its plaza's small pavers (`gb`), the rest broken earth, its trees on the paving round them (`STONE_GROUND`: the
-  user, in the game, 2026-11-27, "most of the ground tiles are actually stone"), and its Fell sigils, three tiles by three, Thracia
+  a plain's numbers), its plaza's small pavers (`gb`), the rest broken earth, its trees and rubble on the ground round them
+  (`STONE_GROUND`: the user, in the game, 2026-11-27, "most of the ground tiles are actually stone", "lets get the pebbles to match
+  the background correctly"), and its Fell sigils, three tiles by three, Thracia
   776's sigil pattern ("replace the 3x3 ground structures with the sigils from the early games"); a crater amid the lava the lava;
   the Brash General's walls its cave's rock but its temple's; low walls and buildings drawn as no house, fort or stall in its walls' stone (the Kingdom of Might's,
   the Ancestor's), Dancer in the Ruins' towers no fort; a sigil set in a castle's floor that floor; houses the map's edge cuts

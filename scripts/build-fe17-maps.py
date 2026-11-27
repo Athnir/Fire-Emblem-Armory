@@ -2602,13 +2602,14 @@ def game_looks(m):
             for x, c in enumerate(line, 1):
                 if c in 'SP' and code(x, top - i) == 'ta':
                     rows[h - (top - i)][x - 1] = 'ge' if c == 'S' else 'gb'
-        # Its trees on the ground round them, its paving where most of it is.
+        # Its trees and rubble on the ground round them, its paving where most of it is (the user, in the game, 2026-11-27: "lets get
+        # the pebbles to match the background correctly").
         stand = {}
         for y in range(1, h + 1):
             for x in range(1, w + 1):
                 near = Counter(code(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy)
                 near = {c: n for c, n in near.items() if c in ('ge', 'gb', 'ta')}
-                if code(x, y) == 'ba' and near:
+                if code(x, y) in ('ba', 'wj') and near:
                     stand[f'{x},{y}'] = max(near, key=lambda c: (near[c], c == 'ge'))
         m['standOn'] = dict(m.get('standOn') or {}, **stand)
     if own.startswith(STONE_BRIDGES):
