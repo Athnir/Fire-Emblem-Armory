@@ -2550,6 +2550,19 @@ def draw_buildings(m, blocks):
     ruined = m['id'].startswith(RUINED)
     whole = {'r': set(), 'c': set()}
     cuts = []
+
+    def houses(rects):
+        """Houses side by side, each drawn whole and apart from its neighbours."""
+        owner = {}
+        for k, rect in enumerate(rects):
+            whole['r'] |= rect
+            for t in rect:
+                owner[t] = k
+        for (x, y), k in owner.items():
+            for n in ((x + 1, y), (x, y - 1)):
+                if n in owner and owner[n] != k:
+                    cuts.append(((x - 1, h - y), (n[0] - 1, h - n[1])))
+
     for b in blocks:
         tiles = {tuple(t) for t in b['tiles']}
         kind = 'ruins' if b['kind'] == 'house' and ruined else b['kind']
@@ -2560,6 +2573,26 @@ def draw_buildings(m, blocks):
         box = len(tiles) == w * tall
         if kind == 'ruins':
             m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
+        elif kind == 'house' and b.get('houses'):
+            # The houses as the scene stands them, each house model's own tiles (scripts/fe17_buildings.py --houses; the user, in the
+            # game, 2026-11-27: Chapter 19's town had "way too many tiles for villages together, instead of where they should be split
+            # to different houses"), one past the map's edge carried past it; what stands between them its crates, else the block's
+            # own tiles.
+            rects = []
+            for hs in b['houses']:
+                ht = {tuple(t) for t in hs}
+                hx, hy = [t[0] for t in ht], [t[1] for t in ht]
+                hw, hh = max(hx) - min(hx) + 1, max(hy) - min(hy) + 1
+                if max(hw, hh) <= 6 and min(hw, hh) <= 4:
+                    # One house, though a corner of its plan is open ground (Chapter 19's at (11, 17)): drawn as one, not parted.
+                    rects.append(ht)
+                    continue
+                # A house too big to draw as one: its biggest rectangles.
+                more, left = split_rects(ht)
+                rects += more
+                m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'house' for x, y in left if 1 <= x <= width and 1 <= y <= h})
+            houses(rects)
+            m['decor'] = dict(m.get('decor') or {}, **{k: 'crates' for k, v in b['between'].items() if v == 'crates'})
         elif kind == 'house' and box and 2 <= w <= 6 and tall <= 4:
             whole['r'] |= tiles
         elif kind == 'house':
@@ -2575,15 +2608,7 @@ def draw_buildings(m, blocks):
                     rects.append(carried)
                 else:
                     m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'house' for x, y in strip if 1 <= x <= width and 1 <= y <= h})
-            owner = {}
-            for k, rect in enumerate(rects):
-                whole['r'] |= rect
-                for t in rect:
-                    owner[t] = k
-            for (x, y), k in owner.items():
-                for n in ((x + 1, y), (x, y - 1)):
-                    if n in owner and owner[n] != k:
-                        cuts.append(((x - 1, h - y), (n[0] - 1, h - n[1])))
+            houses(rects)
         elif kind == 'fort' and not m['id'].startswith(NO_FORTS) and (box or gated(tiles, w, tall)) and 3 <= w <= 6 and 2 <= tall <= 4:
             whole['c'] |= tiles
         elif kind == 'stall':

@@ -448,7 +448,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   scene stands on each block (`scripts/fe17_buildings.py`, by its models' names, into `data-raw/fe17-buildings.json`): houses drawn
   whole (`ra`-`rr`), forts as castles (`ca`-`ci`), a market's goods as stalls (`o5`-`o8`), windmills (two by two), yurts (three by
   two) and crates over their tiles (`decor`), ruins in ruins (`ruins`), each with the Edifice's numbers and named by what it is; the
-  villages the user saw as ruins (the Tempest Trials' c002, Chapter 6, Paralogue 12) have their houses in ruins. Awakening's building
+  villages the user saw as ruins (the Tempest Trials' c002, Chapter 6, Paralogue 12) have their houses in ruins; a block of several
+  houses parted into the houses its scene stands there, each house model's own tiles one house (one a corner of whose plan is open
+  ground still one), one the map's edge cuts carried past it, what stands between them its crates or the block's own tiles (`fe17_buildings.py
+  --houses`, `houses` and `between` on a block: the user, in the game, 2026-11-27, Chapter 19's town had "way too many tiles for villages
+  together, instead of where they should be split to different houses"). Awakening's building
   over a village (a block of walls two to six wide standing just above its tile) is the village's house drawn whole, the village its
   door mat (`map_pieces.village_houses`: the user, Chapter 8's villages), and a building fliers cross (the DLC's and Paralogues 2, 3,
   13, 18 and 20's `w8`, the game's walled compound of three little houses round a yard, the zoomed-out villages: the user, in the

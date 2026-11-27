@@ -7,6 +7,7 @@ the maps the builder last wrote; rerun it, then the builder, when the maps' grid
 
     python scripts/fe17_buildings.py              # every map
     python scripts/fe17_buildings.py fe17-m004    # some (the others kept)
+    python scripts/fe17_buildings.py --houses fe17-m019 fe17-m019-sk    # their house blocks parted into the scene's houses
 """
 import collections
 import json
@@ -91,7 +92,78 @@ def buildings(map_id, m, scene, window):
     return out
 
 
+def house_footprints(map_id, m, scene, window):
+    """[{'name', 'tiles'}]: each house model the scene stands on the map, the tiles whose centres its ground plan covers (one tile past
+    the map's edge at most, where the builder draws a house the edge cuts), a model's LODs and parts merged into the house they belong
+    to; kept in the art cache."""
+    path = os.path.join(CACHE, f'houses-{map_id}.json')
+    if os.path.exists(path):
+        return json.load(open(path, encoding='utf-8'))
+    x1, z1 = window[0], window[1]
+    w, h = m['width'], m['height']
+    found = []
+    for name, _, P, _, tri in scene().renderers():
+        if not re.search(r'house', name, re.I):
+            continue
+        V = P[np.unique(tri)]
+        lo, hi = V.min(0) / 5, V.max(0) / 5
+        xs = range(int(np.ceil(lo[0] - 0.5)) - x1 + 1, int(np.floor(hi[0] - 0.5)) - x1 + 2)
+        zs = range(int(np.ceil(lo[2] - 0.5)) - z1 + 1, int(np.floor(hi[2] - 0.5)) - z1 + 2)
+        tiles = {(x, z) for x in xs for z in zs if 0 <= x <= w + 1 and 0 <= z <= h + 1}
+        if len(xs) and len(zs) and tiles:
+            found.append((re.sub(r'(_LOD\d+|\s*\(\d+\)|[\s_]\d+)+$', '', name), tiles))
+    kept = []
+    for name, tiles in sorted(found, key=lambda f: -len(f[1])):
+        if not any(len(tiles & k) >= 0.6 * len(tiles) for _, k in kept):
+            kept.append((name, tiles))
+    out = [{'name': n, 'tiles': sorted([list(t) for t in k])} for n, k in kept]
+    os.makedirs(CACHE, exist_ok=True)
+    json.dump(out, open(path, 'w', encoding='utf-8'))
+    return out
+
+
+def add_houses(map_id, m, scene, window, blocks):
+    """Each house block's houses as the scene stands them (`houses`: each house model's tiles on the block, and past the map's edge),
+    and what stands on its other tiles (`between`: {"x,y": kind}, its crates and the like) (the user, Chapter 19's town: 'way too many
+    tiles for villages together, instead of where they should be split to different houses')."""
+    w, h = m['width'], m['height']
+    names = tile_names(map_id, m, scene, window)
+    feet = house_footprints(map_id, m, scene, window)
+    for b in blocks:
+        if b['kind'] != 'house':
+            continue
+        tiles = {tuple(t) for t in b['tiles']}
+        houses = []
+        for f in feet:
+            ft = {tuple(t) for t in f['tiles']}
+            on = ft & tiles
+            if on:
+                past = {t for t in ft - tiles if not (1 <= t[0] <= w and 1 <= t[1] <= h)}
+                houses.append(sorted([list(t) for t in on | past]))
+        covered = {tuple(t) for hs in houses for t in hs}
+        b['houses'] = houses
+        b['between'] = {f'{x},{y}': kind_of(names.get(f'{x},{y}', {})) for x, y in sorted(tiles - covered)}
+
+
 def main(only):
+    if only[:1] == ['--houses']:
+        # The houses of maps whose house blocks are already read, from the blocks kept (the builder has since drawn those tiles as
+        # houses, so the grid no longer shows them as Edifice).
+        table = json.load(open(OUT, encoding='utf-8'))
+        chapters = {r['Cid']: r for r in D.rows('chapter')}
+        maps = G.app_maps()
+        scenes = {}
+        for map_id in only[1:]:
+            field, window = G.field_and_window(map_id, chapters)
+            def scene(field=field):
+                if field not in scenes:
+                    scenes.clear()
+                    scenes[field] = fe17_art.Scene(field)
+                return scenes[field]
+            add_houses(map_id, maps[map_id], scene, window, table[map_id])
+            print(map_id, [len(b['houses']) for b in table[map_id] if b['kind'] == 'house'], flush=True)
+        json.dump(table, open(OUT, 'w', encoding='utf-8'), indent=1, sort_keys=True)
+        return
     table = json.load(open(OUT, encoding='utf-8')) if os.path.exists(OUT) else {}
     chapters = {r['Cid']: r for r in D.rows('chapter')}
     scenes = {}

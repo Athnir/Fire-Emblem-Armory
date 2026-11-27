@@ -14,7 +14,6 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Engage | Fell Xenologue 6, Seven Bracelets (`fe17-e006`) | The whole map against the game (marked good) | "manual" |
 | Engage | Divine Paralogue, The Doting Sister, and its skirmish (`fe17-g005`, `fe17-g005-sk`) | Its bridges (drawn whole since 2026-11-26) and the rest of the map against the game | "bridge issues. manually check", "manual" |
 | Engage | Divine Paralogue, The Shepherd Exalt (`fe17-g006`) | The whole map against the game, its altars too | "manual" |
-| Engage | Chapter 19, The Dead Town (`fe17-m019`) | Its houses, (10, 17) first | "village gore (10, 17) , will check manually" |
 | Engage | Paralogue, The Caring Princess (`fe17-s013`) | The whole map against the game, its ship and dais | "will look at manually" |
 
 ## Checked in the game
@@ -33,6 +32,7 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Engage | Chapter 7, Dark Emblem (`fe17-m007`, and its skirmish) | "the main difference is that the cliff tiles in that map are actually holes", "build them as the bridge holes in the radiant games" (2026-11-27, through a skirmish pointed at its map) | Its collapsed floor (崩れた床) holes, drawn as the Tellius games' bridge holes (`wallLooks` 'pit'); Fell Xenologue 3 and the Divine Paralogue The Lonely Heir, the same tiles, too |
 | Engage | Paralogue, The Connector (`fe17-s015`, and its skirmish) | "the connector matches" (2026-11-27, its own encounter at the Garden of Memories) | Nothing to change |
 | Engage | Chapter 18, The Cold Voyage (`fe17-m018`, and its skirmish) | "please have all tiles that are ship (impassable) as wood wall tiles" (2026-11-27, through an Eden mod pointing the world map's encounters at its map) | Every Ship tile the ship's wooden wall, the crates its scene stands on some of them gone (`ship_wood`), the crates only its decks' obstacles; Chapter 19's and the Caring Princess's Ship tiles the same (both still to check) |
+| Engage | Chapter 19, The Dead Town (`fe17-m019`, and its skirmish) | "main issue i have it seems with this is you have way to many tiles for villages together, insted of where they should be split to different houses" (2026-11-27, through the Eden mod) | Its town's blocks parted into the houses its scene stands there, each house model's own tiles (`fe17_buildings.py --houses`), the crates between them crates; its Ship tiles wooden walls since Chapter 18's note |
 
 ## The look-over's checks (2026-11-26)
 
