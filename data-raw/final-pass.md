@@ -12,7 +12,6 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Engage | Tempest Trial, Verdant Plain, map 4 (`fe17-c001-4-1`) | The whole map against the game | "manual" |
 | Engage | Fell Xenologue 5, The Fell Heir (`fe17-e005`) | The whole map against the game | "manual" |
 | Engage | Fell Xenologue 6, Seven Bracelets (`fe17-e006`) | The whole map against the game (marked good) | "manual" |
-| Engage | Divine Paralogue, The Shepherd Exalt (`fe17-g006`) | The whole map against the game, its altars too | "manual" |
 
 ## Checked in the game
 
@@ -33,6 +32,7 @@ until then (CLAUDE.md, "Frozen so far"): once a map here is checked, unfreeze it
 | Engage | Chapter 19, The Dead Town (`fe17-m019`, and its skirmish) | "main issue i have it seems with this is you have way to many tiles for villages together, insted of where they should be split to different houses" (2026-11-27, through the Eden mod) | Its town's blocks parted into the houses its scene stands there, each house model's own tiles (`fe17_buildings.py --houses`), the crates between them crates; its Ship tiles wooden walls since Chapter 18's note |
 | Engage | Paralogue, The Caring Princess (`fe17-s013`, and its skirmish) | "the caring princess matches" (2026-11-27, through the Eden mod) | Nothing to change (its Ship tiles wooden walls since Chapter 18's note) |
 | Engage | Divine Paralogue, The Doting Sister, and its skirmish (`fe17-g005`, `fe17-g005-sk`) | "we dont really have anything for his map, the boxes are almsot compleatly bricks, the market stands are boxes actually, the white bricks are the same as the bricks that should replace most of the current boxes" (2026-11-27, through the Eden mod; its bridges unremarked) | Its blocks of crates bare stone bricks like its other buildings, the thin stacks along its canals (the market stands among them) crates (`CANAL_TOWNS`) |
+| Engage | Divine Paralogue, The Shepherd Exalt (`fe17-g006`, and its skirmish) | "there is no dark barrier on this map, rest looks good", "lets make the 3 crystals as breakable alters then" (2026-11-27, its encounter through the Eden mod) | Its encounter without the barrier (its script's TerrainFill, now read); the paralogue's barrier lifted when its crystals break; the three crystals altars, breakable in the paralogue (each leaving its pedestal), pedestals in the encounter (`crystal_altars`). TerrainFill also opens The Ancestor's barriers whole and Fell Xenologue 5's encounter's two wall runs |
 
 ## The look-over's checks (2026-11-26)
 

@@ -641,7 +641,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   its peaks and cliffs (山, 崖) standing apart from the edge, six tiles or fewer, outcrops too, and the Four Hounds' every one; its
   sky (空) the void, as the Last Engage's, and its collapsed floor (崩れた床) holes, as the Tellius games' bridge holes are drawn
   (`wallLooks` 'pit': Chapter 7's, the user, in the game, 2026-11-27, "cliff tiles in that map are actually holes", "build them as
-  the bridge holes in the radiant games"; Fell Xenologue 3's, Path to War, and the Divine Paralogue The Lonely Heir's the same); its
+  the bridge holes in the radiant games"; Fell Xenologue 3's, Path to War, and the Divine Paralogue The Lonely Heir's the same); the
+  crystals your units break (水晶_味方破壊) altars, breakable, each leaving its pedestal (台座, previewed), and in an encounter, which
+  puts the pedestal there from the start, altars no one breaks (`crystal_altars`: The Shepherd Exalt's three, the user, in the game,
+  2026-11-27, "make the 3 crystals as breakable altars"); a script's TerrainFill floods its tile's region (The Shepherd Exalt's barrier,
+  gone in its encounter, "there is no dark barrier on this map", and lifted in the paralogue when the crystals break); its
   large pillars (大柱) pillars, its candelabras (燭台) candlesticks, its beacons (篝火)
   braziers, Radiant Dawn's lit torch (the user: braziers are no candlesticks), one put out (篝火消) unlit, its statues (石像), coffins
   (石棺) and palisades (防柵) themselves, all on the ground round them

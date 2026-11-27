@@ -2240,6 +2240,7 @@ def main():
         if stairwells(m):
             info.setdefault('gl', dict(info['tc'], name='Stairs going down'))
         game_looks(m)
+        crystal_altars(m)
     # The codes the game's own looks bring in, with the numbers of what they're drawn over.
     used = {r[i:i + 2] for m in maps for r in m['grid'] for i in range(0, len(r), 2)}
     if 't8' in used:
@@ -2430,6 +2431,39 @@ def parts(tiles):
         left -= part
         out.append(part)
     return out
+
+
+def crystal_altars(m):
+    """The crystals your units break (TID_水晶_味方破壊: The Shepherd Exalt's three) drawn as the altars they stand on, breakable (the
+    user, in the game, 2026-11-27: "make the 3 crystals as breakable altars"): attacked down, each leaves its pedestal (台座, a wall's
+    numbers), which the map previews; in an encounter the game puts the pedestal there from the start (the crystal's ChangeEncount), an
+    altar no one breaks."""
+    ids = TIDS.get(m['id'], {})
+    tiles = sorted(t for t, tid in ids.items() if tid == 'TID_水晶_味方破壊')
+    if not tiles:
+        return
+    h = m['height']
+    rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
+    over = m.setdefault('terrainOverrides', {})
+    pedestal = over.setdefault('wa', {'name': 'Pedestal'})
+    m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'altar' for x, y in tiles})
+    if m['id'].endswith('-sk'):
+        for x, y in tiles:
+            rows[h - y][x - 1] = 'wa'
+        m['grid'] = [''.join(r) for r in rows]
+        if pedestal.get('name') != 'Pedestal':
+            pedestal.setdefault('tileNames', {}).setdefault('Pedestal', []).extend([x, y] for x, y in tiles)
+        return
+    if pedestal.get('name') != 'Pedestal':
+        pedestal.setdefault('tileNames', {}).setdefault('Pedestal', []).extend([x, y] for x, y in tiles)
+    r = next(r for r in D.rows('terrain') if r['Tid'] == 'TID_水晶_味方破壊')
+    hp = [int(r[k] or 0) for k in ('Hp_N', 'Hp_H', 'Hp_L')]
+    hp_words = f'{hp[0]} HP' + ('' if len(set(hp)) == 1 else f' (Hard {hp[1]}, Maddening {hp[2]})')
+    for x, y in tiles:
+        m['changes'].append({'id': f"{m['id']}-open-{x}-{y}", 'trigger': 'breakable', 'tile': {'default': [x, y]},
+                             'usableBy': 'Any unit that can attack it',
+                             'effect': f'A crystal with {hp_words}: attack it down and its pedestal is left.',
+                             'patch': [{'tile': [x, y], 'becomes': 'wa'}]})
 
 
 def game_looks(m):

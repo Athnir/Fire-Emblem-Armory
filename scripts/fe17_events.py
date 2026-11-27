@@ -137,6 +137,7 @@ class Battle:
             'ItemGainSilent': lambda u, iid, *a: self._record('item', iid=iid, unit=self._pid(u)),
             'GoldGain': lambda *a: self._record('gold', amount=a[-1]),
             'TerrainSet': self._terrain_set, 'TerrainSetOne': self._terrain_set,
+            'TerrainFill': self._terrain_fill,
             'TerrainGet': lambda x, z: self._terrain_get(x, z),
             'WinRuleSetDestroyBoss': lambda v=True, *a: self.win.__setitem__('boss', truthy(v)),
             'WinRuleSetMID': lambda mid, *a: self.win.__setitem__('mid', (mid, *a)),
@@ -308,6 +309,23 @@ class Battle:
     def _terrain_set(self, x, z, tid, *rest):
         self.terrain[(int(x), int(z))] = tid
         self._record('terrain', tile=(int(x), int(z)), tid=tid)
+
+    def _terrain_fill(self, x, z, tid, *rest):
+        """The start tile's terrain, every tile of it side by side with (x, z), set to `tid` (The Shepherd Exalt's barrier lifted,
+        its encounter's opening and the paralogue's breaking it: TerrainFill from a tile of it)."""
+        start = (int(x), int(z))
+        old = self._terrain_get(*start)
+        if old == tid:
+            return
+        region, todo = set(), [start]
+        while todo:
+            p = todo.pop()
+            if p in region or not (0 <= p[0] < D.GRID and 0 <= p[1] < D.GRID) or self._terrain_get(*p) != old:
+                continue
+            region.add(p)
+            todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+        for p in sorted(region):
+            self._terrain_set(p[0], p[1], tid)
 
     def _terrain_get(self, x, z):
         if (x, z) in self.terrain:
