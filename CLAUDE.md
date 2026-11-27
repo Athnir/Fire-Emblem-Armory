@@ -738,7 +738,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   carriage (馬, 馬車) drawn over their two tiles (`decor`, the user), swapped, the horse on the right turned to face right
   (`mirror`, a drawing over a tile turned with its box too: the user); Part 1 Ch.3's outer walls a step darker than its paving, Part 2
   Ch.3's cliffs the app's grey rock, Part 3 Ch.6's shallows a muddy riverbed (the wiki's bigger capture of the map, its fog lifted: the
-  user, 'mostly dirt'), the map at night as dark as Part 2 Ch.2, its trees in shade (`NIGHT_MAPS`: the user), and the Tower's abyss and its walls beyond its floor the void, black (`FILL_FIXES`: Endgame (1), (3) and (5), the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
+  user, 'mostly dirt'), the map at night as dark as Part 2 Ch.2, its trees in shade (`NIGHT_MAPS`: the user), Part 3 Ch.1's plain
+  cobbles and Part 3 Ch.7's dirt, its river a muddy riverbed a clear step darker than the dirt (`PLAIN_AS`, `FILL_FIXES`: the user,
+  in the game, 2026-11-26: the river and the dirt told apart), and the Tower's abyss and its walls beyond its floor the void, black (`FILL_FIXES`: Endgame (1), (3) and (5), the user); its army tents (テント) drawn whole (`ua`-`ui`, the building's numbers, named Tent), a visit
   before or beside one its door mat (the user: Part 3 Ch.3's tents with their door mats), a tent whose units come out of its side turned
   side-on, its door that way (`tentDoors`: Part 3 Ch.3's three, the user); a breakable wall the game gives a plain wall's
   code is drawn as the walls round it, its crack over it (Part 1 Ch.4's, a grey block in sandstone); its outer walls in the castle walls' colour as
@@ -1349,10 +1351,9 @@ A global switch (header, any game) that lets someone play along without being to
   Watched so far: Genealogy of the Holy War (2026-11-23), Shadow Dragon and the Blade of Light (2026-11-23), Gaiden (2026-11-23),
   Mystery of the Emblem (2026-11-23), Thracia 776 (2026-11-23), The Binding Blade (2026-11-23),
   The Blazing Blade (2026-11-23), The Sacred Stones (2026-11-23), Path of Radiance (2026-11-23), Shadow Dragon (2026-11-24), New Mystery of the Emblem (2026-11-24); Awakening for now (2026-11-24, the user: frozen
-  until the final pass, as Radiant Dawn, its DLC maps' villages waiting for the user to load them in the game); Radiant
-  Dawn for now (2026-11-24, the
-  user: frozen until the final pass, as Part 3 Ch.1 and Ch.7 wait for the user to load them in the game; every map the user can't
-  settle without the game is listed for that pass, `data-raw/final-pass.md`); Fates for now (2026-11-24, the user: its last notes
+  until the final pass, its DLC maps' villages waiting for the user to load them in the game); Radiant Dawn (2026-11-24, the
+  user: frozen until the final pass, as Part 3 Ch.1 and Ch.7 waited for the user to load them in the game, which they did through
+  a chapter jump on 2026-11-26; every map the user can't settle without the game is listed for that pass, `data-raw/final-pass.md`); Fates for now (2026-11-24, the user: its last notes
   done; a note the user left unchanged or marked 'Check' waits for the final pass, `data-raw/final-pass.md`); Echoes
   (2026-11-26, every map marked good).
 - **Games are finished one at a time** (the user's call, 2026-11-23): a fix made for the game being worked on is scoped to that game by

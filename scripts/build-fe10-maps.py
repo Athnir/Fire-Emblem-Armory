@@ -2040,9 +2040,34 @@ NIGHT_MAPS = {'fe10-3-6'}
 # tops); and the Tower's abyss and its walls beyond the floor the void, black (Endgame (1), (3) and (5): the user).
 # Part 3 Ch.6's shallows a muddy riverbed, as the wiki's bigger capture of the map shows them (the user: 'mostly dirt'), the map at
 # night as dark as Part 2 Ch.2 (the user): its grass, mud and rock at that map's ground's and walls' lightness, its trees in shade.
+# Part 3 Ch.7's river a muddy riverbed too, a clear step darker than its dirt (the user, in the game, 2026-11-26: all dirt, the river
+# and the dirt told apart).
 FILL_FIXES = {'fe10-1-3': {'w0': '#665f53'}, 'fe10-2-3': {'wb': '#7d7468'},
-              'fe10-3-6': {'tg': '#5e594a', 't0': '#637944', 'wb': '#514438'},
+              'fe10-3-6': {'tg': '#5e594a', 't0': '#637944', 'wb': '#514438'}, 'fe10-3-7': {'tg': '#6a604c'},
               'fe10-4-endgame-1': {'wv': '#000000'}, 'fe10-4-endgame-3': {'wv': '#000000'}, 'fe10-4-endgame-5': {'wa': '#000000'}}
+
+
+# Maps whose plain is all one ground in the game, every plain tile drawn as it (plain's stats), where the dark minimaps couldn't show
+# it (the user, in the game, 2026-11-26): Part 3 Ch.1's a town's cobbles (`gb`), Part 3 Ch.7's dirt (`ga`).
+PLAIN_AS = {'fe10-3-1': 'gb', 'fe10-3-7': 'ga'}
+PLAIN_NAMES = {'ga': 'Plain (dirt)', 'gb': 'Plain (paving)'}
+
+
+def plain_as(m, terrain):
+    """An encoded map's plain as the ground the user saw in the game (PLAIN_AS), map changes and overrides too."""
+    code = PLAIN_AS.get(m['id'])
+    if not code:
+        return m
+    m['grid'] = [''.join(code if r[i:i + 2] == 't0' else r[i:i + 2] for i in range(0, len(r), 2)) for r in m['grid']]
+    for c in m.get('changes', []):
+        for p in c.get('patch', []):
+            if p.get('becomes') == 't0':
+                p['becomes'] = code
+    over = m.get('terrainOverrides', {})
+    if 't0' in over:
+        over[code] = over.pop('t0')
+    terrain.setdefault(code, {**terrain['t0'], 'name': PLAIN_NAMES[code]})
+    return m
 
 
 def look_fixes(m):
@@ -2146,8 +2171,8 @@ def main():
         f.write('}\n\n/** Def, Avoid, healing (% of max HP each turn) and movement cost (null = can\'t enter) by terrain code. */\n')
         f.write('export const FE10_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {\n')
         coded = {encode('fe10', letter): info for letter, info in terrain.items()}
-        encoded = [look_fixes(map_pieces.barriers(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(
-            encode_map('fe10', sandy_map(m)), coded), coded), coded), coded)) for m in maps]
+        encoded = [look_fixes(plain_as(map_pieces.barriers(map_pieces.stone_crossing(tellius_minimaps.apply(map_pieces.town(
+            encode_map('fe10', sandy_map(m)), coded), coded), coded), coded), coded)) for m in maps]
         # A tent drawn whole works as the building it is, named a tent.
         for code in sorted(set().union(*(tents(m) for m in encoded))):
             coded[code] = dict(coded['oe'], name='Tent')
