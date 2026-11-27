@@ -816,8 +816,11 @@ new game, so the same fixes don't have to be caught again. When the user settles
   else; a wall kept as one big blocks; a wall all but black is the void, drawn black (not lifted to a dark blue); rubble is three
   small rocks lying apart, for rubble alone (the user's call, the last games' review: it had stood in for everything), rubble laid in a
   line of three tiles or more a ruin's walls (a broken wall's stub and a fallen block), and rubble the game names otherwise drawn as
-  it: cherry trees as blossom trees on grass, graves, stones as boulders, barrels, Thracia 776's cracked walls as a wall's courses with
-  a crack (the user, Fates' review). The rest of every game's kinds too (the last games' review, 2026-11-14: "a texture or two"):
+  it: cherry trees as blossom trees on grass, graves, stones as a heap of a few stones, barrels, Thracia 776's cracked walls as a
+  wall's courses with a crack (the user, Fates' review). **A round boulder is only a rock units push** (every game, every map: the
+  user, in the game, 2026-11-27, "if its not a pushable one it shouldnt be a round stone"): any other rock or stone alone on its tile
+  is a heap of a few stones, stone rubble (`STONE_PILE`: Engage's lone outcrops, Awakening's lone rocks, the Hot-Spring Scramble's
+  partitions, the stones a game names among its rubble), and rocks side by side a big boulder's pieces. The rest of every game's kinds too (the last games' review, 2026-11-14: "a texture or two"):
   wasteland bare earth with a crack and pebbles, Three Houses' floors that slow monsters a floor's slabs, wetland a bog's mud, a valley
   a cliff's layers (lava where the map's art is, above), a chasm ledges far down in the dark, the sky a wisp of cloud, clouds puffs,
   falling water or an abyss streaks running down, ice and glaciers a sheen and a crack, darkness a drifting haze, a storm curling gusts,

@@ -1254,7 +1254,9 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
     if (along(-1) && along(1) && water(1) && water(-1)) return BRIDGE_PLANKS
     if (/cherry/i.test(name)) return CHERRY_TREE
     if (/grave/i.test(name)) return GRAVE
-    if (/stone|rock/i.test(name)) return BOULDER
+    // A stone or rock the game names so a heap of a few stones: a round boulder is only a rock units push (every game: the user,
+    // 2026-11-27, "if its not a pushable one it shouldnt be a round stone").
+    if (/stone|rock/i.test(name)) return STONE_PILE
     if (/barrel/i.test(name)) return BARREL
     if (/cracked wall/i.test(name)) return CRACKED_WALL
     // Rubble laid in a line three tiles or more is a ruin's wall (Engage's ruined walls and mazes), but on a map whose rubble is all
@@ -1876,7 +1878,7 @@ const RUIN_ICON = 8
  * (Gaiden's), bones on the ground (Mystery of the Emblem's deserts). */
 const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   door: SEALED_DOOR, bones: BONES, bridge: BRIDGE_SIDE, altar: ALTAR, stairs: STAIRS, statue: STATUE.a, windmill: WINDMILL.a,
-  yurt: YURT.h, crates: CRATES, rock: BOULDER, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
+  yurt: YURT.h, crates: CRATES, rock: STONE_PILE, umbrella: UMBRELLA.a, palm: PALM.a, parasol: PARASOL.a,
   pillar: PILLAR_TOP, dragon: DRAGON_STATUE.a, shack: SHACK.a, barrel: BARREL, downstairs: STAIRS_DOWN, house: TOWN_HOUSE, grave: GRAVE,
   fountain: FOUNTAIN_PIECES.e, horse: HORSE, carriage: CARRIAGE, sarcophagus: SARCOPHAGUS.b, rubble: RUBBLE, candle: CANDLESTICK,
   table: STONE_TABLE, candelabra: CANDLESTICK, garden: GARDEN, tree: TREE, slab: slabPiece(true, true, true, true, 0),
@@ -1892,7 +1894,7 @@ const DECOR_SPRITE: Record<NonNullable<ChapterMap['decor']>[string], Sprite> = {
   'ruin-green': ruinedRoofPiece('green', 0, 0, 1, 1, RUIN_ICON), 'ruin-brown': ruinedRoofPiece('brown', 0, 0, 1, 1, RUIN_ICON),
   shell: ruinedShellPiece(0, 0, 1, 1, RUIN_ICON),
   roundYurt: roundYurtPiece(1, 1, 3, 3), zenGarden: zenGardenPiece(1, 1), cherry: CHERRY_TREE, walledHouse: VILLAGE_HOUSE.middleFront,
-  stones: STONE_PILE, thickPillar: PILLAR_TOP, torch: CANDLESTICK, outcrop: BOULDER, palisade: PALISADE, coffin: COFFIN,
+  stones: STONE_PILE, thickPillar: PILLAR_TOP, torch: CANDLESTICK, outcrop: STONE_PILE, palisade: PALISADE, coffin: COFFIN,
   // A brazier, lit (Radiant Dawn's Part 2 Ch.2 torch: the user, braziers are no candlesticks) or put out.
   brazier: TORCH, brazierOut: TORCH_UNLIT, vaseTable: vaseTablePiece(true, true, true, true, 'ew'),
 }
@@ -1933,7 +1935,8 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   // the others.
   if (kind === 'outcrop') {
     const [u, d, l, r] = [same(0, 1), same(0, -1), same(-1, 0), same(1, 0)]
-    const rock = u || d || l || r ? boulderPiece(!u, !l, !r, !d, variety(x, y)) : BOULDER
+    // A rock alone a heap of a few stones (a round boulder is only a rock units push: the user, 2026-11-27).
+    const rock = u || d || l || r ? boulderPiece(!u, !l, !r, !d, variety(x, y)) : STONE_PILE
     // In the colour of the rock it's drawn over (`outcropTint`: Engage's, as its scenes draw them).
     const own = map.outcropTint && codeAt(map, [x, y])
     return own ? tintedRock(rock, fillOf(map, own)) : rock
@@ -1951,11 +1954,12 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
     const [u, d, l, r] = [same(0, 1), same(0, -1), same(-1, 0), same(1, 0)]
     return slabPiece(!u, !l, !r, !d, variety(x, y))
   }
-  // Rocks side by side are one boulder (the user: large boulders, Awakening's Chapter 9 and the Hot-Spring Scramble), a lone one a rock.
+  // Rocks side by side are one boulder (the user: large boulders, Awakening's Chapter 9 and the Hot-Spring Scramble), a lone one a heap
+// of a few stones (a round boulder is only a rock units push: the user, 2026-11-27).
   if (kind === 'rock') {
     // Each boulder at most two tiles by two, a big block of rocks several boulders (the Hot-Spring Scramble's, as its scene draws them).
     const [x0, x1, y0, y1] = boulders(map).get(tileKey([x, y])) ?? [x, x, y, y]
-    if (x0 === x1 && y0 === y1) return BOULDER
+    if (x0 === x1 && y0 === y1) return STONE_PILE
     return boulderPiece(y === y1, x === x0, x === x1, y === y0, variety(x, y))
   }
   // Rubble in a block two by two or more is large stone rubble (the user: Awakening's Apotheosis); in lines or alone, its pieces varied
@@ -4125,11 +4129,11 @@ function Legend({
     const code = codeAt(map, t)
     items.push({
       label: `${terrainName(map, t)} (a rock outcrop: ${fliers ? 'only fliers cross it' : 'no unit enters'})`,
-      sprite: map.outcropTint && code ? tintedRock(BOULDER, fillOf(map, code)) : BOULDER,
+      sprite: map.outcropTint && code ? tintedRock(STONE_PILE, fillOf(map, code)) : STONE_PILE,
     })
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))
-    if (DECOR_LABEL[kind] && kind !== 'outcrop') items.push({ label: roofLabel(kind), sprite: kind === 'statue' ? (lone(kind) ? STATUE_SMALL : STATUE.a) : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? BOULDER
+    if (DECOR_LABEL[kind] && kind !== 'outcrop') items.push({ label: roofLabel(kind), sprite: kind === 'statue' ? (lone(kind) ? STATUE_SMALL : STATUE.a) : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? STONE_PILE
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
         : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
