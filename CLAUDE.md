@@ -700,7 +700,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   Grassland never paving; a town's Plain its paving (`PAVED_PLAIN`: 31's grey road up its middle and tan stone paths, `gf`, a64's
   lawns `gg`), the open country's grass and dirt (a62); chests, forts, levers and onagers on the ground round them (their photo
   colours are the HUD's); boards for Verdant Wind 29's wooden platform and Chapter 7's stage (`gi`, wood brown); bridges drawn whole
-  (`wideBridges`); the dark halls' floors a clear step over their walls as drawn and no wall the void (`APART`). The user's third look
+  (`wideBridges`); the dark halls' floors a clear step over their walls as drawn and no wall the void (`APART`: Shambhala's walls
+  and Odd Items too, the user, in the game, 2026-11-27, "the voids in lines are walls", "the odd items on the map are basically
+  walls"); its unknown terrain (???) that the grid gives another kind after the rooms the chapter's script opens, each block a
+  closed room behind the doors beside it, opened with the door as the grid lays it after (`script_rooms`: Shambhala's three, SC26's
+  CheckDoorOpened events running each room's SetupTerrainEffects; "the voids in blocks by doors are rooms that are able to be opened
+  but only with the story scripts"). The user's third look
   (2026-11-26): its craters, which take 20% of HP a turn, the cracked magma; its Avo Floor a gold ring round a dot (chevrons read as a
   ledge's); Chapter 4's altars its candle stands, one right over a pillar that pillar's top (`ALTAR_CANDLES`), Chapter 5's two
   impassable tiles candlesticks; Chapter 10's altar platform paved (`STONE_BOXES`), Chapter 3's night path traced by eye on the photos
@@ -1383,8 +1388,10 @@ A global switch (header, any game) that lets someone play along without being to
   (`data/`, `m/E/`, `map/`, `scripts/`, named by its key: `X014`) under the next story chapter's key on the user's save (`005`),
   so that chapter loads it (its heights stay the story chapter's); removed once the user has looked (Paralogue 14, 2026-11-26).
   Three Houses' in Eden, as for its photos: the auxiliary battle Battle in the Mountains pointed at the stage (its scenario record's
-  map byte, written through Eden's debugger connection while the game runs, never halting it), which the user deploys again from the
-  autosave before it (Silver Snow 26 and Crimson Flower 37, 2026-11-26); Eden's debugger connection is switched off again after.
+  map byte, +32 of record 62), which the user deploys again from the autosave before it (Silver Snow 26 and Crimson Flower 37,
+  2026-11-26); since 2026-11-27 through a mod (`%APPDATA%\eden\load\010055D009F78000\ArmoryMapCheck`) holding the update's own scenario
+  table (`patch4/nx/data/fixed_scenario.bin`, file 22, which the update's patch index already puts in) with that byte changed, read at
+  boot, as the debugger connection left the game at 3-4 FPS; removed once the user has looked.
   Engage's in Eden without the debugger (its traffic left the game at 6 FPS): a mod (`%APPDATA%\eden\load\0100A6301214E000\
   ArmoryMapCheck`) with the game's chapter table (`fe_assets_gamedata/chapter.xml.bundle`, repacked as the game packs it) giving every
   chapter whose world map spot holds encounters the target's map, scripts and units, so whichever encounter the user enters loads it

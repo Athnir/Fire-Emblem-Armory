@@ -244,8 +244,10 @@ TILE_DECOR = {29: {(5, 17): 'grave', (12, 12): 'outcrop', (13, 12): 'outcrop', (
 # chest on purple, a64's yellow strongholds, a82's fort).
 ICON_ON_GROUND = ('oa', 'bb', 'ov', 'ox')
 # Maps whose floors and walls the viewer's dark lift draws too close (the user: Chapters 5 and 6, Silver Snow 13, Crimson Flower 37;
-# Chapters 4 and 11 the same), by battle map: every ground kept a clear step over the walls as drawn, and no wall the void.
-APART = {4, 5, 6, 11, 13, 25}
+# Chapters 4 and 11 the same), by battle map: every ground kept a clear step over the walls as drawn, and no wall the void (Shambhala's
+# walls and odd items: the user, in the game, 2026-11-27, "the voids in lines are walls", "the odd items on the map are basically
+# walls").
+APART = {4, 5, 6, 11, 13, 20, 25}
 # The user's third look (2026-11-26). Plain within these boxes (x0, x1, y0, y1) the stone the photos show, its paving `gb` with the
 # Plain's numbers (Chapter 10's altar platform: the user, stone but for its pillars).
 STONE_BOXES = {10: [(7, 13, 16, 20)]}
@@ -597,6 +599,40 @@ for _c, _r in enumerate(CLASSES):
     for _label, _types, _row in GROUPS:
         if _r[D.MOVE_TYPE] in _types:
             CLASS_GROUP[_c] = _label
+
+
+# The unknown terrain (???): no unit enters it; Shambhala's rooms, which its script opens (script_rooms).
+UNKNOWN = 66
+
+
+def kind_code(kind):
+    """A kind's code and numbers, as the map's tiles are encoded."""
+    code, info = encode(GAME, LETTER[kind]), tile_info(kind)
+    if kind in KIND_LOOK:
+        code, info['name'] = KIND_LOOK[kind]
+    return code, info
+
+
+def script_rooms(b):
+    """Each block of the unknown terrain the grid gives another kind after (a room the chapter's script opens), with the doors beside
+    it: [(tiles, doors)], each tile (row from the top, column)."""
+    cells = {(r, c) for r in range(b.h) for c in range(b.w) if b.rows[r][c][0] == UNKNOWN and b.rows[r][c][1] != UNKNOWN}
+    out, seen = [], set()
+    for start in sorted(cells):
+        if start in seen:
+            continue
+        room, todo = set(), [start]
+        while todo:
+            p = todo.pop()
+            if p in room or p not in cells:
+                continue
+            room.add(p)
+            todo += [(p[0] + 1, p[1]), (p[0] - 1, p[1]), (p[0], p[1] + 1), (p[0], p[1] - 1)]
+        seen |= room
+        doors = sorted({(r + dr, c + dc) for r, c in room for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1))
+                        if 0 <= r + dr < b.h and 0 <= c + dc < b.w and TERRAIN[b.rows[r + dr][c + dc][0]]['name'] == 'Door'})
+        out.append((sorted(room), doors))
+    return out
 
 
 def tile_info(kind):
@@ -3902,6 +3938,34 @@ def main():
                     infos.append((code, info))
                     variants.setdefault(code, {}).setdefault(json.dumps(info, sort_keys=True), [info, set()])[1].add(map_id)
                 codes.append(''.join(line))
+            # Rooms the chapter's script opens: each block of its unknown terrain (???) the grid gives another kind after a closed room
+            # (`ws`), and each door beside it a change that opens the door and the room as the grid lays them after (Shambhala's three:
+            # SC26's CheckDoorOpened events each run the room's SetupTerrainEffects; the user, in the game, 2026-11-27, "the voids in
+            # blocks by doors are rooms that are able to be opened but only with the story scripts").
+            rows_ = [[line[i:i + 2] for i in range(0, len(line), 2)] for line in codes]
+
+            def note(code, info):
+                infos.append((code, info))
+                variants.setdefault(code, {}).setdefault(json.dumps(info, sort_keys=True), [info, set()])[1].add(map_id)
+            for room, doors in script_rooms(b):
+                patch = []
+                for r, c in room:
+                    rows_[r][c] = 'ws'
+                    becomes, after_info = kind_code(b.rows[r][c][1])
+                    note(becomes, after_info)
+                    patch.append({'tile': [c + 1, b.h - r], 'becomes': becomes})
+                note('ws', dict(tile_info(UNKNOWN), name='??? (a room the chapter opens)'))
+                for r, c in doors:
+                    x, y = c + 1, b.h - r
+                    becomes, after_info = kind_code(b.rows[r][c][1])
+                    note(becomes, after_info)
+                    others = [f'({c2 + 1}, {b.h - r2})' for r2, c2 in doors if (r2, c2) != (r, c)]
+                    m['changes'].append({
+                        'id': f'room-{x}-{y}', 'trigger': 'event', 'tile': {'default': [x, y]}, 'usableBy': '',
+                        'effect': "A door: once it's opened" + (f" (or the one at {' or '.join(others)})" if others else '')
+                                  + ", the chapter's script opens the room behind it.",
+                        'patch': [{'tile': [x, y], 'becomes': becomes}] + patch})
+            codes = [''.join(line) for line in rows_]
             m['grid'] = codes
             if decor:
                 m['decor'] = decor
