@@ -3456,8 +3456,12 @@ export function MapGrid({
             const marks = walls.length ? walls : [[x, y] as Tile]
             return (
               <g key={c.id}>
-                {/* A breakable drawn as what it is (Engage's junk as shacks) keeps its crack as a small badge, so it shows. */}
-                {marks.map((t) => <SpriteG key={tileKey(t)} sprite={CRACK} x={px(t[0])} y={py(t[1])} size={map.decor?.[tileKey(t)] ? 5 : undefined} />)}
+                {/* A breakable drawn as what it is (Engage's junk as shacks) keeps its crack as a small badge, so it shows; an altar
+                    takes the full crack (The Shepherd Exalt's crystals: the user, "the full breakable crack on it"). */}
+                {marks.map((t) => {
+                  const decor = map.decor?.[tileKey(t)]
+                  return <SpriteG key={tileKey(t)} sprite={CRACK} x={px(t[0])} y={py(t[1])} size={decor && decor !== 'altar' ? 5 : undefined} />
+                })}
               </g>
             )
           }

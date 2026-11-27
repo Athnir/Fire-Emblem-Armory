@@ -644,7 +644,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   the bridge holes in the radiant games"; Fell Xenologue 3's, Path to War, and the Divine Paralogue The Lonely Heir's the same); the
   crystals your units break (水晶_味方破壊) altars, breakable, each leaving its pedestal (台座, previewed), and in an encounter, which
   puts the pedestal there from the start, altars no one breaks (`crystal_altars`: The Shepherd Exalt's three, the user, in the game,
-  2026-11-27, "make the 3 crystals as breakable altars"); a script's TerrainFill floods its tile's region (The Shepherd Exalt's barrier,
+  2026-11-27, "make the 3 crystals as breakable altars"), an altar's crack the full one, not a drawing's small badge; a script's TerrainFill floods its tile's region (The Shepherd Exalt's barrier,
   gone in its encounter, "there is no dark barrier on this map", and lifted in the paralogue when the crystals break); its
   large pillars (大柱) pillars, its candelabras (燭台) candlesticks, its beacons (篝火)
   braziers, Radiant Dawn's lit torch (the user: braziers are no candlesticks), one put out (篝火消) unlit, its statues (石像), coffins
