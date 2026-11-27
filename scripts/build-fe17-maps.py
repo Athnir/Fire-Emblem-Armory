@@ -81,7 +81,8 @@ PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall', 'q': 'Large Pilla
 # Mysterious Merchant's courtyard green grass, not dirt (its photos' sunlit grass); The Doting Sister's buildings its streets' dark
 # slate and its streets a mauve grey (in the game, 2026-11-27: "the bricks should be more grey than white ... basically swap the colors
 # of the bricks and the cobble and darken the cobble to grey insted of white").
-FILLS = {'fe17-m026': {'wd': '#0b0b0e'}, 'fe17-s002': {'ta': '#6a6816'}, 'fe17-g005': {'t1': '#6f6870', 'oe': '#3b3a49'}}
+FILLS = {'fe17-m026': {'wd': '#0b0b0e'}, 'fe17-s002': {'ta': '#6a6816'}, 'fe17-g005': {'t1': '#6f6870', 'oe': '#3b3a49'},
+         'fe17-e006': {'ge': '#b98f98', 'gb': '#d9b2d4', 'ta': '#764948'}}
 # The maps whose junk (wz, two tiles by two) its scene draws as wooden shacks (the user, the Desert Dunes stages): drawn as shacks.
 SHACKS = ('fe17-c005-',)
 # The maps whose dais of large pillars round a floor with stairs is a small stone fort (the user, the Caring Princess's: a fort fix).
@@ -115,6 +116,44 @@ STONE_BRIDGES = ('fe17-m004', 'fe17-s010')
 PAVED_ROADS = ('fe17-m002',)
 # A town its scene paves well past its roads (the user, Serenity in Ruin's: cobble should cover most of the town), traced on its lit
 # render (its stone's hue, the town's rows): its paving `gb` with a plain's numbers, its colour off the render, the rows from the top.
+# Ground its scene paves (the user, in the game, 2026-11-27: Fell Xenologue 6's "most of the ground tiles are actually stone"), read
+# off its scene's materials with the rock models its battle map hides left out (FloorTile_01 its islands' paving, _02 and _03 its
+# plaza's), the photos' broken edges kept as they show them: 'S' its paving drawn as stone slabs (`ge`), 'P' its plaza's small
+# pavers (`gb`), both with a plain's numbers; the rest of its plain its broken earth. The rows from the top.
+STONE_GROUND = {'fe17-e006': (32, [
+    '...........................S',
+    '...S......PPPP.PPPPP......SS..S',
+    '..SS......PPPPPP.PPP.....SSSS.SS',
+    '....S....PP.PPPPPPPPPP..SSS...SS',
+    'SSSS..SS.PPPPP...PP.PP..SSSS.SS',
+    'S.SS.SSS..PPPP...PPPPP..SSSSSSS',
+    'S..SSSS...PPP....P.PPP..SSS...SS',
+    'SS.SSSS....PPPPPPPPP....S.S...SS',
+    'SSS...SS.SPPPP.PPPPP...SSSS...SS',
+    '..S...SSSSS.PPPP.PP...SS.SSSSSS',
+    '..S...S.SSSPPPPPPPPSSSSSSSSSSS',
+    '..SSSSSSS.S..PPPP...SSSSSS.SSSS',
+    '.SSSS.S.SS..........SS.SSSSS.SSS',
+    'SSS.S..SS............SSSS.SSS.S',
+    '....S..........SS..SSSS...SSSSS',
+    '...SSS.......SS...SSSS....SSSSS',
+    '...SSS......SSS...SSS......S.S',
+    '...S.S.....SS.S...SSS......SSS',
+    '...SSS....SSSSSSSSSS.S.....SS',
+    '.SSSSSS...S..SSSSS.SSSS....SSS',
+    '.SSSSSSS......S..SSSSSSS..SSSS',
+    '.SS...S..........S.SSSS.SSS.SSS',
+    '.SS...S..............SS.SSSSSSS',
+    'S.S...SS.SSSSSS.........SSSSS.SS',
+    '.SSSSSSS.SSSSSSS........S.S...SS',
+    '.SSS.SS..SSSSS...S.......SS...S',
+    '.SSSSS....SS.S...SS.......S...S',
+    '..SSS......SSS...SS..S.....SSSS',
+    '..........SSSSSSSSSS.SS....SSS.S',
+    '.........SSSSSSSS.SS..SS..S.SSSS',
+    '........SSSS.SSSSSSSS..S..SSS',
+    '.........SSSSSSSSSSSSS......SS',
+])}
 TOWN_PAVING = {'fe17-m017': ('#785345', 31, [
     '..##........................#',
     '..############............###',
@@ -2259,6 +2298,8 @@ def main():
         info['gf'] = dict(info['tl'], name='Ground')
     if 'gb' in used:
         info.setdefault('gb', dict(info['ta']))
+    if 'ge' in used:
+        info['ge'] = dict(info['ta'])
     # A building drawn as itself works as the Edifice it is, named by what it is.
     for code in sorted(pieces):
         info[code] = dict(info['oe'], name=PIECE_NAMES[code[0]])
@@ -2555,6 +2596,21 @@ def game_looks(m):
                 if c == '#' and code(x, top - i) in ('ta', 'tl', 'ga'):
                     rows[h - (top - i)][x - 1] = 'gb'
         fills['gb'] = colour
+    if own in STONE_GROUND:
+        top, mask = STONE_GROUND[own]
+        for i, line in enumerate(mask):
+            for x, c in enumerate(line, 1):
+                if c in 'SP' and code(x, top - i) == 'ta':
+                    rows[h - (top - i)][x - 1] = 'ge' if c == 'S' else 'gb'
+        # Its trees on the ground round them, its paving where most of it is.
+        stand = {}
+        for y in range(1, h + 1):
+            for x in range(1, w + 1):
+                near = Counter(code(x + dx, y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy)
+                near = {c: n for c, n in near.items() if c in ('ge', 'gb', 'ta')}
+                if code(x, y) == 'ba' and near:
+                    stand[f'{x},{y}'] = max(near, key=lambda c: (near[c], c == 'ge'))
+        m['standOn'] = dict(m.get('standOn') or {}, **stand)
     if own.startswith(STONE_BRIDGES):
         recode('tb', 't8')
     m['grid'] = [''.join(r) for r in rows]

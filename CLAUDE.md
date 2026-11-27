@@ -655,8 +655,12 @@ new game, so the same fixes don't have to be caught again. When the user settles
   staircases on this map"); an effect laid over stairs (its Miasma on stairs) the stairs under its badge, on the stairs' ground
   (Fell Xenologue 5's (25, 4), the middle of its flight, "25-4 is a staircase"; Chapter 19's (9, 19) the same); its bridges whole
   (`wideBridges`), stone where its scene builds them so (A Land in Bloom's, the Sage Lord's); Queen Lumera's white stone road
-  paving and Serenity in Ruin's town paved as its render shows it; a crater amid the lava the lava; the Brash General's walls its
-  cave's rock but its temple's; low walls and buildings drawn as no house, fort or stall in its walls' stone (the Kingdom of Might's,
+  paving and Serenity in Ruin's town paved as its render shows it; Fell Xenologue 6's ground its stone, read off its scene's
+  materials with the rock models its battle map hides left out and checked against its photos: its islands' paving stone slabs (`ge`,
+  a plain's numbers), its plaza's small pavers (`gb`), the rest broken earth, its trees on the paving round them (`STONE_GROUND`: the
+  user, in the game, 2026-11-27, "most of the ground tiles are actually stone"), and its Fell sigils, three tiles by three, Thracia
+  776's sigil pattern ("replace the 3x3 ground structures with the sigils from the early games"); a crater amid the lava the lava;
+  the Brash General's walls its cave's rock but its temple's; low walls and buildings drawn as no house, fort or stall in its walls' stone (the Kingdom of Might's,
   the Ancestor's), Dancer in the Ruins' towers no fort; a sigil set in a castle's floor that floor; houses the map's edge cuts
   carried past it (the Desert Dunes', the Oasis's), a lone leftover a small house; its ruins varied, but the walls a scene builds of
   brick models (Stone_Wall06Brick, which a ruin's names match; the game's plain structures, 建造物) its walls' blocks, and its rubble

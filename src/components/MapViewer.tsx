@@ -599,10 +599,12 @@ function floorPattern(map: ChapterMap, code: TerrainCode, at?: Tile) {
 
 /** A magic floor's or seal's piece of the sigil pattern (Thracia 776's): its place in its sigil's box, the floors and seals joined
  * corner to corner (a ring round its seal, or a block), a-c its top row, d-f its middle, g-i its bottom; the middle repeats where a
- * sigil is wider or taller than three. */
+ * sigil is wider or taller than three. Engage's Fell sigils, blocks of three by three, take the same pattern (the user, in the game,
+ * 2026-11-27: Fell Xenologue 6's, "replace the 3x3 ground structures with the sigils from the early games"). */
 function wardPiece(map: ChapterMap, at?: Tile) {
   if (!at) return FLOOR_PATTERNS.ward[4]
-  const ward = (t: Tile) => codeAt(map, t) === 'bw' || codeAt(map, t) === 'bx'
+  const fell = codeAt(map, at) === 'tx'
+  const ward = (t: Tile) => (fell ? codeAt(map, t) === 'tx' : codeAt(map, t) === 'bw' || codeAt(map, t) === 'bx')
   const seen = new Set<string>()
   const todo: Tile[] = [at]
   let [x0, x1, y0, y1] = [at[0], at[0], at[1], at[1]]
@@ -1291,6 +1293,7 @@ function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // A shore's look: the pebbles (the user's pick of the shore's looks).
   if (code === 'b4') return COAST_VARIANTS[3]
   if (FLOOR_BONUS.has(code)) return floorPattern(map, code, at)
+  if (code === 'tx') return wardPiece(map, at)
   // A town house with a door mat before it has its door over each mat (windows or a blank wall past them), not where it would be.
   if (at && /^r[ghi]$/.test(code)) {
     const [x, y] = at
@@ -2342,7 +2345,7 @@ const SHOP_SPRITE: Record<string, Sprite> = { Armory: ARMORY, Vendor: VENDOR, 'S
 /** Terrain whose icon is a small top-left badge instead (the drop badge is top-right): the Tower's floors cover
  * most of the Endgame's maps, and Echoes' castle floors most of its castles, so full-size icons would hide the map. */
 const BADGE_TERRAIN = new Set<TerrainCode>(['hc', 'ea', 'eb', 'ec', 'ed', 'ee',
-  'eg', 'eh', 'ei', 'tx'])
+  'eg', 'eh', 'ei'])
 
 /** The map's terrain at one phase of a cloud map: the clouds drift one tile left each phase, wrapping round. */
 function withClouds(map: ChapterMap, phase: number): ChapterMap {
