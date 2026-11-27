@@ -623,7 +623,7 @@ def deaths_allowed(game, codes):
         for pid, side in placed.items():
             name = game.people.get(pid, {}).get('name')
             loses = [any((x == 'Any ally dies' and side == 0) or (x == 'Other unit dies' and side in (2, 3))
-                         or (name and re.search(rf'{re.escape(name)}', x)) for x in ls) for _, ls in ch['blocks']]
+                         or (name and re.search(rf'\b{re.escape(name)}\b', x)) for x in ls) for _, ls in ch['blocks']]
             if pid in game.people and not game.people[pid]['generic'] and pid not in safe and not all(loses):
                 seen[pid].append((f"{ch['part']}-{ch['heading'].replace('Ch.', '')}", side))
     return out
