@@ -1382,6 +1382,13 @@ A global switch (header, any game) that lets someone play along without being to
   Three Houses' in Eden, as for its photos: the auxiliary battle Battle in the Mountains pointed at the stage (its scenario record's
   map byte, written through Eden's debugger connection while the game runs, never halting it), which the user deploys again from the
   autosave before it (Silver Snow 26 and Crimson Flower 37, 2026-11-26); Eden's debugger connection is switched off again after.
+  Engage's in Eden without the debugger (its traffic left the game at 6 FPS): a mod (`%APPDATA%\eden\load\0100A6301214E000\
+  ArmoryMapCheck`) with the game's chapter table (`fe_assets_gamedata/chapter.xml.bundle`, repacked as the game packs it) giving every
+  chapter whose world map spot holds encounters the target's map, scripts and units, so whichever encounter the user enters loads it
+  (the game reads the table at boot: the user restarts for each map); a map with no encounter layout of its own its field and terrain
+  with another's layout (Fell Xenologue 6 with Budding Talent's, the Tempest Trials with Fell Xenologue 1's), and a Tempest Trial map
+  its own battle script as the encounter's, whose MapDispos takes its islands and bridges away (2026-11-27); removed once the user has
+  looked.
 - **Check counts against outside sources in the tests** (enemy totals per map, wiki or fireemblemwod.com),
   with every exception explained.
 - **Back each rule with a test where it can be checked** (e.g. no pillar icon on a tile no one can enter;
