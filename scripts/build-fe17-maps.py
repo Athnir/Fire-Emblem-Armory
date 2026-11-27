@@ -1541,6 +1541,9 @@ def random_foes(n, dispos, script, terrain_name, groups):
     for u in units:
         if u.get('difficulties') == DIFFS:
             u.pop('difficulties')
+        # The working keys unit_entry adds, which the story maps drop before writing too.
+        u.pop('_pid', None)
+        u.pop('_raids', None)
     return t, units, starts, terrain
 
 
