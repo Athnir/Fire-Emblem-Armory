@@ -72,6 +72,9 @@ BRIDGE_FLOORS = {'fe12-12': [(x, y) for x in (14, 15, 16) for y in range(4, 11)]
 RIVER_AS_LAKE = {'fe12-17'}
 # Floors kept a clear step lighter than their walls, which the dark lift draws too close (the user: Chapter 20x, as Awakening's 20).
 APART = {'fe12-20x'}
+# A tile the game calls out of bounds that its art draws as the wall round it, drawn as that wall, its numbers kept (the user, 2026-11-27:
+# Chapter 16's (22, 6), "void tile?", the end of the castle's wall beside its channel).
+WALL_LOOKS = {'fe12-16': {(22, 6): 'w0'}}
 # The prologue's second versions: the answer at the end of the chapter before picks one (data-raw/fe12/README.md).
 SECOND = {'bmap204': 'bmap204B', 'bmap206': 'bmap206B', 'bmap207': 'bmap207B'}
 GAIDEN = {'bmap103': '3x', 'bmap106': '6x', 'bmap110': '10x', 'bmap113': '13x', 'bmap116': '16x', 'bmap120': '20x'}
@@ -2716,6 +2719,9 @@ def main():
         for x, y in STAIRS.get(mid, []):
             assert at(x, y) == 't1', (mid, x, y, at(x, y))
             m.setdefault('decor', {})[f'{x},{y}'] = 'stairs'
+        for (x, y), code in WALL_LOOKS.get(mid, {}).items():
+            assert at(x, y) == 'wy', (mid, x, y, at(x, y))
+            m.setdefault('looksAs', {})[f'{x},{y}'] = code
         if mid in WHOLE_BRIDGES:
             m['wholeBridges'] = [list(box) for box in WHOLE_BRIDGES[mid]]
         if mid in BRIDGE_FLOORS:
