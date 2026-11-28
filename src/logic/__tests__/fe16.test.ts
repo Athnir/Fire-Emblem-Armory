@@ -1432,13 +1432,11 @@ describe("Three Houses' maps as its stages draw them", () => {
   })
 
   it("draws a Floor as stone, Grassland never as paving, and a town's Plain as its paving (the user's notes)", () => {
-    // No dirt on a Floor: 31's palace, 21-am's, 34's paths; Silver Snow 20's lighter stone paths parted from its floor.
+    // No dirt on a Floor: 31's palace, 21-am's, 34's paths.
     const rows31 = map('fe16-31-cf').grid.map(rowCodes)
     expect(rows31.slice(0, 13).flat()).not.toContain('ga')
     expect(codes('fe16-21-am')).not.toContain('ga')
     expect(codes('fe16-34-cf').filter((c) => c === 't1').length).toBe(125)
-    expect(codes('fe16-20-ss').filter((c) => c === 'ge').length).toBeGreaterThan(40)
-    expect(FE16_TERRAIN.ge!.move).toEqual(FE16_TERRAIN.t1!.move)
     // 31's grey road up its middle (12-14) and tan stone paths, (12, 6) to (14, 1) stone; 35's grass outside its walls no paving.
     for (let y = 1; y <= 6; y++) for (const x of [12, 14]) expect(at('fe16-31-cf', x, y), `${x},${y}`).toBe('gb')
     expect(at('fe16-31-cf', 23, 2)).toBe('gf')
@@ -1506,14 +1504,24 @@ describe("Three Houses' maps as its stages draw them", () => {
     expect([map('fe16-5').decor?.['9,14'], map('fe16-5').decor?.['13,14']]).toEqual(['candle', 'candle'])
   })
 
-  it("paints every roof of Crimson Flower 32 grey and of 35 brown, and parts Silver Snow 20's floor into its three stones", () => {
+  it("paints every roof of Crimson Flower 32 grey and of 35 brown, and draws Silver Snow 20's floor as one stone", () => {
     const roofs = (id: string) => new Set(Object.values(map(id).decor ?? {}).filter((k) => k.startsWith('roof-')))
     expect(roofs('fe16-32-cf')).toEqual(new Set(['roof-grey']))
     expect(roofs('fe16-35-cf')).toEqual(new Set(['roof-brown']))
-    // the user's fourth look: (18, 20) its dark slate, (15, 20) its grey stone, (16, 29) its tan, each with the Floor's numbers
-    expect([at('fe16-20-ss', 18, 20), at('fe16-20-ss', 15, 20), at('fe16-20-ss', 16, 29)]).toEqual(['ge', 'gf', 't1'])
-    for (const c of ['ge', 'gf', 't1']) expect(codes('fe16-20-ss').filter((k) => k === c).length, c).toBeGreaterThan(100)
-    expect(map('fe16-20-ss').terrainOverrides?.gf?.name).toBe('Floor (gray stone)')
+    // the user's fifth look (2026-11-27): every Floor tile (23, 18)'s stone, the tan its fourth look named at (16, 29), on all three
+    // maps of the stage
+    for (const id of ['fe16-20-ss', 'fe16-20-vw', 'fe16-25-am']) {
+      expect([at(id, 18, 20), at(id, 15, 20), at(id, 16, 29), at(id, 23, 18)], id).toEqual(['t1', 't1', 't1', 't1'])
+      expect(codes(id).filter((k) => k === 'ge' || k === 'gf'), id).toHaveLength(0)
+      expect(map(id).fills?.t1, id).toBe(map('fe16-20-ss').fills?.t1)
+    }
+    // Protecting Garreg Mach's fences wooden, bold as Radiant Dawn's (the user, 2026-11-27), on every route's copy.
+    for (const id of ['fe16-34-cf', 'fe16-14-ss', 'fe16-14-am', 'fe16-14-vw']) {
+      const fences = map(id).grid.flatMap((r, i) => rowCodes(r).flatMap((c, x) => (c === 'wg' ? [`${x + 1},${map(id).height - i}`] : [])))
+      expect(fences, id).toHaveLength(9)
+      for (const k of fences) expect(map(id).wallLooks?.[k], `${id} ${k}`).toBe('fence')
+      expect(map(id).boldFences, id).toBe(true)
+    }
   })
 
   it("gives Crimson Flower 36's water one colour, its ground a clear step over it", () => {

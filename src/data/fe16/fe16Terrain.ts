@@ -73,6 +73,5 @@ export const FE16_TERRAIN: Partial<Record<TerrainCode, TerrainInfo>> = {
   gb: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": 1, "Cavalry": 1, "Fliers": 1, "Giant Crawlers": 1, "Giant Wolves": 1, "Infantry & armor": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Plain (paving)", "res": 0},
   gf: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": 1, "Cavalry": 1, "Fliers": 1, "Giant Crawlers": 1, "Giant Wolves": 1, "Infantry & armor": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Plain (stone path)", "res": 0},
   gg: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": 1, "Cavalry": 1, "Fliers": 1, "Giant Crawlers": 1, "Giant Wolves": 1, "Infantry & armor": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Plain (grass)", "res": 0},
-  ge: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": 1, "Cavalry": 1, "Fliers": 1, "Giant Crawlers": 1, "Giant Wolves": 1, "Infantry & armor": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Floor (stone path)", "res": 0},
   gl: {"avo": 0, "def": 0, "heal": 0, "move": {"Beasts": null, "Cavalry": 3, "Fliers": 1, "Giant Crawlers": null, "Giant Wolves": null, "Infantry & armor": 1, "Mages": 1, "Thieves & brawlers": 1}, "name": "Stairs going down", "res": 0},
 }

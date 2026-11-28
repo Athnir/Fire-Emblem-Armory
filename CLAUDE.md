@@ -730,6 +730,9 @@ new game, so the same fixes don't have to be caught again. When the user settles
   tile (`standOn`: their photo colour the HUD's or a carpet's). The user's fourth look (2026-11-26): Silver Snow 20's Floor its
   three stones by the tiles the user named, (18, 20) its dark slate, (15, 20) its grey stone, (16, 29) its tan (`STONES`: by
   each tile's photo brightness, then its warmth), its walls a step under the slate; a77's (15, 16) Echoes' heap of a few stones.
+  The user's fifth look (2026-11-27): Silver Snow 20's Floor one stone after all, every tile drawn as (23, 18)'s tan ('keep it
+  simple': `ONE_STONE`, its stage's other two maps the same); Protecting Garreg Mach's fences wooden, bold as Radiant Dawn's Part 3
+  Ch.3's (`WOOD_FENCES`, `boldFences`: 'like in fe 10 3-3'), on every route's copy.
   On every 3D game's map its walls
   are kept a step darker than the ground units walk, as Radiant Dawn's caves' (`tellius_minimaps.contrast`, each game naming its own
   ground and wall codes).

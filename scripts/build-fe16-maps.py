@@ -231,6 +231,13 @@ LIGHT_PATHS = {}
 # all with the Floor's numbers. A tile darker than halfway from the slate to the light stones is slate, else the warmer of the two
 # (its red over its blue) halfway between them tan; shade darkens the light stones but leaves their warmth.
 STONES = {17: (('ge', (18, 20)), ('gf', (15, 20)), ('t1', (16, 29)))}
+# A Floor drawn as one stone after all, the one at the tile the user named (Silver Snow 20's stage, the user's fifth look, 2026-11-27:
+# 'its not able to really pick it out well it seems, lets have it just keep it simple with (23, 18) this tile for all the ground tiles'):
+# its stones sorted as STONES has them for that stone's colour, then every one of them drawn in it.
+ONE_STONE = {17: (23, 18)}
+# Fences drawn as wooden ones, bold as Radiant Dawn's (Protecting Garreg Mach's, on every route: the user, 2026-11-27, 'all the
+# partition tiles are wood fence tiles like in fe 10 3-3').
+WOOD_FENCES = {'fe16-14-ss', 'fe16-14-am', 'fe16-14-vw', 'fe16-34-cf'}
 # Bridges and floors drawn as boards (`gi`, their own numbers): Verdant Wind 29's wooden platform (the user: a wood structure, no
 # railings), Chapter 7's wooden stage that burns (the game's Floor that turns to fire: the user, the structure is wood).
 BOARDS = {21: (10,), 7: (79,)}
@@ -4103,6 +4110,17 @@ def main():
             # A breakable wall with no wall round it is a plain wall's stones in its own colour.
             if 'wz' in m['fills'] and 'wa' not in present:
                 m['fills']['wa'] = m['fills']['wz']
+            # A Floor of three stones drawn as one, the one at the tile the user named (`ONE_STONE`).
+            if stage in ONE_STONE:
+                x, y = ONE_STONE[stage]
+                keep = rows[len(rows) - y][x - 1]
+                stones = {code for code, _ in STONES[stage]}
+                assert keep in stones, (m['id'], keep)
+                rows = [[keep if code in stones else code for code in row] for row in rows]
+                m['grid'] = [''.join(r) for r in rows]
+                for code in stones - {keep}:
+                    m['fills'].pop(code, None)
+                    m.get('terrainOverrides', {}).pop(code, None)
         elif m['id'] in emu:
             m['fills'].update(emu[m['id']])
             emu_separate(m['fills'])
@@ -4118,6 +4136,10 @@ def main():
         stage = stage_of[m['id']]
         rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
         h = len(rows)
+        if m['id'] in WOOD_FENCES:
+            m['wallLooks'] = {**(m.get('wallLooks') or {}),
+                              **{f'{c + 1},{h - r}': 'fence' for r, row in enumerate(rows) for c, code in enumerate(row) if code == 'wg'}}
+            m['boldFences'] = True
         tiles = [f'{x},{y}' for x0, y0, x1, y1 in RUINED.get(m['id'], []) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
         tiles += [f'{c + 1},{h - r}' for r, row in enumerate(rows) for c, code in enumerate(row) if code in RUIN_STAGES.get(stage, ())]
         if tiles:
