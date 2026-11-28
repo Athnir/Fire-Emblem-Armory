@@ -680,6 +680,21 @@ new game, so the same fixes don't have to be caught again. When the user settles
   rubble wherever it lies, never a ruin's walls in a line (`BRICK_WALLS`, `plainRubble`: Fell Xenologue 5's, the user, in the game,
   2026-11-27, "the various ruin tiles into bricks and the rubble stays rubble"); and no wall pushed into the
   void by its shaded stairs' photo colours (`WALL_LEAST`), what lies beyond the Final Guardian's and the Azure Twin's walls the void).
+  Its notes of 2026-11-27 (the review): a windmill the map's top edge cuts its bottom tiles (Floral Field 3's); a peak alone on its
+  tile an outcrop even on the map's edge (`LONE_PEAK`: the Vicious Volcano's); the Desert Dunes' stone pillars on the sand round them
+  (an effect's fill a plain's); junk the user names shacks by box, each piece by its place in its box (`SHACK_BOXES`, `decorBoxes`:
+  the Desert Dunes' map 4's and Chapter 13's squares that touch more junk), Chapter 13's lone squares shacks too (`SHACKS`); blocks
+  parted by hand (`HAND_BLOCKS`: the Desert Dunes' map 4's house, the roof its edge cuts and its stalls, Chapter 13's house at
+  (22, 8)), houses of different blocks kept apart; a crater drawn as lava its molten pool too (the Radiant Strategist's); Queen
+  Lumera's garden paths a checkerboard of slabs and grass, a slab where x + y is odd as its scene lays them (`CHECKER_PATHS`, `gg` with
+  the road's numbers); Chapter 6's houses and the Young Lion's village roofless ruins, Serenity in Ruin's caved in, Three Houses'
+  pieces over each house's box (`WRECKS`: `shell`, `ruin-brown`); the Kingdom of Might's low walls and breakable fences its walls, the
+  crack kept (`ONE_STONE`, `looksAs`); Chapter 14's boulders light brown (`OUTCROP_COLOURS`); more of Serenity in Ruin's town paved
+  (`PAVING_MORE`); the Final Guardian's and Gradlon Temple's flights by the walls stairs going down (`DOWN_STAIRS`); the Young Lion's
+  temple stone bricks in its render's grey (`BRICK_WALLS`, `FILLS`); a ship's rails in its wooden walls' wood (`railsInShipWood`:
+  the Caring Princess's); The Connector's central pedestal an altar (`TILE_DECOR`). The user paints which tiles of Chapter 13's, Chapter
+  19's and the Desert Dunes' map 1's buildings are roof, wall or door, and where each house ends, on a page made for it (the Engage
+  house painter artifact, its db `paint/<mapId>`).
   Three Houses' from its stages seen from above (`scripts/fe16_art.py`: the battlefield is a heightfield in its baked colour map,
   under the stage's models, up to three tiles over the ground, the backdrops set above the field for the tilted battle camera left
   out; `fe16_ground.py` into `data-raw/fe16-ground.json`; Cindered Shadows' from the DLC's own stages; a desert whose plain the render gives its sand's colour has

@@ -462,9 +462,37 @@ describe("Engage's buildings drawn as what its scenes stand there", () => {
   })
 
   it('has the villages the user saw as ruins in ruins', () => {
-    expect((map('fe17-m006').ruins ?? []).length).toBeGreaterThan(50)
     expect(map('fe17-c002-1-1').ruins?.length).toBeGreaterThan(10)
     expect(map('fe17-m004').ruins).toBeUndefined()
+    // Chapter 6's houses and the Young Lion's village roofless, Serenity in Ruin's caved in, each drawn whole over its box (2026-11-27).
+    const wrecks = (id: string, kind: string) => Object.values(map(id).decor ?? {}).filter((d) => d === kind).length
+    expect(wrecks('fe17-m006', 'shell')).toBeGreaterThan(80)
+    expect(wrecks('fe17-s012', 'shell')).toBe(9)
+    expect(wrecks('fe17-m017', 'ruin-brown')).toBeGreaterThan(40)
+    expect(map('fe17-m006').decorBoxes?.some(([x0, x1, y0, y1]) => [x0, x1, y0, y1].join() === '5,6,12,13')).toBe(true)
+    // the Young Lion's temple its stone bricks, no ruins left
+    expect(map('fe17-s012').ruins).toBeUndefined()
+  })
+  it("draws the review's notes of 2026-11-27 as the user saw them", () => {
+    const decor = (id: string) => map(id).decor ?? {}
+    const at = (id: string, x: number, y: number) => rowCodes(map(id).grid[map(id).height - y])[x - 1]
+    // Floral Field 3's windmill the top edge cuts; the Vicious Volcano's lone peaks on the edge outcrops
+    expect([decor('fe17-c002-3-1')['1,20'], decor('fe17-c002-3-1')['2,20']]).toEqual(['windmill', 'windmill'])
+    expect([decor('fe17-c006-3-1')['3,1'], decor('fe17-c006-2-1')['7,1']]).toEqual(['outcrop', 'outcrop'])
+    // the Desert Dunes' map 4's shacks, its house and the roof the edge cuts, its stalls
+    for (const k of ['6,13', '7,11', '9,13', '1,5']) expect(decor('fe17-c005-4-1')[k], k).toBe('shack')
+    expect([at('fe17-c005-4-1', 10, 19), at('fe17-c005-4-1', 12, 19), at('fe17-c005-4-1', 11, 12)]).toEqual(['rh', 'rm', 'o5'])
+    // Chapter 13's breakable squares shacks and its house at (22, 8)
+    for (const k of ['3,16', '10,12', '9,10', '12,8']) expect(decor('fe17-m013')[k], k).toBe('shack')
+    expect(at('fe17-m013', 23, 8)).toBe('rh')
+    // Chapter 14's boulders light brown; the Kingdom of Might's low walls and breakable fences its walls
+    expect(map('fe17-m014').outcropTint).toBe('#a98660')
+    expect([map('fe17-m008').looksAs?.['7,16'], map('fe17-m008').looksAs?.['8,12']]).toEqual(['wa', 'wa'])
+    // Queen Lumera's garden paths a checkerboard of slabs and grass
+    expect([at('fe17-m002', 5, 10), at('fe17-m002', 4, 10), at('fe17-m002', 7, 3)]).toEqual(['gf', 'gg', 'gf'])
+    // The Connector's pedestal an altar; the Caring Princess's rails its ship's wood
+    expect(decor('fe17-s015')['15,11']).toBe('altar')
+    expect(map('fe17-s013').railsInShipWood).toBe(true)
   })
 })
 
@@ -538,13 +566,15 @@ describe("Engage's tiles drawn as the game names them", () => {
     expect(map('fe17-m025').wallLooks?.['1,32']).toBe('void')
     expect(codes('fe17-s002').filter((c) => c === 'gl')).toHaveLength(2) // (11, 16) and (17, 16); its plain stairs flights
     expect(codes('fe17-s005').filter((c) => c === 'gl')).toHaveLength(0)
-    expect(codes('fe17-m025').filter((c) => c === 'gl')).toHaveLength(5)
+    // its five, and the flights the user named down stairs (2026-11-27), its skirmish too
+    for (const id of ['fe17-m025', 'fe17-m025-sk']) expect(codes(id).filter((c) => c === 'gl'), id).toHaveLength(15)
   })
   it('draws its bridges whole, stone ones stone, its paved road and town paved, a crater amid lava the lava, a cave its rock', () => {
     expect(map('fe17-c002-2-1').wideBridges).toBe(true)
     for (const id of ['fe17-m004', 'fe17-s010']) expect([codes(id).includes('t8'), codes(id).includes('tb')], id).toEqual([true, false])
     expect(FE17_TERRAIN.t8!.move).toEqual(FE17_TERRAIN.tb!.move)
-    expect(codes('fe17-m002').filter((c) => c === 'gf')).toHaveLength(56)
+    expect(codes('fe17-m002').filter((c) => c === 'gf')).toHaveLength(42)
+    expect(codes('fe17-m002').filter((c) => c === 'gg')).toHaveLength(14)
     expect(codes('fe17-m017').filter((c) => c === 'gb').length).toBeGreaterThan(150)
     expect(map('fe17-g004').looksAs?.['24,25']).toBe('wp')
     expect([map('fe17-g002').looksAs?.['17,11'], map('fe17-g002').looksAs?.['2,23']]).toEqual(['wt', undefined])
@@ -556,6 +586,6 @@ describe("Engage's tiles drawn as the game names them", () => {
     expect(map('fe17-g001').fills?.wg).toBe(map('fe17-g001').fills?.wa)
     expect(codes('fe17-m015').some((c) => /^c[a-i]$/.test(c))).toBe(false) // its towers, no fort
     expect([at('fe17-g001', 18, 28), at('fe17-g001', 4, 28)]).toEqual(['t1', 't1'])
-    expect(map('fe17-m006').variedRuins).toBe(true)
+    expect(map('fe17-c002-1-1').variedRuins).toBe(true)
   })
 })

@@ -461,8 +461,11 @@ export interface ChapterMap {
    * in the game, "the rubble stays rubble"). */
   plainRubble?: true
   /** Its rock outcrops (`decor` 'outcrop') in the colour of the rock they're drawn over, as its scenes draw them (Engage's: tan
-   * sandstone on the beach, dark rock in the volcano, snowy rock in the north). */
-  outcropTint?: true
+   * sandstone on the beach, dark rock in the volcano, snowy rock in the north), or in the colour given (Chapter 14's light brown
+   * boulders: the user). */
+  outcropTint?: true | string
+  /** Its ship's rails (low walls beside its decks) in its wooden walls' wood (Engage's ships: the user, the Caring Princess's). */
+  railsInShipWood?: true
   /** What a wall that shares its numbers with other kinds is, by the 3D model on it (Radiant Dawn's: its fences, sandbags and outer
    * walls are one terrain, as its pillars and castle walls are): "x,y" -> sandbags, a low outer wall or a pillar; a fence has none. A
    * wall the art draws as something else: a low stone wall (the GBA games' fences), rock (Gaiden's cave walls' faces, which fliers

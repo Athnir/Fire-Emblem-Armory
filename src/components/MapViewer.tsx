@@ -328,12 +328,13 @@ const TERRAIN_FILL: Record<TerrainCode, string> = {
   sa: '#cfe3ea',
   sb: '#15121c',
   sc: '#8a5a44',
-  // Effects laid over a tile (Engage): the ground's colour under them, woods' and sand's where they lie on those.
+  // Effects laid over a tile (Engage): the ground's colour under them, a plain's, so each stands on the ground round it (the Desert
+  // Dunes' stone pillars on its sand: the user, 2026-11-27, 'backgrounds for (18, 7) type tiles').
   ea: '#b89a6a',
   eb: '#b89a6a',
   ec: '#b89a6a',
   ed: '#b89a6a',
-  ee: '#e0c88a',
+  ee: '#b89a6a',
   ef: '#b89a6a',
   eg: '#b89a6a',
   eh: '#b89a6a',
@@ -458,7 +459,8 @@ const wallLook = (map: ChapterMap, t: Tile) => {
   // The void (Echoes' caverns and trenches: the user, black, not a cliff) only while its tile is a wall: a script that turns it to floor
   // (the royal chambers' earthquakes) leaves floor.
   if (look === 'void' && codeAt(map, t)?.[0] !== 'w') return undefined
-  return look ?? (lowWall(map, t) ? 'wall' : undefined)
+  // A low wall the map draws as another code (`looksAs`: the Kingdom of Might's, as its walls) has that code's look.
+  return look ?? (lowWall(map, t) && !map.looksAs?.[tileKey(t)] ? 'wall' : undefined)
 }
 /** A ship's wooden wall or rail: a low wall the game files with its obstacles beside its deck (Engage's), or one its art draws as the
  * ship's wood (The Blazing Blade's cabin walls). */
@@ -1151,6 +1153,9 @@ function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile): Sprite | undef
 function tileSprite(map: ChapterMap, code: TerrainCode, at?: Tile) {
   // Muck drawn as a bog, no icon over its mud (`muckAsBog`: Fates' Boo Camp, the user).
   if (code === 'db' && map.muckAsBog) return undefined
+  // A crater amid the lava drawn as the lava round it (`looksAs`: Engage's Radiant Strategist's), its molten pool too, not its colour
+  // alone (the user, 2026-11-27: 'keep these as lava insted of red tile').
+  if (at && map.looksAs?.[tileKey(at)] === 'wp') return TERRAIN_SPRITE.wp
   const compound = compoundPiece(map, code)
   if (compound) return compound
   // A tile whose mark the game doesn't draw (`bareTiles`: a Fates challenge's spent village with no house over it).
@@ -1946,7 +1951,7 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
     const rock = u || d || l || r ? boulderPiece(!u, !l, !r, !d, variety(x, y)) : STONE_PILE
     // In the colour of the rock it's drawn over (`outcropTint`: Engage's, as its scenes draw them).
     const own = map.outcropTint && codeAt(map, [x, y])
-    return own ? tintedRock(rock, fillOf(map, own)) : rock
+    return own ? tintedRock(rock, typeof map.outcropTint === 'string' ? map.outcropTint : fillOf(map, own)) : rock
   }
   // A statue standing alone on its tile (Engage's), its plinth under it; statues two tiles by two are drawn whole below.
   if (kind === 'statue' && !([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dx, dy]) => same(dx, dy))) return STATUE_SMALL
@@ -2045,8 +2050,11 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
   if (kind !== 'statue' && kind !== 'windmill' && kind !== 'umbrella' && kind !== 'palm' && kind !== 'shack' && kind !== 'ice') return kind && DECOR_SPRITE[kind]
   const pieces = kind === 'statue' ? STATUE : kind === 'windmill' ? WINDMILL : kind === 'umbrella' ? UMBRELLA : kind === 'shack' ? SHACK
     : kind === 'ice' ? ICE_CRYSTALS : PALM
-  const top = same(0, -1)
-  const left = same(1, 0)
+  // Its piece by its place in its box where the map gives one (`decorBoxes`: Engage's shacks side by side, the user's), else by the
+  // tiles of its kind beside it.
+  const box = map.decorBoxes?.find(([x0, x1, y0, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1)
+  const top = box ? y === box[3] : same(0, -1)
+  const left = box ? x === box[0] : same(1, 0)
   return top ? (left ? pieces.a : pieces.b) : left ? pieces.c : pieces.d
 }
 
@@ -3134,7 +3142,7 @@ export function MapGrid({
             : wing ? fillOf(map, plainOf(map) ?? 'tv')
             : houseGround ? fillOf(map, houseGround) : inYard || scenery ? villageYard(map)
               : SHOP_CODES.has(letter) && !built ? SHOP_PLAQUE
-              : shipWall(map, t) ? TERRAIN_FILL.w9! : wallLook(map, t) === 'wall' ? lowWallFill(map) : wallLook(map, t) === 'stone' ? stoneWallFill(map)
+              : shipWall(map, t) ? (map.railsInShipWood && lowWall(map, t) === 'ship' ? shipWood(map) : TERRAIN_FILL.w9!) : wallLook(map, t) === 'wall' ? lowWallFill(map) : wallLook(map, t) === 'stone' ? stoneWallFill(map)
                 : wallLook(map, t) === 'rock' ? caveFace(map) : wallLook(map, t) === 'wood' ? shipWood(map)
                 : wallLook(map, t) === 'timber' ? TIMBER : wallLook(map, t) === 'cliff' ? cliffRock(map) : wallLook(map, t) === 'sky' ? skyBelow(map)
                 : wallLook(map, t) === 'pit' ? TERRAIN_FILL.wd! : wallLook(map, t) === 'void' ? VOID_COLOUR
@@ -4139,7 +4147,7 @@ function Legend({
     const code = codeAt(map, t)
     items.push({
       label: `${terrainName(map, t)} (a rock outcrop: ${fliers ? 'only fliers cross it' : 'no unit enters'})`,
-      sprite: map.outcropTint && code ? tintedRock(STONE_PILE, fillOf(map, code)) : STONE_PILE,
+      sprite: map.outcropTint && code ? tintedRock(STONE_PILE, typeof map.outcropTint === 'string' ? map.outcropTint : fillOf(map, code)) : STONE_PILE,
     })
   }
   for (const kind of new Set(Object.values(map.decor ?? {})))

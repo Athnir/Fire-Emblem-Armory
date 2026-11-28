@@ -72,7 +72,19 @@ CANAL_TOWNS = ('fe17-g005',)
 # The maps whose walls their scene builds of brick models (Stone_Wall06Brick, which a ruin's names match), the game's plain structures
 # (建造物), drawn as their walls' blocks, not ruins, and their rubble rubble wherever it lies, never a ruin's walls in a line (the user, in
 # the game, 2026-11-27: Fell Xenologue 5's "the various ruin tiles into bricks and the rubble stays rubble").
-BRICK_WALLS = ('fe17-e005',)
+BRICK_WALLS = ('fe17-e005', 'fe17-s012')
+# Its houses in ruins drawn whole over their boxes as Three Houses' (the user, 2026-11-27): Chapter 6's roofless, the ring of their walls
+# round the fallen roof ('its all houses in ruins, lets put in the variant from 3h'), as its scene stands them, and the Young Lion's
+# village ('can be the razed village 3x3'); Serenity in Ruin's standing with their roofs caved in, the charred rafters showing ('all the
+# houses should be ruined houses'), their timber brown.
+WRECKS = {'fe17-m006': 'shell', 'fe17-s012': 'shell', 'fe17-m017': 'ruin-brown'}
+# Blocks the user parted by hand (2026-11-27), each replacing the scene's blocks it shares a tile with: the Desert Dunes' map 4's
+# house and the roof the map's edge cuts ('(9, 20) to (11, 19) is a house, (12, 20) (12, 18) is a roof'), its market stalls ('(11, 12)
+# (12, 12) are marketstalls', the side-on house above them kept); Chapter 13's house ('(22, 8) to (24, 9) is a house with (23, 7) as its
+# doormat': its door over (23, 7)).
+HAND_BLOCKS = {'fe17-c005-4-': [('house', [(9, 19), (10, 19), (11, 19), (9, 20), (10, 20), (11, 20)]), ('house', [(12, 18), (12, 19), (12, 20)]),
+                                ('stall', [(11, 12), (12, 12)]), ('house', [(12, 13), (12, 14), (12, 15)])],
+               'fe17-m013': [('house', [(22, 8), (23, 8), (24, 8), (22, 9), (23, 9), (24, 9)]), (None, [(23, 10)])]}
 # The maps whose lone stairs are staircases, none going down (the user, in the game, 2026-11-27: Fell Xenologue 5's "all staircases are
 # not down staircases on this map").
 NO_STAIRWELLS = ('fe17-e005',)
@@ -82,9 +94,17 @@ PIECE_NAMES = {'r': 'House', 'c': 'Fort', 'o': 'Market stall', 'q': 'Large Pilla
 # slate and its streets a mauve grey (in the game, 2026-11-27: "the bricks should be more grey than white ... basically swap the colors
 # of the bricks and the cobble and darken the cobble to grey insted of white").
 FILLS = {'fe17-m026': {'wd': '#0b0b0e'}, 'fe17-s002': {'ta': '#6a6816'}, 'fe17-g005': {'t1': '#6f6870', 'oe': '#3b3a49'},
-         'fe17-e006': {'ge': '#b98f98', 'gb': '#d9b2d4', 'ta': '#764948'}}
+         'fe17-e006': {'ge': '#b98f98', 'gb': '#d9b2d4', 'ta': '#764948'},
+         # The Young Lion's ruined temple stone bricks (BRICK_WALLS) in its render's grey stone (the user, 2026-11-27: 'all ruin tiles are
+         # stone bricks').
+         'fe17-s012': {'oe': '#8e8a7c'}}
 # The maps whose junk (wz, two tiles by two) its scene draws as wooden shacks (the user, the Desert Dunes stages): drawn as shacks.
-SHACKS = ('fe17-c005-',)
+SHACKS = ('fe17-c005-', 'fe17-m013')
+# Junk drawn as shacks by box (x0, y0, x1, y1; a box the map's edge cuts runs off it), where a block of it isn't two by two on its own
+# (the user, 2026-11-27, the Desert Dunes' map 4: '(6, 13) (7, 11) (9, 13) (1, 5) all should be the wood shacks', the last one the map's
+# edge cuts; Chapter 13's 'breakable 2x2 squares', those that touch another square or more junk), each piece by its place in its box.
+SHACK_BOXES = {'fe17-c005-4-': [(6, 12, 7, 13), (7, 10, 8, 11), (9, 12, 10, 13), (0, 4, 1, 5)],
+               'fe17-m013': [(10, 11, 11, 12), (9, 9, 10, 10), (11, 7, 12, 8)]}
 # The maps whose dais of large pillars round a floor with stairs is a small stone fort (the user, the Caring Princess's: a fort fix).
 DAIS_FORTS = {'fe17-s013'}
 
@@ -95,6 +115,26 @@ DAIS_FORTS = {'fe17-s013'}
 # Forces' snowy rims); its peaks and cliffs (山, 崖) standing apart from the map's edge, no bigger than SMALL_PEAK, outcrops too (the
 # user: the cliffs not on the map's edge), and every one on the maps the user named (the Four Hounds': all the bricks).
 EDGE_CLIFF, SMALL_PEAK = 12, 6
+# A peak alone on its tile is an outcrop even on the map's edge (the user, 2026-11-27, the Vicious Volcano's '(3, 1) stone outcroppings').
+LONE_PEAK = 1
+# Outcrops in a colour the user gave (Chapter 14's boulders, 2026-11-27: 'these outcropings are light brown'), not their wall code's.
+OUTCROP_COLOURS = {'fe17-m014': '#a98660'}
+# Low walls and breakable fences drawn as the map's walls, their bricks in the walls' colour (the user, 2026-11-27, the Kingdom of
+# Might's: 'lets use the (5, 9) color tiles for all the stone brick colors', its breakable bricks 'the same brick as the rest of the
+# walls while keeping its breakable overlay').
+ONE_STONE = ('fe17-m008',)
+# Stone set among grass in a checkerboard, the slabs on every other tile (the user, 2026-11-27, Queen Lumera's garden: 'more of a
+# checkerboard pattern of white cobblestone and grass'): its paved paths off the main road (the columns given) drawn so, a slab where
+# x + y is odd, as its scene lays them, grass between (`gg`, the road's numbers); the plaza at its top row kept paved.
+CHECKER_PATHS = {'fe17-m002': (6, 8)}
+# More of a town's paving, by tile (the user, 2026-11-27, Serenity in Ruin's: '... are all stone cobble').
+PAVING_MORE = {'fe17-m017': [(21, 15), (24, 15), (25, 15), (26, 15), (27, 15), (32, 20), (32, 24), (14, 20), (15, 20), (19, 20), (16, 24),
+                             (8, 20), (7, 20), (4, 20), (5, 24), (6, 24)]}
+# Stairs going down by box (x0, y0, x1, y1), where the game doesn't mark them for no battle (the user, 2026-11-27, the Final Guardian's
+# and Gradlon Temple's: 'are all down stairs').
+DOWN_STAIRS = {'fe17-m025': [(10, 11, 12, 11), (16, 2, 18, 2), (2, 18, 2, 19), (26, 18, 26, 19)]}
+# What stands on a tile, by hand (the user, 2026-11-27: The Connector's central pedestal 'lets make this an altar').
+TILE_DECOR = {'fe17-s015': {(15, 11): 'altar'}}
 ROCKS, PEAKS = {'TID_岩', 'TID_大岩'}, {'TID_山', 'TID_崖'}
 ROCK_CODE = {'TID_岩': 'wt', 'TID_大岩': 'wa', 'TID_山': 'wb', 'TID_崖': 'wb'}
 ALL_OUTCROPS = ('fe17-m023',)
@@ -1732,6 +1772,12 @@ def stairwells(m):
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     h, w = len(rows), len(rows[0]) if rows else 0
     found = False
+    for x0, y0, x1, y1 in DOWN_STAIRS.get(m['id'].removesuffix('-sk'), []):
+        for x in range(x0, x1 + 1):
+            for y in range(y0, y1 + 1):
+                assert rows[h - y][x - 1] == 'tc', (m['id'], x, y)
+                rows[h - y][x - 1] = 'gl'
+                found = True
     for y in range(h):
         for x in range(w):
             if rows[y][x] == 'tc' and ids.get((x + 1, h - y)) == 'TID_階段_戦禁' and not any(0 <= x + dx < w and 0 <= y + dy < h and rows[y + dy][x + dx] == 'tc'
@@ -2296,6 +2342,8 @@ def main():
         info['t8'] = dict(info['tb'], name='Bridge')
     if 'gf' in used:
         info['gf'] = dict(info['tl'], name='Ground')
+    if 'gg' in used:
+        info['gg'] = dict(info['tl'], name='Ground (grass)')
     if 'gb' in used:
         info.setdefault('gb', dict(info['ta']))
     if 'ge' in used:
@@ -2395,6 +2443,14 @@ def shacks(m):
             seen |= comp
             if comp == {(x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)}:
                 m['decor'] = {**(m.get('decor') or {}), **{f'{a + 1},{h - b}': 'shack' for a, b in comp}}
+    for prefix, boxes in SHACK_BOXES.items():
+        if m['id'].startswith(prefix):
+            for x0, y0, x1, y1 in boxes:
+                m['decorBoxes'] = (m.get('decorBoxes') or []) + [[x0, x1, y0, y1]]
+                for x in range(max(1, x0), min(w, x1) + 1):
+                    for y in range(max(1, y0), min(h, y1) + 1):
+                        assert rows[h - y][x - 1] == 'wz', (m['id'], x, y)
+                        m['decor'] = {**(m.get('decor') or {}), f'{x},{y}': 'shack'}
 
 
 def dais_forts(m):
@@ -2444,6 +2500,9 @@ def ship_wood(m):
     decks = {(x, y) for y in range(1, h + 1) for x in range(1, m['width'] + 1) if rows[h - y][x - 1] == 't3'}
     if not decks:
         return
+    # Its low walls beside its decks, the ship's rails, in its wooden walls' wood (the user, 2026-11-27, the Caring Princess's: 'lets
+    # match the wood wall colors').
+    m['railsInShipWood'] = True
     for y in range(1, h + 1):
         for x in range(1, m['width'] + 1):
             c = rows[h - y][x - 1]
@@ -2554,7 +2613,7 @@ def game_looks(m):
         edge = any(a in (1, w) or b in (1, h) for a, b in block)
         for a, b in block:
             if (own.startswith(ALL_OUTCROPS) or ids[a, b] == 'TID_大岩' or (kinds is ROCKS and not (edge and len(block) > EDGE_CLIFF))
-                    or (kinds is PEAKS and not edge and len(block) <= SMALL_PEAK)):
+                    or (kinds is PEAKS and (not edge or len(block) <= LONE_PEAK) and len(block) <= SMALL_PEAK)):
                 decor.setdefault(f'{a},{b}', 'outcrop')
     for (x, y), tid in ids.items():
         k = f'{x},{y}'
@@ -2596,6 +2655,22 @@ def game_looks(m):
                 if c == '#' and code(x, top - i) in ('ta', 'tl', 'ga'):
                     rows[h - (top - i)][x - 1] = 'gb'
         fills['gb'] = colour
+    for x, y in PAVING_MORE.get(own, []):
+        assert code(x, y) in ('ta', 'tl', 'ga'), (mid, x, y, code(x, y))
+        rows[h - y][x - 1] = 'gb'
+    if own in CHECKER_PATHS:
+        x0, x1 = CHECKER_PATHS[own]
+        for y in range(1, h):
+            for x in range(1, w + 1):
+                if code(x, y) == 'gf' and not x0 <= x <= x1 and (x + y) % 2 == 0:
+                    rows[h - y][x - 1] = 'gg'
+        fills['gg'] = fills.get('ta', '#6a8a3a')
+    if own.startswith(ONE_STONE):
+        for (x, y), tid in ids.items():
+            if (code(x, y) == 'wj' and tid == 'TID_低い壁') or code(x, y) == 'wz':
+                looks_as[f'{x},{y}'] = 'wa'
+    for (x, y), kind in TILE_DECOR.get(own, {}).items():
+        decor[f'{x},{y}'] = kind
     if own in STONE_GROUND:
         top, mask = STONE_GROUND[own]
         for i, line in enumerate(mask):
@@ -2625,7 +2700,7 @@ def game_looks(m):
         if value:
             m[field] = value
     if 'outcrop' in decor.values():
-        m['outcropTint'] = True
+        m['outcropTint'] = OUTCROP_COLOURS.get(own, True)
 
 
 def split_rects(tiles, max_w=6, max_h=4):
@@ -2671,22 +2746,33 @@ def draw_buildings(m, blocks):
     ruined = m['id'].startswith(RUINED)
     whole = {'r': set(), 'c': set()}
     cuts = []
+    for prefix, hand in HAND_BLOCKS.items():
+        if m['id'].startswith(prefix):
+            mine = {t for _, ts in hand for t in ts}
+            blocks = [b for b in blocks if not mine & {tuple(t) for t in b['tiles']}] + \
+                [{'kind': kind, 'names': [], 'tiles': [list(t) for t in ts], 'houses': [], 'between': {}} for kind, ts in hand]
+    wreck = next((v for k, v in WRECKS.items() if m['id'].startswith(k)), None)
+
+    owner = {}
 
     def houses(rects):
-        """Houses side by side, each drawn whole and apart from its neighbours."""
-        owner = {}
-        for k, rect in enumerate(rects):
+        """Houses side by side, each drawn whole and apart from its neighbours (those of other blocks too: the user's by hand)."""
+        for rect in rects:
+            k = len({*owner.values()}) + 1
             whole['r'] |= rect
             for t in rect:
                 owner[t] = k
-        for (x, y), k in owner.items():
-            for n in ((x + 1, y), (x, y - 1)):
-                if n in owner and owner[n] != k:
-                    cuts.append(((x - 1, h - y), (n[0] - 1, h - n[1])))
+            for x, y in rect:
+                for n, a, b in (((x + 1, y), (x, y), (x + 1, y)), ((x - 1, y), (x - 1, y), (x, y)), ((x, y - 1), (x, y), (x, y - 1)),
+                                ((x, y + 1), (x, y + 1), (x, y))):
+                    if n in owner and owner[n] != k:
+                        cuts.append(((a[0] - 1, h - a[1]), (b[0] - 1, h - b[1])))
 
     for b in blocks:
         tiles = {tuple(t) for t in b['tiles']}
         kind = 'ruins' if b['kind'] == 'house' and ruined else b['kind']
+        if wreck and b['kind'] == 'house':
+            kind = 'wreck'
         if kind == 'ruins' and m['id'].startswith(BRICK_WALLS):
             kind = None
         if kind == 'house':
@@ -2696,6 +2782,18 @@ def draw_buildings(m, blocks):
         box = len(tiles) == w * tall
         if m['id'].startswith(CANAL_TOWNS) and kind in ('crates', 'stall'):
             kind = 'crates' if min(w, tall) == 1 else None
+        if kind == 'wreck':
+            # Its houses in ruins drawn whole over their boxes (WRECKS), each house the scene stands there, one the map's edge cuts
+            # carried past it.
+            rects = [past_edge({tuple(t) for t in hs}, width, h) for hs in b.get('houses') or []]
+            if not rects or not tiles <= set().union(*rects):
+                # (the scene's houses not the whole block: the block whole where it's a box, Chapter 6's at (5, 12))
+                rects = [tiles] if box else split_rects(tiles)[0]
+            for rect in rects:
+                rx, ry = [t[0] for t in rect], [t[1] for t in rect]
+                m['decorBoxes'] = (m.get('decorBoxes') or []) + [[min(rx), max(rx), min(ry), max(ry)]]
+                m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': wreck for x, y in rect if 1 <= x <= width and 1 <= y <= h})
+            continue
         if kind == 'ruins':
             m['ruins'] = sorted(set(m.get('ruins', [])) | {f'{x},{y}' for x, y in tiles})
         elif kind == 'house' and scene_houses(b) and not (box and 2 <= w <= 6 and tall <= 4):
@@ -2723,7 +2821,7 @@ def draw_buildings(m, blocks):
                     x, y = map(int, k.split(','))
                     rows[h - y][x - 1] = 'XS'
         elif kind == 'house' and box and 2 <= w <= 6 and tall <= 4:
-            whole['r'] |= tiles
+            houses([tiles])
         elif kind == 'house':
             # A block of several houses (and what stands between them) the scene shows as one: parted into houses, the biggest
             # rectangles first, each two to six wide (the user, Chapter 19's town: houses, not blocks of wall).
@@ -2745,6 +2843,10 @@ def draw_buildings(m, blocks):
                 rows[h - y][x - 1] = 'XS'
         elif (kind == 'windmill' and box and (w, tall) == (2, 2)) or (kind == 'yurt' and box and (w, tall) == (3, 2)) or kind == 'crates':
             m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': kind for x, y in tiles})
+        elif kind == 'windmill' and box and (w, tall) == (2, 1) and max(ys) == h:
+            # A windmill the map's top edge cuts (Floral Field 3's: the user, 2026-11-27, 'the bottom 2 tiles of the windmill like (1, 2)
+            # (2, 2) are'): its bottom half on the map, drawn as the windmill's bottom tiles.
+            m['decor'] = dict(m.get('decor') or {}, **{f'{x},{y}': 'windmill' for x, y in tiles})
         elif kind == 'windmill':
             # A windmill in its fenced yard (Paralogue 1's, the user: not a block of wall): the windmill over the yard's middle two by
             # two, the yard's other tiles its fences.
