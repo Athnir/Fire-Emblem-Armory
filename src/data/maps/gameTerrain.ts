@@ -36,7 +36,7 @@ export interface GameTerrain {
   /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */
   ruins?: string[]
   /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user), or the void (Museum Melee's sky). */
-  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void' | 'fence' | 'wall'>
+  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void' | 'fence' | 'wall' | 'sandbags'>
   /** Tiles drawn as another code, their numbers kept (Boo Camp's partitions as its walls, Museum Melee's Exit as a purple pad). */
   looksAs?: Record<string, TerrainCode>
   /** The ground an icon stands on, by tile (Ghostly Gold's rubble on grass, Revelation 13's obstacles on stone or wood). */
@@ -62,6 +62,8 @@ export interface GameTerrain {
   bridgeSpans?: Record<string, 'ew' | 'ns'>
   /** Each partition at a boat's end, drawn as its bow over the water the way it points (Birthright 12's: the user). */
   boatEnds?: Record<string, 'n' | 's' | 'e' | 'w'>
+  /** Ledges whose chevrons point another way than down, up toward their higher ground (Vanguard Dawn's: the user). */
+  ledgeUp?: Record<string, 'n' | 's' | 'e' | 'w'>
 }
 
 export const GAME_TERRAIN: Record<string, GameTerrain> = {
@@ -390,7 +392,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14b-9': {
     code: 'A009',
     fills: { t1: '#6a4a33', ta: '#9c9e86', wa: '#3d2c1f' },
-    decor: { '12,1': 'stairs', '12,2': 'stairs', '13,1': 'stairs', '13,2': 'stairs', '14,1': 'stairs', '14,2': 'stairs', '2,3': 'zenGarden', '2,4': 'zenGarden', '2,5': 'zenGarden', '21,17': 'zenGarden', '21,18': 'zenGarden', '21,19': 'zenGarden', '22,17': 'zenGarden', '22,18': 'zenGarden', '22,19': 'zenGarden', '22,3': 'zenGarden', '22,4': 'zenGarden', '22,5': 'zenGarden', '23,17': 'zenGarden', '23,18': 'zenGarden', '23,19': 'zenGarden', '23,3': 'zenGarden', '23,4': 'zenGarden', '23,5': 'zenGarden', '24,3': 'zenGarden', '24,4': 'zenGarden', '24,5': 'zenGarden', '3,17': 'zenGarden', '3,18': 'zenGarden', '3,19': 'zenGarden', '3,3': 'zenGarden', '3,4': 'zenGarden', '3,5': 'zenGarden', '4,17': 'zenGarden', '4,18': 'zenGarden', '4,19': 'zenGarden', '4,3': 'zenGarden', '4,4': 'zenGarden', '4,5': 'zenGarden', '5,17': 'zenGarden', '5,18': 'zenGarden', '5,19': 'zenGarden' },
+    decor: { '12,2': 'stairs', '12,3': 'stairs', '13,2': 'stairs', '13,3': 'stairs', '14,2': 'stairs', '14,3': 'stairs', '2,3': 'zenGarden', '2,4': 'zenGarden', '2,5': 'zenGarden', '21,17': 'zenGarden', '21,18': 'zenGarden', '21,19': 'zenGarden', '22,17': 'zenGarden', '22,18': 'zenGarden', '22,19': 'zenGarden', '22,3': 'zenGarden', '22,4': 'zenGarden', '22,5': 'zenGarden', '23,17': 'zenGarden', '23,18': 'zenGarden', '23,19': 'zenGarden', '23,3': 'zenGarden', '23,4': 'zenGarden', '23,5': 'zenGarden', '24,3': 'zenGarden', '24,4': 'zenGarden', '24,5': 'zenGarden', '3,17': 'zenGarden', '3,18': 'zenGarden', '3,19': 'zenGarden', '3,3': 'zenGarden', '3,4': 'zenGarden', '3,5': 'zenGarden', '4,17': 'zenGarden', '4,18': 'zenGarden', '4,19': 'zenGarden', '4,3': 'zenGarden', '4,4': 'zenGarden', '4,5': 'zenGarden', '5,17': 'zenGarden', '5,18': 'zenGarden', '5,19': 'zenGarden' },
     width: 25,
     height: 24,
     grid: [
@@ -1097,7 +1099,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14b-24': {
     code: 'A024',
     fills: { t1: '#3a3d42', wa: '#616156' },
-    decor: { '11,14': 'dragon', '11,15': 'dragon', '11,16': 'dragon', '11,17': 'dragon', '11,18': 'dragon', '12,14': 'dragon', '12,15': 'dragon', '12,16': 'dragon', '12,17': 'dragon', '12,18': 'dragon', '12,5': 'stairs', '13,14': 'dragon', '13,15': 'dragon', '13,16': 'dragon', '13,17': 'dragon', '13,18': 'dragon', '13,26': 'stairs', '13,27': 'stairs', '13,5': 'stairs', '13,6': 'stairs', '14,14': 'dragon', '14,15': 'dragon', '14,16': 'dragon', '14,17': 'dragon', '14,18': 'dragon', '14,27': 'stairs', '15,14': 'dragon', '15,15': 'dragon', '15,16': 'dragon', '15,17': 'dragon', '15,18': 'dragon', '2,16': 'stairs', '2,17': 'stairs', '23,16': 'stairs', '24,15': 'stairs', '24,16': 'stairs', '3,16': 'stairs' },
+    decor: { '11,14': 'dragon', '11,15': 'dragon', '11,16': 'dragon', '11,17': 'dragon', '11,18': 'dragon', '12,14': 'dragon', '12,15': 'dragon', '12,16': 'dragon', '12,17': 'dragon', '12,18': 'dragon', '12,26': 'stairs', '12,27': 'stairs', '12,5': 'stairs', '12,6': 'stairs', '13,14': 'dragon', '13,15': 'dragon', '13,16': 'dragon', '13,17': 'dragon', '13,18': 'dragon', '13,26': 'stairs', '13,27': 'stairs', '13,5': 'stairs', '13,6': 'stairs', '14,14': 'dragon', '14,15': 'dragon', '14,16': 'dragon', '14,17': 'dragon', '14,18': 'dragon', '14,26': 'stairs', '14,27': 'stairs', '14,5': 'stairs', '14,6': 'stairs', '15,14': 'dragon', '15,15': 'dragon', '15,16': 'dragon', '15,17': 'dragon', '15,18': 'dragon', '2,15': 'stairs', '2,16': 'stairs', '2,17': 'stairs', '23,15': 'stairs', '23,16': 'stairs', '23,17': 'stairs', '24,15': 'stairs', '24,16': 'stairs', '24,17': 'stairs', '3,15': 'stairs', '3,16': 'stairs', '3,17': 'stairs' },
     width: 25,
     height: 30,
     grid: [
@@ -1149,7 +1151,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14b-25': {
     code: 'A025',
-    fills: { t1: '#3f342b', wa: '#5e5344' },
+    fills: { t1: '#6a5a48', wa: '#2c2621' },
     decor: { '13,20': 'pillar', '13,23': 'pillar', '13,26': 'pillar', '13,29': 'pillar' },
     width: 25,
     height: 30,
@@ -1378,7 +1380,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14c-7': {
     code: 'B007',
-    fills: { ta: '#353a27' },
+    fills: { t8: '#7c7a72', ta: '#353a27' },
     width: 19,
     height: 20,
     grid: [
@@ -1710,8 +1712,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14c-14': {
     code: 'B014',
     fills: { t1: '#501a16', t3: '#76553a' },
-    wallLooks: { '1,12': 'wood', '1,13': 'wood', '23,4': 'wood', '24,4': 'wood', '25,18': 'wood', '25,4': 'wood' },
-    boatEnds: { '10,1': 'w', '10,3': 'e', '10,8': 'e', '10,9': 'e', '11,12': 'w', '11,3': 'w', '11,4': 'w', '11,7': 'w', '11,8': 'w', '12,5': 'w', '13,10': 'e', '13,11': 'e', '13,2': 'e', '13,3': 'e', '14,1': 'e', '14,10': 'w', '14,11': 'w', '14,3': 'w', '15,6': 'w', '15,7': 'e', '15,8': 'e', '16,1': 'w', '16,11': 'e', '16,12': 'e', '16,4': 'e', '17,12': 'w', '17,13': 'w', '17,14': 'w', '17,4': 'w', '17,5': 'e', '17,7': 'w', '17,8': 'w', '17,9': 'w', '19,1': 'e', '19,10': 'e', '19,13': 'e', '19,14': 'e', '19,3': 'e', '19,6': 'e', '19,7': 'e', '2,8': 'w', '2,9': 'w', '20,10': 'w', '20,11': 'w', '20,5': 'w', '20,6': 'w', '21,14': 'w', '21,16': 'w', '22,10': 'e', '22,11': 'e', '22,12': 'e', '22,13': 'w', '22,15': 'w', '22,2': 'w', '22,4': 'e', '22,8': 'e', '22,9': 'e', '23,12': 'w', '23,5': 'e', '23,7': 'w', '23,8': 'w', '24,14': 'e', '24,16': 'e', '25,10': 'e', '25,12': 'e', '25,2': 'e', '25,6': 'e', '25,8': 'e', '3,12': 'w', '3,13': 'w', '3,15': 'w', '3,16': 'w', '3,17': 'w', '3,5': 'w', '4,6': 'w', '5,16': 'e', '5,3': 'w', '5,4': 'w', '6,15': 'e', '6,17': 'e', '6,8': 'e', '6,9': 'e', '7,4': 'e', '7,7': 'w', '7,8': 'w', '8,10': 'w', '8,11': 'w', '8,12': 'e', '8,13': 'e', '8,2': 'w', '8,5': 'e', '8,9': 'w', '9,6': 'e', '9,7': 'e' },
+    wallLooks: { '24,4': 'wood' },
+    boatEnds: { '1,12': 'e', '1,13': 'e', '10,1': 'w', '10,3': 'e', '10,8': 'e', '10,9': 'e', '11,12': 'w', '11,3': 'w', '11,4': 'w', '11,7': 'w', '11,8': 'w', '12,5': 'w', '13,10': 'e', '13,11': 'e', '13,2': 'e', '13,3': 'e', '14,1': 'e', '14,10': 'w', '14,11': 'w', '14,3': 'w', '15,6': 'w', '15,7': 'e', '15,8': 'e', '16,1': 'w', '16,11': 'e', '16,12': 'e', '16,4': 'e', '17,12': 'w', '17,13': 'w', '17,14': 'w', '17,4': 'w', '17,5': 'e', '17,7': 'w', '17,8': 'w', '17,9': 'w', '19,1': 'e', '19,10': 'e', '19,13': 'e', '19,14': 'e', '19,3': 'e', '19,6': 'e', '19,7': 'e', '2,8': 'w', '2,9': 'w', '20,10': 'w', '20,11': 'w', '20,5': 'w', '20,6': 'w', '21,14': 'w', '21,16': 'w', '22,10': 'e', '22,11': 'e', '22,12': 'e', '22,13': 'w', '22,15': 'w', '22,2': 'w', '22,4': 'e', '22,8': 'e', '22,9': 'e', '23,12': 'w', '23,4': 'w', '23,5': 'e', '23,7': 'w', '23,8': 'w', '24,14': 'e', '24,16': 'e', '25,10': 'e', '25,12': 'e', '25,18': 'w', '25,2': 'e', '25,4': 'e', '25,6': 'e', '25,8': 'e', '3,12': 'w', '3,13': 'w', '3,15': 'w', '3,16': 'w', '3,17': 'w', '3,5': 'w', '4,6': 'w', '5,16': 'e', '5,3': 'w', '5,4': 'w', '6,15': 'e', '6,17': 'e', '6,8': 'e', '6,9': 'e', '7,4': 'e', '7,7': 'w', '7,8': 'w', '8,10': 'w', '8,11': 'w', '8,12': 'e', '8,13': 'e', '8,2': 'w', '8,5': 'e', '8,9': 'w', '9,6': 'e', '9,7': 'e' },
     width: 25,
     height: 20,
     grid: [
@@ -1901,7 +1903,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14c-18': {
     code: 'B018',
     fills: { t1: '#6a4a33', ta: '#9c9e86', wa: '#3d2c1f' },
-    decor: { '12,1': 'stairs', '12,2': 'stairs', '13,1': 'stairs', '13,2': 'stairs', '14,1': 'stairs', '14,2': 'stairs', '2,3': 'zenGarden', '2,4': 'zenGarden', '2,5': 'zenGarden', '21,17': 'zenGarden', '21,18': 'zenGarden', '21,19': 'zenGarden', '22,17': 'zenGarden', '22,18': 'zenGarden', '22,19': 'zenGarden', '22,3': 'zenGarden', '22,4': 'zenGarden', '22,5': 'zenGarden', '23,17': 'zenGarden', '23,18': 'zenGarden', '23,19': 'zenGarden', '23,3': 'zenGarden', '23,4': 'zenGarden', '23,5': 'zenGarden', '24,3': 'zenGarden', '24,4': 'zenGarden', '24,5': 'zenGarden', '3,17': 'zenGarden', '3,18': 'zenGarden', '3,19': 'zenGarden', '3,3': 'zenGarden', '3,4': 'zenGarden', '3,5': 'zenGarden', '4,17': 'zenGarden', '4,18': 'zenGarden', '4,19': 'zenGarden', '4,3': 'zenGarden', '4,4': 'zenGarden', '4,5': 'zenGarden', '5,17': 'zenGarden', '5,18': 'zenGarden', '5,19': 'zenGarden' },
+    decor: { '12,2': 'stairs', '12,3': 'stairs', '13,2': 'stairs', '13,3': 'stairs', '14,2': 'stairs', '14,3': 'stairs', '2,3': 'zenGarden', '2,4': 'zenGarden', '2,5': 'zenGarden', '21,17': 'zenGarden', '21,18': 'zenGarden', '21,19': 'zenGarden', '22,17': 'zenGarden', '22,18': 'zenGarden', '22,19': 'zenGarden', '22,3': 'zenGarden', '22,4': 'zenGarden', '22,5': 'zenGarden', '23,17': 'zenGarden', '23,18': 'zenGarden', '23,19': 'zenGarden', '23,3': 'zenGarden', '23,4': 'zenGarden', '23,5': 'zenGarden', '24,3': 'zenGarden', '24,4': 'zenGarden', '24,5': 'zenGarden', '3,17': 'zenGarden', '3,18': 'zenGarden', '3,19': 'zenGarden', '3,3': 'zenGarden', '3,4': 'zenGarden', '3,5': 'zenGarden', '4,17': 'zenGarden', '4,18': 'zenGarden', '4,19': 'zenGarden', '4,3': 'zenGarden', '4,4': 'zenGarden', '4,5': 'zenGarden', '5,17': 'zenGarden', '5,18': 'zenGarden', '5,19': 'zenGarden' },
     width: 25,
     height: 24,
     grid: [
@@ -2280,6 +2282,7 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
     code: 'B025',
     fills: { t1: '#0f1009', wa: '#30160f' },
     decor: { '10,3': 'stairs', '10,4': 'stairs', '19,3': 'stairs', '19,4': 'stairs' },
+    standOn: { '12,10': 't1', '12,11': 't1', '12,12': 't1', '12,13': 't1', '12,14': 't1', '12,15': 't1', '12,16': 't1', '12,8': 't1', '12,9': 't1', '13,10': 't1', '13,11': 't1', '13,12': 't1', '13,13': 't1', '13,14': 't1', '13,15': 't1', '13,16': 't1', '13,8': 't1', '13,9': 't1', '14,10': 't1', '14,11': 't1', '14,12': 't1', '14,13': 't1', '14,14': 't1', '14,15': 't1', '14,16': 't1', '14,8': 't1', '14,9': 't1', '15,10': 't1', '15,11': 't1', '15,12': 't1', '15,13': 't1', '15,14': 't1', '15,15': 't1', '15,16': 't1', '15,8': 't1', '15,9': 't1', '16,10': 't1', '16,11': 't1', '16,12': 't1', '16,13': 't1', '16,14': 't1', '16,15': 't1', '16,16': 't1', '16,8': 't1', '16,9': 't1', '17,10': 't1', '17,11': 't1', '17,12': 't1', '17,13': 't1', '17,14': 't1', '17,15': 't1', '17,16': 't1', '17,8': 't1', '17,9': 't1' },
     width: 28,
     height: 25,
     grid: [
@@ -5166,7 +5169,11 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-72': {
     code: 'E000',
-    fills: { t1: '#53534c' },
+    fills: { t1: '#53534c', wg: '#7a746c' },
+    decor: { '1,3': 'crates', '1,4': 'crates', '1,5': 'crates', '13,8': 'crates', '18,1': 'crates', '18,2': 'crates', '19,1': 'crates', '20,1': 'crates', '21,1': 'crates', '22,1': 'crates', '5,1': 'crates', '5,15': 'crates', '5,2': 'crates', '5,3': 'crates', '6,15': 'crates', '8,8': 'crates' },
+    wallLooks: { '1,11': 'stone', '1,14': 'sandbags', '10,13': 'stone', '10,15': 'sandbags', '10,9': 'stone', '11,13': 'stone', '11,15': 'sandbags', '11,9': 'stone', '12,13': 'stone', '12,18': 'stone', '12,19': 'stone', '12,20': 'stone', '12,21': 'stone', '12,5': 'sandbags', '12,9': 'stone', '13,13': 'stone', '13,14': 'stone', '13,15': 'stone', '13,16': 'stone', '13,18': 'stone', '13,5': 'sandbags', '13,9': 'stone', '14,16': 'stone', '14,18': 'stone', '14,5': 'stone', '14,6': 'stone', '14,7': 'stone', '14,8': 'stone', '14,9': 'stone', '15,11': 'sandbags', '15,15': 'stone', '15,16': 'stone', '15,6': 'stone', '16,11': 'sandbags', '16,18': 'stone', '16,19': 'stone', '16,20': 'stone', '16,21': 'stone', '17,11': 'sandbags', '17,6': 'stone', '18,10': 'stone', '18,11': 'stone', '18,12': 'stone', '18,13': 'stone', '18,14': 'stone', '18,15': 'stone', '18,16': 'stone', '18,17': 'stone', '18,18': 'stone', '18,19': 'stone', '18,20': 'stone', '18,21': 'stone', '18,5': 'stone', '18,6': 'stone', '18,7': 'stone', '18,8': 'stone', '18,9': 'stone', '19,10': 'stone', '19,11': 'stone', '19,12': 'stone', '19,13': 'stone', '19,14': 'stone', '19,15': 'stone', '19,16': 'stone', '19,17': 'stone', '19,18': 'stone', '19,19': 'stone', '19,2': 'stone', '19,20': 'stone', '19,21': 'stone', '19,5': 'stone', '19,6': 'stone', '19,7': 'stone', '19,8': 'stone', '19,9': 'stone', '2,11': 'stone', '2,14': 'sandbags', '2,16': 'stone', '2,17': 'stone', '2,18': 'stone', '2,19': 'stone', '2,9': 'stone', '20,2': 'stone', '20,5': 'stone', '21,2': 'stone', '22,2': 'stone', '3,11': 'stone', '3,14': 'sandbags', '3,16': 'stone', '3,9': 'stone', '4,11': 'stone', '4,13': 'sandbags', '4,16': 'stone', '4,18': 'stone', '4,20': 'stone', '4,21': 'stone', '4,9': 'stone', '5,11': 'stone', '5,16': 'stone', '5,18': 'stone', '5,9': 'stone', '6,1': 'stone', '6,16': 'stone', '6,18': 'stone', '6,2': 'stone', '6,3': 'stone', '6,4': 'stone', '6,5': 'stone', '6,6': 'stone', '6,7': 'stone', '6,8': 'stone', '6,9': 'stone', '7,13': 'stone', '7,14': 'stone', '7,15': 'stone', '7,16': 'stone', '7,18': 'stone', '7,9': 'stone', '8,13': 'stone', '8,18': 'stone', '8,19': 'stone', '8,20': 'stone', '8,21': 'stone', '8,9': 'stone', '9,13': 'stone', '9,9': 'stone' },
+    ledgeUp: { '4,19': 'w' },
+    standOn: { '1,14': 't1', '10,15': 't1', '11,15': 't1', '12,5': 't1', '13,5': 't1', '15,11': 't1', '16,11': 't1', '17,11': 't1', '2,14': 't1', '3,14': 't1', '4,13': 't1' },
     width: 22,
     height: 21,
     grid: [
@@ -5251,7 +5258,6 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   'fe14-dlc-76': {
     code: 'E000',
     fills: { ga: '#928d5e', t1: '#a49d67', ta: '#7d7f46', wa: '#6a523a' },
-    decor: { '19,16': 'walledHouse', '19,17': 'walledHouse', '20,16': 'walledHouse', '20,17': 'walledHouse', '21,16': 'walledHouse', '21,17': 'walledHouse' },
     width: 30,
     height: 23,
     grid: [
@@ -5261,8 +5267,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       'bababmt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tbtbtbtbtata', // 20
       'bababmt1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tbtbtbtbtaga', // 19
       'bababmt1t1t1bmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmtftfgagaga', // 18
-      'bababmt1t1bmbmbababababat1bababababawawawababababatftfgagaga', // 17
-      'bababmt1t1bmbababababababbt1bbbababawawawababababatftftagaga', // 16
+      'bababmt1t1bmbmbababababat1bababababararbrcbabababatftfgagaga', // 17
+      'bababmt1t1bmbababababababbt1bbbababargrhribabababatftftagaga', // 16
       'bmbmbmt1t1bmbmbababababababababababataoctababababatftftataga', // 15
       't1bat1t1t1babmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmbmtftfgagata', // 14
       't1t1gagatat1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1t1tbtbtbtbtata', // 13
@@ -5289,6 +5295,12 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
       ga: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       oc: { name: "Village", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       od: { name: "(Village)", def: 1, avo: 5, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
+      ra: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rb: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rc: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rg: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      rh: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
+      ri: { name: "House", def: 0, avo: 0, heal: 0, move: { "Infantry A": null, "Infantry B": null, "Infantry C": null, "Infantry D": null, Armor: null, "Cavalry A": null, "Cavalry B": null, Mages: null, Beasts: null, Fliers: null } },
       t1: { name: "Floor", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       ta: { name: "Plain", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
       tb: { name: "Bridge", def: 0, avo: 0, heal: 0, move: { "Infantry A": 1, "Infantry B": 1, "Infantry C": 1, "Infantry D": 1, Armor: 1, "Cavalry A": 1, "Cavalry B": 1, Mages: 1, Beasts: 1, Fliers: 1 } },
@@ -5298,7 +5310,8 @@ export const GAME_TERRAIN: Record<string, GameTerrain> = {
   },
   'fe14-dlc-79': {
     code: 'E000',
-    fills: { ta: '#885743' },
+    fills: { ta: '#885743', wg: '#938676' },
+    wallLooks: { '17,24': 'stone', '17,25': 'stone', '18,24': 'stone', '20,24': 'stone', '21,24': 'stone', '21,25': 'stone' },
     width: 30,
     height: 25,
     grid: [

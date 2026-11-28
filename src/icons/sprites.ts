@@ -7945,7 +7945,8 @@ export const PARASOL: Record<'a' | 'b', Sprite> = {
 }
 
 /** A great dragon statue seen from above, five tiles by five on its plinth (Fates' Birthright 24: the user, the statue in its hall):
- * its head up, its wings spread on their bones, its tail curled below; a-e its top row, left to right, to u-y its bottom. */
+ * drawn head up, its wings spread on their bones, its tail curled below; a-e its top row, left to right, to u-y its bottom. The map
+ * turns it upside down, its head at the bottom, as the game's faces (the user, 2026-11-27). */
 const DRAGON_STATUE_PALETTE = { o: '#2a2a2e', s: '#9a9c9e', L: '#c4c6c8', d: '#6e7073', w: '#86888b', D: '#5a5c60', e: '#d8b04a', p: '#3a3d42', q: '#57595c', Q: '#4e5054' }
 export const DRAGON_STATUE: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y', Sprite> = {
   a: {

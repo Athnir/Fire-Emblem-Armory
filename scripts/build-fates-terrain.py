@@ -83,7 +83,12 @@ FILLS = {'fe14b-19': {'wa': '#0b0b0e'},
          # Museum Melee's Exit (DRAWN_AS), the purple pad its photos show.
          'fe14-dlc-6b': {'ge': '#733f90'},
          # Revelation 13's docks (DOCKS), weathered timber.
-         'fe14r-13': {'gi': '#6b5238'}}
+         'fe14r-13': {'gi': '#6b5238'},
+         # The user's notes of 2026-11-27: Birthright 25's walls and floor kept apart, as Conquest 12's ('walls and floor blend a bit
+         # much'), the floor a step lighter, the walls darker; Conquest 7's stone bridge a dull grey, not white ('too bright'); Vanguard
+         # Dawn's and the Witches' Trial's partitions low stone walls (STONE_FENCES) in their photos' stone.
+         'fe14b-25': {'t1': '#6a5a48', 'wa': '#2c2621'}, 'fe14c-7': {'t8': '#7c7a72'},
+         'fe14-dlc-72': {'wg': '#7a746c'}, 'fe14-dlc-79': {'wg': '#938676'}}
 # Ships whose floor is their deck (the user: wood, not flagstones; Revelation 14's two ships, Paralogue 3's, Birthright 11's, Revelation
 # 12's in the ice, Conquest 10's two docked boats), and the same maps on the other routes (Conquest 16's ship is Birthright 11's,
 # Revelation 14's port Conquest 10's): the floor drawn as deck (`t3`), the floor's numbers kept; every wall joined to the walls beside its
@@ -97,6 +102,10 @@ STONE_PARTITIONS = {'fe14c-10', 'fe14r-14'}
 # its deck (`boatEnds`); where a partition has deck on both sides, its boat is the shorter run (the other is the next boat's or the
 # great round deck's).
 BOATS = {'fe14b-12': '#76553a', 'fe14c-14': '#76553a'}
+# Boats' ends the deck rule can't see, by hand: Conquest 14's three partitions at the map's edges, each the end of a boat moored off the
+# map, its bow pointing in as its field draws (1, 12)'s, and the small boat at (23, 4) to (25, 4), a bow at each end of its hull (the
+# user, 2026-11-27: 'these are endcaps facing to the map edge', 'this is a boat').
+BOAT_ENDS = {'fe14c-14': {(1, 12): 'e', (1, 13): 'e', (25, 18): 'w', (23, 4): 'w', (25, 4): 'e'}}
 # Maps whose buildings standing alone are ice (Birthright 17's and Conquest 8's village in the snow: the user, ice blocks, not stone):
 # each block two tiles by two its ice crystals over the snow, the block three by three in its lake a frozen fountain; the building's
 # numbers kept.
@@ -132,8 +141,16 @@ BIG_TREES = {'fe14c-24'}
 RUBBLE_MAPS = {'fe14-5'}
 # Conquest 21's partitions are its terraces' cliff edges (the user: a cliff, not a fence).
 CLIFF_PARTITIONS = {'fe14c-21'}
-# Partitions that are low stone walls (Ghostly Gold's two at (16, 10) and (17, 10): the user, stone), in their render's colour (FILLS).
-STONE_FENCES = {'fe14-dlc-6a'}
+# Partitions that are low stone walls (Ghostly Gold's two at (16, 10) and (17, 10): the user, stone), in their render's colour (FILLS);
+# Vanguard Dawn's and the Witches' Trial's, all of them (the user, 2026-11-27: 'all of the partition tiles on this map are stone walls').
+STONE_FENCES = {'fe14-dlc-6a', 'fe14-dlc-72', 'fe14-dlc-79'}
+# Rubble drawn as what its photos show, by box (x0, y0, x1, y1 in map tiles): crates, and sandbags on the floor round them (Vanguard
+# Dawn's: the user, 2026-11-27, 'are boxes', 'are sandbags'); the rest of its rubble kept.
+RUBBLE_AS = {'fe14-dlc-72': {'crates': [(1, 3, 1, 5), (5, 1, 5, 3), (8, 8, 8, 8), (13, 8, 13, 8), (5, 15, 6, 15), (18, 1, 22, 1), (18, 2, 18, 2)],
+                             'sandbags': [(12, 5, 13, 5), (15, 11, 17, 11), (1, 14, 3, 14), (4, 13, 4, 13), (10, 15, 11, 15)]}}
+# Ledges whose chevrons point another way than down (`ledgeUp`): Vanguard Dawn's breach in its courtyard's west wall pointing west, out of
+# it (the user, 2026-11-27: 'the arrows should point left'), as its other breach, in a south wall, points south.
+LEDGE_UP = {'fe14-dlc-72': {(4, 19): 'w'}}
 # The user's notes of 2026-11-26. Tiles drawn as another code, their numbers kept (`looksAs`): Boo Camp's partitions (低壁) the walls
 # they are in its photos (the user: all of this type of tile is a wall on this map), Museum Melee's Exit (出口) a purple pad on the
 # floor (the user: not a wall; its photos' purple, FILLS), by the game's name for the tile.
@@ -158,6 +175,9 @@ FENCE_MAPS = {'fe14-dlc-6b'}
 # The ground an icon stands on, by tile (`standOn`): Ghostly Gold's rubble on its grass (the user: the backdrop of these on grass),
 # Revelation 13's obstacles on the stone or the dock's wood under each in its photos (the user: some on the wrong ground).
 STAND_ON = {'fe14-dlc-6a': {(19, 8): 'ta', (22, 11): 'ta', (22, 12): 'ta'},
+            # Conquest 25's healing hall the map's stone floor under its healing mark (the user, 2026-11-27: 'should be the stone floor
+            # of the map with the healing icon it currently has').
+            'fe14c-25': {(x, y): 't1' for x in range(12, 18) for y in range(8, 17)},
             'fe14r-13': {(2, 3): 't1', (15, 3): 't1', (18, 4): 't1', (9, 5): 't1', (4, 6): 't1', (4, 10): 't1', (11, 10): 'gi',
                          (19, 11): 't1', (19, 15): 't1', (4, 17): 't1'}}
 # Its sky (空) the void, a drop into the dark (the user, Museum Melee: sky void tiles, not cliffs, as Engage's).
@@ -194,9 +214,10 @@ ROOFS = {'fe14-x21': [(6, 23, 8, 24, 'yellow'), (9, 22, 11, 23, 'red'), (13, 23,
 # The DLC's Museum Melee: its buildings are carts, crates and benches on the plaza (the user: villages where they don't belong), drawn as
 # crates; the one in its spring's middle a pedestal.
 CRATE_BUILDINGS = {'fe14-dlc-6b': {(12, 13): 'pillar'}}
-# Ballistician Blitz's house, three tiles by two, drawn as the small house with a low wall round it that Shadow Dragon and the Blade of
-# Light and Mystery of the Emblem draw for a village (the user: the house from the map's original game).
-WALLED_HOUSES = {'fe14-dlc-76': [(19, 16, 21, 17)]}
+# Houses drawn as the small house with a low wall round it that Shadow Dragon and the Blade of Light and Mystery of the Emblem draw for a
+# village: none now (Ballistician Blitz's was, the user's earlier call; since 2026-11-27 a house three tiles by two with its village
+# before it its door mat, 'as you dont interact with it on the door tile but on the doormat tile').
+WALLED_HOUSES = {}
 # Bridges its field builds of stone (Conquest 7's, Revelation 20's slabs: the user's bridge notes), drawn as stone (`t8`), the bridge's
 # numbers kept, the bridges its veins lay too.
 STONE_BRIDGES = {'fe14c-7', 'fe14r-20'}
@@ -226,14 +247,16 @@ STEPS = {
     'fe14-dlc-86': [(10, 3, 10, 4), (19, 3, 19, 4)],
     'fe14-x22': [(9, 3, 9, 4), (19, 3, 19, 4), (2, 24, 3, 24), (22, 24, 23, 24)],
     'fe14b-11': [(11, 6, 11, 7), (5, 10, 5, 11), (16, 11, 17, 13), (5, 13, 5, 14), (11, 17, 11, 18)],
-    'fe14b-24': [(12, 5, 13, 5), (13, 6, 13, 6), (24, 15, 24, 16), (2, 16, 3, 16), (23, 16, 23, 16), (2, 17, 2, 17), (13, 26, 13, 27), (14, 27, 14, 27)],
+    # (its four flights each two tiles by three, whole: the user, 2026-11-27)
+    'fe14b-24': [(12, 5, 14, 6), (2, 15, 3, 17), (23, 15, 24, 17), (12, 26, 14, 27)],
     # (and the two flights either side of its carpet at the bottom: the user, 2026-11-26)
     'fe14b-27': [(6, 6, 6, 7), (12, 6, 14, 6), (20, 6, 20, 7), (6, 14, 6, 15), (20, 14, 20, 15), (7, 19, 9, 19), (17, 19, 19, 19), (12, 21, 14, 22),
                  (11, 1, 11, 5), (15, 1, 15, 5)],
     'fe14b-7': [(12, 2, 14, 3)],
-    'fe14b-9': [(12, 1, 14, 2)],
+    # (its flight the gap in the wall, rows 2 and 3, the plain below it no step: the user, 2026-11-27)
+    'fe14b-9': [(12, 2, 14, 3)],
     'fe14c-16': [(11, 6, 11, 7), (5, 10, 5, 11), (16, 11, 17, 13), (5, 13, 5, 14), (11, 17, 11, 18)],
-    'fe14c-18': [(12, 1, 14, 2)],
+    'fe14c-18': [(12, 2, 14, 3)],
     'fe14c-20': [(15, 4, 15, 4), (6, 10, 6, 10), (21, 10, 21, 10), (13, 11, 13, 11), (10, 13, 10, 13), (15, 13, 16, 13), (20, 14, 20, 14), (4, 19, 4, 19), (16, 25, 16, 25)],
     'fe14c-25': [(10, 3, 10, 4), (19, 3, 19, 4)],
     'fe14c-26': [(6, 14, 7, 16), (20, 14, 21, 16)],
@@ -937,6 +960,9 @@ def main():
                         ends[f'{xx + 1},{hh - yy}'] = 'e' if w_ and (not e or w_ <= e) else 'w'
                     elif n_ or s_:
                         ends[f'{xx + 1},{hh - yy}'] = 's' if n_ and (not s_ or n_ <= s_) else 'n'
+            for (bx, by), d in BOAT_ENDS.get(map_id, {}).items():
+                assert g2[hh - by][bx - 1] == 'wg', (map_id, bx, by)
+                ends[f'{bx},{by}'] = d
             if ends:
                 m['boatEnds'] = ends
             rest = {f'{xx + 1},{hh - yy}': 'wood' for yy in range(hh) for xx in range(ww) if g2[yy][xx] == 'wg' and f'{xx + 1},{hh - yy}' not in ends}
@@ -1096,6 +1122,17 @@ def main():
             for b in m['breakables']:
                 looks[f"{b['tile'][0]},{b['tile'][1]}"] = 'wall'
             m['boldFences'] = True
+        for kind, boxes in RUBBLE_AS.get(map_id, {}).items():
+            for x, y in rects(boxes):
+                assert at(x, y) == 'wj', (map_id, x, y, at(x, y))
+                if kind == 'crates':
+                    decor[f'{x},{y}'] = 'crates'
+                else:
+                    looks[f'{x},{y}'] = kind
+                    m.setdefault('standOn', {})[f'{x},{y}'] = 't1'
+        if map_id in LEDGE_UP:
+            assert all(at(x, y) == 'bg' for x, y in LEDGE_UP[map_id]), map_id
+            m['ledgeUp'] = {f'{x},{y}': d for (x, y), d in LEDGE_UP[map_id].items()}
         for x0, y0, x1, y1, colour in ROOFS.get(map_id, []):
             decor.update({f'{x},{y}': f'roof-{colour}' for x, y in rects([(x0, y0, x1, y1)])})
         for box in WALLED_HOUSES.get(map_id, []):
@@ -1277,7 +1314,7 @@ def main():
         "  /** Tiles drawn in ruins though their terrain stands (Conquest 15's buildings: the user). */",
         '  ruins?: string[]',
         "  /** Walls drawn as what they are on a ship (Revelation 14's and Paralogue 3's cabins and rails: the user), or the void (Museum Melee's sky). */",
-        "  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void' | 'fence' | 'wall'>",
+        "  wallLooks?: Record<string, 'wood' | 'ship' | 'stone' | 'timber' | 'cliff' | 'sky' | 'void' | 'fence' | 'wall' | 'sandbags'>",
         "  /** Tiles drawn as another code, their numbers kept (Boo Camp's partitions as its walls, Museum Melee's Exit as a purple pad). */",
         '  looksAs?: Record<string, TerrainCode>',
         "  /** The ground an icon stands on, by tile (Ghostly Gold's rubble on grass, Revelation 13's obstacles on stone or wood). */",
@@ -1303,6 +1340,8 @@ def main():
         "  bridgeSpans?: Record<string, 'ew' | 'ns'>",
         "  /** Each partition at a boat's end, drawn as its bow over the water the way it points (Birthright 12's: the user). */",
         "  boatEnds?: Record<string, 'n' | 's' | 'e' | 'w'>",
+        "  /** Ledges whose chevrons point another way than down, up toward their higher ground (Vanguard Dawn's: the user). */",
+        "  ledgeUp?: Record<string, 'n' | 's' | 'e' | 'w'>",
         '}',
         '',
         'export const GAME_TERRAIN: Record<string, GameTerrain> = {',
@@ -1322,6 +1361,8 @@ def main():
             lines.append('    bridgeSpans: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['bridgeSpans'].items())) + ' },')
         if m.get('boatEnds'):
             lines.append('    boatEnds: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['boatEnds'].items())) + ' },')
+        if m.get('ledgeUp'):
+            lines.append('    ledgeUp: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['ledgeUp'].items())) + ' },')
         if m.get('looksAs'):
             lines.append('    looksAs: { ' + ', '.join(f"'{k}': '{v}'" for k, v in sorted(m['looksAs'].items())) + ' },')
         if m.get('standOn'):

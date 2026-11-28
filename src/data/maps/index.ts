@@ -160,6 +160,7 @@ function withGameLooks(map: ChapterMap): ChapterMap {
     ...(game.ruins && !map.ruins ? { ruins: game.ruins } : {}),
     ...(game.bridgeSpans ? { bridgeSpans: game.bridgeSpans } : {}),
     ...(game.boatEnds ? { boatEnds: game.boatEnds } : {}),
+    ...(game.ledgeUp ? { ledgeUp: game.ledgeUp } : {}),
     ...(game.looksAs ? { looksAs: game.looksAs } : {}),
     ...(game.standOn ? { standOn: game.standOn } : {}),
     ...(game.greyRoofs ? { greyRoofs: true as const } : {}),

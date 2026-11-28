@@ -1128,6 +1128,13 @@ function flipped(s: Sprite): Sprite {
   if (!f) FLIPPED.set(s, (f = { ...s, rows: s.rows.map((r) => [...r].reverse().join('')) }))
   return f
 }
+/** A sprite turned upside down, top for bottom. */
+const UPSIDE_DOWN = new WeakMap<Sprite, Sprite>()
+function upsideDown(s: Sprite): Sprite {
+  let f = UPSIDE_DOWN.get(s)
+  if (!f) UPSIDE_DOWN.set(s, (f = { ...s, rows: [...s.rows].reverse() }))
+  return f
+}
 /** A tile's icon or building piece; in a block the user turned round (`mirror`), its partner's across the block, flipped. */
 function spriteOf(map: ChapterMap, code: TerrainCode, at?: Tile): Sprite | undefined {
   // A town's houses roofed grey where its art paints them so (`greyRoofs`: Fates' Paralogue 20, the user).
@@ -1977,12 +1984,13 @@ function decorAt(map: ChapterMap, [x, y]: Tile): Sprite | undefined {
     const place = (top ? 'abc' : 'ghi')[col] as 'a' | 'b' | 'c' | 'g' | 'h' | 'i'
     return kind === 'yurt' ? YURT[place] : SARCOPHAGUS[place]
   }
-  // A dragon statue: its piece by its place in the five by five.
+  // A dragon statue: its piece by its place in the five by five, turned to face down, its head at the bottom, as the game's does
+  // (Birthright 24's: the user).
   if (kind === 'dragon') {
     let [x0, y0] = [x, y]
     while (map.decor?.[tileKey([x0 - 1, y])] === kind) x0--
     while (map.decor?.[tileKey([x, y0 + 1])] === kind) y0++
-    return DRAGON_STATUE['abcdefghijklmnopqrstuvwxy'[(y0 - y) * 5 + (x - x0)] as keyof typeof DRAGON_STATUE]
+    return upsideDown(DRAGON_STATUE['abcdefghijklmnopqrstuvwxy'[(4 - (y0 - y)) * 5 + (x - x0)] as keyof typeof DRAGON_STATUE])
   }
   // A fountain's basin drawn over the fences the game files it as (Path of Radiance's Endgame): its piece by its place in the basin.
   if (kind === 'fountain') {
@@ -4138,7 +4146,7 @@ function Legend({
     if (DECOR_LABEL[kind] && kind !== 'outcrop') items.push({ label: roofLabel(kind), sprite: kind === 'statue' ? (lone(kind) ? STATUE_SMALL : STATUE.a) : kind === 'windmill' ? WINDMILL.a : kind === 'yurt' ? YURT.h : kind === 'rock' ? STONE_PILE
         : kind === 'umbrella' ? UMBRELLA.a : kind === 'palm' ? PALM.a : kind === 'parasol' ? PARASOL.a : kind === 'pillar' ? PILLAR_TOP
         : kind === 'downstairs' ? STAIRS_DOWN : kind === 'house' ? TOWN_HOUSE : kind === 'fountain' ? FOUNTAIN_PIECES.e
-        : kind === 'dragon' ? DRAGON_STATUE.m : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
+        : kind === 'dragon' ? upsideDown(DRAGON_STATUE.m) : kind === 'shack' ? SHACK.a : kind === 'barrel' ? BARREL : kind === 'grave' ? GRAVE
         : kind === 'horse' ? HORSE : kind === 'carriage' ? CARRIAGE : kind === 'sarcophagus' ? SARCOPHAGUS.b : kind === 'rubble' ? RUBBLE
         : kind === 'candle' || kind === 'candelabra' ? CANDLESTICK : kind === 'table' ? STONE_TABLE : kind === 'garden' ? GARDEN
         : kind === 'tree' ? TREE : kind === 'slab' ? slabPiece(true, true, true, true, 0) : kind === 'ice' ? ICE_CRYSTALS.a

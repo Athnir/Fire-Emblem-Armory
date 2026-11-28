@@ -419,7 +419,8 @@ new game, so the same fixes don't have to be caught again. When the user settles
   stalls by their paint and its streets cobbles (`TOWN_HOUSES`, `TOWN_STALLS`, `greyRoofs`, `PAVED_FLOORS`), Paralogue 21's houses
   all roofs seen from above in their render's paints (`ROOFS`), the museum plaza's buildings crates and a pedestal, not villages
   (`CRATE_BUILDINGS`), Ballistician Blitz's house the small walled house of Shadow Dragon and the Blade of Light, the map's own game
-  (`WALLED_HOUSES`), Before Awakening, Awakening's Chapter 2 tile for tile, its road where the user put Awakening's and the rest grass
+  (`WALLED_HOUSES`; since the notes of 2026-11-27 a house three tiles by two drawn whole, its village its door mat: 'you dont interact
+  with it on the door tile but on the doormat tile'), Before Awakening, Awakening's Chapter 2 tile for tile, its road where the user put Awakening's and the rest grass
   (`COBBLES`, `NO_DIRT`), Boo Camp's muck a bog with no icon and its mist a dark fog, not water (`muckAsBog`, a Mist tile's look),
   Conquest 19's dead tree a snag; all the user's calls, 2026-11-24. Their tenth look: Revelation 13's docks and piers wooden boards (`DOCKS`,
   `gi` with the floor's numbers, each found by its planks' stripes in the render and checked by eye), its five pale plank
@@ -437,9 +438,16 @@ new game, so the same fixes don't have to be caught again. When the user settles
   lighting'), Paralogue 22's candles from (11, 23) to (17, 12) and the rest tables holding vases, one table along each run of three
   (`PARTITION_DECOR`, decor `vaseTable`), their challenges the same; Museum Melee's partitions, and its boxes joined in pairs, wooden
   fences bold as Radiant Dawn's, its single boxes crates and its breakable walls stone bricks in its walls' grey, its photos' cracked
-  grey stone (`FENCE_MAPS`). A decor over a tile fliers cross says so in the legend. The chapters written by hand take the builder's looks too
+  grey stone (`FENCE_MAPS`). Their notes of 2026-11-27: Birthright 9's flight the gap in its wall, rows 2 and 3, not the plain below
+  (Conquest 18's the same map), and Birthright 24's four flights each two tiles by three, whole (`STEPS`); Birthright 25's floor a step
+  lighter and its walls darker, Conquest 7's stone bridge a dull grey (`FILLS`); Conquest 14's partitions at the map's edges boats' ends
+  moored off the map, their bows pointing in as its field draws them, and its small boat at (23, 4) to (25, 4) a bow at each end of its
+  hull (`BOAT_ENDS`); Conquest 25's healing hall the map's stone floor under its healing marks (`STAND_ON`); Vanguard Dawn's and the
+  Witches' Trial's partitions low stone walls (`STONE_FENCES`), Vanguard Dawn's rubble crates and sandbags by tile, as its photos show
+  them (`RUBBLE_AS`: the sandbags on the floor round them), and its courtyard's west breach a ledge pointing west, out of it
+  (`LEDGE_UP`, `ledgeUp`). A decor over a tile fliers cross says so in the legend. The chapters written by hand take the builder's looks too
   (`index.ts`'s `withGameLooks`); a hall's few plain tiles its floor (`PLAIN_AS_FLOOR`: Revelation 25's); a pot on its round stone base; Birthright 21's walls standing alone two tiles by two are its statues (`decor`, the user's call; elsewhere the
-  same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, Birthright 25's walls
+  same blocks are crystals and rocks, kept as walls), Birthright 24's block five by five its great dragon statue, facing down, its head at the bottom (the user, 2026-11-27), Birthright 25's walls
   standing alone in its halls its pillars (`decor`: the user's calls); where its buildings join into blocks the house rule can't part
   (x21's town, its houses and walls all Edifice), the render's roof colours part them (`fates_ground.ROOF_COLOURS`, each colour's
   blocks a house); a map's colour its render gets wrong is set by hand (`FILLS`: Birthright 19's void black, the user), and a path its

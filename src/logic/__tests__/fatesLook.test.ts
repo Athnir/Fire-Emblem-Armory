@@ -107,7 +107,10 @@ describe("Fates' maps after the user's ninth look", () => {
     expect(decor('fe14b-9', 'zenGarden')).toHaveLength(36)
     expect(decor('fe14b-22', /^stall-/)).toHaveLength(160)
     expect(decor('fe14c-24', 'cherry').length).toBeGreaterThan(100)
-    expect(decor('fe14-dlc-76', 'walledHouse')).toHaveLength(6)
+    // Ballistician Blitz's house drawn whole, three tiles by two, its village before it its door mat (the user, 2026-11-27).
+    expect(decor('fe14-dlc-76', 'walledHouse')).toHaveLength(0)
+    const house = (x: number, y: number) => rowCodes(map('fe14-dlc-76').grid[map('fe14-dlc-76').height - y])[x - 1]
+    expect([19, 20, 21].flatMap((x) => [house(x, 17), house(x, 16)]).every((c) => /^r[a-r]$/.test(c))).toBe(true)
     // The DLC's museum plaza has no villages: its buildings are crates and a pedestal.
     expect(codes('fe14-dlc-6b').filter((c) => /^r[a-r]$/.test(c))).toHaveLength(0)
   })
@@ -161,9 +164,30 @@ describe("Fates' maps after the user's tenth look", () => {
     expect(at('fe14b-22', 18, 23)).toBe('gb')
   })
 
-  it("keeps Birthright 9's walls a step darker than its floor", () => {
+  it("keeps Birthright 9's and 25's walls a step darker than their floors", () => {
     const lum = (hex: string) => [1, 3, 5].reduce((s, i) => s + parseInt(hex.slice(i, i + 2), 16), 0)
-    for (const id of ['fe14b-9', 'fe14c-18']) expect(lum(map(id).fills!.wa!), id).toBeLessThan(lum(map(id).fills!.t1!))
+    for (const id of ['fe14b-9', 'fe14c-18', 'fe14b-25']) expect(lum(map(id).fills!.wa!), id).toBeLessThan(lum(map(id).fills!.t1!) - 60)
+  })
+
+  it("draws the review's notes of 2026-11-27 as the user saw them", () => {
+    // Birthright 9's flight the gap in its wall (rows 2 and 3), the plain below no step; its challenge and Conquest 18 the same map.
+    for (const id of ['fe14b-9', 'fe14b-9-challenge', 'fe14c-18']) {
+      const stairs = Object.entries(map(id).decor ?? {}).filter(([, d]) => d === 'stairs').map(([k]) => k).sort()
+      expect(stairs, id).toEqual(['12,2', '12,3', '13,2', '13,3', '14,2', '14,3'])
+    }
+    // Birthright 24's four flights, each two tiles by three, whole.
+    expect(Object.values(map('fe14b-24').decor ?? {}).filter((d) => d === 'stairs')).toHaveLength(24)
+    // Conquest 14's boats' ends at the map's edges and the small boat at (23, 4).
+    const c14 = map('fe14c-14').boatEnds ?? {}
+    expect([c14['1,12'], c14['1,13'], c14['25,18'], c14['23,4'], c14['25,4']]).toEqual(['e', 'e', 'w', 'w', 'e'])
+    // Conquest 25's healing hall on the map's stone floor.
+    expect(map('fe14c-25').standOn?.['14,12']).toBe('t1')
+    // Vanguard Dawn's partitions stone, its rubble crates and sandbags, its west breach pointing west.
+    const v = map('fe14-dlc-72')
+    expect(v.wallLooks?.['9,9']).toBe('stone')
+    expect([v.decor?.['1,4'], v.decor?.['22,1'], v.wallLooks?.['16,11'], v.wallLooks?.['4,13']]).toEqual(['crates', 'crates', 'sandbags', 'sandbags'])
+    expect(v.ledgeUp).toEqual({ '4,19': 'w' })
+    expect(map('fe14-dlc-79').wallLooks?.['17,24']).toBe('stone')
   })
 
   it("leaves a challenge's spent village with no house over it bare, and draws Revelation 18's middle sigil there", () => {
