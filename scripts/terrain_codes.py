@@ -241,6 +241,8 @@ GAME['fe2'] = {
     # its masts (castle tiles only fliers cross); its rocky shores and ships' raised decks (mountains); a stone bridge's deck the game
     # codes as castle floor (Regal's slabs, Avo +20).
     'H': 't8', 'D': 't3', 'o': 'o1', '4': 'w4', 'y': 'na', 'Y': 'nb', 'Q': 'nc',
+    # Its forts (tile $DA) the supply tile, as Echoes' supplies (the user's final pass: not really forts).
+    'U': 'nd',
 }
 
 # Awakening (scripts/build-fe13-maps.py): every tile that only fliers cross is a wall to the rest (cliffs, peaks, hills, buildings, bones,

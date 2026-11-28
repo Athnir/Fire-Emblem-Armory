@@ -146,7 +146,9 @@ describe("Gaiden's battles", () => {
   })
 
   it("gives its forts and swamps the turn's healing and damage, in HP", () => {
-    expect(FE2_TERRAIN.bb).toMatchObject({ name: 'Fort', avo: 40, heal: 5 })
+    // Its forts the supply tile, as Echoes' supplies, which remake them, with a fort's numbers (the user's final pass, 2026-11-27).
+    expect(FE2_TERRAIN.nd).toMatchObject({ name: 'Supplies', avo: 40, heal: 5 })
+    expect(FE2_TERRAIN.bb).toBeUndefined()
     expect(FE2_TERRAIN.df).toMatchObject({ name: 'Swamp', heal: -5 })
     expect(FE2_TERRAIN.b2).toMatchObject({ name: 'Grave', avo: 60 })
   })
@@ -208,7 +210,7 @@ describe("Gaiden's maps drawn as the game draws them (scripts/fe2_art.py)", () =
     // Walls inside a castle or a dungeon stay walls; the fort of four corner walls round a cross of floor (Act 4) is drawn whole.
     for (const id of ['fe2-1-7', 'fe2-d23', 'fe2-4a-8']) expect(codes(id).some((c) => /^[cq][a-i]$/.test(c)), id).toBe(false)
     expect([at('fe2-4a-3', 23, 12), at('fe2-4a-3', 25, 12), at('fe2-4a-3', 23, 10), at('fe2-4a-3', 25, 10)]).toEqual(['qa', 'qc', 'qg', 'qi'])
-    expect(at('fe2-4a-3', 24, 11)).toBe('bb')
+    expect(at('fe2-4a-3', 24, 11)).toBe('nd')
   })
 })
 

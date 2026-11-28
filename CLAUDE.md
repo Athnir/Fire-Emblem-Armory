@@ -323,7 +323,7 @@ new game, so the same fixes don't have to be caught again. When the user settles
   fort's pieces, `g` ground drawn as the map's art shows it with the numbers of the terrain the game calls it (`ga` a plain's dirt,
   `gb` a town's paving, `gf` a road's paving, `gg` a road drawn as grass, `gh` a road of boards), `n` more bonus tiles (the `b` group
   is full: `na` a mountain drawn as a rocky shore, `nb` as a ship's raised deck, `nc` a castle floor as a stone bridge's deck, `nd`
-  supplies that work as a fort: Echoes' 補給, Gaiden's forts in the final pass, the user: not really forts), `x`
+  supplies that work as a fort: Echoes' 補給, Gaiden's forts since the final pass, 2026-11-27, the user: not really forts), `x`
   more objects (the `o` group is full: `xa` an obstacle, Fates' 障害物, its own mark: the user); the second numbers it (a-z, 0-9). Each code means
   one thing in every game; a new kind of tile gets a new code in its group, and each game maps its own tiles onto the codes there.
 - **Walls are drawn by what they are on the map** (the user's call: so a ruin in a forest reads as a ruin and a castle as a castle):

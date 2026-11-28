@@ -151,6 +151,10 @@ ARMY_MAX = 16 + 3
 def tile_info(tile, groups):
     code = TILES[tile]
     letter, name = CODE_LETTER[code]
+    if tile == FORT_TILE:
+        # The supply tile, as Shadows of Valentia, which remakes them, draws its supplies (a fort's numbers: the user, 2026-11-27,
+        # "a supply tile variant for the fort that we can use for 2 and 15 ... they are not really fort tiles").
+        letter, name = 'U', 'Supplies'
     if code == 9:
         letter = '_' if tile == VOID_TILE else 'K'
     elif code == 13:
