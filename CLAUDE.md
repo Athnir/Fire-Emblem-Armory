@@ -463,14 +463,18 @@ new game, so the same fixes don't have to be caught again. When the user settles
   door mat (`map_pieces.village_houses`: the user, Chapter 8's villages), and a building fliers cross (the DLC's and Paralogues 2, 3,
   13, 18 and 20's `w8`, the game's walled compound of three little houses round a yard, the zoomed-out villages: the user, in the
   game, 2026-11-26, Champions of Yore's and Lost Bloodlines'; the paralogues stand the same building) Shadow Dragon's and New Mystery's
-  walled compound (`va`-`vi` on a map of `walledVillages`, a piece a tile: the user, 'you can use the ones from 11 and 12'), the
-  village below its gate its door mat, or over a castle gate the castle drawn whole (`ca`-`ci`), the gate its front (the user:
-  villages and forts), each with the building's numbers (`fliers_buildings`); its towns' paler ground is cobbles (`gb`, the plain's
+  walled compound (`va`-`vi` on a map of `walledVillages`, a piece a tile: the user, 'you can use the ones from 11 and 12'), but one
+  whose village stands before it, its door mat, the village's house drawn whole as Chapter 8's are (the user's review, 2026-11-27:
+  "swap the village back to the house if it has its interact tile in front of it instead of on top of it", every such village in the
+  game), or over a castle gate the castle drawn whole (`ca`-`ci`), the gate its front (the user: villages and forts), each with the
+  building's numbers (`fliers_buildings`, the houses' through the map's overrides); its towns' paler ground is cobbles (`gb`, the plain's
   numbers: the user's calls, Chapter 2's roads), and the cobbles those two looks don't find are found each its own way in its render
   (`fe13_ground.PAVING`: the Prologue's causeways by their busy grey stone, Chapter 1's cracked red ground by its warmth, Chapter 9's
   paved floor inside its ruin and Chapter 22's road through the dunes read off their renders), Chapter 3's snowy courtyard its floor's
   cobbles (`t4`); where the sorting finds more cobbles than a town has, the user's own road (`ROAD_ONLY`: Chapter 2's up its middle,
-  the rest grass), and a stone patch it misses marked by hand (`COBBLES`: Paralogue 17's); Chapter 9's bones, which its scene draws as rocks, are rocks (`decor`, the bones' numbers: the user); a block of its
+  the rest grass), and a stone patch it misses marked by hand (`COBBLES`: Paralogue 17's; the Prologue's road along its bottom and left
+  edges, the user's review, 2026-11-27, and its (3, 6) grass, `NOT_COBBLES`); the Hot-Spring Scramble's cliffs along its spring drawn
+  as its water, their numbers kept (`LOOKS_AS`: "just water, looks like cliffs from stage effects"); Chapter 9's bones, which its scene draws as rocks, are rocks (`decor`, the bones' numbers: the user); a block of its
   supplies one heap of crates, a lone one a crate (Chapters 12 and 15: the user, a 2x2 of boxes); Paralogue 21's block of partitions
   its sarcophagus drawn whole, and The Future Past 3's partitions rubble, as their scenes show them (`decor`, the user); an islet
   that erupts on its turn (Chapter 18's lava floor) marked as a script's change, not a flame (the user: flames read as tiles that

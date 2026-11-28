@@ -753,19 +753,23 @@ describe("Awakening's towns, buildings and scenery drawn as its scenes show them
     expect(codes('fe13-3').filter((c) => c === 't4').length).toBeGreaterThan(100)
     expect(codes('fe13-3')).not.toContain('t1')
   })
-  it('draws a building fliers cross over a village as the walled compound it is, and one over a gate as the castle, each with the building\'s numbers', () => {
-    // The zoomed-out villages, drawn as the DS games' walled compounds (the user, in the game, 2026-11-26), a village before the gate
-    // its door mat.
+  it('draws a building fliers cross with a village before it as its house, any other as the walled compound, and one over a gate as the castle, each with the building\'s numbers', () => {
+    // A building whose village stands before it, its door mat, is the village's house drawn whole (the user's review, 2026-11-27:
+    // "swap the village back to the house if it has its interact tile in front of it instead of on top of it"), as Chapter 8's are.
     for (const id of ['fe13-dlc1', 'fe13-dlc7', 'fe13-par13', 'fe13-par18', 'fe13-par2', 'fe13-par3', 'fe13-par20']) {
       expect(codes(id), id).not.toContain('w8')
-      expect(map(id).walledVillages, id).toBe(true)
-      expect(codes(id).some((c) => /^v[a-i]$/.test(c)), id).toBe(true)
-      for (const c of new Set(codes(id).filter((c) => /^v[a-i]$/.test(c))))
-        expect(terrainInfo(map(id), c).move, `${id} ${c}`).toEqual(FE13_TERRAIN.w8!.move)
+      const houses = new Set(codes(id).filter((c) => /^r[a-r]$/.test(c)))
+      expect(houses.size, id).toBeGreaterThan(0)
+      for (const c of houses) expect(terrainInfo(map(id), c).move, `${id} ${c}`).toEqual(FE13_TERRAIN.w8!.move)
       const villages = map(id).objects.filter((o) => o.type === 'village')
       expect(villages.length, id).toBeGreaterThan(0)
       for (const v of villages) expect(doorMat(map(id), v.tile), `${id} ${tileKey(v.tile)}`).toBe(true)
     }
+    // The zoomed-out villages with no village before them stay the DS games' walled compounds (the user, in the game, 2026-11-26).
+    expect(map('fe13-dlc1').walledVillages).toBe(true)
+    const yards = new Set(codes('fe13-dlc1').filter((c) => /^v[a-i]$/.test(c)))
+    expect(yards.size).toBeGreaterThan(0)
+    for (const c of yards) expect(terrainInfo(map('fe13-dlc1'), c).move, c).toEqual(FE13_TERRAIN.w8!.move)
     // Chapter 8's desert villages are another building (walls): houses drawn whole, not compounds.
     expect(map('fe13-8').walledVillages).toBeUndefined()
     // The keeps over their gates: the DLC's islands and Paralogue 18.

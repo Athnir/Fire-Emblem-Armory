@@ -1780,7 +1780,9 @@ def renown_rewards():
 def main():
     global GENERIC_LABELS, ARMY_LABELS, FACELESS
     GENERIC_LABELS, ARMY_LABELS, FACELESS = generic_labels()
+    global TERRAIN_INFO
     info, groups = build_terrain()
+    TERRAIN_INFO = info
     # A plain its art draws as dirt (art_ground) works as a plain.
     info['ga'] = {**info[encode(GAME, '.')], 'name': 'Plain'}
     info['t2'] = {**info[encode(GAME, '.')], 'name': 'Plain'}  # a snowy map's snow (fe13_ground's dirtAs)
@@ -1980,7 +1982,10 @@ PAVED_FLOORS = {'fe13-12', 'fe13-3'}
 # other cobble tile its grass (Chapter 2: the road runs up the middle). And a stone patch the sorting missed (Paralogue 17's at (15, 19),
 # its colour off its render): cobbles, with the plain's numbers.
 ROAD_ONLY = {'fe13-2': [(8, 3, 9, 7), (9, 8, 10, 17), (9, 18, 9, 20), (8, 20, 8, 20), (7, 1, 7, 3)]}
-COBBLES = {'fe13-par17': ([(13, 18, 17, 21), (14, 16, 16, 17)], '#99906c')}
+COBBLES = {'fe13-par17': ([(13, 18, 17, 21), (14, 16, 16, 17)], '#99906c'),
+           # The prologue's road along its bottom and left edges and the corners of its stone (the user's review, 2026-11-27), in the
+           # map's own paving colour.
+           'fe13-prologue': ([(1, 1, 1, 9), (1, 1, 10, 1), (2, 2, 2, 2), (10, 2, 10, 2), (1, 13, 1, 13), (4, 13, 6, 13)], None)}
 
 
 # Maps whose bones its scene draws as rocks (the user, Chapter 9: no bones, those are rocks): drawn as boulders, the bones' numbers kept.
@@ -2019,7 +2024,7 @@ STEPS = {
     'fe13-prologue': [(3, 2, 10, 2), (2, 3, 2, 9)],
     'fe13-3': [(2, 7, 2, 8), (20, 7, 20, 8)],
     'fe13-6': [(3, 5, 4, 6), (18, 5, 19, 6), (3, 11, 4, 12), (11, 11, 11, 12), (18, 11, 19, 12)],
-    'fe13-9': [(18, 12, 18, 13)],
+    'fe13-9': [(18, 10, 18, 14)],
     'fe13-15': [(15, 7, 16, 8)],
     'fe13-17': [(12, 4, 14, 4), (21, 4, 23, 4), (2, 5, 3, 5), (2, 7, 3, 8), (20, 7, 24, 7), (5, 9, 6, 9), (17, 9, 18, 10), (20, 9, 24, 9), (2, 20, 3, 20), (13, 20, 13, 20), (17, 20, 18, 20)],
     'fe13-20': [(6, 1, 6, 2), (16, 1, 16, 2), (10, 3, 12, 4), (2, 4, 3, 6), (19, 4, 20, 6), (2, 11, 3, 12), (19, 11, 20, 12), (7, 12, 15, 14), (5, 20, 5, 21), (17, 20, 17, 21), (7, 24, 15, 25)],
@@ -2107,7 +2112,7 @@ def fliers_buildings(m):
     building's numbers."""
     rows = [[r[i:i + 2] for i in range(0, len(r), 2)] for r in m['grid']]
     h, w = len(rows), len(rows[0]) if rows else 0
-    seen, castles, houses = set(), set(), set()
+    seen, castles, houses, homes = set(), set(), set(), set()
     for y in range(h):
         for x in range(w):
             if rows[y][x] != 'w8' or (x, y) in seen:
@@ -2125,13 +2130,25 @@ def fliers_buildings(m):
             if len(comp) != bw * bh or not 2 <= bw <= 6 or bh > 4:
                 continue
             below = {rows[max(ys) + 1][xx] for xx in range(min(xs), max(xs) + 1)} if max(ys) + 1 < h else set()
-            (castles if 'bd' in below else houses).update(comp)
-    if not castles and not houses:
+            # Its village just below it, the visit its door mat: the village's house drawn whole, as Chapter 8's are (the user's review,
+            # 2026-11-27: "swap the village back to the house if it has its interact tile in front of it instead of on top of it").
+            (castles if 'bd' in below else homes if below & set(map_pieces.VILLAGES) else houses).update(comp)
+    if not castles and not houses and not homes:
         return m
     if any(c[0] == 'v' and c[1] in 'abcdefghi' for r in rows for c in r):
         raise SystemExit(f"{m['id']}: village pieces already on the map: the buildings' numbers can't share the codes")
-    marked = [''.join('XC' if (x, y) in castles else 'XV' if (x, y) in houses else c for x, c in enumerate(r)) for y, r in enumerate(rows)]
-    m['grid'] = map_pieces.place(map_pieces.place(marked, 'XC', 'c', {'XC'}), 'XV', 'v', {'XV'})
+    if homes and any(c[0] == 'r' and c[1] in 'abcdefghijklmnopqr' for r in rows for c in r):
+        raise SystemExit(f"{m['id']}: houses over walls already on the map: a house over a building fliers cross can't share their codes")
+    marked = [''.join('XC' if (x, y) in castles else 'XV' if (x, y) in houses else 'XH' if (x, y) in homes else c for x, c in enumerate(r))
+              for y, r in enumerate(rows)]
+    m['grid'] = map_pieces.place(map_pieces.place(map_pieces.place(marked, 'XC', 'c', {'XC'}), 'XV', 'v', {'XV'}), 'XH', 'r', {'XH'},
+                                 side_on=True)
+    if homes:
+        # A house drawn over a building fliers cross works as that building, on this map (no house here stands for a wall).
+        used = {r[i:i + 2] for r in m['grid'] for i in range(0, len(r), 2)}
+        over = m.setdefault('terrainOverrides', {})
+        for code in sorted(c for c in used if c[0] == 'r' and len(c) == 2):
+            over[code] = {'move': TERRAIN_INFO['w8']['move'], 'name': 'House'}
     # Drawn as the DS games draw their villages' walled compounds (the user: 'you can use the ones from 11 and 12').
     if houses:
         m['walledVillages'] = True
@@ -2159,7 +2176,7 @@ def encode_grid(m):
                 elif (x, y) in road and c in ('t0', 'ga', 'gb'):
                     rows[h - y][x - 1] = 'gb'
         m['grid'] = [''.join(r) for r in rows]
-        if base in COBBLES:
+        if base in COBBLES and COBBLES[base][1]:
             m['fills'] = {**(m.get('fills') or {}), 'gb': COBBLES[base][1]}
     # A building over a village is the village's house, drawn whole (map_pieces.village_houses: the user, Chapter 8's villages); a
     # ship's floor its deck (map_pieces.ship_decks: the user, wood for a ship's deck).
@@ -2199,9 +2216,12 @@ BOLD_FENCES = {'fe13-par5'}
 RUINS = {'fe13-19': [(14, 9, 16, 11)]}
 RUIN_WALLS = {'fe13-par23'}
 # a road's tiles its art draws as the dunes round it (Chapter 22's top), its plain;
-NOT_COBBLES = {'fe13-22': [(13, 15), (14, 15), (15, 15), (14, 16), (15, 16)]}
+NOT_COBBLES = {'fe13-22': [(13, 15), (14, 15), (15, 15), (14, 16), (15, 16)], 'fe13-prologue': [(3, 6)]}
 # partitions its scene draws as boulders and as large stone rubble (the Hot-Spring Scramble's, Apotheosis'), each keeping its numbers;
 PARTITION_DECOR = {'fe13-dlc23': {(1, 1, 21, 22): 'rock'}, 'fe13-dlc19': {(1, 1, 30, 30): 'slab'}}
+# tiles the game calls one thing that its scene draws as another, drawn so, their numbers kept (the Hot-Spring Scramble's cliffs along its
+# spring, which are its water: the user's review, 2026-11-27, "just water, looks like cliffs from stage effects");
+LOOKS_AS = {'fe13-dlc23': {(x, y): 'tg' for x in (1, 2, 3) for y in range(16, 22)}}
 # A map with no dirt, its plain grass throughout (the Summer Scramble: the user, the sunlight's shine read as dirt); a map with no grass,
 # its few plain tiles drawn as the stone floor round them, named as the game names them (Roster Rescue: plain and floor work alike);
 # the Harvest Scramble's cobbled streets outside its plaza's steps, its floor's numbers (x0, y0, x1, y1); a floor tile walls and the
@@ -2311,6 +2331,9 @@ def user_notes(m):
     for x, y in NOT_COBBLES.get(base, []):
         assert rows[h - y][x - 1] == 'gb', (base, x, y)
         rows[h - y][x - 1] = 't0'
+    for (x, y), code in LOOKS_AS.get(base, {}).items():
+        assert rows[h - y][x - 1][0] == 'w', (base, x, y)
+        m.setdefault('looksAs', {})[f'{x},{y}'] = code
     for rect, kind in PARTITION_DECOR.get(base, {}).items():
         for x, y in tiles([rect]):
             if rows[h - y][x - 1] == 'wg':
